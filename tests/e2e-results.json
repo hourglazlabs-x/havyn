@@ -1,0 +1,182 @@
+[
+ {
+  "check": "first screen under 1 s (6x CPU throttle)",
+  "pass": true,
+  "detail": "195 ms normal, 452 ms throttled"
+ },
+ {
+  "check": "service worker controls the page",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "check": "card 'cpr' in 2 taps",
+  "pass": true,
+  "detail": "Tap and shout. Breathing normally?"
+ },
+ {
+  "check": "card 'cpr' shows source + checked date",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "check": "card 'cprchild' in 2 taps",
+  "pass": true,
+  "detail": "Tap and shout. Breathing normally?"
+ },
+ {
+  "check": "card 'cprchild' shows source + checked date",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "check": "card 'choking' in 2 taps",
+  "pass": true,
+  "detail": "Ask: are you choking?"
+ },
+ {
+  "check": "card 'choking' shows source + checked date",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "check": "card 'bleeding' in 2 taps",
+  "pass": true,
+  "detail": "Make sure you are safe. Call 911"
+ },
+ {
+  "check": "card 'bleeding' shows source + checked date",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "check": "card 'anaphylaxis' in 2 taps",
+  "pass": true,
+  "detail": "Spot it"
+ },
+ {
+  "check": "card 'anaphylaxis' shows source + checked date",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "check": "card 'stroke' in 2 taps",
+  "pass": true,
+  "detail": "B: Balance"
+ },
+ {
+  "check": "card 'stroke' shows source + checked date",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "check": "card 'heatstroke' in 2 taps",
+  "pass": true,
+  "detail": "Spot it"
+ },
+ {
+  "check": "card 'heatstroke' shows source + checked date",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "check": "card 'co' in 2 taps",
+  "pass": true,
+  "detail": "Everyone outside now"
+ },
+ {
+  "check": "card 'co' shows source + checked date",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "check": "card 'burns' in 2 taps",
+  "pass": true,
+  "detail": "Stop the burning"
+ },
+ {
+  "check": "card 'burns' shows source + checked date",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "check": "card 'seizure' in 2 taps",
+  "pass": true,
+  "detail": "Ease them to the ground"
+ },
+ {
+  "check": "card 'seizure' shows source + checked date",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "check": "CPR beat step shows the metronome",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "check": "autonomy computed for example",
+  "pass": true,
+  "detail": "[6.105263157894737, 'food']"
+ },
+ {
+  "check": "playbook tick persists after reload",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "check": "person saved",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "check": "item from preset + log use",
+  "pass": true,
+  "detail": "1 -> 0.5"
+ },
+ {
+  "check": "memory card file written",
+  "pass": true,
+  "detail": "3752 bytes"
+ },
+ {
+  "check": "erase empties the phone",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "check": "memory card round trip has zero data loss",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "check": "merge keeps the newest edit",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "check": "works offline after first install",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "check": "emergency card offline",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "check": "CSP blocks fetch (external + same-origin) and external images",
+  "pass": true,
+  "detail": "['blocked https://example.com/x', 'blocked /index.html']; violations=['connect-src https://example.com/x', 'connect-src http://localhost:8765/index.html', 'img-src https://example.com/pixel.png']"
+ },
+ {
+  "check": "no external requests during the whole session",
+  "pass": true,
+  "detail": "[]"
+ },
+ {
+  "check": "no script errors",
+  "pass": true,
+  "detail": "['Connecting to \\'https://example.com/x\\' violates the following Content Security Policy directive: \"connect-src \\'none\\'\". The action has been blocked.', \"Fetch API cannot load https://example.com/x. Refused to connect because it violates the document's Content Security Policy.\", 'Connecting to \\'http://localhost:8765/index.html\\' violates the following Content Security Policy directive: \"connect-src \\'none\\'\". The action has been blocked.', \"Fetch API cannot load http://localhost:8765/index.html. Refused to connect because it violates the document's Content Security Policy.\", 'Loading the image \\'https://example.com/pixel.png\\' violates the following Content Security Policy directive: \"img-src \\'self\\' data: blob:\". The action has been blocked.']"
+ }
+]

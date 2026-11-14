@@ -1,0 +1,1631 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-3taYEW3DnnX6d5Q3iCVcR79rhr6wyx+o+Jbz82rVb/I='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'none'; font-src 'none'; media-src 'none'; object-src 'none'; frame-src 'none'; worker-src 'self'; manifest-src 'self'; base-uri 'none'; form-action 'none'">
+<title>HAVYN FIELD</title>
+<meta name="theme-color" content="#04050d">
+<meta name="color-scheme" content="dark">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="HAVYN">
+<meta name="referrer" content="no-referrer">
+<meta name="format-detection" content="telephone=no">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<style>
+/* HAVYN FIELD — PS2 void x LABS ANALYTIX white-lab glass. System fonts only. */
+:root {
+  --bg0: #04050d; --bg1: #0a0e24; --bg2: #141c48;
+  --ink: #f3f6ff; --ink2: #c3cbec; --mute: #8590bd;
+  --line: rgba(255,255,255,.13); --line2: rgba(255,255,255,.26);
+  --glass: rgba(255,255,255,.055); --glass2: rgba(255,255,255,.095);
+  --cyan: #5ce8ff; --cyan2: #2fb4ff; --aqua: #a6fff0;
+  --ok: #3de58e; --warn: #ffb547; --crit: #ff4d5e; --none: #69739c; --solar: #ffe066;
+  --red: #ff3347; --red2: #c2102a;
+  --r: 18px;
+  --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+  --sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", system-ui, sans-serif;
+  --st: env(safe-area-inset-top, 0px); --sb: env(safe-area-inset-bottom, 0px);
+  color-scheme: dark;
+}
+body.night {
+  --bg0: #000; --bg1: #000; --bg2: #120000;
+  --ink: #ff5b4e; --ink2: #e0463b; --mute: #a8382f;
+  --line: rgba(255,80,64,.22); --line2: rgba(255,80,64,.42);
+  --glass: rgba(255,40,30,.05); --glass2: rgba(255,40,30,.09);
+  --cyan: #ff5b4e; --cyan2: #d93a2e; --aqua: #ff7a6e;
+  --ok: #ff5b4e; --warn: #ff5b4e; --crit: #ff8a80; --none: #7a2620; --solar: #ff5b4e;
+  --red: #ff5b4e; --red2: #8f1a12;
+}
+html { font: -apple-system-body; font-size: 100%; -webkit-text-size-adjust: 100%; }
+* { box-sizing: border-box; }
+body {
+  margin: 0; min-height: 100vh; background: var(--bg0); color: var(--ink);
+  font-family: var(--sans); line-height: 1.35; -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent; overscroll-behavior-y: none;
+}
+button, input, select, textarea { font: inherit; color: inherit; }
+a { color: var(--cyan); }
+.mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.lab { font-family: var(--mono); font-size: .68rem; letter-spacing: .16em; text-transform: uppercase; color: var(--mute); }
+.hide { display: none !important; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+
+/* ---------- the void ---------- */
+.void { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none;
+  background:
+    radial-gradient(110% 55% at 50% -5%, #1b2a6e 0%, rgba(20,28,72,.35) 38%, rgba(4,5,13,0) 68%),
+    radial-gradient(80% 45% at 50% 108%, #0f2257 0%, rgba(4,5,13,0) 70%),
+    linear-gradient(180deg, #04050d 0%, #060920 55%, #04050d 100%); }
+.void::before { content: ""; position: absolute; left: -20%; right: -20%; top: 38%; height: 30%;
+  background: radial-gradient(50% 50% at 50% 50%, rgba(92,232,255,.10), rgba(92,232,255,0) 70%); filter: blur(8px); }
+.void i { position: absolute; width: 3px; height: 3px; border-radius: 50%; background: rgba(166,240,255,.75);
+  box-shadow: 0 0 8px rgba(92,232,255,.9); opacity: .0; animation: mote 22s linear infinite; }
+@keyframes mote { 0% { transform: translate3d(0, 20px, 0); opacity: 0; } 15% { opacity: .8; } 85% { opacity: .6; } 100% { transform: translate3d(14px, -160px, 0); opacity: 0; } }
+body.night .void, body.em .void { background: #000; }
+body.night .void i, body.night .void::before, body.em .void i, body.em .void::before { display: none; }
+
+/* ---------- shell ---------- */
+#app { max-width: 560px; margin: 0 auto; padding: calc(var(--st) + 10px) 16px calc(var(--sb) + 104px); }
+.top { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 2px 0 14px; }
+.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); }
+.brand svg { width: 26px; height: 26px; }
+.brand b { font-weight: 650; letter-spacing: .34em; font-size: .95rem; }
+.brand span { font-family: var(--mono); font-size: .66rem; letter-spacing: .2em; color: var(--cyan); margin-left: -4px; }
+.ibtn { width: 44px; height: 44px; display: inline-grid; place-items: center; border-radius: 14px; border: 1px solid var(--line);
+  background: var(--glass); color: var(--ink2); }
+.ibtn svg { width: 22px; height: 22px; }
+.ibtn.on { color: var(--cyan); border-color: var(--line2); }
+.tools { display: flex; gap: 8px; }
+
+/* glass: Frutiger Aero sheen with a thin white mirror edge */
+.glass { position: relative; background: linear-gradient(180deg, var(--glass2), var(--glass) 46%, rgba(255,255,255,.02));
+  border: 1px solid var(--line); border-radius: var(--r);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.22), inset 0 -1px 0 rgba(255,255,255,.04), 0 14px 34px rgba(0,0,0,.38);
+  -webkit-backdrop-filter: blur(14px) saturate(140%); backdrop-filter: blur(14px) saturate(140%); }
+.glass::before { content: ""; position: absolute; inset: 1px 1px 52% 1px; border-radius: calc(var(--r) - 1px) calc(var(--r) - 1px) 40% 40% / calc(var(--r) - 1px) calc(var(--r) - 1px) 18px 18px;
+  background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,0)); pointer-events: none; }
+body.night .glass { box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
+body.night .glass::before { display: none; }
+.panel { padding: 16px; margin: 0 0 12px; }
+.panel h3 { margin: 0 0 10px; font-size: .78rem; font-family: var(--mono); letter-spacing: .16em; text-transform: uppercase; color: var(--ink2); font-weight: 600; }
+
+/* ---------- hero ---------- */
+.hero { padding: 18px 18px 16px; }
+.hero .num { display: flex; align-items: baseline; gap: 10px; margin: 4px 0 2px; }
+.hero .big { font-family: var(--mono); font-size: 3.6rem; font-weight: 300; letter-spacing: -.02em; line-height: 1; }
+.hero .unit { font-family: var(--mono); letter-spacing: .2em; font-size: .8rem; color: var(--ink2); }
+.hero .sub { color: var(--ink2); font-size: .92rem; }
+.chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px; border-radius: 999px; border: 1px solid var(--line2);
+  font-family: var(--mono); font-size: .64rem; letter-spacing: .14em; text-transform: uppercase; color: var(--ink2); background: rgba(255,255,255,.04); vertical-align: middle; }
+.chip.ok { color: var(--ok); border-color: color-mix(in srgb, var(--ok) 45%, transparent); }
+.chip.warn { color: var(--warn); border-color: color-mix(in srgb, var(--warn) 45%, transparent); }
+.chip.crit { color: var(--crit); border-color: color-mix(in srgb, var(--crit) 55%, transparent); }
+.chip.heat { color: var(--warn); }
+.chip.cyan { color: var(--cyan); }
+
+/* ---------- towers ---------- */
+.scene { margin: 2px -8px 8px; }
+.scene svg { display: block; width: 100%; height: auto; overflow: visible; }
+.tw { transform-box: fill-box; transform-origin: 50% 100%; animation: rise .9s cubic-bezier(.2,.8,.2,1) both, float 7s ease-in-out infinite alternate; }
+.tw:nth-of-type(2) { animation-delay: .06s, -1.7s; } .tw:nth-of-type(3) { animation-delay: .12s, -3.4s; } .tw:nth-of-type(4) { animation-delay: .18s, -5.1s; }
+@keyframes rise { from { transform: scaleY(.04); opacity: 0; } to { transform: scaleY(1); opacity: 1; } }
+@keyframes float { from { translate: 0 0; } to { translate: 0 -5px; } }
+.twlink { cursor: pointer; }
+.twlink:focus-visible { outline: 2px solid var(--cyan); }
+
+/* ---------- rows, lists ---------- */
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+.grid2 .panel { margin: 0; }
+.kv { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); }
+.kv:first-of-type { border-top: 0; }
+.kv span:first-child { color: var(--ink2); }
+.alert { display: flex; gap: 12px; align-items: flex-start; padding: 12px 14px; border-radius: 14px; border: 1px solid var(--line); background: rgba(255,255,255,.035); margin-bottom: 8px; text-decoration: none; color: var(--ink); }
+.alert .dot { width: 9px; height: 9px; border-radius: 50%; margin-top: 6px; flex: none; background: var(--warn); box-shadow: 0 0 10px var(--warn); }
+.alert.crit .dot { background: var(--crit); box-shadow: 0 0 10px var(--crit); }
+.alert.info .dot { background: var(--cyan); box-shadow: 0 0 10px var(--cyan); }
+.alert small { display: block; color: var(--mute); margin-top: 2px; }
+.list { display: grid; gap: 8px; }
+.li { display: flex; align-items: center; gap: 12px; padding: 13px 14px; border-radius: 14px; border: 1px solid var(--line);
+  background: rgba(255,255,255,.035); color: var(--ink); text-decoration: none; min-height: 56px; }
+.li .ic { width: 36px; height: 36px; border-radius: 11px; display: grid; place-items: center; flex: none;
+  background: linear-gradient(180deg, rgba(92,232,255,.18), rgba(92,232,255,.05)); border: 1px solid rgba(92,232,255,.28); color: var(--cyan); }
+.li .ic svg { width: 20px; height: 20px; }
+.li .tx { flex: 1; min-width: 0; }
+.li .tx b { display: block; font-weight: 600; }
+.li .tx small { display: block; color: var(--mute); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.li .rt { font-family: var(--mono); color: var(--ink2); text-align: right; font-size: .9rem; }
+.li.soon { opacity: .45; }
+.li > svg { width: 18px; height: 18px; flex: none; color: var(--mute); }
+.btn svg { width: 18px; height: 18px; flex: none; }
+.sec { margin: 18px 2px 8px; display: flex; justify-content: space-between; align-items: center; }
+.empty { color: var(--mute); padding: 6px 2px 2px; }
+
+/* ---------- buttons ---------- */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 18px; border-radius: 999px; cursor: pointer;
+  border: 1px solid rgba(166,240,255,.55); color: #04121c; font-weight: 650; letter-spacing: .02em; text-decoration: none;
+  background: linear-gradient(180deg, #c8fbff 0%, #6fe9ff 48%, #2fb4ff 52%, #57d6ff 100%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.85), 0 6px 18px rgba(47,180,255,.32); }
+.btn.ghost { background: rgba(255,255,255,.05); color: var(--ink); border-color: var(--line2); box-shadow: inset 0 1px 0 rgba(255,255,255,.12); }
+.btn.red { color: #fff; border-color: rgba(255,140,150,.6); background: linear-gradient(180deg, #ff8090 0%, #ff3347 48%, #d11a33 52%, #ff3347 100%); box-shadow: inset 0 1px 0 rgba(255,255,255,.55), 0 6px 20px rgba(255,51,71,.35); }
+.btn.wide { width: 100%; }
+.btn.sm { min-height: 38px; padding: 0 14px; font-size: .88rem; }
+.btn[disabled] { opacity: .45; }
+body.night .btn { background: #1a0000; color: var(--ink); border-color: var(--line2); box-shadow: none; }
+body.night .btn.red { background: #3a0000; }
+.btnrow { display: flex; gap: 10px; flex-wrap: wrap; }
+.btnrow .btn { flex: 1; }
+
+/* ---------- tab bar ---------- */
+.tabbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; padding: 8px 10px calc(var(--sb) + 8px);
+  background: linear-gradient(180deg, rgba(6,9,26,.55), rgba(4,5,13,.92)); border-top: 1px solid var(--line);
+  -webkit-backdrop-filter: blur(18px) saturate(150%); backdrop-filter: blur(18px) saturate(150%); }
+.tabbar nav { max-width: 560px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr 1.25fr 1fr 1fr; align-items: end; gap: 4px; }
+.tab { display: grid; justify-items: center; gap: 3px; padding: 6px 0 2px; color: var(--mute); text-decoration: none; font-family: var(--mono); font-size: .58rem; letter-spacing: .12em; }
+.tab svg { width: 24px; height: 24px; }
+.tab.on { color: var(--cyan); }
+.tab.sos { margin-top: -18px; color: #fff; }
+.tab.sos .disc { width: 62px; height: 62px; border-radius: 22px; display: grid; place-items: center; border: 1px solid rgba(255,160,170,.7);
+  background: linear-gradient(180deg, #ff8a98 0%, #ff3347 46%, #cf1530 54%, #ff3347 100%); box-shadow: inset 0 1px 0 rgba(255,255,255,.6), 0 8px 24px rgba(255,51,71,.45); }
+.tab.sos svg { width: 28px; height: 28px; fill: #fff; stroke: none; }
+.tab.sos span { color: var(--red); font-weight: 700; }
+body.night .tabbar { background: #000; }
+body.night .tab.sos .disc { background: #3a0000; box-shadow: none; border-color: var(--red); }
+body.em .tabbar { display: none; }
+
+/* ---------- forms ---------- */
+.fld { display: grid; gap: 6px; margin-bottom: 12px; }
+.fld > span:first-child { font-family: var(--mono); font-size: .66rem; letter-spacing: .14em; text-transform: uppercase; color: var(--mute); }
+.fld input, .fld select, .fld textarea { width: 100%; min-height: 48px; padding: 11px 13px; border-radius: 12px; border: 1px solid var(--line2);
+  background: rgba(0,0,0,.35); color: var(--ink); font-size: 1rem; }
+.fld textarea { min-height: 84px; resize: vertical; }
+.fld input:focus, .fld select:focus, .fld textarea:focus { outline: none; border-color: var(--cyan); box-shadow: 0 0 0 3px rgba(92,232,255,.18); }
+.fld .hint { color: var(--mute); font-size: .8rem; }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.chk { display: flex; gap: 12px; align-items: flex-start; padding: 12px 0; border-top: 1px solid var(--line); cursor: pointer; }
+.chk:first-of-type { border-top: 0; }
+.chk input { appearance: none; -webkit-appearance: none; width: 26px; height: 26px; flex: none; margin: 0; border-radius: 8px; border: 1.5px solid var(--line2); background: rgba(0,0,0,.3); display: grid; place-items: center; }
+.chk input:checked { background: var(--cyan); border-color: var(--cyan); }
+.chk input:checked::after { content: ""; width: 7px; height: 13px; border: solid #04121c; border-width: 0 3px 3px 0; transform: translateY(-2px) rotate(45deg); }
+.chk .tx b { display: block; font-weight: 600; }
+.chk .tx small { color: var(--mute); display: block; margin-top: 2px; }
+.chk.done .tx b { color: var(--mute); }
+.seg { display: inline-flex; border: 1px solid var(--line2); border-radius: 999px; overflow: hidden; }
+.seg button { border: 0; background: transparent; padding: 8px 14px; color: var(--ink2); font-family: var(--mono); font-size: .7rem; letter-spacing: .12em; }
+.seg button.on { background: var(--cyan); color: #04121c; }
+.filters { display: flex; gap: 8px; overflow-x: auto; padding: 2px 2px 10px; scrollbar-width: none; }
+.filters a { flex: none; text-decoration: none; }
+.filters .chip.on { background: var(--cyan); color: #04121c; border-color: var(--cyan); }
+.toast { position: fixed; left: 50%; bottom: calc(var(--sb) + 112px); transform: translateX(-50%); z-index: 50; padding: 12px 18px; border-radius: 14px;
+  background: rgba(10,16,40,.92); border: 1px solid var(--line2); color: var(--ink); font-weight: 600; box-shadow: 0 10px 30px rgba(0,0,0,.5); max-width: 90vw; }
+.photo { width: 100%; border-radius: 12px; border: 1px solid var(--line); display: block; margin-top: 8px; }
+.danger { color: var(--crit); }
+
+/* ---------- memory card ---------- */
+.mc { display: flex; gap: 14px; align-items: center; }
+.mc .card { width: 54px; height: 70px; border-radius: 8px; flex: none; position: relative;
+  background: linear-gradient(160deg, #e9f2ff, #9fb6d6 55%, #6f86a8); box-shadow: inset 0 1px 0 #fff, 0 6px 16px rgba(0,0,0,.4); }
+.mc .card::after { content: "HAVYN"; position: absolute; left: 6px; right: 6px; bottom: 8px; font: 700 .5rem var(--mono); letter-spacing: .14em; color: #23324d; text-align: center; }
+.mc .card::before { content: ""; position: absolute; left: 8px; right: 8px; top: 8px; height: 22px; border-radius: 3px; background: repeating-linear-gradient(90deg, #c9a24a 0 4px, #8a6a20 4px 6px); opacity: .85; }
+.bar { height: 8px; border-radius: 99px; background: rgba(255,255,255,.08); overflow: hidden; border: 1px solid var(--line); }
+.bar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--cyan2), var(--cyan)); transition: width .5s ease; }
+
+/* ---------- EMERGENCY MODE: no animation, white on black, big type ---------- */
+body.em { background: #000; --ink: #fff; --ink2: #e6e6e6; --mute: #bdbdbd; --line: rgba(255,255,255,.35); --line2: rgba(255,255,255,.6); }
+body.em *, body.em *::before, body.em *::after { animation: none !important; transition: none !important; }
+body.em #app { padding-bottom: calc(var(--sb) + 20px); }
+.emtop { display: flex; gap: 10px; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.emtop .exit { min-height: 52px; padding: 0 18px; border-radius: 14px; border: 2px solid #fff; background: #000; color: #fff; font-weight: 800; font-size: 1.05rem; letter-spacing: .06em; text-decoration: none; display: inline-flex; align-items: center; }
+.emtop .call { min-height: 52px; padding: 0 20px; border-radius: 14px; border: 0; background: var(--red); color: #fff; font-weight: 900; font-size: 1.2rem; letter-spacing: .04em; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
+.emtop .call svg { width: 22px; height: 22px; }
+.emgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.emtile { min-height: 96px; border: 2px solid #fff; border-radius: 16px; background: #000; color: #fff; text-decoration: none; padding: 12px 14px; display: flex; flex-direction: column; justify-content: space-between; }
+.emtile b { font-size: 1.45rem; font-weight: 850; letter-spacing: .01em; line-height: 1.1; }
+.emtile small { color: #cfcfcf; font-size: .85rem; line-height: 1.2; }
+.emtile svg { width: 26px; height: 26px; }
+.emtile.red { background: var(--red); border-color: var(--red); }
+.emhead { font-size: 1rem; color: #cfcfcf; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; display: flex; justify-content: space-between; }
+.emstep { font-size: 2.05rem; font-weight: 850; line-height: 1.12; margin: 12px 0 12px; letter-spacing: -.01em; }
+.emdet { font-size: 1.45rem; line-height: 1.3; color: #fff; font-weight: 500; }
+.emnote { margin-top: 16px; padding: 12px 14px; border: 2px solid #fff; border-radius: 14px; font-size: 1.1rem; }
+.emnav { display: grid; grid-template-columns: 1fr 1.4fr; gap: 10px; margin-top: 20px; }
+.emnav button, .emnav a { min-height: 72px; border-radius: 16px; font-size: 1.35rem; font-weight: 850; border: 2px solid #fff; background: #000; color: #fff; text-decoration: none; display: grid; place-items: center; }
+.emnav .next { background: #fff; color: #000; }
+.emsrc { margin-top: 18px; font-size: .95rem; color: #d0d0d0; line-height: 1.4; }
+.emsrc a { color: #fff; }
+.emlink { margin-top: 14px; display: inline-flex; min-height: 56px; padding: 0 18px; border-radius: 14px; background: var(--red); color: #fff; font-weight: 850; font-size: 1.2rem; align-items: center; text-decoration: none; }
+.dots { display: flex; gap: 6px; margin-top: 8px; }
+.dots i { flex: 1; height: 6px; border-radius: 3px; background: #444; }
+.dots i.on { background: #fff; }
+.beat { margin: 18px auto 6px; width: 190px; height: 190px; border-radius: 50%; border: 6px solid #fff; display: grid; place-items: center; text-align: center; }
+.beat b { font-size: 2.2rem; font-weight: 900; letter-spacing: .06em; }
+.beat small { display: block; font-size: 1rem; color: #ddd; }
+.beat.hit { background: #fff; color: #000; }
+.beat.hit small { color: #000; }
+.cprbar { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 10px; font-size: 1.1rem; }
+.cprbar button { min-height: 52px; padding: 0 16px; border-radius: 14px; border: 2px solid #fff; background: #000; color: #fff; font-weight: 800; }
+.swap { color: #000; background: #fff; border-radius: 10px; padding: 6px 10px; font-weight: 900; }
+body.night.em { --ink: #fff; }
+
+@media (prefers-reduced-motion: reduce) {
+  .tw, .void i { animation: none !important; }
+  .bar i { transition: none; }
+}
+@media (min-width: 420px) { .emstep { font-size: 2.25rem; } }
+
+</style>
+</head>
+<body>
+<div class="void" aria-hidden="true"></div>
+<main id="app"></main>
+<div class="tabbar"><nav aria-label="Main">
+<a class="tab" data-tab="status" href="#/status"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M5 20V12M10 20V6M15 20v-5M20 20V9"/></svg><span>STATUS</span></a>
+<a class="tab" data-tab="playbooks" href="#/playbooks"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H19v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H19v-5"/><path d="M8 7h7M8 10.5h5"/></svg><span>PLAYBOOKS</span></a>
+<a class="tab sos" data-tab="emergency" href="#/emergency"><span class="disc"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 3h4v7h7v4h-7v7h-4v-7H3v-4h7z"/></svg></span><span>EMERGENCY</span></a>
+<a class="tab" data-tab="family" href="#/family"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><circle cx="17.5" cy="9" r="2.4"/><path d="M15.8 14.3A5 5 0 0 1 21 19"/></svg><span>FAMILY</span></a>
+<a class="tab" data-tab="supplies" href="#/supplies"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5z"/><path d="M3 7.5 12 12l9-4.5M12 12v9"/></svg><span>SUPPLIES</span></a>
+</nav></div>
+<noscript><p style="padding:24px;color:#fff">HAVYN FIELD needs JavaScript turned on.</p></noscript>
+<script>/* HAVYN FIELD — protocol content.
+   Every card and playbook line is written from the sources listed with it.
+   "reviewed" = date the text was checked against those sources (an independent pass, 2026-11-14).
+   "gate" = the human review still required before the family relies on it. */
+const HAVYN_CONTENT = {
+  reviewed: "2026-11-14",
+  gate: "Awaiting EMT or nurse review",
+  noSignal: "No signal? Keep dialing 911: it can connect through another carrier. iPhone 14 or later offers Emergency SOS via satellite outdoors. If help truly can't come, get them to the nearest ER.",
+
+  cards: [
+    {
+      id: "cpr", title: "CPR", sub: "Teen or adult not responding, not breathing normally", icon: "heart",
+      steps: [
+        { t: "Tap and shout. Breathing normally?", d: "Not responding and not breathing normally means start CPR. Gasping is not normal breathing." },
+        { t: "Call 911 on speaker", d: "Send someone to find an AED. The dispatcher can coach you." },
+        { t: "Hands on the center of the chest", d: "Heel of one hand, other hand on top. Arms straight, shoulders over your hands." },
+        { t: "Push hard and fast", d: "100 to 120 a minute, to the beat. At least 2 in (5 cm), not more than 2.4 in (6 cm). Let the chest come all the way back up.", beat: 110 },
+        { t: "AED here? Turn it on", d: "Follow its voice. Keep pushing until it tells you to stop." },
+        { t: "Do not stop", d: "Keep going until help takes over or they breathe normally. If someone can take over, switch about every 2 minutes." }
+      ],
+      note: "Trained in breaths? 30 pushes, then 2 breaths. Breaths matter most after drowning, carbon monoxide or choking. Child or baby: use the CPR child card.",
+      sources: [
+        { n: "AHA 2025 guidelines: Adult Basic Life Support", u: "https://cpr.heart.org/en/resuscitation-science/cpr-and-ecc-guidelines/adult-basic-life-support" },
+        { n: "American Heart Association: Hands-Only CPR", u: "https://www.heart.org/-/media/Files/Nation-of-Lifesavers/How-to-Perform-CPR-Infographic.pdf" }
+      ]
+    },
+    {
+      id: "cprchild", title: "CPR child", sub: "Child or baby not responding, not breathing normally", icon: "heart",
+      steps: [
+        { t: "Tap and shout. Breathing normally?", d: "Baby: tap the foot. Not responding and not breathing normally means start CPR. Gasping is not normal breathing." },
+        { t: "Call 911 on speaker", d: "Alone with no phone at hand: give about 2 minutes of CPR first, then go call." },
+        { t: "Hand position", d: "Child: heel of one or two hands, center of the chest. Baby under 1: heel of one hand, center of the chest just below the nipple line." },
+        { t: "Push fast, the right depth", d: "100 to 120 a minute. Child: about 2 in (5 cm). Baby: about 1.5 in (4 cm). Let the chest come all the way back up.", beat: 110 },
+        { t: "If you can: 30 pushes, then 2 breaths", d: "Each breath just enough to make the chest rise. Breaths matter for children and babies." },
+        { t: "Do not stop", d: "Keep going until help takes over or they breathe normally. AED: use it, with child pads if it has them." }
+      ],
+      note: "",
+      sources: [
+        { n: "AHA 2025 guidelines: Pediatric Basic Life Support", u: "https://cpr.heart.org/en/resuscitation-science/cpr-and-ecc-guidelines/pediatric-basic-life-support" },
+        { n: "AHA: Updated CPR guidelines (infant compressions)", u: "https://www.heart.org/en/healthy-living/live-fierce/updated-cpr-guidelines-aim-to-save-more-lives" }
+      ]
+    },
+    {
+      id: "choking", title: "Choking", sub: "Can't breathe, cough or speak", icon: "choke",
+      steps: [
+        { t: "Ask: are you choking?", d: "If they can cough hard or talk, let them keep coughing and stay with them." },
+        { t: "Can't breathe, cough or speak? Call 911", d: "Or have someone else call while you act." },
+        { t: "5 back blows", d: "Stand behind and slightly to the side. Lean them forward. Hit firmly between the shoulder blades with the heel of your hand." },
+        { t: "5 abdominal thrusts", d: "Fist just above the belly button, other hand over it. Quick pulls inward and upward." },
+        { t: "Repeat 5 and 5", d: "Keep alternating until the object comes out or they stop responding." },
+        { t: "Pregnant or too big to reach around?", d: "Use 5 chest thrusts instead: hands at the base of the breastbone, quick hard thrusts." },
+        { t: "They collapse: start CPR", d: "Lower them to the ground, make sure 911 is called, and start CPR. If you see the object in the mouth, take it out. Never sweep blindly with a finger.", link: "cpr" }
+      ],
+      note: "Baby under 1 year: face down along your forearm, head lower than chest. 5 back blows, then turn face up: 5 chest thrusts with the heel of one hand. Repeat. Never abdominal thrusts on a baby. Baby stops responding: start child CPR.",
+      noteLink: "cprchild",
+      sources: [
+        { n: "AHA 2025 adult choking algorithm", u: "https://cpr.heart.org/-/media/CPR-Files/CPR-Guidelines-Files/2025-Algorithms/Algorithm-BLS-Adult-FBAO-250630.pdf" },
+        { n: "AHA 2025 guidelines: choking update", u: "https://newsroom.heart.org/news/updated-cpr-guidelines-tackle-choking-response-opioid-related-emergencies-and-a-revised-chain-of-survival" },
+        { n: "Mayo Clinic: choking first aid (positions)", u: "https://www.mayoclinic.org/first-aid/first-aid-choking/basics/art-20056637" }
+      ]
+    },
+    {
+      id: "bleeding", title: "Bleeding", sub: "Life-threatening bleeding", icon: "drop",
+      steps: [
+        { t: "Make sure you are safe. Call 911", d: "Put on gloves if you have them." },
+        { t: "Find where the blood comes from", d: "Open or cut away clothing to see the wound." },
+        { t: "Press hard with both hands", d: "Directly on the wound, with gauze or any clean cloth. Do not let up." },
+        { t: "Arm or leg? Tourniquet", d: "2 to 3 in above the wound, never on a joint. Tighten until the bleeding stops, even though it hurts." },
+        { t: "Neck, armpit or groin, or no tourniquet? Pack it", d: "Stuff gauze or clean cloth tightly into the wound, then press hard with both hands." },
+        { t: "Note the time. Never loosen it", d: "Write the time on the tourniquet or skin. Still bleeding? Add a second tourniquet above the first." },
+        { t: "Keep pressure until help takes over", d: "Do not lift the packing to check it." }
+      ],
+      note: "Chest or belly wound: press on it and get help fast. Don't pack chest or belly wounds.",
+      sources: [
+        { n: "Stop the Bleed (American College of Surgeons): booklet", u: "https://police.ucsd.edu/_files/Stop-the-Bleed.pdf" },
+        { n: "American Red Cross: how to apply a tourniquet", u: "https://www.redcross.org/take-a-class/resources/articles/how-to-apply-a-tourniquet" },
+        { n: "Stop the Bleed v2.0 course (Arizona DHS)", u: "https://apps.azdot.gov/files/24/aztt/Learn-the-Basics-of-Bleeding-Control-(B-Con)-Course-ADHS.pdf" }
+      ]
+    },
+    {
+      id: "anaphylaxis", title: "Allergy", sub: "Anaphylaxis: severe allergic reaction", icon: "allergy",
+      steps: [
+        { t: "Spot it", d: "After a food, sting or medicine: trouble breathing or wheezing, tight throat, swollen lips or tongue, hives all over, repeated vomiting, pale or blue skin, dizziness or fainting. Or mild signs in two body areas at once." },
+        { t: "Epinephrine now", d: "Auto-injector: middle of the outer thigh, through clothing is fine. Nasal spray: into one nostril. Follow the device's own instructions." },
+        { t: "Call 911. Say anaphylaxis", d: "They need the ER even if they start to feel better." },
+        { t: "Lay them flat, legs raised", d: "Trouble breathing: let them sit up. Vomiting: turn them on their side." },
+        { t: "No better after 5 minutes?", d: "Or getting worse: give a second dose with a new device, if you have one." },
+        { t: "Stops responding, not breathing normally: CPR", d: "Start CPR and keep going until help arrives.", link: "cpr" }
+      ],
+      note: "Epinephrine is the first treatment. Don't rely on antihistamines or inhalers instead.",
+      sources: [
+        { n: "FARE food allergy and anaphylaxis emergency care plan (8/2025)", u: "https://www.vdh.virginia.gov/content/uploads/sites/58/ECP-FAAP-FARE-Food-Allergy-and-Anaphylaxis-Emergency-Care-Plan.pdf" },
+        { n: "2024 AHA and Red Cross first aid guidelines", u: "https://cpr.heart.org/en/resuscitation-science/2024-first-aid-guidelines" },
+        { n: "Cleveland Clinic: how to use an EpiPen", u: "https://health.clevelandclinic.org/how-to-use-an-epipen" }
+      ]
+    },
+    {
+      id: "stroke", title: "Stroke", sub: "BE FAST", icon: "brain",
+      steps: [
+        { t: "B: Balance", d: "Sudden loss of balance or coordination?" },
+        { t: "E: Eyes", d: "Sudden loss or change of vision?" },
+        { t: "F: Face", d: "Ask them to smile. Does one side droop?" },
+        { t: "A: Arms", d: "Ask them to raise both arms. Does one drift down?" },
+        { t: "S: Speech", d: "Slurred, strange, or unable to speak?" },
+        { t: "T: Time to call 911", d: "Any one sign, call now, even if it goes away. Note the time it started or when they were last seen well. Don't drive them yourself unless 911 can't be reached." }
+      ],
+      note: "Tell the dispatcher: I think this is a stroke.",
+      sources: [
+        { n: "American Stroke Association: stroke facts (BE FAST)", u: "https://www.stroke.org/stroke-facts" },
+        { n: "American Stroke Association: warning signs", u: "https://www.stroke.org/en/help-and-support/resource-library/lets-talk-about-stroke/stroke-tia-and-warning-signs" },
+        { n: "CDC: stroke signs (don't drive)", u: "https://www.cdc.gov/stroke/signs-symptoms/index.html" },
+        { n: "Harvard Health: last seen well", u: "https://www.health.harvard.edu/heart-health/recognizing-the-most-common-warning-signs-of-a-stroke" }
+      ]
+    },
+    {
+      id: "heatstroke", title: "Heat stroke", sub: "Hot, confused, collapsing", icon: "sun",
+      steps: [
+        { t: "Spot it", d: "Body 103°F or higher. Hot, red, dry or damp skin. Fast, strong pulse. Confusion or passing out. No thermometer? Confusion in the heat is enough." },
+        { t: "Call 911", d: "Heat stroke is a medical emergency." },
+        { t: "Move them somewhere cooler", d: "Shade, indoors, a cool car parked outside." },
+        { t: "Cool them now", d: "Cold-water immersion up to the neck is best: 15 minutes, or until they are no longer confused. Otherwise soak them with cold water and fan them, and put ice or cold packs on the neck, armpits and groin." },
+        { t: "Give nothing to drink", d: "CDC's rule for heat stroke." },
+        { t: "Keep cooling until they improve or help arrives", d: "Stops responding, not breathing normally: start CPR.", link: "cpr" }
+      ],
+      note: "Alert and thinking clearly, with heavy sweating, cold clammy skin or cramps? Likely heat exhaustion: see the Heat playbook. Any confusion: treat as heat stroke.",
+      sources: [
+        { n: "CDC: heat-related illness", u: "https://www.cdc.gov/disasters/extremeheat/pdf/Heat_Related_Illness.pdf" },
+        { n: "American Red Cross: heat stroke", u: "https://www.redcross.org/take-a-class/resources/learn-first-aid/heat-stroke" },
+        { n: "2024 AHA and Red Cross first aid guidelines (immersion time)", u: "https://cpr.heart.org/en/resuscitation-science/2024-first-aid-guidelines" },
+        { n: "CDC NIOSH: heat illnesses (ice locations)", u: "https://www.cdc.gov/niosh/heat-stress/about/illnesses.html" }
+      ]
+    },
+    {
+      id: "co", title: "CO alarm", sub: "Carbon monoxide", icon: "gas",
+      steps: [
+        { t: "Everyone outside now", d: "Alarm, or headache, dizziness, nausea, confusion. Don't look for the source." },
+        { t: "Call 911 from outside", d: "Tell them a carbon monoxide alarm went off." },
+        { t: "Count everyone, pets too", d: "Do not go back inside for anyone or anything." },
+        { t: "Stay out until responders say it's safe", d: "Don't restart the generator, stove or heater." },
+        { t: "Anyone sick, sleepy or confused?", d: "Tell 911 it may be carbon monoxide. They need medical care. Can't reach 911? Poison Control: 1-800-222-1222." },
+        { t: "Not responding, not breathing normally: CPR", d: "Give breaths if you are trained.", link: "cpr" }
+      ],
+      note: "Generators, grills, camp stoves and cars: never indoors, in a garage, carport or basement, even with doors or windows open. Generators at least 20 ft from doors, windows and vents, exhaust pointed away.",
+      sources: [
+        { n: "Oregon State Fire Marshal: if your CO alarm sounds", u: "https://www.oregon.gov/osfm/education/Pages/carbon-monoxide.aspx" },
+        { n: "CPSC: carbon monoxide questions and answers", u: "https://www.cpsc.gov/Safety-Education/Safety-Education-Centers/Carbon-Monoxide-Information-Center/Carbon-Monoxide-Questions-and-Answers" },
+        { n: "CDC: during a power outage (Poison Control)", u: "https://www.cdc.gov/natural-disasters/response/what-to-do-protect-yourself-during-a-power-outage.html" },
+        { n: "CPSC 2026: generator CO warning", u: "https://www.cpsc.gov/Newsroom/News-Releases/2026/CPSC-Warns-of-Generator-Carbon-Monoxide-and-Fire-Hazards-Ahead-of-Hurricane-Season" }
+      ]
+    },
+    {
+      id: "burns", title: "Burns", sub: "Heat, chemical, electrical", icon: "flame",
+      steps: [
+        { t: "Stop the burning", d: "Away from the heat. Take off jewelry and clothing near the burn, unless it is stuck." },
+        { t: "Cool running water, right away", d: "Cool, not ice. At least 10 minutes, ideally 20. No running water? Use a clean, cool wet cloth. Large burn or small child: watch that they don't get too cold." },
+        { t: "Cover loosely", d: "Clean, dry, non-stick dressing or clean cloth." },
+        { t: "Don't pop blisters", d: "No butter, oil or toothpaste." },
+        { t: "When to call 911", d: "Deep burns, or larger than 3 in. Face, hands, feet, groin or a major joint. Wraps around an arm, leg, chest or neck. Chemical, electrical or explosion burns. Breathed in smoke, or any trouble breathing. Babies, young children and older adults." }
+      ],
+      note: "Chemical burn: protect your hands, brush off dry powder, remove soaked clothing, then rinse with lots of running water for at least 15 minutes. Eye: keep rinsing until help arrives. Electrical burn: make sure the power is off at the source before you touch them. In a blackout it can come back at any moment. Be ready to start CPR.",
+      sources: [
+        { n: "American Red Cross: burns", u: "https://www.redcross.org/take-a-class/resources/learn-first-aid/burns" },
+        { n: "2024 AHA and Red Cross first aid guidelines", u: "https://cpr.heart.org/en/resuscitation-science/2024-first-aid-guidelines" },
+        { n: "American Red Cross: burn cooling advisory", u: "https://www.redcross.org/content/dam/redcross/docs/Burn%20Cooling%E2%80%94ADVISORY.pdf" },
+        { n: "Mayo Clinic: burns first aid", u: "https://www.mayoclinic.org/first-aid/first-aid-burns/basics/art-20056649" }
+      ]
+    },
+    {
+      id: "seizure", title: "Seizure", sub: "Shaking, unresponsive", icon: "pulse",
+      steps: [
+        { t: "Ease them to the ground", d: "Move hard and sharp things away." },
+        { t: "Protect the head", d: "Something soft and flat under the head. Take off glasses. Loosen anything around the neck." },
+        { t: "Turn them on their side", d: "Gently, mouth pointing to the ground, to keep the airway clear." },
+        { t: "Time it. Hands off", d: "Don't hold them down. Put nothing in their mouth." },
+        { t: "Call 911 if", d: "Over 5 minutes. Another seizure soon after. Trouble breathing or waking. Not back to normal. Injured. In water. First seizure. Pregnant or diabetic." },
+        { t: "Stay until they are fully awake", d: "No food or drink until fully alert." }
+      ],
+      note: "Don't give rescue breaths during the seizure. Breathing usually restarts on its own afterward.",
+      sources: [
+        { n: "CDC: first aid for seizures", u: "https://www.cdc.gov/epilepsy/first-aid-for-seizures/index.html" },
+        { n: "Epilepsy Foundation: first aid resources", u: "https://www.epilepsy.com/recognition/first-aid-resources" }
+      ]
+    }
+  ],
+
+  playbooks: [
+    {
+      id: "blackout", title: "Blackout", sub: "Power out at home", icon: "bolt",
+      trigger: "The power is out at home, or the utility reports an outage.",
+      leave: [
+        "Hot weather: an extreme-heat warning and an outage expected past 24 hours.",
+        "Hot inside and anyone is an infant, over 65 or chronically ill.",
+        "Any sign of heat exhaustion.",
+        "A medical device's backup power is running out.",
+        "CO alarm: outside immediately, then follow the CO card."
+      ],
+      phases: [
+        { label: "First 10 minutes", items: [
+          { t: "Start the outage clock", d: "Status switches to consumption mode: run-out dates use what you log.", act: "outage-start" },
+          { t: "Check on everyone", d: "Anyone on powered medical equipment switches to its backup battery now." },
+          { t: "Keep the fridge and freezer shut", d: "Closed fridge: food stays safe about 4 hours. Full freezer about 48 hours, half full about 24.", s: "cdcfood" },
+          { t: "Text family, don't call", d: "Texts get through busy networks more often than calls. 911 is always a call. Phones on Low Power Mode.", s: "fcc" },
+          { t: "Flashlights and headlamps, not candles", s: "cdcpo" },
+          { t: "Unplug appliances and electronics", d: "Power can come back with surges. Leave one lamp switched on so you know when it returns.", s: "fema" }
+        ]},
+        { label: "First hour", items: [
+          { t: "Check the outage map or alerts while data works", d: "Cell towers run on backup batteries, often only a few hours." },
+          { t: "Text your out-of-area contact: OK + location", d: "Family plan, then Contacts." },
+          { t: "Confirm check-in times: 08:00, 12:00, 18:00", d: "5 minutes each. Radios off in between to save battery." },
+          { t: "Summer: open the Heat playbook now", go: "heat" },
+          { t: "If you have a waterBOB, fill it now", d: "While the water pressure holds." }
+        ]},
+        { label: "First day", items: [
+          { t: "Fridge food: toss after 4 hours without power", d: "Meat, fish, eggs, milk, leftovers, cut fruit and vegetables, unless you had a cold source. When in doubt, throw it out.", s: "cdcfood" },
+          { t: "Above 90°F, don't leave food out more than 1 hour", s: "usda" },
+          { t: "Generators, grills, camp stoves: outdoors only", d: "Never indoors, in a garage, carport or basement, even with doors open. Generator at least 20 ft from doors, windows and vents, exhaust pointed away.", s: "co" },
+          { t: "Charge from the power station or a car parked outside", d: "Never run a car in a garage, even with the door open.", s: "cpsc" },
+          { t: "Drink what you need. Don't ration water", d: "Unless the authorities tell you to. In very hot weather, needs can double.", s: "readywater" },
+          { t: "Check on family and neighbors", d: "Older adults and young children are most at risk from heat.", s: "fema" }
+        ]},
+        { label: "Days 2 to 14", items: [
+          { t: "Log what you use in Supplies", d: "Status then shows real run-out dates." },
+          { t: "Freezer food: refreeze only if it still has ice crystals or is 40°F or colder", s: "cdcfood" },
+          { t: "Water or sewer down? Switch to the bucket toilet kit" },
+          { t: "Refrigerated medicine: keep using life-sustaining drugs like insulin until you get a new supply", d: "Check the label or ask a pharmacist how long it lasts unrefrigerated.", s: "cdcpo" },
+          { t: "Every summer morning: check the leave-now rule" }
+        ]}
+      ],
+      sources: ["cdcfood", "usda", "co", "cpsc", "cdcpo", "fcc", "fema", "readywater"]
+    },
+    {
+      id: "heat", title: "Extreme heat", sub: "Phoenix summer, power or AC out", icon: "sun",
+      trigger: "A National Weather Service heat warning, or the house is heating up with no AC.",
+      leave: [
+        "Extreme-heat warning and an outage expected past 24 hours.",
+        "Hot inside and anyone is an infant, over 65 or chronically ill.",
+        "Any sign of heat exhaustion that isn't improving.",
+        "Go early, in daylight, to a place you arranged in advance."
+      ],
+      phases: [
+        { label: "Now", items: [
+          { t: "Confirm where you would go", d: "Family on another grid, a hotel, a cooler town. Public cooling centers hold only a small share of the city." },
+          { t: "Cut heat gain", d: "Close blinds and curtains on sun-facing windows. Reflective covers if you have them." },
+          { t: "Live in the coolest room", d: "Lowest, most interior room. No oven. No hard work at midday." },
+          { t: "Drink water regularly", d: "Don't wait until you are thirsty.", s: "cdcoa" },
+          { t: "Check everyone twice a day", d: "Especially infants, anyone over 65 and anyone chronically ill.", s: "cdcoa" },
+          { t: "Never leave anyone in a parked car", d: "Children and pets included.", s: "cdckc" }
+        ]},
+        { label: "If it keeps getting hotter", items: [
+          { t: "Above 90°F indoors, fans can make it worse", d: "A fan can raise body temperature then. Use cool showers or baths and wet cloths.", s: "cdcab" },
+          { t: "Batteries can't run air conditioning", d: "Save the power station for phones, lights, radios and medical devices." },
+          { t: "Car AC as a short refuge", d: "Parked outdoors only. Never in a garage.", s: "cpsc" }
+        ]},
+        { label: "Know the signs", items: [
+          { t: "Heat exhaustion", d: "Heavy sweating; cold, pale, clammy skin; fast weak pulse; nausea; cramps; tiredness; dizziness; headache; fainting. Move somewhere cooler, loosen clothes, cool wet cloths, sip water. Get help if they vomit, get worse, or it lasts over 1 hour.", s: "cdcillness" },
+          { t: "Heat stroke: 911", d: "103°F or higher; hot, red, dry or damp skin; fast strong pulse; confusion; passing out. Any confusion counts. Call 911 and cool them now.", s: "cdcillness", card: "heatstroke" }
+        ]}
+      ],
+      sources: ["cdcillness", "cdcoa", "cdckc", "cdcab", "cpsc"]
+    },
+    { id: "storm", title: "Monsoon and dust storm", sub: "Coming in v1.1", icon: "wind", soon: true },
+    { id: "smoke", title: "Wildfire smoke or evacuation", sub: "Coming in v1.1", icon: "flame", soon: true },
+    { id: "boil", title: "Boil-water notice", sub: "Coming in v1.1", icon: "drop", soon: true }
+  ],
+
+  refs: {
+    cdcfood: { n: "CDC: keep food safe after an emergency", u: "https://www.cdc.gov/food-safety/foods/keep-food-safe-after-emergency.html" },
+    usda: { n: "USDA FSIS: how temperatures affect food", u: "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/how-temperatures-affect-food" },
+    co: { n: "CDC: avoiding carbon monoxide poisoning", u: "https://www.cdc.gov/natural-disasters/psa-toolkit/avoiding-carbon-monoxide-poisoning.html" },
+    cpsc: { n: "CPSC: carbon monoxide questions and answers", u: "https://www.cpsc.gov/Safety-Education/Safety-Education-Centers/Carbon-Monoxide-Information-Center/Carbon-Monoxide-Questions-and-Answers" },
+    cdcpo: { n: "CDC: what to do during a power outage", u: "https://www.cdc.gov/natural-disasters/response/what-to-do-protect-yourself-during-a-power-outage.html" },
+    fcc: { n: "FCC and FEMA: communicating in an emergency", u: "https://www.fcc.gov/reports-research/guides/tips-communicating-emergency" },
+    fema: { n: "FEMA: be prepared for a power outage", u: "https://www.ready.gov/sites/default/files/2024-03/ready.gov_power-outage_hazard-info-sheet.pdf" },
+    readywater: { n: "Ready.gov: water", u: "https://www.ready.gov/water" },
+    cdcoa: { n: "CDC: heat and older adults", u: "https://www.cdc.gov/heat-health/risk-factors/heat-and-older-adults-aged-65.html" },
+    cdckc: { n: "CDC: keeping cool in a heat wave", u: "https://www.cdc.gov/natural-disasters/psa-toolkit/keeping-cool-in-a-heat-wave.html" },
+    cdcab: { n: "CDC: about heat and your health (fans)", u: "https://www.cdc.gov/heat-health/about/index.html" },
+    cdcillness: { n: "CDC: heat-related illness", u: "https://www.cdc.gov/disasters/extremeheat/pdf/Heat_Related_Illness.pdf" }
+  }
+};
+if (typeof module !== "undefined") module.exports = HAVYN_CONTENT;
+
+/* HAVYN FIELD — autonomy engine and Memory Card merge. Pure functions, no DOM. */
+const HAVYN_ENGINE = (() => {
+  "use strict";
+  // Planning estimates (kcal/day) by age band; each person can override.
+  const KCAL = { infant: 0, child: 1400, teen: 2200, adult: 2000, senior: 1800 };
+  const ETA = 0.85;        // battery-to-device conversion efficiency
+  const PV_DERATE = 0.7;   // portable panel real-world output factor
+  const DAY = 86400000;
+
+  const num = (v) => { const n = Number(v); return Number.isFinite(n) ? n : 0; };
+  const live = (arr) => (Array.isArray(arr) ? arr.filter((r) => r && !r.deleted) : []);
+
+  function seasonOf(settings, now) {
+    const s = (settings && settings.season) || "auto";
+    if (s === "heat" || s === "normal") return s;
+    const m = new Date(now).getMonth() + 1;
+    return m >= 5 && m <= 9 ? "heat" : "normal"; // Phoenix: May–Sep
+  }
+
+  function kcalFor(p) {
+    if (p.kcal !== undefined && p.kcal !== null && p.kcal !== "" && Number.isFinite(Number(p.kcal))) return Number(p.kcal);
+    return KCAL[p.ageBand] !== undefined ? KCAL[p.ageBand] : KCAL.adult;
+  }
+
+  function needs(S, now) {
+    const season = seasonOf(S.settings, now);
+    const m = season === "heat" ? 2 : 1; // gal per person per day
+    const people = live(S.people), pets = live(S.pets);
+    const petGal = pets.reduce((a, p) => a + num(p.weightLb) / 128, 0); // 1 oz per lb per day
+    const settings = S.settings || {};
+    return {
+      season,
+      people: people.length,
+      water: m * people.length + petGal,
+      food: people.reduce((a, p) => a + kcalFor(p), 0),
+      power: num(season === "heat" ? settings.loadWhHeat : settings.loadWhNormal),
+      solar: num(settings.solarW) * num(settings.sunHours) * PV_DERATE
+    };
+  }
+
+  function stock(S) {
+    const items = live(S.items);
+    const sum = (cat, key) => items.filter((i) => i.category === cat)
+      .reduce((a, i) => a + num(i.qty) * num(i.per_unit && i.per_unit[key]), 0);
+    return { water: sum("water", "gal"), food: sum("food", "kcal"), power: sum("power", "wh") };
+  }
+
+  function medsDays(S) {
+    const meds = live(S.items).filter((i) => i.category === "meds" && i.critical && num(i.per_day) > 0);
+    if (!meds.length) return { days: null, item: null };
+    let best = null;
+    for (const i of meds) {
+      const d = (num(i.qty) * num(i.per_unit && i.per_unit.doses)) / num(i.per_day);
+      if (!best || d < best.days) best = { days: d, item: i };
+    }
+    return best;
+  }
+
+  // Actual daily use from the usage log since the outage started (consumption mode).
+  function consumption(S, now) {
+    const o = S.outage || {};
+    if (!o.active || !o.startedAt) return null;
+    const elapsedDays = (now - o.startedAt) / DAY;
+    if (elapsedDays < 0.5) return { elapsedDays, rates: {} };
+    const rates = {};
+    for (const e of live(S.log)) {
+      if (e.t < o.startedAt || !e.res) continue;
+      rates[e.res] = (rates[e.res] || 0) + num(e.amount);
+    }
+    for (const k of Object.keys(rates)) rates[k] = rates[k] / elapsedDays;
+    return { elapsedDays, rates };
+  }
+
+  function daysFor(stockAmt, need) {
+    if (!(need > 0)) return null;
+    return Math.max(0, stockAmt) / need;
+  }
+
+  function autonomy(S, now) {
+    const n = needs(S, now), s = stock(S), c = consumption(S, now);
+    const rate = (k, planned) => (c && c.rates[k] > 0 ? c.rates[k] : planned);
+    const measured = (k) => !!(c && c.rates[k] > 0);
+    const water = daysFor(s.water, rate("water", n.water));
+    const food = daysFor(s.food, rate("food", n.food));
+    const med = medsDays(S);
+    let power = null;
+    const hasPower = live(S.items).some((i) => i.category === "power");
+    if (hasPower || n.power > 0) {
+      const load = rate("power", n.power);
+      const net = load - n.solar;
+      if (!hasPower && !(n.solar > 0)) power = null;
+      else if (net <= 0) power = Infinity;
+      else power = (s.power * ETA) / net;
+    }
+    const parts = [["water", water], ["food", food], ["meds", med.days]].filter((p) => p[1] !== null);
+    let family = null, limiting = null;
+    for (const [k, v] of parts) if (family === null || v < family) { family = v; limiting = k; }
+    return {
+      season: n.season, needs: n, stock: s, consumption: c,
+      water, food, meds: med.days, medsItem: med.item, power, family, limiting,
+      measured: { water: measured("water"), food: measured("food"), power: measured("power") }
+    };
+  }
+
+  function status(days) {
+    if (days === null || days === undefined || Number.isNaN(days)) return "none";
+    if (days >= 14) return "ok";
+    if (days >= 3) return "warn";
+    return "crit";
+  }
+
+  // What to add to reach the target number of days.
+  function gaps(S, now) {
+    const n = needs(S, now), s = stock(S);
+    const T = num((S.settings || {}).targetDays) || 14;
+    const out = [];
+    const g = (k, need, have, unit) => { const gap = Math.max(0, T * need - have); if (need > 0 && gap > 0) out.push({ res: k, gap, unit }); };
+    g("water", n.water, s.water, "gal");
+    g("food", n.food, s.food, "kcal");
+    for (const i of live(S.items).filter((x) => x.category === "meds" && x.critical && num(x.per_day) > 0)) {
+      const have = num(i.qty) * num(i.per_unit && i.per_unit.doses);
+      const gap = Math.max(0, T * num(i.per_day) - have);
+      if (gap > 0) out.push({ res: "meds", gap, unit: "doses", name: i.name, id: i.id });
+    }
+    return { target: T, list: out };
+  }
+
+  function expiring(S, now, within) {
+    const lim = now + (within || 90) * DAY;
+    return live(S.items).filter((i) => i.expires)
+      .map((i) => ({ item: i, at: Date.parse(i.expires + "T12:00:00") }))
+      .filter((x) => Number.isFinite(x.at) && x.at <= lim)
+      .sort((a, b) => a.at - b.at)
+      .map((x) => ({ item: x.item, at: x.at, expired: x.at < now, days: Math.round((x.at - now) / DAY) }));
+  }
+
+  const HOT = /\b(garage|carport|shed|attic|patio|car|truck|trunk|outside|outdoor|yard|porch)\b/i;
+  function hotStorage(S) {
+    return live(S.items).filter((i) => i.location && HOT.test(i.location));
+  }
+
+  function nextCheckin(times, now) {
+    const d = new Date(now);
+    const list = (times || []).map((t) => { const [h, m] = String(t).split(":").map(Number); return Number.isFinite(h) ? h * 60 + (m || 0) : null; })
+      .filter((x) => x !== null).sort((a, b) => a - b);
+    if (!list.length) return null;
+    const mins = d.getHours() * 60 + d.getMinutes() + d.getSeconds() / 60;
+    let next = list.find((x) => x > mins);
+    let add = 0;
+    if (next === undefined) { next = list[0]; add = 1440; }
+    const inMin = Math.round(next + add - mins);
+    const hh = String(Math.floor(next / 60)).padStart(2, "0"), mm = String(next % 60).padStart(2, "0");
+    return { at: hh + ":" + mm, inMin };
+  }
+
+  // ---- Memory Card merge: newest edit of each record wins; deletions travel as tombstones.
+  function mergeColl(a, b) {
+    const map = new Map((Array.isArray(a) ? a : []).filter((r) => r && r.id).map((r) => [r.id, r]));
+    let added = 0, updated = 0;
+    for (const r of Array.isArray(b) ? b : []) {
+      if (!r || typeof r.id !== "string") continue;
+      const l = map.get(r.id);
+      if (!l) { map.set(r.id, r); if (!r.deleted) added++; }
+      else if (num(r.updated) > num(l.updated)) { map.set(r.id, r); updated++; }
+    }
+    return { list: Array.from(map.values()), added, updated };
+  }
+  function mergeOne(a, b) {
+    if (!b || typeof b !== "object") return { rec: a, took: false };
+    if (!a || num(b.updated) > num(a.updated)) return { rec: b, took: true };
+    return { rec: a, took: false };
+  }
+  const COLLS = ["people", "pets", "items", "log"];
+  const SINGLES = ["settings", "plan", "outage", "checks"];
+  function merge(local, incoming) {
+    const out = Object.assign({}, local);
+    const report = { added: 0, updated: 0, sections: [] };
+    for (const k of COLLS) {
+      const r = mergeColl(local[k], incoming[k]);
+      out[k] = r.list; report.added += r.added; report.updated += r.updated;
+      if (r.added || r.updated) report.sections.push(k);
+    }
+    for (const k of SINGLES) {
+      const r = mergeOne(local[k], incoming[k]);
+      out[k] = r.rec; if (r.took && local[k]) { report.updated++; report.sections.push(k); }
+    }
+    return { state: out, report };
+  }
+
+  // Coerce an untrusted Memory Card payload into the expected shape.
+  function sanitize(data) {
+    const str = (v, max) => (v === undefined || v === null ? "" : String(v)).slice(0, max || 2000);
+    const rec = (r) => (r && typeof r === "object" && typeof r.id === "string" ? r : null);
+    const out = {};
+    for (const k of COLLS) out[k] = (Array.isArray(data && data[k]) ? data[k] : []).map(rec).filter(Boolean).slice(0, 20000);
+    for (const k of SINGLES) out[k] = data && data[k] && typeof data[k] === "object" ? data[k] : undefined;
+    for (const p of out.people) { p.name = str(p.name, 120); }
+    for (const i of out.items) { i.name = str(i.name, 160); i.qty = num(i.qty); if (i.per_unit && typeof i.per_unit !== "object") i.per_unit = {}; }
+    return out;
+  }
+
+  return { KCAL, ETA, PV_DERATE, seasonOf, kcalFor, needs, stock, medsDays, consumption, autonomy, status, gaps, expiring, hotStorage, nextCheckin, merge, mergeColl, sanitize, live };
+})();
+if (typeof module !== "undefined") module.exports = HAVYN_ENGINE;
+
+/* HAVYN FIELD — app. Vanilla JS, no network, no dependencies. */
+(() => {
+  "use strict";
+  const C = HAVYN_CONTENT, E = HAVYN_ENGINE;
+  const VERSION = "1.0.0+a05d59015a";
+  const PREVIEW = !!window.HAVYN_PREVIEW;
+  const DAY = 86400000;
+  const t0 = performance.now();
+
+  /* ---------------- utilities ---------------- */
+  const $ = (s, r) => (r || document).querySelector(s);
+  const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
+  const esc = (v) => String(v === undefined || v === null ? "" : v).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+  const now = () => Date.now();
+  const num = (v) => { const n = Number(String(v === undefined || v === null ? "" : v).replace(",", ".").trim()); return Number.isFinite(n) ? n : 0; };
+  const optNum = (v) => (String(v === undefined || v === null ? "" : v).trim() === "" ? "" : num(v));
+  const ymd = (t) => { const d = new Date(t); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); };
+  const fmtDays = (d) => (d === null || d === undefined ? "—" : d === Infinity ? "∞" : d >= 100 ? Math.round(d).toString() : (Math.round(d * 10) / 10).toFixed(1));
+  const fmtN = (n, dp) => { const p = Math.pow(10, dp || 0); const r = Math.round(n * p) / p; return r.toLocaleString("en-US", { maximumFractionDigits: dp || 0 }); };
+  const dur = (ms) => { const s = Math.max(0, Math.floor(ms / 1000)); const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), x = s % 60; return (h > 23 ? Math.floor(h / 24) + "d " + String(h % 24).padStart(2, "0") : String(h).padStart(2, "0")) + ":" + String(m).padStart(2, "0") + ":" + String(x).padStart(2, "0"); };
+  const STATUS_WORD = { ok: "OK", warn: "LOW", crit: "CRITICAL", none: "NO DATA" };
+  const RES = {
+    water: { label: "Water", unit: "gal", key: "gal", icon: "drop" },
+    food: { label: "Food", unit: "kcal", key: "kcal", icon: "food" },
+    meds: { label: "Meds", unit: "doses", key: "doses", icon: "pill" },
+    power: { label: "Power", unit: "Wh", key: "wh", icon: "bolt" },
+    gear: { label: "Gear", unit: "", key: null, icon: "box" }
+  };
+
+  /* ---------------- icons ---------------- */
+  const P = {
+    drop: '<path d="M12 3c3.6 4.6 6 8 6 11a6 6 0 0 1-12 0c0-3 2.4-6.4 6-11z"/>',
+    food: '<path d="M4 11h16a8 8 0 0 1-16 0z"/><path d="M9 7c0-1.4.9-1.8.9-3M13 7c0-1.4.9-1.8.9-3"/>',
+    pill: '<path d="M10.5 3.5a5 5 0 0 1 7 7l-7 7a5 5 0 0 1-7-7z"/><path d="M7 7l7 7"/>',
+    bolt: '<path d="M13 2 4 14h7l-1 8 9-12h-7z"/>',
+    box: '<path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5z"/><path d="M3 7.5 12 12l9-4.5M12 12v9"/>',
+    heart: '<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/><path d="M8 12h2l1-2 2 4 1-2h2"/>',
+    choke: '<circle cx="12" cy="7" r="3.2"/><path d="M6.5 21v-2.5a5.5 5.5 0 0 1 11 0V21"/><path d="M10 14l2 1.6 2-1.6"/>',
+    allergy: '<path d="M14.5 3.5l6 6M17.5 6.5l-9 9-3.5 1 1-3.5 9-9M5 19l-2 2"/>',
+    brain: '<path d="M9 4a3 3 0 0 0-3 3 3 3 0 0 0-2 5 3 3 0 0 0 3 5 3 3 0 0 0 5 1.5V5a3 3 0 0 0-3-1zM12 5a3 3 0 0 1 3-1 3 3 0 0 1 3 3 3 3 0 0 1 2 5 3 3 0 0 1-3 5 3 3 0 0 1-5 1.5"/>',
+    sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+    gas: '<path d="M7 18a4 4 0 0 1-.6-8A5.5 5.5 0 0 1 17 8.6 4.6 4.6 0 0 1 17 18z"/><path d="M9 14h6"/>',
+    flame: '<path d="M12 3c1 3 5 5.2 5 10a5 5 0 0 1-10 0c0-2.5 1.4-4.1 2.5-5 .3 1.6 1 2.6 2 3 .5-2.6-.5-5.4.5-8z"/>',
+    pulse: '<path d="M3 12h4l2-5 3 10 2-6 2 3h5"/>',
+    wind: '<path d="M3 8h11a3 3 0 1 0-3-3M3 12h15a3 3 0 1 1-3 3M3 16h7"/>',
+    people: '<circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><circle cx="17.5" cy="9" r="2.4"/><path d="M15.8 14.3A5 5 0 0 1 21 19"/>',
+    book: '<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H19v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H19v-5"/><path d="M8 7h7M8 10.5h5"/>',
+    towers: '<path d="M5 20V12M10 20V6M15 20v-5M20 20V9"/>',
+    card: '<rect x="5" y="3" width="14" height="18" rx="2.5"/><path d="M8.5 3v4.5M12 3v4.5M15.5 3v4.5"/>',
+    moon: '<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>',
+    cross: '<path d="M10 3h4v7h7v4h-7v7h-4v-7H3v-4h7z"/>',
+    phone: '<path d="M5 3h4l2 5-2.5 1.6a11 11 0 0 0 5.9 5.9L16 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 5a2 2 0 0 1 2-2z"/>',
+    plus: '<path d="M12 5v14M5 12h14"/>',
+    back: '<path d="M15 5l-7 7 7 7"/>',
+    chev: '<path d="M9 5l7 7-7 7"/>',
+    paw: '<circle cx="7" cy="9" r="1.8"/><circle cx="11" cy="6" r="1.8"/><circle cx="15" cy="6.5" r="1.8"/><circle cx="18" cy="10" r="1.8"/><path d="M12 12c-3 0-6 3.5-5 6 1 2 3.5 1 5 1s4 1 5-1c1-2.5-2-6-5-6z"/>',
+    pin: '<path d="M12 21s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/>',
+    gear: '<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9 7 7M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/>'
+  };
+  const ic = (n, cls) => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"' + (cls ? ' class="' + cls + '"' : "") + ">" + (P[n] || "") + "</svg>";
+  const icFill = (n) => '<svg viewBox="0 0 24 24" aria-hidden="true">' + P[n] + "</svg>";
+  const MARK = '<svg viewBox="0 0 26 26" aria-hidden="true"><defs><linearGradient id="mk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d8fdff"/><stop offset="1" stop-color="#2fb4ff"/></linearGradient></defs><rect x="2.5" y="11" width="5" height="12" rx="1.2" fill="url(#mk)" opacity=".55"/><rect x="10.5" y="4" width="5" height="19" rx="1.2" fill="url(#mk)"/><rect x="18.5" y="8" width="5" height="15" rx="1.2" fill="url(#mk)" opacity=".75"/></svg>';
+
+  /* ---------------- storage (IndexedDB, memory fallback) ---------------- */
+  const Store = (() => {
+    let db = null; const mem = {};
+    const open = () => new Promise((res) => {
+      try {
+        const r = indexedDB.open("havyn-field", 1);
+        r.onupgradeneeded = () => r.result.createObjectStore("kv");
+        r.onsuccess = () => { db = r.result; res(true); };
+        r.onerror = r.onblocked = () => res(false);
+      } catch (e) { res(false); }
+    });
+    const tx = (mode, fn) => new Promise((res) => {
+      if (!db) return res(fn(null));
+      try { const t = db.transaction("kv", mode); const s = t.objectStore("kv"); const out = fn(s); t.oncomplete = () => res(out && out.result !== undefined ? out.result : out); t.onerror = () => res(undefined); }
+      catch (e) { res(undefined); }
+    });
+    return {
+      open,
+      get ok() { return !!db; },
+      get: (k) => (db ? tx("readonly", (s) => s.get(k)) : Promise.resolve(mem[k])),
+      set: (k, v) => { mem[k] = v; return db ? tx("readwrite", (s) => { s.put(v, k); return true; }) : Promise.resolve(true); },
+      del: (k) => { delete mem[k]; return db ? tx("readwrite", (s) => { s.delete(k); return true; }) : Promise.resolve(true); },
+      keys: () => (db ? tx("readonly", (s) => s.getAllKeys()) : Promise.resolve(Object.keys(mem)))
+    };
+  })();
+
+  /* ---------------- state ---------------- */
+  const defaults = () => ({
+    settings: { season: "auto", targetDays: 14, loadWhNormal: 300, loadWhHeat: 1080, solarW: 0, sunHours: 6.5, checkins: ["08:00", "12:00", "18:00"], updated: 0 },
+    plan: { contactName: "", contactPhone: "", rally1: "Home", rally2: "", rally3: "", leaveTo: "", leaveNotes: "", gas: "", water: "", power: "", updated: 0 },
+    outage: { active: false, startedAt: 0, endedAt: 0, updated: 0 },
+    checks: { updated: 0 },
+    people: [], pets: [], items: [], log: []
+  });
+  const prefDefaults = () => ({ theme: "void", sound: true, deviceName: "", lastBackup: 0, installHidden: false });
+  let S = defaults(), PR = prefDefaults();
+  let saveTimer = null;
+  function save() { clearTimeout(saveTimer); saveTimer = setTimeout(flush, 120); }
+  function flush() { clearTimeout(saveTimer); Store.set("state", S); Store.set("prefs", PR); }
+  function touch(o) { o.updated = now(); return o; }
+  function upsert(coll, rec) {
+    touch(rec);
+    const i = S[coll].findIndex((r) => r.id === rec.id);
+    if (i >= 0) S[coll][i] = rec; else S[coll].push(rec);
+    save(); requestPersist();
+  }
+  function remove(coll, id) { const i = S[coll].findIndex((r) => r.id === id); if (i >= 0) S[coll][i] = { id, deleted: true, updated: now() }; save(); }
+  function setOne(key, patch) { S[key] = Object.assign({}, S[key], patch); touch(S[key]); save(); }
+  const L = (coll) => E.live(S[coll]);
+  const byId = (coll, id) => L(coll).find((r) => r.id === id);
+
+  let persistAsked = false;
+  function requestPersist() {
+    if (persistAsked || !navigator.storage || !navigator.storage.persist) return;
+    persistAsked = true; navigator.storage.persist().catch(() => {});
+  }
+
+  /* ---------------- sound (synthesized, no files) ---------------- */
+  const Snd = (() => {
+    let ac = null;
+    const ctx = () => {
+      if (!ac) { const A = window.AudioContext || window.webkitAudioContext; if (!A) return null; try { ac = new A(); } catch (e) { return null; } }
+      if (ac.state === "suspended") ac.resume().catch(() => {});
+      return ac;
+    };
+    const tone = (f, t, d, g, type) => {
+      const a = ctx(); if (!a) return;
+      const o = a.createOscillator(), v = a.createGain();
+      o.type = type || "sine"; o.frequency.setValueAtTime(f, t);
+      v.gain.setValueAtTime(0.0001, t); v.gain.exponentialRampToValueAtTime(g, t + 0.008); v.gain.exponentialRampToValueAtTime(0.0001, t + d);
+      o.connect(v).connect(a.destination); o.start(t); o.stop(t + d + 0.03);
+    };
+    const chime = (kind) => {
+      if (!PR.sound || document.body.classList.contains("em")) return;
+      const a = ctx(); if (!a) return; const t = a.currentTime + 0.01;
+      if (kind === "nav") { tone(1318.5, t, 0.16, 0.022); tone(2637, t, 0.09, 0.006); }
+      else if (kind === "ok") [1046.5, 1318.5, 1568].forEach((f, i) => { tone(f, t + i * 0.07, 0.42, 0.028); tone(f * 2.01, t + i * 0.07, 0.25, 0.006); });
+      else if (kind === "save") [784, 1046.5, 1318.5, 1568, 2093].forEach((f, i) => { tone(f, t + i * 0.085, 0.6, 0.026); tone(f * 2.01, t + i * 0.085, 0.3, 0.006); });
+      else if (kind === "warn") { tone(392, t, 0.25, 0.04, "triangle"); tone(330, t + 0.16, 0.35, 0.04, "triangle"); }
+    };
+    const click = (t) => { tone(1760, t, 0.045, 0.32, "square"); tone(880, t, 0.06, 0.18); };
+    return { ctx, chime, click };
+  })();
+
+  // CPR metronome: audio clock drives the clicks; the visual follows the same clock.
+  const Metro = {
+    on: false, sound: true, bpm: 110, nextT: 0, timer: 0, raf: 0, p0: 0, a0: 0, startedAt: 0,
+    start(bpm) {
+      this.stop(); this.bpm = bpm; this.on = true; this.startedAt = now();
+      const a = this.sound ? Snd.ctx() : null;
+      try { if (navigator.audioSession) navigator.audioSession.type = "playback"; } catch (e) {}
+      this.p0 = performance.now() + 60;
+      if (a) { this.a0 = a.currentTime + 0.06; this.nextT = this.a0; this.schedule(); }
+      this.loop();
+    },
+    schedule() {
+      const a = Snd.ctx(); if (!a || !this.on || !this.sound) return;
+      const spb = 60 / this.bpm;
+      while (this.nextT < a.currentTime + 0.25) { Snd.click(this.nextT); this.nextT += spb; }
+      this.timer = setTimeout(() => this.schedule(), 60);
+    },
+    loop() {
+      const el = $(".beat"); if (!el || !this.on) return;
+      const spb = 60 / this.bpm;
+      const a = this.sound ? Snd.ctx() : null;
+      const t = a && a.state === "running" ? a.currentTime - this.a0 : (performance.now() - this.p0) / 1000;
+      const ph = ((t % spb) + spb) % spb / spb;
+      el.classList.toggle("hit", ph < 0.22);
+      const tEl = $("#cprtime");
+      if (tEl) { const s = Math.floor((now() - this.startedAt) / 1000); tEl.textContent = Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0"); const sw = $("#swap"); if (sw) sw.classList.toggle("hide", !(s >= 120 && (s % 120) < 10)); }
+      cancelAnimationFrame(this.raf);
+      this.raf = requestAnimationFrame(() => this.loop());
+    },
+    stop() {
+      this.on = false; clearTimeout(this.timer); cancelAnimationFrame(this.raf);
+      try { if (navigator.audioSession) navigator.audioSession.type = "auto"; } catch (e) {}
+    }
+  };
+
+  // Keep the screen on during emergency screens.
+  const Wake = { lock: null,
+    async on() { try { if (!this.lock && navigator.wakeLock) { this.lock = await navigator.wakeLock.request("screen"); this.lock.addEventListener("release", () => { this.lock = null; }); } } catch (e) {} },
+    off() { try { if (this.lock) this.lock.release(); } catch (e) {} this.lock = null; }
+  };
+
+  /* ---------------- router ---------------- */
+  const app = () => $("#app");
+  let route = { path: "status", parts: [], q: {} };
+  function parseHash() {
+    const h = (location.hash || "#/status").replace(/^#\/?/, "");
+    const [p, qs] = h.split("?");
+    const parts = p.split("/").filter(Boolean);
+    const q = {}; (qs || "").split("&").filter(Boolean).forEach((kv) => { const [k, v] = kv.split("="); q[decodeURIComponent(k)] = decodeURIComponent(v || ""); });
+    return { path: parts[0] || "status", parts, q };
+  }
+  function go(h) { if (location.hash === h) render(); else location.hash = h; }
+
+  const SCREENS = {
+    status: renderStatus, emergency: renderEmergency, playbooks: renderPlaybooks, family: renderFamily, supplies: renderSupplies, system: renderSystem
+  };
+  let lastPath = "";
+  function render() {
+    route = parseHash();
+    const em = route.path === "emergency";
+    document.body.classList.toggle("em", em);
+    document.body.classList.toggle("night", PR.theme === "night");
+    if (em) Wake.on(); else { Wake.off(); Metro.stop(); cardView.id = null; cardView.autoBeat = false; }
+    if (!(route.path === "supplies" && route.parts[1] === "edit")) draft = null;
+    const fn = SCREENS[route.path] || renderStatus;
+    const html = fn();
+    app().innerHTML = html;
+    $$(".tab").forEach((t) => t.classList.toggle("on", t.dataset.tab === route.path));
+    if (lastPath !== location.hash) { window.scrollTo(0, 0); lastPath = location.hash; }
+    afterRender();
+  }
+  function afterRender() {
+    tick();
+    hydratePhotos();
+    if (route.path === "emergency" && cardView.beatStep && Metro.on === false && cardView.autoBeat) { Metro.start(cardView.beatStep); }
+    if (!$(".beat")) Metro.stop(); else if (Metro.on) Metro.loop();
+  }
+
+  /* ---------------- shared chrome ---------------- */
+  function topbar(title) {
+    return '<header class="top"><a class="brand" href="#/status" aria-label="HAVYN FIELD home">' + MARK + "<b>HAVYN</b><span>FIELD</span></a>" +
+      '<div class="tools"><button class="ibtn' + (PR.theme === "night" ? " on" : "") + '" data-act="night" aria-label="Night mode">' + ic("moon") + "</button>" +
+      '<a class="ibtn" href="#/system" aria-label="Memory card and settings">' + ic("card") + "</a></div></header>" +
+      (title ? '<div class="sec" style="margin-top:4px"><span class="lab">' + esc(title) + "</span></div>" : "");
+  }
+  function backbar(href, label) {
+    return '<header class="top"><a class="ibtn" href="' + href + '" aria-label="Back">' + ic("back") + '</a><span class="lab">' + esc(label) + '</span><span style="width:44px"></span></header>';
+  }
+  const srcLine = (list) => list.map((s) => '<a href="' + esc(s.u) + '" target="_blank" rel="noopener">' + esc(s.n) + "</a>").join(" · ");
+
+  /* ---------------- STATUS ---------------- */
+  function towersSVG(a) {
+    const W = 360, H = 262, ground = 200, w = 50, d = 24;
+    const xs = [52, 136, 220, 304];
+    const rs = [["water", a.water], ["food", a.food], ["meds", a.meds], ["power", a.power]];
+    const color = { ok: "var(--ok)", warn: "var(--warn)", crit: "var(--crit)", none: "var(--none)", solar: "var(--solar)" };
+    let out = '<svg viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="Days of supply: ' + rs.map(([k, v]) => k + " " + fmtDays(v)).join(", ") + '"><defs>';
+    rs.forEach(([k, v]) => {
+      const st = v === Infinity ? "solar" : E.status(v);
+      out += '<linearGradient id="g' + k + '" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:' + color[st] + ';stop-opacity:.62"/><stop offset="1" style="stop-color:' + color[st] + ';stop-opacity:.06"/></linearGradient>';
+    });
+    out += '<radialGradient id="floor" cx="50%" cy="0%" r="70%"><stop offset="0" style="stop-color:var(--cyan);stop-opacity:.20"/><stop offset="1" style="stop-color:var(--cyan);stop-opacity:0"/></radialGradient></defs>';
+    // floor grid in perspective
+    out += '<g opacity=".55"><ellipse cx="180" cy="' + (ground + 8) + '" rx="190" ry="34" fill="url(#floor)"/>';
+    for (let i = 0; i < 5; i++) { const y = ground + 2 + i * i * 3.2 + i * 4; out += '<line x1="' + (6 + i * 6) + '" y1="' + y + '" x2="' + (354 - i * 6) + '" y2="' + y + '" style="stroke:var(--cyan)" stroke-opacity="' + (0.22 - i * 0.035) + '" stroke-width="1"/>'; }
+    for (let i = -6; i <= 6; i++) { out += '<line x1="' + (180 + i * 22) + '" y1="' + (ground + 2) + '" x2="' + (180 + i * 52) + '" y2="' + (ground + 60) + '" style="stroke:var(--cyan)" stroke-opacity=".08" stroke-width="1"/>'; }
+    out += "</g>";
+    rs.forEach(([k, v], i) => {
+      const x = xs[i];
+      const st = v === Infinity ? "solar" : E.status(v);
+      const hgt = v === null ? 14 : v === Infinity ? 150 : 16 + Math.min(v, 30) / 30 * 138;
+      const y = ground, top = y - hgt;
+      const L = [[x - w / 2, y], [x, y + d / 2], [x, top + d / 2], [x - w / 2, top]];
+      const R = [[x, y + d / 2], [x + w / 2, y], [x + w / 2, top], [x, top + d / 2]];
+      const T = [[x - w / 2, top], [x, top + d / 2], [x + w / 2, top], [x, top - d / 2]];
+      const pts = (a) => a.map((p) => p[0].toFixed(1) + "," + p[1].toFixed(1)).join(" ");
+      const c = color[st];
+      const ghost = v === null;
+      out += '<g class="twlink" data-go="#/supplies' + (k === "power" || k === "meds" || k === "water" || k === "food" ? "?cat=" + k : "") + '" tabindex="0" role="link" aria-label="' + RES[k].label + " " + fmtDays(v) + ' days">';
+      out += '<g class="tw" style="animation-delay:' + (i * 0.07).toFixed(2) + "s," + (-i * 1.7).toFixed(1) + 's">';
+      out += '<ellipse cx="' + x + '" cy="' + (y + d / 2 + 2) + '" rx="' + (w * 0.72) + '" ry="9" style="fill:' + c + '" opacity="' + (ghost ? 0.05 : 0.16) + '"/>';
+      if (ghost) {
+        out += '<polygon points="' + pts(L) + '" fill="none" style="stroke:var(--none)" stroke-dasharray="3 3"/><polygon points="' + pts(R) + '" fill="none" style="stroke:var(--none)" stroke-dasharray="3 3"/><polygon points="' + pts(T) + '" fill="none" style="stroke:var(--none)" stroke-dasharray="3 3"/>';
+      } else {
+        out += '<polygon points="' + pts(L) + '" fill="url(#g' + k + ')" style="stroke:' + c + '" stroke-opacity=".75" stroke-width="1"/>';
+        out += '<polygon points="' + pts(R) + '" fill="url(#g' + k + ')" opacity=".72" style="stroke:' + c + '" stroke-opacity=".55" stroke-width="1"/>';
+        out += '<polygon points="' + pts(T) + '" style="fill:' + c + ';stroke:#fff" fill-opacity=".55" stroke-opacity=".7" stroke-width="1"/>';
+        out += '<line x1="' + (x - w / 2 + 3) + '" y1="' + (top + 4) + '" x2="' + (x - w / 2 + 3) + '" y2="' + (y - 6) + '" stroke="#fff" stroke-opacity=".38" stroke-width="1.4"/>';
+      }
+      out += '<text x="' + x + '" y="' + (top - d / 2 - 10) + '" text-anchor="middle" style="fill:var(--ink);font:300 22px var(--mono)">' + fmtDays(v) + "</text>";
+      out += "</g>";
+      out += '<text x="' + x + '" y="' + (ground + 38) + '" text-anchor="middle" style="fill:var(--ink2);font:600 10.5px var(--mono);letter-spacing:.16em">' + RES[k].label.toUpperCase() + "</text>";
+      out += '<text x="' + x + '" y="' + (ground + 53) + '" text-anchor="middle" style="fill:' + c + ';font:600 9px var(--mono);letter-spacing:.14em">' + (st === "solar" ? "SOLAR" : STATUS_WORD[st]) + "</text>";
+      out += "</g>";
+    });
+    return out + "</svg>";
+  }
+
+  function renderStatus() {
+    const t = now();
+    const a = E.autonomy(S, t);
+    const people = L("people");
+    let h = topbar();
+    const fam = a.family;
+    const st = E.status(fam);
+    h += '<section class="glass hero"><div class="lab">Family autonomy</div>';
+    if (!people.length) {
+      h += '<div class="num"><span class="big">—</span><span class="unit">DAYS</span></div><div class="sub">Add your household and supplies to see how long you can last.</div></section>';
+    } else {
+      h += '<div class="num"><span class="big">' + fmtDays(fam) + '</span><span class="unit">DAYS</span> <span class="chip ' + st + '">' + STATUS_WORD[st] + "</span></div>";
+      h += '<div class="sub">' + (a.limiting ? "Limited by <b>" + esc(RES[a.limiting].label.toLowerCase()) + "</b> · " : "") + "target " + E.gaps(S, t).target + " days · " +
+        '<span class="chip ' + (a.season === "heat" ? "heat" : "") + '">' + (a.season === "heat" ? "Heat mode" : "Normal mode") + "</span>" +
+        (a.measured.water || a.measured.food || a.measured.power ? ' <span class="chip cyan">Measured use</span>' : "") + "</div></section>";
+    }
+    h += '<div class="scene">' + towersSVG(a) + "</div>";
+
+    // Outage + check-in
+    const o = S.outage || {};
+    const nc = E.nextCheckin(S.settings.checkins, t);
+    h += '<div class="grid2"><section class="glass panel"><div class="lab">Outage clock</div>';
+    if (o.active) h += '<div class="mono" style="font-size:1.6rem;margin:6px 0" data-tick="outage">' + dur(t - o.startedAt) + '</div><button class="btn ghost sm" data-act="outage-stop">Power is back</button>';
+    else h += '<div class="mono" style="font-size:1.6rem;margin:6px 0;color:var(--mute)">00:00:00</div><button class="btn sm" data-act="outage-start">Start</button>';
+    h += '</section><section class="glass panel"><div class="lab">Next check-in</div>' +
+      (nc ? '<div class="mono" style="font-size:1.6rem;margin:6px 0">' + nc.at + '</div><div style="color:var(--ink2)" data-tick="checkin">in ' + Math.floor(nc.inMin / 60) + "h " + (nc.inMin % 60) + "m</div>" : '<div style="margin-top:8px;color:var(--mute)">Set times in settings</div>') +
+      "</section></div>";
+
+    // Alerts
+    const alerts = [];
+    if (!people.length && !L("items").length) {
+      alerts.push('<div class="glass panel"><h3>Start here</h3><div class="list">' +
+        '<a class="li" href="#/family">' + '<span class="ic">' + ic("people") + '</span><span class="tx"><b>1. Add your household</b><small>People, pets, contacts, meeting places</small></span>' + ic("chev") + "</a>" +
+        '<a class="li" href="#/supplies">' + '<span class="ic">' + ic("box") + '</span><span class="tx"><b>2. Add supplies</b><small>Water, food, critical meds, batteries</small></span>' + ic("chev") + "</a>" +
+        '<a class="li" href="#/system">' + '<span class="ic">' + ic("card") + '</span><span class="tx"><b>3. Save a Memory Card</b><small>Back up and share to every phone</small></span>' + ic("chev") + "</a>" +
+        '</div><div class="btnrow" style="margin-top:12px"><button class="btn ghost" data-act="example">Try with an example household</button></div></div>');
+    }
+    if (L("items").some((i) => i.example) || L("people").some((p) => p.example)) alerts.push('<button class="alert info" data-act="clear-example" style="width:100%;text-align:left"><span class="dot"></span><span><b>Example data loaded</b><small>Tap to remove it and start with your own.</small></span></button>');
+    if (!PREVIEW && !isStandalone() && !PR.installHidden) alerts.push('<div class="alert info"><span class="dot"></span><span><b>Install for offline use</b><small>In Safari tap Share, then Add to Home Screen. Open it from the icon once while online.</small></span><button class="ibtn" data-act="hide-install" aria-label="Dismiss" style="margin-left:auto;width:36px;height:36px">×</button></div>');
+    if ((people.length || L("items").length) && t - (PR.lastBackup || 0) > 30 * DAY) alerts.push('<a class="alert" href="#/system"><span class="dot"></span><span><b>Save a Memory Card</b><small>Last backup: ' + (PR.lastBackup ? ymd(PR.lastBackup) : "never") + "</small></span></a>");
+    const ex = E.expiring(S, t, 90);
+    if (ex.length) { const bad = ex.filter((x) => x.expired).length; alerts.push('<a class="alert' + (bad ? " crit" : "") + '" href="#/supplies"><span class="dot"></span><span><b>' + ex.length + " item" + (ex.length > 1 ? "s" : "") + " expire within 90 days</b><small>" + (bad ? bad + " already expired · " : "") + "Use them in normal life and replace</small></span></a>"); }
+    const hot = E.hotStorage(S);
+    if (hot.length) alerts.push('<a class="alert" href="#/supplies"><span class="dot"></span><span><b>' + hot.length + " item" + (hot.length > 1 ? "s" : "") + " stored somewhere hot</b><small>Phoenix garages and cars cook food, medicine and batteries</small></span></a>");
+    const g = E.gaps(S, t);
+    if (people.length && g.list.length) alerts.push('<a class="alert" href="#/supplies"><span class="dot"></span><span><b>To reach ' + g.target + " days</b><small>" + g.list.slice(0, 3).map((x) => "+" + fmtN(x.gap, x.unit === "gal" ? 1 : 0) + " " + x.unit + " " + (x.name ? esc(x.name) : x.res)).join(" · ") + "</small></span></a>");
+    if (alerts.length) h += '<div class="sec"><span class="lab">Attention</span></div>' + alerts.join("");
+    if (PREVIEW) h += '<div class="alert info"><span class="dot"></span><span><b>Preview build</b><small>Data stays in this browser only. Install from your own link for offline use on iPhone.</small></span></div>';
+    return h;
+  }
+
+  /* ---------------- EMERGENCY ---------------- */
+  const cardView = { id: null, step: 0, beatStep: 0, autoBeat: false };
+  function emTop() {
+    return '<div class="emtop"><a class="exit" href="#/status">EXIT</a><a class="call" href="tel:911">' + ic("phone") + "CALL 911</a></div>";
+  }
+  function renderEmergency() {
+    const id = route.parts[1];
+    if (id) return renderCard(id);
+    cardView.id = null; cardView.beatStep = 0;
+    let h = emTop() + '<div class="emgrid">';
+    for (const c of C.cards) h += '<a class="emtile" href="#/emergency/' + c.id + '">' + ic(c.icon) + "<span><b>" + esc(c.title) + "</b><br><small>" + esc(c.sub) + "</small></span></a>";
+    h += "</div>";
+    h += '<div class="emnote">' + esc(C.noSignal) + "</div>";
+    h += '<p class="emsrc">Cards: ' + esc(C.gate) + ". Checked against sources " + esc(C.reviewed) + ". Training beats any app: take a CPR and Stop the Bleed class.</p>";
+    return h;
+  }
+  function renderCard(id) {
+    const c = C.cards.find((x) => x.id === id);
+    if (!c) return renderEmergency();
+    if (cardView.id !== id) { cardView.id = id; cardView.step = 0; }
+    const n = c.steps.length, i = Math.min(cardView.step, n - 1), s = c.steps[i];
+    cardView.beatStep = s.beat || 0;
+    let h = emTop();
+    h += '<div class="emhead"><span>' + esc(c.title) + "</span><span>Step " + (i + 1) + " of " + n + "</span></div>";
+    h += '<div class="dots">' + c.steps.map((_, k) => "<i" + (k <= i ? ' class="on"' : "") + "></i>").join("") + "</div>";
+    h += '<div class="emstep">' + esc(s.t) + '</div><div class="emdet">' + esc(s.d) + "</div>";
+    if (s.beat) {
+      h += '<div class="beat" aria-hidden="true"><div><b>PUSH</b><small>' + s.beat + " / min</small></div></div>";
+      h += '<div class="cprbar"><span>Time <b class="mono" id="cprtime">0:00</b> <span id="swap" class="swap hide">SWITCH</span></span>' +
+        '<button data-act="beat-toggle">' + (Metro.on || cardView.autoBeat ? "Stop beat" : "Start beat") + "</button>" +
+        '<button data-act="beat-sound">' + (Metro.sound ? "Sound on" : "Sound off") + "</button></div>";
+    }
+    if (s.link) h += '<a class="emlink" href="#/emergency/' + s.link + '" data-act="card-jump" data-card="' + s.link + '">Open ' + esc(C.cards.find((x) => x.id === s.link).title) + " card</a>";
+    h += '<div class="emnav"><button data-act="step-prev"' + (i === 0 ? " disabled" : "") + ">BACK</button>" +
+      (i < n - 1 ? '<button class="next" data-act="step-next">NEXT</button>' : '<a class="next" href="#/emergency">ALL CARDS</a>') + "</div>";
+    if (c.note) h += '<div class="emnote">' + esc(c.note) + "</div>";
+    if (c.noteLink) h += '<a class="emlink" href="#/emergency/' + c.noteLink + '" data-act="card-jump">Open ' + esc(C.cards.find((x) => x.id === c.noteLink).title) + " card</a>";
+    h += '<div class="emsrc">' + esc(C.noSignal) + '<br><br>Source: ' + srcLine(c.sources) + "<br>Checked " + esc(C.reviewed) + " · " + esc(C.gate) + "</div>";
+    return h;
+  }
+  function stepTo(delta) {
+    const c = C.cards.find((x) => x.id === cardView.id); if (!c) return;
+    cardView.step = Math.max(0, Math.min(c.steps.length - 1, cardView.step + delta));
+    const s = c.steps[cardView.step];
+    if (s.beat) { cardView.autoBeat = true; Snd.ctx(); } else { Metro.stop(); }
+    render();
+  }
+
+  /* ---------------- PLAYBOOKS ---------------- */
+  function renderPlaybooks() {
+    const id = route.parts[1];
+    if (id) return renderPlaybook(id);
+    let h = topbar("Playbooks");
+    h += '<div class="list">';
+    for (const p of C.playbooks) {
+      if (p.soon) h += '<div class="li soon"><span class="ic">' + ic(p.icon) + '</span><span class="tx"><b>' + esc(p.title) + "</b><small>" + esc(p.sub) + "</small></span></div>";
+      else {
+        const done = countChecks(p);
+        h += '<a class="li" href="#/playbooks/' + p.id + '"><span class="ic">' + ic(p.icon) + '</span><span class="tx"><b>' + esc(p.title) + "</b><small>" + esc(p.sub) + '</small></span><span class="rt">' + done.d + "/" + done.n + "</span>" + ic("chev") + "</a>";
+      }
+    }
+    h += "</div>";
+    h += '<p class="empty" style="margin-top:14px">Each playbook: what to do in the first 10 minutes, hour, day, and the hard rule for leaving. Tick items as you go; reset after the event.</p>';
+    return h;
+  }
+  function countChecks(p) {
+    const ch = (S.checks && S.checks[p.id]) || {};
+    let n = 0, d = 0; p.phases.forEach((ph, a) => ph.items.forEach((_, b) => { n++; if (ch[a + "." + b]) d++; }));
+    return { n, d };
+  }
+  function renderPlaybook(id) {
+    const p = C.playbooks.find((x) => x.id === id && !x.soon);
+    if (!p) return renderPlaybooks();
+    const ch = (S.checks && S.checks[p.id]) || {};
+    let h = backbar("#/playbooks", "Playbook");
+    h += '<section class="glass hero"><div class="lab">Playbook</div><h2 style="margin:6px 0 4px;font-size:1.6rem">' + esc(p.title) + '</h2><div class="sub">' + esc(p.trigger) + "</div></section>";
+    h += '<section class="panel" style="border:2px solid var(--crit);border-radius:var(--r);background:rgba(255,77,94,.06)"><h3 style="color:var(--crit)">Hard rule: leave now if</h3>' +
+      p.leave.map((l) => '<div class="kv"><span style="color:var(--ink)">' + esc(l) + "</span></div>").join("") +
+      (S.plan.leaveTo ? '<div class="kv"><span>Destination</span><span>' + esc(S.plan.leaveTo) + "</span></div>" : '<div class="kv"><span>Destination</span><a href="#/family/plan">Set it now</a></div>') + "</section>";
+    p.phases.forEach((ph, a) => {
+      h += '<section class="glass panel"><h3>' + esc(ph.label) + "</h3>";
+      ph.items.forEach((it, b) => {
+        const k = a + "." + b, on = !!ch[k];
+        h += '<label class="chk' + (on ? " done" : "") + '"><input type="checkbox" data-chk="' + p.id + "|" + k + '"' + (on ? " checked" : "") + '><span class="tx"><b>' + esc(it.t) + "</b>" +
+          (it.d ? "<small>" + esc(it.d) + "</small>" : "") +
+          (it.s && C.refs[it.s] ? '<small class="mono" style="font-size:.7rem;margin-top:4px">' + esc(C.refs[it.s].n) + "</small>" : "") +
+          (it.act === "outage-start" && !(S.outage && S.outage.active) ? '<span style="display:block;margin-top:8px"><button class="btn sm" data-act="outage-start">Start outage clock</button></span>' : "") +
+          (it.go ? '<span style="display:block;margin-top:8px"><a class="btn ghost sm" href="#/playbooks/' + it.go + '">Open</a></span>' : "") +
+          (it.card ? '<span style="display:block;margin-top:8px"><a class="btn red sm" href="#/emergency/' + it.card + '">Open card</a></span>' : "") +
+          "</span></label>";
+      });
+      h += "</section>";
+    });
+    h += '<div class="btnrow"><button class="btn ghost" data-act="reset-checks" data-id="' + p.id + '">Reset checklist</button></div>';
+    h += '<p class="empty" style="margin-top:14px;font-size:.85rem">Sources: ' + srcLine(p.sources.map((k) => C.refs[k])) + "<br>Checked " + esc(C.reviewed) + ".</p>";
+    return h;
+  }
+
+  /* ---------------- FAMILY ---------------- */
+  const AGE = { infant: "Infant (under 1)", child: "Child (1–12)", teen: "Teen (13–17)", adult: "Adult (18–64)", senior: "65 or older" };
+  function renderFamily() {
+    const sub = route.parts[1];
+    if (sub === "person") return renderPersonForm(route.parts[2]);
+    if (sub === "pet") return renderPetForm(route.parts[2]);
+    if (sub === "plan") return renderPlanForm();
+    let h = topbar("Family");
+    const pl = S.plan || {};
+    h += '<section class="glass panel"><h3>Plan</h3>' +
+      '<div class="kv"><span>Out-of-area contact</span><span>' + (pl.contactName ? esc(pl.contactName) + (pl.contactPhone ? ' · <a href="tel:' + esc(pl.contactPhone.replace(/[^0-9+]/g, "")) + '">' + esc(pl.contactPhone) + "</a>" : "") : '<span style="color:var(--mute)">not set</span>') + "</span></div>" +
+      '<div class="kv"><span>Meet 1 · near home</span><span>' + (esc(pl.rally1) || "—") + "</span></div>" +
+      '<div class="kv"><span>Meet 2 · neighborhood</span><span>' + (esc(pl.rally2) || "—") + "</span></div>" +
+      '<div class="kv"><span>Meet 3 · out of area</span><span>' + (esc(pl.rally3) || "—") + "</span></div>" +
+      '<div class="kv"><span>If heat forces us out</span><span>' + (esc(pl.leaveTo) || "—") + "</span></div>" +
+      '<div class="kv"><span>Check-ins</span><span class="mono">' + esc((S.settings.checkins || []).join(" · ")) + "</span></div>" +
+      '<div class="btnrow" style="margin-top:10px"><a class="btn ghost" href="#/family/plan">Edit plan and shutoffs</a></div></section>';
+    h += '<div class="sec"><span class="lab">People</span><a class="btn sm" href="#/family/person/new">' + ic("plus") + "Add</a></div><div class=\"list\">";
+    const ppl = L("people");
+    if (!ppl.length) h += '<div class="empty">No one yet. Add everyone who lives in the house.</div>';
+    for (const p of ppl) {
+      const flags = [p.meds ? "meds" : "", p.allergies ? "allergies" : "", p.conditions ? "conditions" : ""].filter(Boolean).join(" · ");
+      h += '<a class="li" href="#/family/person/' + esc(p.id) + '"><span class="ic">' + ic("people") + '</span><span class="tx"><b>' + esc(p.name || "Unnamed") + "</b><small>" + esc(AGE[p.ageBand] || "") + (flags ? " · " + flags : "") + "</small></span>" + ic("chev") + "</a>";
+    }
+    h += '</div><div class="sec"><span class="lab">Pets</span><a class="btn sm" href="#/family/pet/new">' + ic("plus") + "Add</a></div><div class=\"list\">";
+    const pets = L("pets");
+    if (!pets.length) h += '<div class="empty">No pets added.</div>';
+    for (const p of pets) h += '<a class="li" href="#/family/pet/' + esc(p.id) + '"><span class="ic">' + ic("paw") + '</span><span class="tx"><b>' + esc(p.name || "Pet") + "</b><small>" + esc(p.species || "") + (p.weightLb ? " · " + esc(p.weightLb) + " lb" : "") + "</small></span>" + ic("chev") + "</a>";
+    h += "</div>";
+    h += '<section class="glass panel" style="margin-top:14px"><h3>Utility shutoffs</h3>' +
+      ["gas", "water", "power"].map((k) => '<div class="kv"><span>' + k[0].toUpperCase() + k.slice(1) + "</span><span>" + (esc(pl[k]) || '<span style="color:var(--mute)">not set</span>') + "</span></div>" + (pl[k + "Photo"] ? '<img class="photo" data-photo="' + esc(pl[k + "Photo"]) + '" alt="' + k + ' shutoff photo">' : "")).join("") + "</section>";
+    h += '<p class="empty" style="font-size:.85rem">Stored only on this phone and in Memory Cards you make. Never sent anywhere.</p>';
+    return h;
+  }
+  function fld(name, label, val, o) {
+    o = o || {};
+    const v = esc(val === undefined || val === null ? "" : val);
+    if (o.type === "area") return '<label class="fld"><span>' + esc(label) + '</span><textarea name="' + name + '" placeholder="' + esc(o.ph || "") + '">' + v + "</textarea>" + (o.hint ? '<span class="hint">' + esc(o.hint) + "</span>" : "") + "</label>";
+    if (o.type === "select") return '<label class="fld"><span>' + esc(label) + '</span><select name="' + name + '">' + o.opts.map(([k, l]) => '<option value="' + esc(k) + '"' + (String(val) === String(k) ? " selected" : "") + ">" + esc(l) + "</option>").join("") + "</select>" + (o.hint ? '<span class="hint">' + esc(o.hint) + "</span>" : "") + "</label>";
+    const type = o.type === "num" ? 'text" inputmode="decimal' : o.type === "date" ? "date" : o.type === "time" ? "time" : o.type === "tel" ? "tel" : "text";
+    return '<label class="fld"><span>' + esc(label) + '</span><input name="' + name + '" type="' + type + '" value="' + v + '" placeholder="' + esc(o.ph || "") + '" autocomplete="off">' + (o.hint ? '<span class="hint">' + esc(o.hint) + "</span>" : "") + "</label>";
+  }
+  function formEnd(delId, coll) {
+    return '<div class="btnrow" style="margin-top:6px"><button class="btn" type="submit">Save</button></div>' +
+      (delId ? '<div class="btnrow" style="margin-top:10px"><button class="btn ghost danger" type="button" data-act="del" data-coll="' + coll + '" data-id="' + esc(delId) + '">Delete</button></div>' : "") + "</form>";
+  }
+  function renderPersonForm(id) {
+    const p = id && id !== "new" ? byId("people", id) || {} : {};
+    let h = backbar("#/family", p.id ? "Edit person" : "Add person");
+    h += '<form class="glass panel" data-form="person" data-id="' + esc(p.id || "") + '">' +
+      fld("name", "Name", p.name, { ph: "First name" }) +
+      fld("ageBand", "Age group", p.ageBand || "adult", { type: "select", opts: Object.entries(AGE) }) +
+      fld("conditions", "Medical conditions", p.conditions, { type: "area" }) +
+      fld("meds", "Medications and doses", p.meds, { type: "area", hint: "Add critical medicines to Supplies too, to track days left." }) +
+      fld("allergies", "Allergies", p.allergies, { type: "area" }) +
+      '<div class="two">' + fld("blood", "Blood type", p.blood) + fld("kcal", "Calories a day", p.kcal, { type: "num", ph: String(E.kcalFor({ ageBand: p.ageBand || "adult" })) }) + "</div>" +
+      fld("doctor", "Doctor and pharmacy", p.doctor) +
+      fld("device", "Powered medical device", p.device, { hint: "CPAP, oxygen, pump: plan its backup power first." }) +
+      fld("notes", "Notes", p.notes, { type: "area" }) + formEnd(p.id, "people");
+    return h;
+  }
+  function renderPetForm(id) {
+    const p = id && id !== "new" ? byId("pets", id) || {} : {};
+    let h = backbar("#/family", p.id ? "Edit pet" : "Add pet");
+    h += '<form class="glass panel" data-form="pet" data-id="' + esc(p.id || "") + '">' + fld("name", "Name", p.name) +
+      fld("species", "Kind", p.species || "Dog", { type: "select", opts: [["Dog", "Dog"], ["Cat", "Cat"], ["Other", "Other"]] }) +
+      fld("weightLb", "Weight (lb)", p.weightLb, { type: "num", hint: "Water need: about 1 oz per lb per day." }) +
+      fld("notes", "Food, medicine, vet", p.notes, { type: "area" }) + formEnd(p.id, "pets");
+    return h;
+  }
+  function renderPlanForm() {
+    const pl = S.plan || {};
+    let h = backbar("#/family", "Family plan");
+    h += '<form class="glass panel" data-form="plan"><h3>Out-of-area contact</h3><div class="two">' + fld("contactName", "Name", pl.contactName) + fld("contactPhone", "Phone", pl.contactPhone, { type: "tel" }) + "</div>" +
+      '<p class="empty" style="margin-top:-4px;font-size:.85rem">Everyone texts this person "OK + location". Long-distance texts often get through when local lines can\'t.</p>' +
+      "<h3>Meeting places</h3>" + fld("rally1", "1 · Near home", pl.rally1, { ph: "Front of the house" }) + fld("rally2", "2 · Neighborhood", pl.rally2, { ph: "Park, school, church" }) + fld("rally3", "3 · Out of area", pl.rally3, { ph: "Relative's address" }) +
+      "<h3>If heat forces us out</h3>" + fld("leaveTo", "Destination", pl.leaveTo, { ph: "Family on another grid, a hotel, a cooler town" }) + fld("leaveNotes", "Route and contact", pl.leaveNotes, { type: "area" }) +
+      "<h3>Check-in times</h3>" + '<div class="two">' + fld("c1", "First", (S.settings.checkins || [])[0], { type: "time" }) + fld("c2", "Second", (S.settings.checkins || [])[1], { type: "time" }) + "</div>" + fld("c3", "Third", (S.settings.checkins || [])[2], { type: "time" }) +
+      "<h3>Utility shutoffs</h3>" + ["gas", "water", "power"].map((k) =>
+        fld(k, k[0].toUpperCase() + k.slice(1) + " shutoff: where and how", pl[k], { ph: k === "gas" ? "Meter, east wall. Wrench in hall closet." : "" }) +
+        '<div class="btnrow" style="margin:-4px 0 14px"><label class="btn ghost sm">' + (pl[k + "Photo"] ? "Replace photo" : "Add photo") + '<input class="sr" type="file" accept="image/*" data-photo-for="' + k + '"></label></div>' +
+        (pl[k + "Photo"] ? '<img class="photo" data-photo="' + esc(pl[k + "Photo"]) + '" alt="' + k + ' shutoff" style="margin:-6px 0 14px">' : "")).join("") +
+      formEnd(null);
+    return h;
+  }
+
+  /* ---------------- SUPPLIES ---------------- */
+  function itemLine(i) {
+    const r = RES[i.category] || RES.gear;
+    const per = r.key && i.per_unit ? num(i.per_unit[r.key]) : 0;
+    const total = per * num(i.qty);
+    let right = r.key ? fmtN(total, r.key === "gal" ? 1 : 0) + " " + r.unit : "×" + fmtN(num(i.qty), 1);
+    let sub = "×" + fmtN(num(i.qty), 2) + (r.key ? " · " + fmtN(per, 2) + " " + r.unit + " each" : "") + (i.location ? " · " + i.location : "");
+    if (i.category === "meds" && num(i.per_day) > 0) right = fmtDays(total / num(i.per_day)) + " d";
+    const exp = i.expires ? Date.parse(i.expires + "T12:00:00") : NaN;
+    const expTag = Number.isFinite(exp) && exp < now() + 90 * DAY ? ' <span class="chip ' + (exp < now() ? "crit" : "warn") + '">' + (exp < now() ? "expired" : "exp " + esc(i.expires)) + "</span>" : "";
+    return '<a class="li" href="#/supplies/item/' + esc(i.id) + '"><span class="ic">' + ic(r.icon) + '</span><span class="tx"><b>' + esc(i.name || "Item") + (i.critical ? ' <span class="chip crit">critical</span>' : "") + expTag + "</b><small>" + esc(sub) + '</small></span><span class="rt">' + right + "</span></a>";
+  }
+  function renderSupplies() {
+    const sub = route.parts[1];
+    if (sub === "item") return renderItem(route.parts[2]);
+    if (sub === "edit") return renderItemForm(route.parts[2]);
+    const t = now(), a = E.autonomy(S, t), g = E.gaps(S, t), cat = route.q.cat || "all";
+    let h = topbar("Supplies");
+    h += '<div class="grid2">' + ["water", "food", "meds", "power"].map((k) => {
+      const v = a[k], st = v === Infinity ? "ok" : E.status(v);
+      return '<a class="glass panel" href="#/supplies?cat=' + k + '" style="text-decoration:none;color:var(--ink)"><div class="lab">' + RES[k].label + '</div><div class="mono" style="font-size:1.7rem;margin-top:4px">' + fmtDays(v) + ' <span style="font-size:.8rem;color:var(--mute)">days</span></div><span class="chip ' + st + '" style="margin-top:6px">' + (v === Infinity ? "SOLAR" : STATUS_WORD[st]) + (a.measured[k] ? " · measured" : "") + "</span></a>";
+    }).join("") + "</div>";
+    if (L("people").length && g.list.length) h += '<section class="glass panel"><h3>To reach ' + g.target + " days</h3>" + g.list.map((x) => '<div class="kv"><span>' + esc(x.name || RES[x.res].label) + '</span><span class="mono">+' + fmtN(x.gap, x.unit === "gal" ? 1 : 0) + " " + x.unit + "</span></div>").join("") + "</section>";
+    const ex = E.expiring(S, t, 90);
+    if (ex.length) h += '<section class="glass panel"><h3>Expiring within 90 days</h3>' + ex.map((x) => '<div class="kv"><span>' + esc(x.item.name) + '</span><span class="mono" style="color:' + (x.expired ? "var(--crit)" : "var(--warn)") + '">' + (x.expired ? "expired" : x.days + " d") + "</span></div>").join("") + '<p class="empty" style="font-size:.85rem">Use these in normal life and restock.</p></section>';
+    const hot = E.hotStorage(S);
+    if (hot.length) h += '<section class="glass panel"><h3>Stored somewhere hot</h3>' + hot.map((i) => '<div class="kv"><span>' + esc(i.name) + "</span><span>" + esc(i.location) + "</span></div>").join("") + '<p class="empty" style="font-size:.85rem">Move food, medicine and batteries indoors.</p></section>';
+    h += '<div class="sec"><span class="lab">Inventory</span><a class="btn sm" href="#/supplies/edit/new' + (cat !== "all" ? "?cat=" + cat : "") + '">' + ic("plus") + "Add</a></div>";
+    h += '<div class="filters">' + ["all", "water", "food", "meds", "power", "gear"].map((k) => '<a href="#/supplies' + (k === "all" ? "" : "?cat=" + k) + '"><span class="chip' + (cat === k ? " on" : "") + '">' + (k === "all" ? "All" : RES[k].label) + "</span></a>").join("") + "</div>";
+    const items = L("items").filter((i) => cat === "all" || i.category === cat).sort((x, y) => (x.category + x.name).localeCompare(y.category + y.name));
+    h += '<div class="list">' + (items.length ? items.map(itemLine).join("") : '<div class="empty">Nothing here yet.</div>') + "</div>";
+    return h;
+  }
+  const PRESETS = {
+    water: [["55-gal drum", 55], ["WaterBrick 3.5 gal", 3.5], ["Case: 24 bottles × 16.9 oz", 3.17], ["1-gal jug", 1], ["waterBOB (bathtub)", 100]],
+    power: [["1 kWh station (DELTA 3 Classic)", 1024], ["1 kWh station (SOLIX C1000)", 1056], ["Power bank 20,000 mAh", 74]],
+    food: [], meds: [], gear: []
+  };
+  let draft = null;
+  function renderItemForm(id) {
+    const base = id && id !== "new" ? byId("items", id) || {} : { category: route.q.cat && RES[route.q.cat] ? route.q.cat : "water", qty: 1 };
+    const i = draft && draft.id === (base.id || "") ? Object.assign({}, base, draft.vals) : base;
+    const cat = i.category || "water", r = RES[cat];
+    let h = backbar(base.id ? "#/supplies/item/" + esc(base.id) : "#/supplies", base.id ? "Edit item" : "Add item");
+    h += '<form class="glass panel" data-form="item" data-id="' + esc(base.id || "") + '">' +
+      fld("category", "Type", cat, { type: "select", opts: Object.keys(RES).map((k) => [k, RES[k].label]) });
+    if (PRESETS[cat] && PRESETS[cat].length && !base.id) h += '<div class="filters" style="margin-top:-4px">' + PRESETS[cat].map(([n, v]) => '<button type="button" class="chip" data-preset="' + esc(n) + "|" + v + '">' + esc(n) + "</button>").join("") + "</div>";
+    h += fld("name", "Name", i.name, { ph: cat === "food" ? "Rice, 20 lb bag" : cat === "meds" ? "Insulin pens" : "" }) +
+      '<div class="two">' + fld("qty", "How many", i.qty, { type: "num" }) +
+      (r.key ? fld("per", r.unit + " each", i.per_unit ? i.per_unit[r.key] : "", { type: "num", ph: cat === "food" ? "from the label" : "" }) : "<span></span>") + "</div>";
+    if (cat === "food") h += '<p class="empty" style="margin:-6px 0 12px;font-size:.85rem">Calories per unit = calories per serving × servings per container.</p>';
+    if (cat === "meds") h += '<div class="two">' + fld("per_day", "Doses used a day", i.per_day, { type: "num" }) + fld("critical", "Critical", i.critical ? "yes" : "no", { type: "select", opts: [["yes", "Yes, life-critical"], ["no", "No"]] }) + "</div>" +
+      fld("owner", "For", i.owner || "", { type: "select", opts: [["", "Anyone"]].concat(L("people").map((p) => [p.id, p.name || "Unnamed"])) });
+    h += fld("location", "Stored where", i.location, { ph: "Hall closet", hint: "Avoid the garage and car in Phoenix." }) +
+      '<div class="two">' + fld("expires", "Expires", i.expires, { type: "date" }) + fld("min_qty", "Keep at least", i.min_qty, { type: "num" }) + "</div>" +
+      fld("notes", "Notes", i.notes, { type: "area" }) + formEnd(base.id, "items");
+    return h;
+  }
+  function renderItem(id) {
+    const i = byId("items", id);
+    if (!i) return renderSupplies();
+    const r = RES[i.category] || RES.gear;
+    const per = r.key && i.per_unit ? num(i.per_unit[r.key]) : 0;
+    let h = backbar("#/supplies" + (i.category ? "?cat=" + i.category : ""), r.label);
+    h += '<section class="glass hero"><div class="lab">' + esc(r.label) + '</div><h2 style="margin:6px 0 2px;font-size:1.5rem">' + esc(i.name) + "</h2>" +
+      '<div class="num"><span class="big" style="font-size:2.6rem">' + fmtN(num(i.qty), 2) + '</span><span class="unit">ON HAND' + (r.key ? " · " + fmtN(per * num(i.qty), r.key === "gal" ? 1 : 0) + " " + r.unit : "") + "</span></div>" +
+      '<div class="sub">' + [i.location ? "Stored: " + esc(i.location) : "", i.expires ? "Expires " + esc(i.expires) : "", i.min_qty ? "Keep at least " + esc(i.min_qty) : ""].filter(Boolean).join(" · ") + "</div></section>";
+    h += '<section class="glass panel"><h3>Log use</h3><div class="btnrow"><button class="btn ghost" data-act="use" data-id="' + esc(i.id) + '" data-n="1">−1</button><button class="btn ghost" data-act="use" data-id="' + esc(i.id) + '" data-n="0.5">−½</button><button class="btn ghost" data-act="use" data-id="' + esc(i.id) + '" data-n="-1">+1 restock</button></div>' +
+      '<form data-form="use" data-id="' + esc(i.id) + '" style="margin-top:12px"><div class="two">' + fld("n", "Custom amount used", "", { type: "num" }) + '<div style="display:flex;align-items:flex-end;margin-bottom:12px"><button class="btn wide" type="submit">Log</button></div></div></form>' +
+      '<p class="empty" style="font-size:.85rem">During an outage, logged use replaces the planning numbers on Status.</p></section>';
+    const logs = L("log").filter((e) => e.itemId === i.id).sort((a, b) => b.t - a.t).slice(0, 8);
+    if (logs.length) h += '<section class="glass panel"><h3>Recent</h3>' + logs.map((e) => '<div class="kv"><span>' + new Date(e.t).toLocaleString([], { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }) + '</span><span class="mono">' + (e.delta > 0 ? "−" : "+") + fmtN(Math.abs(e.delta), 2) + "</span></div>").join("") + "</section>";
+    h += '<div class="btnrow"><a class="btn ghost" href="#/supplies/edit/' + esc(i.id) + '">Edit item</a></div>';
+    return h;
+  }
+  function logUse(id, n) {
+    const i = byId("items", id); if (!i || !n) return;
+    const r = RES[i.category] || RES.gear;
+    const per = r.key && i.per_unit ? num(i.per_unit[r.key]) : 0;
+    const q = Math.max(0, num(i.qty) - n);
+    const used = num(i.qty) - q;
+    upsert("items", Object.assign({}, i, { qty: Math.round(q * 1000) / 1000 }));
+    upsert("log", { id: uid(), t: now(), itemId: i.id, delta: n > 0 ? used : n, res: n > 0 && r.key ? i.category : null, amount: n > 0 ? used * per : 0 });
+    toast(n > 0 ? "Logged: used " + fmtN(used, 2) : "Restocked +" + fmtN(-n, 2));
+    Snd.chime("nav");
+  }
+
+  /* ---------------- SYSTEM: memory card + settings ---------------- */
+  let pendingCard = null, preparedFile = null;
+  function isStandalone() { return window.navigator.standalone === true || (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches); }
+  function renderSystem() {
+    const st = S.settings;
+    let h = topbar("System");
+    h += '<section class="glass panel"><div class="mc"><div class="card" aria-hidden="true"></div><div style="flex:1"><div class="lab">Memory card · slot 1</div><div style="font-weight:650;margin-top:4px">Backup and share</div>' +
+      '<div style="color:var(--ink2);font-size:.9rem">Last saved: ' + (PR.lastBackup ? new Date(PR.lastBackup).toLocaleString() : "never") + "</div></div></div>" +
+      '<div class="bar" style="margin:14px 0 10px"><i id="mcbar"></i></div><div id="mcmsg" class="empty" style="min-height:1.4em"></div>' +
+      '<div class="btnrow"><button class="btn" data-act="mc-save">Save to Memory Card</button></div>' +
+      '<div class="btnrow' + (preparedFile ? "" : " hide") + '" id="mcsend" style="margin-top:10px"><button class="btn" data-act="mc-share">Send (AirDrop, Files)</button><button class="btn ghost" data-act="mc-download">Download</button></div>' +
+      '<div class="btnrow" style="margin-top:10px"><label class="btn ghost">Load Memory Card<input class="sr" type="file" id="mcfile"></label></div>' +
+      (pendingCard ? '<div class="alert info" style="margin-top:12px"><span class="dot"></span><span><b>Card from ' + esc(pendingCard.device || "another phone") + " · " + esc((pendingCard.exported || "").slice(0, 10)) + "</b><small>" + pendingCard.preview + "</small></span></div>" +
+        '<div class="btnrow"><button class="btn" data-act="mc-merge">Merge (newest edit wins)</button><button class="btn ghost" data-act="mc-replace">Replace all</button></div><div class="btnrow" style="margin-top:8px"><button class="btn ghost" data-act="mc-cancel">Cancel</button></div>' : "") +
+      '<p class="empty" style="font-size:.85rem;margin-top:12px">Save on each phone, AirDrop the card to the others, and load it there. Merging keeps the newest edit of every record. Keep a copy on the vault drive.</p></section>';
+    h += '<form class="glass panel" data-form="settings"><h3>Household settings</h3>' +
+      fld("season", "Season mode", st.season, { type: "select", opts: [["auto", "Auto: heat May to September"], ["normal", "Normal: 1 gal per person a day"], ["heat", "Heat: 2 gal per person a day"]] }) +
+      '<div class="two">' + fld("targetDays", "Target days", st.targetDays, { type: "num" }) + fld("deviceName", "This phone's name", PR.deviceName, { ph: "Dad's iPhone" }) + "</div>" +
+      '<div class="two">' + fld("loadWhNormal", "Daily use, normal (Wh)", st.loadWhNormal, { type: "num" }) + fld("loadWhHeat", "Daily use, heat (Wh)", st.loadWhHeat, { type: "num" }) + "</div>" +
+      '<div class="two">' + fld("solarW", "Solar panels (W)", st.solarW, { type: "num" }) + fld("sunHours", "Sun hours a day", st.sunHours, { type: "num", hint: "Phoenix averages about 6.5" }) + "</div>" +
+      fld("sound", "Interface sounds", PR.sound ? "on" : "off", { type: "select", opts: [["on", "On"], ["off", "Off"]] }) +
+      '<div class="btnrow"><button class="btn" type="submit">Save settings</button></div></form>';
+    h += '<section class="glass panel"><h3>This phone</h3>' +
+      '<div class="kv"><span>Installed to Home Screen</span><span>' + (isStandalone() ? "Yes" : "No") + "</span></div>" +
+      '<div class="kv"><span>Offline copy</span><span id="swst">' + (PREVIEW ? "Preview: none" : navigator.serviceWorker && navigator.serviceWorker.controller ? "Saved for offline" : "Not yet: open once online") + "</span></div>" +
+      '<div class="kv"><span>Storage</span><span id="stst">' + (Store.ok ? "On this phone" : "Temporary") + "</span></div>" +
+      '<div class="kv"><span>Network use</span><span>None (blocked by policy)</span></div>' +
+      '<div class="kv"><span>Version</span><span class="mono">' + esc(VERSION) + "</span></div>" +
+      '<p class="empty" style="font-size:.85rem">Deleting the app icon deletes its data. Keep Memory Cards on another phone and the vault drive.</p></section>';
+    h += '<section class="glass panel"><h3>Danger zone</h3><button class="btn ghost danger wide" data-act="erase">Erase everything on this phone</button></section>';
+    return h;
+  }
+  async function sha256(text) {
+    try { const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text)); return Array.from(new Uint8Array(b)).map((x) => x.toString(16).padStart(2, "0")).join(""); } catch (e) { return ""; }
+  }
+  function snapshot() { return JSON.parse(JSON.stringify({ settings: S.settings, plan: S.plan, outage: S.outage, checks: S.checks, people: S.people, pets: S.pets, items: S.items, log: S.log })); }
+  async function allPhotos() {
+    const out = {}; const keys = (await Store.keys()) || [];
+    for (const k of keys) if (String(k).startsWith("photo:")) out[String(k).slice(6)] = await Store.get(k);
+    return out;
+  }
+  async function prepareCard() {
+    const bar = $("#mcbar"), msg = $("#mcmsg");
+    const step = (p, m) => { if (bar) bar.style.width = p + "%"; if (msg) msg.textContent = m; };
+    if (PREVIEW) { step(100, "Preview only. The installed app saves the card here and sends it by AirDrop or Files."); return; }
+    step(15, "Saving data. Do not close the app.");
+    const data = snapshot();
+    const json = JSON.stringify(data);
+    const card = { format: "havyn.memorycard", version: 1, app: "HAVYN FIELD " + VERSION, exported: new Date().toISOString(), device: PR.deviceName || "", checksum: await sha256(json), data, photos: await allPhotos() };
+    step(70, "Writing Memory Card…");
+    const name = "HAVYN-MemoryCard-" + ymd(now()) + "-" + (PR.deviceName || "phone").replace(/[^A-Za-z0-9]+/g, "-").replace(/^-|-$/g, "") + ".json";
+    preparedFile = new File([JSON.stringify(card)], name, { type: "application/json" });
+    PR.lastBackup = now(); flush();
+    setTimeout(() => { step(100, "Complete. " + name + " (" + fmtN(preparedFile.size / 1024, 0) + " KB)"); Snd.chime("save"); const s = $("#mcsend"); if (s) s.classList.remove("hide"); }, 260);
+  }
+  async function shareCard() {
+    if (!preparedFile) return;
+    if (navigator.canShare && navigator.canShare({ files: [preparedFile] })) {
+      try { await navigator.share({ files: [preparedFile], title: "HAVYN Memory Card" }); toast("Sent"); return; } catch (e) { if (e && e.name === "AbortError") return; }
+    }
+    downloadCard();
+  }
+  function downloadCard() {
+    if (!preparedFile) return;
+    const url = URL.createObjectURL(preparedFile); const a = document.createElement("a");
+    a.href = url; a.download = preparedFile.name; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+  }
+  async function readCardFile(file) {
+    if (!file) return;
+    if (file.size > 60 * 1024 * 1024) { toast("That file is too large to be a Memory Card"); return; }
+    let card;
+    try { card = JSON.parse(await file.text()); } catch (e) { toast("Not a Memory Card file"); return; }
+    if (!card || card.format !== "havyn.memorycard" || !card.data) { toast("Not an HAVYN Memory Card"); return; }
+    let warn = "";
+    if (card.checksum) { const sum = await sha256(JSON.stringify(card.data)); if (sum && sum !== card.checksum) warn = " Checksum mismatch: the file may be damaged."; }
+    const data = E.sanitize(card.data);
+    const dry = E.merge(snapshot(), data).report;
+    pendingCard = { device: card.device, exported: card.exported, data, photos: card.photos && typeof card.photos === "object" ? card.photos : {}, preview: dry.added + " new and " + dry.updated + " newer records." + warn };
+    render();
+  }
+  async function applyCard(mode) {
+    if (!pendingCard) return;
+    if (mode === "replace") { const d = defaults(); S = Object.assign(d, Object.fromEntries(Object.entries(pendingCard.data).filter(([, v]) => v !== undefined))); S.settings = Object.assign(defaults().settings, S.settings || {}); S.plan = Object.assign(defaults().plan, S.plan || {}); }
+    else S = Object.assign(S, E.merge(snapshot(), pendingCard.data).state);
+    for (const [id, url] of Object.entries(pendingCard.photos)) if (typeof url === "string" && url.startsWith("data:image/") && /^[\w-]+$/.test(id)) await Store.set("photo:" + id, url);
+    pendingCard = null; flush(); Snd.chime("ok"); toast("Memory Card loaded"); render();
+  }
+
+  /* ---------------- photos ---------------- */
+  function hydratePhotos() {
+    $$("img[data-photo]").forEach(async (img) => { const u = await Store.get("photo:" + img.dataset.photo); if (u) img.src = u; else img.remove(); });
+  }
+  function shrinkPhoto(file) {
+    return new Promise((res, rej) => {
+      const r = new FileReader();
+      r.onload = () => {
+        const im = new Image();
+        im.onload = () => { const m = 1280, k = Math.min(1, m / Math.max(im.width, im.height)); const c = document.createElement("canvas"); c.width = Math.round(im.width * k); c.height = Math.round(im.height * k); c.getContext("2d").drawImage(im, 0, 0, c.width, c.height); res(c.toDataURL("image/jpeg", 0.72)); };
+        im.onerror = rej; im.src = r.result;
+      };
+      r.onerror = rej; r.readAsDataURL(file);
+    });
+  }
+
+  /* ---------------- example household ---------------- */
+  function loadExample() {
+    const ex = (o) => Object.assign(o, { id: uid(), example: true, updated: now() });
+    S.people.push(ex({ name: "Parent A", ageBand: "adult" }), ex({ name: "Parent B", ageBand: "adult", meds: "Rescue inhaler" }), ex({ name: "Teen", ageBand: "teen" }), ex({ name: "Kid", ageBand: "child", allergies: "Peanuts: epinephrine in kitchen drawer" }));
+    S.pets.push(ex({ name: "Dog", species: "Dog", weightLb: 45 }));
+    const soon = ymd(now() + 40 * DAY), later = ymd(now() + 400 * DAY);
+    S.items.push(
+      ex({ category: "water", name: "55-gal drum", qty: 2, per_unit: { gal: 55 }, location: "Hall closet", expires: ymd(now() + 300 * DAY) }),
+      ex({ category: "water", name: "WaterBrick 3.5 gal", qty: 4, per_unit: { gal: 3.5 }, location: "Bedroom closet" }),
+      ex({ category: "water", name: "Case: 24 bottles", qty: 2, per_unit: { gal: 3.17 }, location: "Garage shelf" }),
+      ex({ category: "food", name: "Rice, 20 lb", qty: 1, per_unit: { kcal: 32000 }, location: "Pantry", expires: later }),
+      ex({ category: "food", name: "Canned meals", qty: 24, per_unit: { kcal: 450 }, location: "Pantry", expires: later }),
+      ex({ category: "food", name: "Granola bars, box", qty: 3, per_unit: { kcal: 1200 }, location: "Pantry", expires: soon }),
+      ex({ category: "meds", name: "Rescue inhaler", qty: 1, per_unit: { doses: 200 }, per_day: 4, critical: true, location: "Kitchen drawer", expires: later }),
+      ex({ category: "power", name: "1 kWh station", qty: 1, per_unit: { wh: 1024 }, location: "Office" }),
+      ex({ category: "power", name: "Power bank 20,000 mAh", qty: 4, per_unit: { wh: 74 }, location: "Go-bags" }),
+      ex({ category: "gear", name: "Headlamp", qty: 4, location: "Go-bags" }),
+      ex({ category: "gear", name: "CO alarm (battery)", qty: 3, location: "Hallways" })
+    );
+    S.plan = Object.assign({}, S.plan, { contactName: "Aunt in Tucson (example)", contactPhone: "555-0100", rally1: "Front of the house", rally2: "Park at the corner", rally3: "Aunt's house, Tucson", leaveTo: "Hotel on another grid", updated: now() });
+    save(); toast("Example household loaded"); Snd.chime("ok"); render();
+  }
+  function clearExample() {
+    for (const k of ["people", "pets", "items"]) S[k] = S[k].map((r) => (r.example ? { id: r.id, deleted: true, updated: now() } : r));
+    if ((S.plan.contactName || "").includes("(example)")) S.plan = Object.assign(defaults().plan, { updated: now() });
+    save(); toast("Example data removed"); render();
+  }
+
+  /* ---------------- events ---------------- */
+  let toastTimer = 0;
+  function toast(msg) {
+    let el = $(".toast"); if (!el) { el = document.createElement("div"); el.className = "toast"; el.setAttribute("role", "status"); document.body.appendChild(el); }
+    el.textContent = msg; el.classList.remove("hide"); clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.add("hide"), 2400);
+  }
+  const armed = {};
+  function confirmTap(btn, key, label) {
+    if (armed[key] && now() - armed[key] < 4000) { delete armed[key]; return true; }
+    armed[key] = now(); btn.textContent = label; Snd.chime("warn");
+    setTimeout(() => { if (armed[key]) { delete armed[key]; render(); } }, 4000);
+    return false;
+  }
+  document.addEventListener("click", (ev) => {
+    const go = ev.target.closest("[data-go]"); if (go) { location.hash = go.dataset.go; return; }
+    const pre = ev.target.closest("[data-preset]");
+    if (pre) { const [n, v] = pre.dataset.preset.split("|"); const f = pre.closest("form"); const nm = f.querySelector("[name=name]"), pv = f.querySelector("[name=per]"); if (nm) nm.value = n; if (pv) pv.value = v; return; }
+    const b = ev.target.closest("[data-act]"); if (!b) return;
+    const act = b.dataset.act;
+    if (act === "night") { PR.theme = PR.theme === "night" ? "void" : "night"; flush(); render(); }
+    else if (act === "outage-start") { setOne("outage", { active: true, startedAt: now(), endedAt: 0 }); Snd.chime("warn"); toast("Outage clock started"); render(); }
+    else if (act === "outage-stop") { setOne("outage", { active: false, endedAt: now() }); Snd.chime("ok"); toast("Outage ended: " + dur(now() - S.outage.startedAt)); render(); }
+    else if (act === "example") loadExample();
+    else if (act === "clear-example") clearExample();
+    else if (act === "hide-install") { PR.installHidden = true; flush(); render(); }
+    else if (act === "step-next") { ev.preventDefault(); stepTo(1); }
+    else if (act === "step-prev") { ev.preventDefault(); stepTo(-1); }
+    else if (act === "card-jump") { cardView.id = null; Metro.stop(); }
+    else if (act === "beat-toggle") { if (Metro.on) { Metro.stop(); cardView.autoBeat = false; } else { cardView.autoBeat = true; Metro.start(cardView.beatStep || 110); } b.textContent = Metro.on ? "Stop beat" : "Start beat"; }
+    else if (act === "beat-sound") { Metro.sound = !Metro.sound; if (Metro.on) Metro.start(cardView.beatStep || 110); b.textContent = Metro.sound ? "Sound on" : "Sound off"; }
+    else if (act === "reset-checks") { const c = Object.assign({}, S.checks); delete c[b.dataset.id]; S.checks = touch(c); save(); render(); }
+    else if (act === "use") logUse(b.dataset.id, num(b.dataset.n)), render();
+    else if (act === "del") { if (confirmTap(b, "del" + b.dataset.id, "Tap again to delete")) { remove(b.dataset.coll, b.dataset.id); toast("Deleted"); go(b.dataset.coll === "items" ? "#/supplies" : "#/family"); } }
+    else if (act === "mc-save") prepareCard();
+    else if (act === "mc-share") shareCard();
+    else if (act === "mc-download") downloadCard();
+    else if (act === "mc-merge") applyCard("merge");
+    else if (act === "mc-replace") { if (confirmTap(b, "replace", "Tap again: replace everything")) applyCard("replace"); }
+    else if (act === "mc-cancel") { pendingCard = null; render(); }
+    else if (act === "erase") { if (confirmTap(b, "erase", "Tap again to erase this phone")) eraseAll(); }
+  });
+  document.addEventListener("keydown", (ev) => { const g = ev.target.closest && ev.target.closest("[data-go]"); if (g && (ev.key === "Enter" || ev.key === " ")) { ev.preventDefault(); location.hash = g.dataset.go; } });
+  document.addEventListener("change", async (ev) => {
+    const t = ev.target;
+    if (t.dataset && t.dataset.chk) {
+      const [pid, k] = t.dataset.chk.split("|"); const c = Object.assign({}, S.checks); c[pid] = Object.assign({}, c[pid]); if (t.checked) c[pid][k] = now(); else delete c[pid][k];
+      S.checks = touch(c); save(); t.closest(".chk").classList.toggle("done", t.checked); if (t.checked) Snd.chime("nav"); return;
+    }
+    if (t.id === "mcfile") { await readCardFile(t.files && t.files[0]); t.value = ""; return; }
+    if (t.dataset && t.dataset.photoFor) {
+      const f = t.files && t.files[0]; if (!f) return;
+      try { const url = await shrinkPhoto(f); const id = uid(); await Store.set("photo:" + id, url); const old = S.plan[t.dataset.photoFor + "Photo"]; if (old) Store.del("photo:" + old); const p = {}; p[t.dataset.photoFor + "Photo"] = id; setOne("plan", p); toast("Photo saved"); render(); } catch (e) { toast("Could not read that photo"); }
+      return;
+    }
+    const form = t.closest && t.closest("form[data-form=item]");
+    if (form && t.name === "category") { draft = { id: form.dataset.id || "", vals: formVals(form) }; render(); }
+  });
+  function formVals(f) { const o = {}; new FormData(f).forEach((v, k) => { o[k] = typeof v === "string" ? v.trim() : v; }); return o; }
+  document.addEventListener("submit", (ev) => {
+    const f = ev.target.closest("form[data-form]"); if (!f) return;
+    ev.preventDefault();
+    const v = formVals(f), kind = f.dataset.form, id = f.dataset.id;
+    if (kind === "person") {
+      const p = Object.assign({}, id ? byId("people", id) : { id: uid() }, { name: v.name, ageBand: v.ageBand, conditions: v.conditions, meds: v.meds, allergies: v.allergies, blood: v.blood, kcal: optNum(v.kcal), doctor: v.doctor, device: v.device, notes: v.notes });
+      delete p.example; upsert("people", p); toast("Saved"); Snd.chime("ok"); go("#/family");
+    } else if (kind === "pet") {
+      const p = Object.assign({}, id ? byId("pets", id) : { id: uid() }, { name: v.name, species: v.species, weightLb: optNum(v.weightLb), notes: v.notes });
+      delete p.example; upsert("pets", p); toast("Saved"); Snd.chime("ok"); go("#/family");
+    } else if (kind === "plan") {
+      const checkins = [v.c1, v.c2, v.c3].filter(Boolean);
+      setOne("plan", { contactName: v.contactName, contactPhone: v.contactPhone, rally1: v.rally1, rally2: v.rally2, rally3: v.rally3, leaveTo: v.leaveTo, leaveNotes: v.leaveNotes, gas: v.gas, water: v.water, power: v.power });
+      setOne("settings", { checkins }); toast("Plan saved"); Snd.chime("ok"); go("#/family");
+    } else if (kind === "item") {
+      const cat = RES[v.category] ? v.category : "gear", r = RES[cat];
+      const base = id ? byId("items", id) : { id: uid() };
+      const it = Object.assign({}, base, { category: cat, name: v.name || r.label, qty: num(v.qty), location: v.location, expires: v.expires, min_qty: optNum(v.min_qty), notes: v.notes });
+      it.per_unit = r.key ? (() => { const o = {}; o[r.key] = num(v.per); return o; })() : {};
+      if (cat === "meds") { it.per_day = num(v.per_day); it.critical = v.critical === "yes"; it.owner = v.owner; } else { delete it.per_day; delete it.critical; delete it.owner; }
+      delete it.example; draft = null; upsert("items", it); toast("Saved"); Snd.chime("ok"); go("#/supplies/item/" + it.id);
+    } else if (kind === "use") {
+      logUse(id, num(v.n)); render();
+    } else if (kind === "settings") {
+      setOne("settings", { season: v.season, targetDays: num(v.targetDays) || 14, loadWhNormal: num(v.loadWhNormal), loadWhHeat: num(v.loadWhHeat), solarW: num(v.solarW), sunHours: num(v.sunHours) });
+      PR.deviceName = v.deviceName; PR.sound = v.sound === "on"; flush(); toast("Settings saved"); Snd.chime("ok"); render();
+    }
+  });
+  // Swipe left/right on emergency cards.
+  let sx = 0, sy = 0;
+  document.addEventListener("touchstart", (e) => { if (!document.body.classList.contains("em")) return; sx = e.touches[0].clientX; sy = e.touches[0].clientY; }, { passive: true });
+  document.addEventListener("touchend", (e) => {
+    if (!document.body.classList.contains("em") || !cardView.id) return;
+    const dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy;
+    if (Math.abs(dx) > 70 && Math.abs(dy) < 50) stepTo(dx < 0 ? 1 : -1);
+  }, { passive: true });
+  document.addEventListener("click", (e) => { const t = e.target.closest(".tab, a.li"); if (t && !document.body.classList.contains("em")) Snd.chime("nav"); }, true);
+  window.addEventListener("hashchange", render);
+  document.addEventListener("visibilitychange", () => { if (document.hidden) flush(); else if (document.body.classList.contains("em")) Wake.on(); });
+
+  async function eraseAll() {
+    const keys = (await Store.keys()) || [];
+    for (const k of keys) await Store.del(k);
+    S = defaults(); PR = prefDefaults(); preparedFile = null; pendingCard = null; flush(); toast("Erased"); go("#/status");
+  }
+
+  /* ---------------- ticking clocks ---------------- */
+  function tick() {
+    const o = $("[data-tick=outage]"); if (o && S.outage.active) o.textContent = dur(now() - S.outage.startedAt);
+    const c = $("[data-tick=checkin]"); if (c) { const n = E.nextCheckin(S.settings.checkins, now()); if (n) c.textContent = "in " + Math.floor(n.inMin / 60) + "h " + (n.inMin % 60) + "m"; }
+  }
+  setInterval(tick, 1000);
+
+  /* ---------------- boot ---------------- */
+  async function boot() {
+    await Store.open();
+    const st = await Store.get("state"), pr = await Store.get("prefs");
+    if (st && typeof st === "object") { const d = defaults(); S = Object.assign(d, st); S.settings = Object.assign(d.settings, st.settings || {}); S.plan = Object.assign(d.plan, st.plan || {}); }
+    if (pr && typeof pr === "object") PR = Object.assign(prefDefaults(), pr);
+    const v = $(".void"); if (v && !v.children.length) for (let i = 0; i < 14; i++) { const m = document.createElement("i"); m.style.left = (5 + Math.random() * 90) + "%"; m.style.top = (40 + Math.random() * 55) + "%"; m.style.animationDelay = (-Math.random() * 22).toFixed(1) + "s"; v.appendChild(m); }
+    render();
+    document.body.dataset.ready = "1";
+    window.__HAVYN_READY_MS = Math.round(performance.now() - t0); window.__HAVYN_READY_AT = Math.round(performance.now());
+    if (!PREVIEW && "serviceWorker" in navigator) {
+      navigator.serviceWorker.register("./sw.js").then(() => navigator.serviceWorker.ready).then(() => { const s = $("#swst"); if (s) s.textContent = "Saved for offline"; }).catch(() => { const s = $("#swst"); if (s) s.textContent = "Not available"; });
+    }
+  }
+  window.__HAVYN = { get state() { return S; }, get prefs() { return PR; }, E, C, version: VERSION };
+  boot();
+})();
+</script>
+</body>
+</html>
