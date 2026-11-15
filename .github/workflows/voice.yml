@@ -35,7 +35,7 @@ jobs:
         env:
           VOICE: ${{ inputs.voice }}
           SPEED: ${{ inputs.speed }}
-        run: python tools/voice_render.py --voice "$VOICE" --speed "$SPEED" --samples
+        run: PYTHONPATH=tools python tools/voice_render.py --voice "$VOICE" --speed "$SPEED" --samples
       - name: Commit
         env:
           VOICE: ${{ inputs.voice }}
