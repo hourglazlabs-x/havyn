@@ -22,17 +22,20 @@ jobs:
     timeout-minutes: 40
     steps:
       - uses: actions/checkout@v6
+      - uses: actions/setup-python@v5   # Kokoro needs Python 3.10 to 3.12
+        with:
+          python-version: "3.12"
       - name: Tools
         run: |
           sudo apt-get update -q && sudo apt-get install -y -q espeak-ng ffmpeg
-          python3 -m pip install -q --upgrade pip
-          python3 -m pip install -q torch --index-url https://download.pytorch.org/whl/cpu
-          python3 -m pip install -q "kokoro>=0.9.4" soundfile
+          python -m pip install -q --upgrade pip
+          python -m pip install -q torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install -q "kokoro>=0.9.4" soundfile
       - name: Render
         env:
           VOICE: ${{ inputs.voice }}
           SPEED: ${{ inputs.speed }}
-        run: python3 tools/voice_render.py --voice "$VOICE" --speed "$SPEED" --samples
+        run: python tools/voice_render.py --voice "$VOICE" --speed "$SPEED" --samples
       - name: Commit
         env:
           VOICE: ${{ inputs.voice }}
