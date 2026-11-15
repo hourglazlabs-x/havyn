@@ -1,0 +1,112 @@
+{
+ "voice": "bf_emma",
+ "speed": 0.95,
+ "model": "hexgrad/Kokoro-82M (Apache-2.0)",
+ "lines": {
+  "welcome": {
+   "text": "Welcome to Haven.",
+   "file": "welcome.mp3",
+   "bytes": 17612,
+   "sha256": "c8f7e4b48eda2971560c1fb523c7e897c3aafb1ca833c4b3148e33db74ef936b",
+   "ms": 1373
+  },
+  "around": {
+   "text": "Let me show you around.",
+   "file": "around.mp3",
+   "bytes": 18188,
+   "sha256": "b55baffaeeb3f91c0053189542b416aa006a40498913c8c4ca755e422d09074f",
+   "ms": 1437
+  },
+  "level": {
+   "text": "This is your command deck. Your level rises as you finish quests, and most of them finish themselves.",
+   "file": "level.mp3",
+   "bytes": 67148,
+   "sha256": "7c40181ca3caf19ea1bf44fb99342aef2c826ba309fa4ce94ff312fd6d2e97c5",
+   "ms": 5502
+  },
+  "now": {
+   "text": "When something happens, tap it here. Everything you need is in one place.",
+   "file": "now.mp3",
+   "bytes": 50444,
+   "sha256": "5c6a6c730f0678fa77a5e40d1475ea985c0655b61a91d8a9ccd7d0b62e6eee83",
+   "ms": 4118
+  },
+  "sos": {
+   "text": "In an emergency, tap the red button. Every card is two taps away.",
+   "file": "sos.mp3",
+   "bytes": 50444,
+   "sha256": "c9564d9ac9de2187871a3ccaf97f6c9b3a38cbc9b24a53bc3fed0620d6ba46d0",
+   "ms": 4114
+  },
+  "guides": {
+   "text": "Guides tells you what to do, step by step.",
+   "file": "guides.mp3",
+   "bytes": 31436,
+   "sha256": "b5b3114383626f8b790484bed84a2e4012d5e90f98fc4d1e151d9df0b849240f",
+   "ms": 2521
+  },
+  "family": {
+   "text": "Family keeps everyone's medicines, allergies and needs in one place.",
+   "file": "family.mp3",
+   "bytes": 49292,
+   "sha256": "8b1512beab2ac505f601e7d102279a2f2347fdc15c859035bdb819db0d91c8a5",
+   "ms": 4020
+  },
+  "supplies": {
+   "text": "Supplies turns what you have into days you can last.",
+   "file": "supplies.mp3",
+   "bytes": 36332,
+   "sha256": "569ab346d7ed5a1b7b01a32c9fdec8cd25037a9bfb18090abf2a2251b3544ead",
+   "ms": 2949
+  },
+  "search": {
+   "text": "Search finds anything, even inside every manual, with no internet.",
+   "file": "search.mp3",
+   "bytes": 51308,
+   "sha256": "81de99f154a6699c18d2028fce09f84d03e80978bb2d4de214d0b843b626b11d",
+   "ms": 4191
+  },
+  "get": {
+   "text": "Now I'm downloading everything this phone needs. Stay on Wi-Fi, and keep me open.",
+   "file": "get.mp3",
+   "bytes": 57068,
+   "sha256": "7cedf88e4a361f1971e188e39ba4d0ec94966a7f7ef0ff2cc158b7efe9287b69",
+   "ms": 4657
+  },
+  "home": {
+   "text": "One last step. Add Haven to your Home Screen, and open it from the icon.",
+   "file": "home.mp3",
+   "bytes": 51020,
+   "sha256": "fae1ee556911911fb4ab94db02f28e0ff3970d5ba26f409fb44b400eef2b3461",
+   "ms": 4154
+  },
+  "stocked": {
+   "text": "This phone already has everything. It works with no internet.",
+   "file": "stocked.mp3",
+   "bytes": 44108,
+   "sha256": "73a1ec57f84bb6d33d9a1f14c6e5b0edf567fb51eadc6c7af9315933207a021b",
+   "ms": 3591
+  },
+  "preview": {
+   "text": "In the app on your Home Screen, everything downloads right here, by itself.",
+   "file": "preview.mp3",
+   "bytes": 49004,
+   "sha256": "fc31727c1808af66f841ec515728d7bf4e039782add110e8fab414477f915d60",
+   "ms": 4007
+  },
+  "equipped": {
+   "text": "You're equipped. Everything works with no internet, and nothing leaves this phone.",
+   "file": "equipped.mp3",
+   "bytes": 49004,
+   "sha256": "0ac0dcd9e7aafe6986e019bd9c358c5960d9e23162e3aced52051c2ff88b1800",
+   "ms": 4001
+  },
+  "sample": {
+   "text": "Welcome to Haven. This is my voice.",
+   "file": "sample.mp3",
+   "bytes": 28844,
+   "sha256": "300894b77f039fa305b87cb64efd3a443b19944323f27fb0115998c455ec73d9",
+   "ms": 2308
+  }
+ }
+}
