@@ -361,3 +361,37 @@ test("v1.6 every line HAVYN speaks has a recording in its own voice (src/voice/l
     for (const t of lines) assert.ok(Object.values(m.lines).some((l) => l.text === t && fs.existsSync(path.join(__dirname, "..", "src", "voice", l.file))), "rendered: " + t);
   }
 });
+
+test("v1.7 every emergency-card step has a recording of its own words, read for the ear", () => {
+  const { execFileSync } = require("node:child_process"), path = require("node:path"), fs = require("node:fs");
+  const want = JSON.parse(execFileSync("python3", ["-c", "import json, voice_lines; print(json.dumps(voice_lines.all_lines()))"], { cwd: path.join(__dirname, "..", "tools") }).toString());
+  const cards = want.filter((l) => l.kind === "card"), C = require("../src/content.js");
+  assert.equal(cards.length, C.cards.reduce((n, c) => n + c.steps.length, 0), "one line per step");
+  for (const c of C.cards) c.steps.forEach((s, i) => assert.ok(cards.some((l) => l.id === "c-" + c.id + "-" + i), "line for " + c.id + " step " + (i + 1)));
+  // read for the ear: no symbols or abbreviations a voice would stumble on
+  for (const l of cards) assert.doesNotMatch(l.text, /\b911\b|°|\bmg\b|\bCPR\b|\bAED\b|›|\d in\b|\(\d/, l.id + ": " + l.text);
+  assert.match(cards.find((l) => l.id === "c-cpr-0").text, /^C P R\. /);
+  const m = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "src", "voice", "manifest.json"), "utf8"));
+  for (const l of want) {
+    const r = m.lines[l.id];
+    assert.ok(r && r.text === l.text, "recording matches the words: " + l.id);
+    assert.ok(fs.existsSync(path.join(__dirname, "..", "src", "voice", r.file)), "file for " + l.id);
+    assert.ok(r.ms > 400 && r.bytes > 2000, "not empty: " + l.id);
+  }
+});
+
+test("v1.7 time buttons: labels unique per card, timers point at real steps, stops pair with starts", () => {
+  const C = require("../src/content.js");
+  let n = 0;
+  for (const c of C.cards) for (const m of c.log || []) {
+    n++;
+    assert.ok(m.w && m.w.length <= 22, c.id + ": short label " + m.w);
+    assert.equal(c.log.filter((x) => x.w === m.w).length, 1, c.id + ": unique " + m.w);
+    if (m.due) { assert.ok(m.due > 0 && m.due <= 30 && m.hint, c.id + ": a timer has a reason"); }
+    if (m.at !== undefined) assert.ok(c.steps[m.at] && /minute/i.test(c.steps[m.at].t + " " + c.steps[m.at].d), c.id + ": step " + (m.at + 1) + " is the one about the wait");
+    if (m.of) assert.ok(c.log.some((x) => x.w === m.of && !x.of), c.id + ": " + m.w + " ends " + m.of);
+  }
+  assert.ok(n >= 15);
+  const sz = C.cards.find((c) => c.id === "seizure").log;
+  assert.equal(sz[0].due, 5); assert.match(sz[0].hint, /911/);
+});

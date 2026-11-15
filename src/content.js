@@ -10,6 +10,7 @@ const HAVYN_CONTENT = {
   cards: [
     {
       id: "cpr", title: "CPR", sub: "Teen or adult not responding, not breathing normally", icon: "heart",
+      log: [{ w: "CPR started" }, { w: "AED shock given" }],
       steps: [
         { t: "Tap and shout. Breathing normally?", d: "Not responding and not breathing normally means start CPR. Gasping is not normal breathing." },
         { t: "Call 911 on speaker", d: "Send someone to find an AED. The dispatcher can coach you." },
@@ -26,6 +27,7 @@ const HAVYN_CONTENT = {
     },
     {
       id: "cprchild", title: "CPR child", sub: "Child or baby not responding, not breathing normally", icon: "heart",
+      log: [{ w: "CPR started" }, { w: "AED shock given" }],
       steps: [
         { t: "Tap and shout. Breathing normally?", d: "Baby: tap the foot. Not responding and not breathing normally means start CPR. Gasping is not normal breathing." },
         { t: "Call 911 on speaker", d: "Alone with no phone at hand: give about 2 minutes of CPR first, then go call." },
@@ -61,6 +63,7 @@ const HAVYN_CONTENT = {
     },
     {
       id: "bleeding", title: "Bleeding", sub: "Life-threatening bleeding", icon: "drop",
+      log: [{ w: "Tourniquet on" }],
       steps: [
         { t: "Make sure you are safe. Call 911", d: "Put on gloves if you have them." },
         { t: "Find where the blood comes from", d: "Open or cut away clothing to see the wound." },
@@ -79,6 +82,7 @@ const HAVYN_CONTENT = {
     },
     {
       id: "heartattack", title: "Heart attack", sub: "Chest pain, pressure or squeezing", icon: "heart", checked: "2026-11-15",
+      log: [{ w: "Aspirin given" }],
       steps: [
         { t: "Chest pain or pressure? Call 911 now", d: "Don't wait to be sure. It can spread to an arm, the back, neck, jaw or stomach, and come with shortness of breath, a cold sweat, nausea or lightheadedness. Women more often have breathlessness, nausea, back or jaw pain.", call: { n: "911", num: "911" } },
         { t: "Sit them down and keep them still", d: "Loosen tight clothing. Nobody drives them to the hospital: paramedics start treatment on the way." },
@@ -95,6 +99,7 @@ const HAVYN_CONTENT = {
     },
     {
       id: "anaphylaxis", title: "Allergy", sub: "Anaphylaxis: severe allergic reaction", icon: "allergy",
+      log: [{ w: "Epinephrine given", due: 5, at: 4, hint: "5 minutes: no better, or worse? Step 5" }],
       steps: [
         { t: "Spot it", d: "After a food, sting or medicine: trouble breathing or wheezing, tight throat, swollen lips or tongue, hives all over, repeated vomiting, pale or blue skin, dizziness or fainting. Or mild signs in two body areas at once." },
         { t: "Epinephrine now", d: "Auto-injector: middle of the outer thigh, through clothing is fine. Nasal spray: into one nostril. Follow the device's own instructions." },
@@ -112,6 +117,7 @@ const HAVYN_CONTENT = {
     },
     {
       id: "stroke", title: "Stroke", sub: "BE FAST", icon: "brain",
+      log: [{ w: "Symptoms noticed" }],
       steps: [
         { t: "B: Balance", d: "Sudden loss of balance or coordination?" },
         { t: "E: Eyes", d: "Sudden loss or change of vision?" },
@@ -148,6 +154,7 @@ const HAVYN_CONTENT = {
     },
     {
       id: "heatstroke", title: "Heat stroke", sub: "Hot, confused, collapsing", icon: "sun",
+      log: [{ w: "Cooling started", due: 15, at: 3, hint: "15 minutes of cooling: step 4" }],
       steps: [
         { t: "Spot it", d: "Body 103°F or higher. Hot, red, dry or damp skin. Fast, strong pulse. Confusion or passing out. No thermometer? Confusion in the heat is enough." },
         { t: "Call 911", d: "Heat stroke is a medical emergency." },
@@ -184,6 +191,7 @@ const HAVYN_CONTENT = {
     },
     {
       id: "burns", title: "Burns", sub: "Heat, chemical, electrical", icon: "flame",
+      log: [{ w: "Cooling started", due: 20, at: 1, hint: "20 minutes of cool water: done" }],
       steps: [
         { t: "Stop the burning", d: "Away from the heat. Take off jewelry and clothing near the burn, unless it is stuck." },
         { t: "Cool running water, right away", d: "Cool, not ice. At least 10 minutes, ideally 20. No running water? Use a clean, cool wet cloth. Large burn or small child: watch that they don't get too cold." },
@@ -218,6 +226,7 @@ const HAVYN_CONTENT = {
     },
     {
       id: "seizure", title: "Seizure", sub: "Shaking, unresponsive", icon: "pulse",
+      log: [{ w: "Seizure started", due: 5, at: 4, hint: "Over 5 minutes: call 911" }, { w: "Seizure stopped", of: "Seizure started" }],
       steps: [
         { t: "Ease them to the ground", d: "Move hard and sharp things away." },
         { t: "Protect the head", d: "Something soft and flat under the head. Take off glasses. Loosen anything around the neck." },
@@ -252,6 +261,7 @@ const HAVYN_CONTENT = {
     },
     {
       id: "overdose", title: "Opioid overdose", sub: "Won't wake up, slow or no breathing", icon: "pill",
+      log: [{ w: "Naloxone given", due: 2, at: 4, hint: "2 to 3 minutes, no change? Step 5" }],
       steps: [
         { t: "Shout their name and rub the breastbone hard", d: "Signs: won't wake up, slow or no breathing, blue or gray lips, tiny pupils, gurgling." },
         { t: "Call 911 now", d: "Put it on speaker. Say someone won't wake up and isn't breathing normally." },
@@ -269,6 +279,7 @@ const HAVYN_CONTENT = {
     },
     {
       id: "poison", title: "Poisoning", sub: "Swallowed, breathed in, on skin or in eyes", icon: "poison", checked: "2026-11-15",
+      log: [{ w: "Rinsing started", due: 15, hint: "15 to 20 minutes of rinsing" }],
       steps: [
         { t: "Won't wake up, not breathing, or a seizure? Call 911", d: "Start CPR if they aren't breathing normally.", call: { n: "911", num: "911" }, link: "cpr" },
         { t: "Everything else: call Poison Control", d: "1-800-222-1222, free and open 24/7; it reaches your local poison center. Call right away, before any signs. Keep the container in your hand.", call: { n: "Poison Control", num: "1-800-222-1222" } },
@@ -287,6 +298,7 @@ const HAVYN_CONTENT = {
     },
     {
       id: "asthma", title: "Asthma attack", sub: "Wheezing, can't catch their breath", icon: "lungs",
+      log: [{ w: "Inhaler used" }],
       steps: [
         { t: "After a sting, food or medicine? Epinephrine first", d: "Sudden trouble breathing then may be anaphylaxis.", link: "anaphylaxis" },
         { t: "Sit them upright and stay with them", d: "Keep them calm. Loosen anything tight around the chest or neck." },
@@ -302,6 +314,7 @@ const HAVYN_CONTENT = {
     },
     {
       id: "lowsugar", title: "Low blood sugar", sub: "Diabetes: shaky, sweaty, confused", icon: "candy",
+      log: [{ w: "Sugar given", due: 15, at: 3, hint: "15 minutes: check again (step 4)" }, { w: "Glucagon given", due: 15, at: 1, hint: "15 minutes, not awake? Step 2" }],
       steps: [
         { t: "Passed out, seizing or can't swallow? Nothing by mouth", d: "Food or drink can choke them. Call 911 now." },
         { t: "Give their glucagon if they have it", d: "Follow the kit. Turn them on their side; they may throw up. Not awake in 15 minutes: a second dose if you have one." },

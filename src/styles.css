@@ -621,3 +621,54 @@ body:not([data-ready]) .tabbar { opacity: 0; }
 .qall { text-decoration: none; color: var(--cyan); }
 .quests.mini .li { padding: 9px 12px; }
 .quests.mini .li .tx b { font-size: .92rem; }
+
+/* ---------------- v1.7 professional polish ---------------- */
+/* Home's status line: four instrument cells */
+.strip { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; margin: 2px 0 4px; }
+.strip .sc { min-width: 0; padding: 7px 9px 8px; border-radius: 12px; border: 1px solid var(--line); background: rgba(255,255,255,.035); }
+.strip small { display: block; font: 500 .55rem var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--mute); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.strip b { display: flex; align-items: center; gap: 6px; margin-top: 3px; font-size: .8rem; font-weight: 650; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.strip .ok b::before, .strip .warn b::before { content: ""; flex: none; width: 6px; height: 6px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 8px var(--ok); }
+.strip .warn b::before { background: var(--warn); box-shadow: 0 0 8px var(--warn); }
+/* numbered sections, like a system dashboard */
+.sec .lab b { display: inline-block; margin-right: 8px; padding: 1px 6px; border-radius: 6px; font-weight: 600; color: var(--cyan); border: 1px solid color-mix(in srgb, var(--cyan) 40%, transparent); background: color-mix(in srgb, var(--cyan) 8%, transparent); letter-spacing: .08em; }
+.sec.first { margin-top: 8px; }
+/* the voice guide on a card */
+.emvrow { display: flex; gap: 8px; margin: 14px 0 2px; }
+.emvoice, .emagain { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px; border-radius: 12px; border: 1.5px solid rgba(255,255,255,.4); background: #000; color: #fff; font: 700 .95rem var(--sans); }
+.emvoice.on { border-color: #fff; background: rgba(255,255,255,.12); }
+.emvoice svg, .emagain svg { width: 20px; height: 20px; flex: none; }
+/* times for the paramedics */
+.emlog { margin-top: 18px; padding-top: 14px; border-top: 1.5px solid rgba(255,255,255,.25); }
+.emlog .emdh, .emdeep .emdh { display: flex; align-items: center; gap: 8px; }
+.emlog .emdh svg { width: 18px; height: 18px; }
+.emmark { display: grid; gap: 3px; width: 100%; margin-top: 10px; padding: 12px 14px; text-align: left; border-radius: 14px; border: 2px solid #fff; background: #000; color: #fff; }
+.emmark .mw { display: flex; align-items: center; gap: 10px; font-size: 1.25rem; font-weight: 800; }
+.emmark .mw svg { width: 22px; height: 22px; flex: none; }
+.emmark .mtime { font-size: 1rem; color: #cfcfcf; }
+.emmark .mtime b { font: 700 1.05rem var(--mono); color: #fff; }
+.emmark.done { background: #0c0c0c; }
+.emmark.done .mw svg { color: var(--ok); }
+.emmark .mh { display: none; font-weight: 800; font-size: 1.05rem; color: #000; background: var(--warn); border-radius: 8px; padding: 4px 8px; margin-top: 4px; justify-self: start; }
+.emmark.due { border-color: var(--warn); }
+.emmark.due .mh { display: block; }
+.emlogl { display: flex; align-items: center; gap: 10px; margin-top: 10px; min-height: 56px; padding: 0 14px; border-radius: 14px; border: 2px solid #fff; background: #fff; color: #000; text-decoration: none; font-size: 1.15rem; font-weight: 800; }
+.emlogl svg { width: 22px; height: 22px; flex: none; }
+.emlogl span { flex: 1; }
+.emlogl b { font: 800 1rem var(--mono); padding: 2px 9px; border-radius: 999px; background: #000; color: #fff; }
+.emlogbar { display: flex; align-items: center; gap: 12px; margin: 0 0 12px; padding: 12px 14px; border-radius: 16px; background: #fff; color: #000; text-decoration: none; }
+.emlogbar svg { width: 26px; height: 26px; flex: none; }
+.emlogbar b { display: block; font-size: 1.2rem; font-weight: 850; }
+.emlogbar small { font-size: .95rem; }
+.logsub { font-size: 1.05rem; color: #cfcfcf; margin: 10px 0 6px; }
+.loglist { list-style: none; margin: 8px 0 0; padding: 0; }
+.loglist li { display: grid; grid-template-columns: auto 1fr auto; align-items: baseline; gap: 12px; padding: 12px 2px; border-bottom: 1px solid rgba(255,255,255,.22); }
+.loglist time { font: 800 1.15rem var(--mono); }
+.loglist span { font-size: 1.25rem; font-weight: 600; line-height: 1.25; color: #cfcfcf; }
+.loglist .key span { color: #fff; font-weight: 800; }
+.loglist em { font-style: normal; font-weight: 700; color: var(--warn); }
+.loglist small { font: 600 .9rem var(--mono); color: #bdbdbd; }
+.loglive { margin-top: 12px; font-size: 1.05rem; color: #cfcfcf; }
+.loglive b { font: 800 1.15rem var(--mono); color: #fff; }
+/* know-how tiles: two lines instead of cutting words off */
+.mt small { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }

@@ -132,7 +132,7 @@
     people: [], pets: [], items: [], log: [], tasks: [], buys: []
   });
   const prefDefaults = () => ({ theme: "void", sound: true, deviceName: "", lastBackup: 0, installHidden: false });
-  let S = defaults(), PR = prefDefaults();
+  let S = defaults(), PR = prefDefaults(), INC = null;
   let saveTimer = null;
   function save() { clearTimeout(saveTimer); saveTimer = setTimeout(flush, 120); }
   function flush() { clearTimeout(saveTimer); Store.set("state", S); Store.set("prefs", PR); }
@@ -276,6 +276,8 @@
     if (route.path === "search") SearchUI.mount();
     if (route.path === "archive") Get.mount();
     if (route.path === "status" || route.path === "" || route.path === "quests") Ready.mount();
+    CardVoice.sync();
+    if (route.path === "status" || route.path === "") Strip.fill();
   }
 
   /* ---------------- shared chrome ---------------- */
@@ -338,15 +340,28 @@
     return out + "</svg>";
   }
 
+  // Home's status line, like an operating system's: works offline, what's stored, the last Memory Card, online or not.
+  const Strip = {
+    html() {
+      const off = !!(navigator.serviceWorker && navigator.serviceWorker.controller) || PREVIEW, card = PR.lastBackup ? Math.floor((now() - PR.lastBackup) / DAY) : -1, net = navigator.onLine !== false;
+      const cell = (k, v, cl, id) => '<div class="sc' + (cl ? " " + cl : "") + '"><small>' + k + "</small><b" + (id ? ' id="' + id + '"' : "") + ">" + v + "</b></div>";
+      return '<div class="strip" aria-label="System status">' + cell("Offline", off ? "Ready" : "Not yet", off ? "ok" : "warn") + cell("Stored", this.used ? sz(this.used) : "…", "", "stuse") +
+        cell("Backup", card < 0 ? "Never" : card === 0 ? "Today" : card + "d ago", card < 0 || card > 30 ? "warn" : "ok") + cell("Network", net ? "Online" : "Offline", net ? "ok" : "") + "</div>";
+    },
+    fill() {
+      if (!navigator.storage || !navigator.storage.estimate) return;
+      navigator.storage.estimate().then((e) => { this.used = e.usage || 0; const el = $("#stuse"); if (el && this.used) el.textContent = sz(this.used); }).catch(() => {});
+    }
+  };
   function deck() {
     // The command deck: the one red button, then "What's happening?", then the rest of HAVYN as tiles.
     let h = '<a class="sostile" href="#/emergency"><span class="sd">' + ic("cross") + '</span><span class="tx"><b>Someone\'s hurt</b><small>Not breathing, bleeding, choking, chest pain: the cards, with one-tap 911</small></span>' + ic("chev") + "</a>";
-    h += '<div class="sec"><span class="lab">What\'s happening?</span></div><div class="nowgrid">' + (C.situations || []).map((x) => {
+    h += '<div class="sec"><span class="lab"><b>02</b> What\'s happening?</span></div><div class="nowgrid">' + (C.situations || []).map((x) => {
       const pb = x.pb && C.playbooks.find((p) => p.id === x.pb && !p.soon), pr = pb ? countChecks(pb) : null;
       return '<a class="gt" href="#/now/' + x.id + '">' + ic(x.icon) + "<b>" + esc(x.t) + "</b>" + (pr && pr.d ? '<small class="on">' + pr.d + " of " + pr.n + " done</small>" : "<small>" + esc(x.sub) + "</small>") + "</a>";
     }).join("") + "</div>";
-    h += '<div class="sec"><span class="lab">Know-how</span></div><div class="menugrid">' +
-      [["#/field", "book", "How do I…", FIELD().length + " answers"], ["#/library", "globe", "Library", libSummary() || "Encyclopedias, manuals"], ["#/plan", "pin", "Plan", "Meeting places, contacts"], ["#/comms", "radio", "Comms", "Radios, check-ins"]]
+    h += '<div class="sec"><span class="lab"><b>03</b> Know-how</span></div><div class="menugrid">' +
+      [["#/field", "book", "How do I…", FIELD().length + " answers"], ["#/library", "globe", "Library", libSummary() || "Books and manuals"], ["#/plan", "pin", "Plan", "Where to meet"], ["#/comms", "radio", "Comms", "Radios, check-ins"]]
         .map(([href, icn, b, sm]) => '<a class="mt" href="' + href + '">' + ic(icn) + "<span><b>" + esc(b) + "</b><small>" + esc(sm) + "</small></span></a>").join("") + "</div>";
     return h;
   }
@@ -361,8 +376,8 @@
     const rs = Ready.score(), lv = level(rs);
     if (PR.level && lv.n > PR.level && !Welcome.on) setTimeout(() => { toast("LEVEL UP · " + lv.rank.toUpperCase() + " · LV " + lv.n); Snd.chime("save"); }, 400);
     if (PR.level !== lv.n) { PR.level = lv.n; flush(); }
-    h += Ready.panel() + deck();
-    h += '<div class="sec"><span class="lab">Family status</span></div>';
+    h += Strip.html() + '<div class="sec first"><span class="lab"><b>01</b> Readiness</span></div>' + Ready.panel() + deck();
+    h += '<div class="sec"><span class="lab"><b>04</b> Family status</span></div>';
     h += '<section class="glass hero"><div class="lab">Family autonomy</div>';
     if (!people.length) {
       h += '<div class="num"><span class="big">—</span><span class="unit">DAYS</span></div><div class="sub">Add your household and supplies to see how long you can last.</div></section>';
@@ -413,6 +428,78 @@
   }
 
   function renderQuests() { return backbar("#/status", "Quests") + Ready.panel(true); }
+
+  // The voice guide reads each step of an emergency card aloud, in HAVYN's own voice, as it comes up (hands-free).
+  const CardVoice = {
+    said: "",
+    sync() {
+      const m = /^#\/emergency\/([\w-]+)/.exec(location.hash || "");
+      const key = m && PR.cardVoice !== false ? "c-" + m[1] + "-" + (cardView.id === m[1] ? cardView.step : 0) : "";
+      if (!key || !Clips.hasId(key)) { if (this.said) this.off(); return; }
+      if (key === this.said) return;
+      this.said = key; this.say(key);
+    },
+    say(key) { AudioMode.set("playback"); Clips.playId(key || this.said); },
+    off() { Clips.stop(); this.said = ""; AudioMode.set("auto"); }
+  };
+
+  // The log for responders: one tap stamps the time of what was done (CPR started, a tourniquet on, a dose given, a
+  // seizure's start and end), with a live timer where the card says to wait. Paramedics see it all on one screen.
+  // Kept on this phone only (not in Memory Cards); a log with nothing new for 6 hours is finished.
+  const mss = (ms) => { const s = Math.max(0, Math.floor(ms / 1000)), h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), x = s % 60; return (h ? h + ":" + String(m).padStart(2, "0") : m) + ":" + String(x).padStart(2, "0"); };
+  const hm = (t) => new Date(t).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+  const STOPS = () => { const o = {}; C.cards.forEach((c) => (c.log || []).forEach((m) => { if (m.of) o[m.w] = m.of; })); return o; };
+  const Inc = {
+    arm: 0,
+    on() { return INC && now() - INC.last < 6 * 3600e3 ? INC : null; },
+    add(w, card) {
+      if (!this.on()) {
+        INC = { last: now(), ev: [] };
+        const c = cardView.id && C.cards.find((x) => x.id === cardView.id);
+        if (c && cardView.at && !/^Opened /.test(w)) INC.ev.push({ t: cardView.at, c: c.id, w: "Opened the " + c.title + " card" });
+      }
+      INC.ev.push({ t: now(), c: card || "", w }); INC.last = now(); Store.set("incident", INC);
+    },
+    opened(c) { // while a log is running, opening a card is part of the story (once per card in 10 minutes)
+      if (!this.on()) return;
+      const l = INC.ev.filter((e) => e.c === c.id && /^Opened /.test(e.w)).pop();
+      if (!l || now() - l.t > 10 * 60e3) this.add("Opened the " + c.title + " card", c.id);
+    },
+    last(w) { const I = this.on(); return I ? I.ev.filter((e) => e.w === w).pop() : null; },
+    count(w) { const I = this.on(); return I ? I.ev.filter((e) => e.w === w).length : 0; },
+    clear() { INC = null; this.arm = 0; Store.set("incident", null); }
+  };
+  function logRow(c) {
+    if (!c.log || !c.log.length) return "";
+    const stopOf = (m, e) => { const x = c.log.find((y) => y.of === m.w), se = x && Inc.last(x.w); return se && se.t >= e.t ? se : null; };
+    return '<div class="emlog"><div class="emdh">' + ic("clock") + "Times for the paramedics</div>" + c.log.map((m) => {
+      const e = Inc.last(m.w), n = Inc.count(m.w);
+      let t = "Tap when it happens", due = false;
+      if (e && m.of) { const st = Inc.last(m.of); t = hm(e.t) + (st && st.t <= e.t ? " · lasted " + mss(e.t - st.t) : ""); }
+      else if (e) {
+        const sp = stopOf(m, e);
+        if (sp) t = hm(e.t) + " · lasted " + mss(sp.t - e.t);
+        else { due = !!m.due && now() - e.t >= m.due * 60e3; t = hm(e.t) + ' · <b data-since="' + e.t + '"' + (m.due ? ' data-due="' + m.due + '"' : "") + ">" + mss(now() - e.t) + "</b> ago"; }
+      }
+      return '<button class="emmark' + (e ? " done" : "") + (due ? " due" : "") + '" data-act="inc-mark" data-w="' + esc(m.w) + '" data-card="' + c.id + '">' +
+        '<span class="mw">' + ic(e ? "check" : "clock") + esc(m.w) + (n > 1 ? " ×" + n : "") + '</span><span class="mtime">' + t + "</span>" +
+        (m.hint && e && !stopOf(m, e) ? '<span class="mh">' + esc(m.hint) + "</span>" : "") + "</button>";
+    }).join("") + (Inc.on() ? '<a class="emlogl" href="#/emergency/log">' + ic("clock") + "<span>Show the log</span><b>" + Inc.on().ev.length + "</b></a>" : "") + "</div>";
+  }
+  function renderLog() {
+    const I = INC, st = STOPS();
+    let h = emTop() + '<div class="emhead"><span>Log for responders</span>' + (I && I.ev.length ? "<span>From " + hm(I.ev[0].t) + "</span>" : "") + "</div>";
+    if (!I || !I.ev.length) return h + '<div class="emdet" style="margin-top:14px">Nothing logged yet. On a card, tap a time button (like "CPR started") when it happens.</div><div class="emnav"><a class="next" href="#/emergency" style="grid-column:1/-1">ALL CARDS</a></div>';
+    const t0 = I.ev[0].t;
+    h += '<p class="logsub">Show this screen to the paramedics, or read it to the 911 dispatcher.' + (Inc.on() ? "" : " It's from " + new Date(t0).toLocaleDateString() + ".") + "</p>";
+    h += '<ol class="loglist">' + I.ev.map((e, i) => {
+      const from = st[e.w] && I.ev.slice(0, i).filter((x) => x.w === st[e.w]).pop();
+      return "<li" + (/^Opened /.test(e.w) ? "" : ' class="key"') + "><time>" + hm(e.t) + "</time><span>" + esc(e.w) + (from ? " <em>lasted " + mss(e.t - from.t) + "</em>" : "") + "</span><small>" + (i ? "+" + mss(e.t - t0) : "first") + "</small></li>";
+    }).join("") + "</ol>";
+    if (Inc.on()) h += '<div class="loglive">Since the first entry <b data-since="' + t0 + '">' + mss(now() - t0) + "</b></div>";
+    h += '<div class="emnav"><button data-act="inc-clear">' + (Inc.arm && now() - Inc.arm < 5000 ? "TAP AGAIN" : "CLEAR LOG") + '</button><a class="next" href="#/emergency">ALL CARDS</a></div>';
+    return h;
+  }
 
   /* ---------------- WHAT'S HAPPENING: one situation, everything for it ---------------- */
   function renderNow() {
@@ -487,15 +574,19 @@
   }
 
   /* ---------------- EMERGENCY ---------------- */
-  const cardView = { id: null, step: 0, beatStep: 0, autoBeat: false };
+  const cardView = { id: null, step: 0, beatStep: 0, autoBeat: false, at: 0 };
   function emTop() {
     return '<div class="emtop"><a class="exit" href="#/status">EXIT</a><a class="call" href="tel:911">' + ic("phone") + "CALL 911</a></div>";
   }
   function renderEmergency() {
     const id = route.parts[1];
+    if (id === "log") return renderLog();
     if (id) return renderCard(id);
     cardView.id = null; cardView.beatStep = 0;
-    let h = emTop() + '<div class="emgrid">';
+    let h = emTop();
+    const I = Inc.on();
+    if (I) h += '<a class="emlogbar" href="#/emergency/log">' + ic("clock") + "<span><b>Log for responders</b><small>" + I.ev.length + (I.ev.length === 1 ? " entry" : " entries") + " since " + hm(I.ev[0].t) + "</small></span></a>";
+    h += '<div class="emgrid">';
     for (const c of C.cards) h += '<a class="emtile" href="#/emergency/' + c.id + '">' + ic(c.icon) + "<span><b>" + esc(c.title) + "</b><br><small>" + esc(c.sub) + "</small></span></a>";
     h += "</div>";
     h += '<div class="emnote">' + esc(C.noSignal) + "</div>";
@@ -505,13 +596,16 @@
   function renderCard(id) {
     const c = C.cards.find((x) => x.id === id);
     if (!c) return renderEmergency();
-    if (cardView.id !== id) { cardView.id = id; cardView.step = 0; }
+    if (cardView.id !== id) { cardView.id = id; cardView.step = 0; cardView.at = now(); Inc.opened(c); }
     const n = c.steps.length, i = Math.min(cardView.step, n - 1), s = c.steps[i];
     cardView.beatStep = s.beat || 0;
     let h = emTop();
+    const vg = Clips.hasId("c-" + c.id + "-" + i);
     h += '<div class="emhead"><span>' + esc(c.title) + "</span><span>Step " + (i + 1) + " of " + n + "</span></div>";
     h += '<div class="dots">' + c.steps.map((_, k) => "<i" + (k <= i ? ' class="on"' : "") + "></i>").join("") + "</div>";
     h += '<div class="emstep">' + esc(s.t) + '</div><div class="emdet">' + esc(s.d) + "</div>";
+    if (vg) h += '<div class="emvrow"><button class="emvoice' + (PR.cardVoice === false ? "" : " on") + '" data-act="card-voice" aria-pressed="' + (PR.cardVoice !== false) + '">' + ic(PR.cardVoice === false ? "speakeroff" : "speaker") + "<span>" + (PR.cardVoice === false ? "Voice guide off" : "Voice guide on") + "</span></button>" +
+      (PR.cardVoice !== false ? '<button class="emagain" data-act="card-say">' + ic("play") + "<span>Repeat</span></button>" : "") + "</div>";
     if (s.beat) {
       h += '<div class="beat" aria-hidden="true"><div><b>PUSH</b><small>' + s.beat + " / min</small></div></div>";
       h += '<div class="cprbar"><span>Time <b class="mono" id="cprtime">0:00</b> <span id="swap" class="swap hide">SWITCH</span></span>' +
@@ -522,6 +616,7 @@
     if (s.link) h += '<a class="emlink" href="#/emergency/' + s.link + '" data-act="card-jump" data-card="' + s.link + '">Open ' + esc(C.cards.find((x) => x.id === s.link).title) + " card</a>";
     h += '<div class="emnav"><button data-act="step-prev"' + (i === 0 ? " disabled" : "") + ">BACK</button>" +
       (i < n - 1 ? '<button class="next" data-act="step-next">NEXT</button>' : '<a class="next" href="#/emergency">ALL CARDS</a>') + "</div>";
+    h += logRow(c);
     if (c.note) h += '<div class="emnote">' + esc(c.note) + "</div>";
     if (c.noteLink) h += '<a class="emlink" href="#/emergency/' + c.noteLink + '" data-act="card-jump">Open ' + esc(C.cards.find((x) => x.id === c.noteLink).title) + " card</a>";
     const deep = deeperRefs("card", c.id), here = deep.filter((r) => pageHref(r[0], r[1]));
@@ -2151,7 +2246,7 @@
       const st = sc >= 90 ? "ok" : sc >= 50 ? "warn" : "crit", lv = level(sc), circ = 2 * Math.PI * 34;
       let h = '<section class="glass panel ready hud" id="ready"><div class="rdyhead">' +
         '<div class="ring" aria-hidden="true"><svg viewBox="0 0 80 80"><circle cx="40" cy="40" r="34" class="rt"/><circle cx="40" cy="40" r="34" class="rp" style="stroke-dasharray:' + circ.toFixed(1) + ";stroke-dashoffset:" + (circ * (1 - sc / 100)).toFixed(1) + '"/></svg><div class="lv"><small>LV</small><b>' + lv.n + "</b></div></div>" +
-        '<div class="hudtx"><div class="lab">This phone · readiness</div><div class="rank">' + esc(lv.rank) + "</div>" +
+        '<div class="hudtx"><div class="lab">This phone · rank</div><div class="rank">' + esc(lv.rank) + "</div>" +
         '<div class="num"><span class="big">' + sc + '</span><span class="unit">% READY</span>' + (lv.next ? '<span class="xpn">' + (lv.next.at - sc) + " XP to " + esc(lv.next.rank) + "</span>" : '<span class="xpn">Max level</span>') + "</div></div></div>" +
         '<div class="bar xp"><i style="width:' + sc + '%"></i></div>';
       if (!PREVIEW && !done) {
@@ -2740,6 +2835,10 @@
       Snd.chime("nav");
     }
     else if (act === "q-save") quickSave();
+    else if (act === "inc-mark") { Inc.add(b.dataset.w, b.dataset.card); render(); }
+    else if (act === "inc-clear") { if (Inc.arm && now() - Inc.arm < 5000) { Inc.clear(); go("#/emergency"); } else { Inc.arm = now(); render(); } }
+    else if (act === "card-voice") { PR.cardVoice = PR.cardVoice === false; flush(); if (PR.cardVoice === false) CardVoice.off(); else { Snd.ctx(); CardVoice.said = ""; } render(); }
+    else if (act === "card-say") { Snd.ctx(); const m = /^#\/emergency\/([\w-]+)/.exec(location.hash || ""); if (m) CardVoice.say("c-" + m[1] + "-" + cardView.step); }
     else if (act === "voice-test") { Welcome.muted = false; Snd.ctx(); Voice.unlock(); Voice.say("Welcome to Haven. This is my voice."); setTimeout(render, 600); }
     else if (act === "wel-begin") Welcome.begin();
     else if (act === "wel-skip") Welcome.close("skip");
@@ -2867,6 +2966,14 @@
     if (Math.abs(dx) > 70 && Math.abs(dy) < 50) stepTo(dx < 0 ? 1 : -1);
   }, { passive: true });
   document.addEventListener("click", (e) => { const t = e.target.closest(".tab, a.li, a.gt, a.mt, a.nc, a.sostile"); if (t && !document.body.classList.contains("em")) Snd.chime("nav"); }, true);
+  document.addEventListener("click", (e) => {
+    const a = e.target.closest('a[href^="tel:"]'); if (!a || !document.body.classList.contains("em")) return;
+    const n = decodeURIComponent(a.getAttribute("href").slice(4)), w = n === "911" ? "Called 911" : "Called " + (a.textContent.trim().replace(/^call\s+/i, "") || n);
+    Inc.add(w, cardView.id || ""); if (route.path === "emergency") setTimeout(render, 50);
+  }, true);
+  // An iPhone lets a page make sound only after a touch: unlock it on the first touch of every session (silently),
+  // so the voice guide can speak the moment a card opens.
+  ["pointerdown", "touchend", "keydown"].forEach((ev) => document.addEventListener(ev, function once() { Snd.ctx(); document.removeEventListener(ev, once, true); }, true));
   window.addEventListener("hashchange", render);
   document.addEventListener("visibilitychange", () => { if (document.hidden) flush(); else { if (document.body.classList.contains("em")) Wake.on(); Everything.carryOn(); } });
   window.addEventListener("online", () => Everything.carryOn());
@@ -2875,12 +2982,13 @@
     await PdfV.close(); Media.close(); for (const x of LIB) if (typeOf(x) === "zim") ZR.drop(x.id); LIB = [];
     const keys = (await Store.keys()) || [];
     for (const k of keys) await Store.del(k);
-    S = defaults(); PR = prefDefaults(); preparedFile = null; pendingCard = null; flush(); toast("Erased"); go("#/status");
+    S = defaults(); PR = prefDefaults(); preparedFile = null; pendingCard = null; Inc.clear(); flush(); toast("Erased"); go("#/status");
   }
 
   /* ---------------- ticking clocks ---------------- */
   function tick() {
     const o = $("[data-tick=outage]"); if (o && S.outage.active) o.textContent = dur(now() - S.outage.startedAt);
+    $$("[data-since]").forEach((el) => { const ms = now() - Number(el.dataset.since), d = Number(el.dataset.due || 0); el.textContent = mss(ms); if (d) { const b = el.closest(".emmark"); if (b) b.classList.toggle("due", ms >= d * 60e3); } });
     const c = $("[data-tick=checkin]"); if (c) { const n = E.nextCheckin(S.settings.checkins, now()); if (n) c.textContent = "in " + Math.floor(n.inMin / 60) + "h " + (n.inMin % 60) + "m"; }
   }
   setInterval(tick, 1000);
@@ -2916,7 +3024,7 @@
     },
     say(t) {
       if (Welcome.muted || !t) return;
-      if (Clips.has(t)) { this.stop(); Clips.play(t).then((ok) => { if (!ok) this.speak(t); }); return; }
+      if (Clips.has(t)) { this.stop(); Clips.play(t).then((ok) => { if (ok === false) this.speak(t); }); return; }
       this.speak(t);
     },
     speak(t) {
@@ -2931,8 +3039,10 @@
   // (Kokoro-82M, tools/voice_render.py) and shipped with the app, so it sounds the same on every phone, offline.
   // Played through Web Audio, which the first touch unlocks; a line with no recording falls back to the phone's voice.
   const Clips = {
-    map: null, buf: {}, played: [], src: null,
-    init() { if (this.map) return; this.map = {}; const V = window.HAVYN_VOICE; if (V && V.lines) for (const k in V.lines) this.map[V.lines[k].text] = "./voice/" + V.lines[k].file + "?" + (V.lines[k].sha || ""); },
+    map: null, buf: {}, played: [], src: null, seq: 0,
+    init() { if (this.map) return; this.map = {}; this.ids = {}; const V = window.HAVYN_VOICE; if (V && V.lines) for (const k in V.lines) { const u = "./voice/" + V.lines[k].file + "?" + (V.lines[k].sha || ""); this.map[V.lines[k].text] = u; this.ids[k] = V.lines[k].text; } },
+    hasId(id) { this.init(); return !!this.ids[id]; },
+    playId(id) { this.init(); return this.ids[id] ? this.play(this.ids[id]) : Promise.resolve(false); },
     has(t) { this.init(); return !!this.map[t]; },
     load(t) {
       this.init(); const u = this.map[t], a = Snd.ctx(); if (!u || !a) return Promise.resolve(null);
@@ -2941,12 +3051,17 @@
       return this.buf[u];
     },
     preload() { this.init(); Object.keys(this.map).forEach((t) => this.load(t)); },
+    // true: playing; false: can't play it (fall back); null: a newer line or a stop came first (stay quiet).
     async play(t) {
-      const b = await this.load(t), a = Snd.ctx(); if (!b || !a || Welcome.muted) return false;
-      this.stop(); if (a.state === "suspended") try { await a.resume(); } catch (e) {}
+      const my = ++this.seq, b = await this.load(t), a = Snd.ctx();
+      if (my !== this.seq) return null;
+      if (!b || !a || (Welcome.on && Welcome.muted)) return false;
+      this.halt(); if (a.state === "suspended") try { await a.resume(); } catch (e) {}
+      if (my !== this.seq) return null;
       const s = a.createBufferSource(), g = a.createGain(); g.gain.value = 1; s.buffer = b; s.connect(g).connect(a.destination); s.start(); this.src = s; this.played.push(t); return true;
     },
-    stop() { try { if (this.src) this.src.stop(); } catch (e) {} this.src = null; }
+    stop() { this.seq++; this.halt(); },
+    halt() { try { if (this.src) this.src.stop(); } catch (e) {} this.src = null; }
   };
   // While the welcome plays, its sound plays like a video (even with the ring switch on silent); after it, back to normal.
   const AudioMode = { set(t) { try { if (navigator.audioSession) navigator.audioSession.type = t; } catch (e) {} } };
@@ -3066,7 +3181,7 @@
       return [
         { go: "#/status", at: "#ready .rdyhead", t: "Your level", d: "Your phone levels up as you finish quests: the downloads, your household, your supplies, a Memory Card. Most of it happens by itself, and every quest is a few taps.", say: "This is your command deck. Your level rises as you finish quests, and most of them finish themselves." },
         { go: "#/status", at: ".nowgrid", t: "What's happening?", d: "Tap what's going on: power out, extreme heat, a storm, smoke, unsafe water, an earthquake. You get everything for it in one place: the steps, the cards, the manual pages and the numbers to call.", say: "When something happens, tap it here. Everything you need is in one place." },
-        { go: "#/status", at: ".tab.sos", t: "Someone hurt? The red button", d: "This red button, on every screen (and the red tile on Home), opens twenty step-by-step cards: CPR with a beat to follow, bleeding, choking, heart attack, heat stroke and more, with one-tap 911.", say: "In an emergency, tap the red button. Every card is two taps away." },
+        { go: "#/status", at: ".tab.sos", t: "Someone hurt? The red button", d: "This red button, on every screen (and the red tile on Home), opens twenty step-by-step cards: CPR with a beat to follow, bleeding, choking, heart attack, heat stroke and more. Each card reads its steps aloud, keeps the times for the paramedics, and calls 911 in one tap.", say: "In an emergency, tap the red button. Each card talks you through it, step by step, and keeps the times for the paramedics." },
         { go: "#/guides", at: ".tab[data-tab=guides]", t: "Guides: know what to do", d: "How do I… opens the exact page in the manuals on this phone. Playbooks walk you through blackouts, extreme heat, storms and smoke.", say: "Guides tells you what to do, step by step." },
         { go: "#/family", at: ".tab[data-tab=family]", t: "Family: your people", d: "Everyone's medicines, allergies and needs. Fill it in once, then copy it to every phone with the Memory Card.", say: "Family keeps everyone's medicines, allergies and needs in one place." },
         { go: "#/supplies", at: ".tab[data-tab=supplies]", t: "Supplies: what you have", d: "Water, food, medicine and power on hand become days of autonomy, and HAVYN warns you before anything expires.", say: "Supplies turns what you have into days you can last." },
@@ -3145,6 +3260,7 @@
     if (st && typeof st === "object") { const d = defaults(); S = Object.assign(d, st); S.settings = Object.assign(d.settings, st.settings || {}); S.plan = Object.assign(d.plan, st.plan || {}); }
     if (pr && typeof pr === "object") PR = Object.assign(prefDefaults(), pr);
     const lib = await Store.get("lib"); LIB = Array.isArray(lib) ? lib.filter((x) => x && typeof x.id === "string") : [];
+    const inc = await Store.get("incident"); INC = inc && Array.isArray(inc.ev) && inc.ev.length ? inc : null;
     const v = $(".void"); if (v && !v.children.length) for (let i = 0; i < 14; i++) { const m = document.createElement("i"); m.style.left = (5 + Math.random() * 90) + "%"; m.style.top = (40 + Math.random() * 55) + "%"; m.style.animationDelay = (-Math.random() * 22).toFixed(1) + "s"; v.appendChild(m); }
     // First open from the Home Screen: get everything onto this phone without being asked (the welcome says so, and Stop stops it).
     if (isStandalone() && !PREVIEW && !PR.setupAt) { PR.setupAt = Date.now(); PR.autoGet = true; PR.firstGet = true; flush(); }
@@ -3159,6 +3275,6 @@
       navigator.serviceWorker.register("./sw.js").then(() => navigator.serviceWorker.ready).then(() => { const s = $("#swst"); if (s) s.textContent = "Saved for offline"; }).catch(() => { const s = $("#swst"); if (s) s.textContent = "Not available"; });
     }
   }
-  window.__HAVYN = { get state() { return S; }, get prefs() { return PR; }, get lib() { return LIB; }, E, C, version: VERSION, arc: Arc, shelf: Shelf, ready: Ready, store: Store, welcome: Welcome, voice: Voice, clips: Clips };
+  window.__HAVYN = { get incident() { return INC; }, get state() { return S; }, get prefs() { return PR; }, get lib() { return LIB; }, E, C, version: VERSION, arc: Arc, shelf: Shelf, ready: Ready, store: Store, welcome: Welcome, voice: Voice, clips: Clips };
   boot();
 })();

@@ -1,0 +1,177 @@
+[
+ {
+  "name": "Home status line: offline, stored, backup, network",
+  "pass": true,
+  "detail": "['offline', 'stored', 'backup', 'network']"
+ },
+ {
+  "name": "Home status line: storage on this phone fills in",
+  "pass": true,
+  "detail": "74 KB"
+ },
+ {
+  "name": "Home status line: no Memory Card yet reads Never (amber)",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "Home sections are numbered 01 to 04",
+  "pass": true,
+  "detail": "['01', '02', '03', '04']"
+ },
+ {
+  "name": "Know-how tiles say short things (nothing cut off)",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "Every card step ships with its recording",
+  "pass": true,
+  "detail": "121 of 121"
+ },
+ {
+  "name": "Opening a card reads step 1 aloud in HAVYN's voice",
+  "pass": true,
+  "detail": "1"
+ },
+ {
+  "name": "Voice guide is on by default, with Repeat",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "Next reads step 2",
+  "pass": true,
+  "detail": "1"
+ },
+ {
+  "name": "\u2026and it is playing",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "Repeat reads the step again",
+  "pass": true,
+  "detail": "2"
+ },
+ {
+  "name": "Voice guide switches off (and stops talking)",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "Off means quiet on the next step",
+  "pass": true,
+  "detail": "0"
+ },
+ {
+  "name": "Switching it back on reads the current step",
+  "pass": true,
+  "detail": "1"
+ },
+ {
+  "name": "Opening another card reads its first step",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "Leaving the cards stops the voice",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "No card log without a time button (Choking has none)",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "All recordings are saved with the app",
+  "pass": true,
+  "detail": "136"
+ },
+ {
+  "name": "With no internet, a card step's recording still plays (from the phone)",
+  "pass": true,
+  "detail": "29996"
+ },
+ {
+  "name": "A recording that went missing is saved again when it next plays online",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "Opening a card doesn't start a log by itself",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "Seizure card has its two time buttons",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "A tap stamps the time (and when the card was opened)",
+  "pass": true,
+  "detail": "['Opened the Seizure card', 'Seizure started']"
+ },
+ {
+  "name": "The timer runs",
+  "pass": true,
+  "detail": "('0:00', '0:02')"
+ },
+ {
+  "name": "No warning before the card's 5 minutes",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "After 5 minutes the button warns, in the card's own words",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "Stopping shows how long it lasted, and the warning goes",
+  "pass": true,
+  "detail": "TIMES FOR THE PARAMEDICS\nSeizure started\n4:04 PM \u00b7 lasted 5:22\nSeizure stopped\n4:10 PM \u00b7 lasted 5:22\nShow the log\n3"
+ },
+ {
+  "name": "Calling 911 from a card goes in the log",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "The log lists every entry in order",
+  "pass": true,
+  "detail": "['4:04 PM Opened the Seizure card first', '4:04 PM Seizure started +0:00', '4:10 PM Seizure stopped lasted 5:22 +5:22', '4:10 PM Called 911 +5:22']"
+ },
+ {
+  "name": "\u2026with the time since the first entry",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "All cards: the log is one tap away",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "The log survives closing the app",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "Clear asks for a second tap",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "\u2026then clears it",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "No errors on the page",
+  "pass": true,
+  "detail": "[]"
+ }
+]

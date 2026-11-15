@@ -7,14 +7,18 @@ const VERSION = "__VERSION__";
 const CACHE = "havyn-field-" + VERSION;
 const ASSETS = ["./", "./index.html", "./manifest.webmanifest", "./apple-touch-icon.png", "./icon-192.png", "./icon-512.png", "./icon-maskable-512.png",
   "./pdfjs/pdf.min.js", "./pdfjs/pdf.worker.min.js", "./pdflib/pdf-lib.esm.min.js", "./zimkit.js",
-  "./vault/get-vault.sh", "./vault/get-vault.ps1", "./vault/START-HERE.html"/*VOICE*/];
+  "./vault/get-vault.sh", "./vault/get-vault.ps1", "./vault/START-HERE.html"];
+// HAVYN's recorded voice (the welcome, the tour and every emergency-card step). Cached with the app, one by one, so a
+// file that fails on a weak connection never stops the app itself from installing; a missing one is saved the first
+// time it plays with a connection.
+const VOICE = [/*VOICE*/];
 
 // Archive pages never run scripts and never reach the network.
 const ZCSP = "default-src 'self' data: blob:; script-src 'none'; object-src 'none'; frame-src 'none'; worker-src 'none'; connect-src 'none'; " +
   "form-action 'none'; base-uri 'self'; style-src 'self' 'unsafe-inline' data:; img-src 'self' data: blob:; media-src 'self' data: blob:; font-src 'self' data:";
 
 self.addEventListener("install", (event) => {
-  event.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS)).then(() => self.skipWaiting()));
+  event.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS).then(() => Promise.allSettled(VOICE.map((u) => c.add(u))))).then(() => self.skipWaiting()));
 });
 
 self.addEventListener("activate", (event) => {
@@ -124,6 +128,13 @@ self.addEventListener("fetch", (event) => {
   const rel = url.pathname.startsWith(scopePath) ? url.pathname.slice(scopePath.length) : "";
   if (rel.startsWith("z/")) { event.respondWith(zimResponse(rel.slice(2), req, base)); return; }
   if (rel.startsWith("shelf/")) return; // shelf downloads go straight to HAVYN's address; the app stores them itself, never twice
+  if (rel.startsWith("voice/")) {
+    event.respondWith(caches.match(req, { ignoreSearch: true }).then((r) => r || fetch(req).then((res) => {
+      if (res.ok && res.status === 200) { const copy = res.clone(); caches.open(CACHE).then((c) => c.put(url.origin + url.pathname, copy)).catch(() => {}); }
+      return res;
+    })));
+    return;
+  }
   if (req.mode === "navigate") {
     event.respondWith(caches.match("./index.html").then((r) => r || fetch(req)));
     return;
