@@ -380,12 +380,13 @@ def fetch_item1(it, work, rel):
         r.update(ok=False, error=str(e)[:1500])
     return r
 
-def keep_prev(p, repo, tag, rel):
-    """Make sure last build's copy is still in the release; phone-set files are fetched too (they go in the phone zip)."""
+def keep_prev(p, repo, tag, rel, ph=None):
+    """Make sure last build's copy is still in the release; phone-set files are fetched too (they go in the phone zip).
+    ph: whether today's catalog puts it in the phone set (last build's record may say otherwise)."""
     if not p.get("mirror"): return True
     url = RELEASES % (repo, tag) + urllib.parse.quote(p["file"])
     try:
-        if p.get("ph"):
+        if p.get("ph") if ph is None else ph:
             size, sha = download(url, rel / p["file"])
             if sha != p.get("sha256"): raise RuntimeError("checksum differs from last build")
         else:
@@ -400,7 +401,7 @@ def carry_over(results, prev, prev_built, repo, tag, rel):
     for i, r in enumerate(results):
         p = prev.get(r["id"])
         if r.get("ok") or not p or p.get("file") != r.get("file") or bool(p.get("mirror")) != bool(r.get("mirror")) or p.get("rev", 0) != r.get("rev", 0): continue
-        if not keep_prev(p, repo, tag, rel): continue
+        if not keep_prev(p, repo, tag, rel, bool(r.get("ph"))): continue
         results[i] = dict(p, carried=r.get("error", "")[:600], carried_from=prev_built)
         print("↺ %-16s kept last build's copy (today: %s)" % (r["id"], r.get("error", "")[:160]), flush=True)
 
@@ -450,7 +451,7 @@ def main():
         for it in cat["items"]:
             p = prev.get(it["id"])
             if it["id"] in got: continue
-            if p and p.get("file") == it["file"] and p.get("rev", 0) == it.get("rev", 0) and keep_prev(p, repo, tag, rel): got[it["id"]] = p
+            if p and p.get("file") == it["file"] and p.get("rev", 0) == it.get("rev", 0) and keep_prev(p, repo, tag, rel, bool(it.get("ph"))): got[it["id"]] = p
             elif it["id"] in prev_all and not prev_all[it["id"]].get("ok"): got[it["id"]] = prev_all[it["id"]]   # still missing: keep it listed
         results = [got[it["id"]] for it in cat["items"] if it["id"] in got]
     apply_catalog(results, cat["items"])
@@ -475,7 +476,15 @@ def main():
               "same release). Built %s from %s.\n" % (datetime.date.today().isoformat(), repo))
     with zipfile.ZipFile(rel / "HAVYN-shelf-phone.zip", "w", zipfile.ZIP_STORED) as z:
         z.writestr("HAVYN-shelf-phone/README.txt", readme)
-        for r in phone: z.write(rel / r["file"], "HAVYN-shelf-phone/" + r["file"])
+        for r in phone:
+            f = rel / r["file"]
+            if not f.exists():   # a kept copy that only just joined the phone set: fetch it from the release
+                try:
+                    size, sha = download(RELEASES % (repo, tag) + urllib.parse.quote(r["file"]), f)
+                    if sha != r.get("sha256"): raise RuntimeError("checksum differs from the index")
+                except Exception as e:
+                    print("left out of the phone zip: %s (%s)" % (r["file"], e)); f.unlink(missing_ok=True); continue
+            z.write(f, "HAVYN-shelf-phone/" + r["file"])
     index = {"built": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds"), "repo": repo, "release": tag, "items": results}
     (rel / "shelf-index.json").write_text(json.dumps(index, indent=1, ensure_ascii=False), encoding="utf-8")
     prev_sha = {p["file"]: p.get("sha256") for p in prev.values() if p.get("mirror")}

@@ -107,7 +107,8 @@ threading.Thread(target=srv.serve_forever, daemon=True).start()
 sha = lambda b: hashlib.sha256(b).hexdigest()
 PREV = [
  {"id": "it-rev", "ok": True, "mirror": True, "file": "Rev-Doc.pdf", "sha256": "0" * 64, "size": 1, "t": "Rev", "sys": "a", "by": "x", "lic": "pd", "rev": 0},
- {"id": "it-stub", "ok": True, "mirror": True, "file": "Stub-Doc.pdf", "sha256": sha(PREV_STUB), "size": len(PREV_STUB), "t": "Stub doc", "sys": "a", "by": "x", "lic": "pd", "ph": True, "url": BASE + "/stub/s.pdf"},
+ # last build had it outside the phone set; today's catalog puts it in (the NEETS 4/5 case of 2026-11-15)
+ {"id": "it-stub", "ok": True, "mirror": True, "file": "Stub-Doc.pdf", "sha256": sha(PREV_STUB), "size": len(PREV_STUB), "t": "Stub doc", "sys": "a", "by": "x", "lic": "pd", "url": BASE + "/stub/s.pdf"},
  {"id": "it-flaky", "ok": True, "mirror": True, "file": "Flaky-Doc.pdf", "sha256": sha(DOC["FLAKY doc"]), "size": 1, "t": "Flaky", "sys": "a", "by": "x", "lic": "pd"},
 ]
 cat = {"release": "shelf", "checked": "2026-11-14", "systems": [{"id": "a", "n": "01", "t": "Alpha"}], "items": [
