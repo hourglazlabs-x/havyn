@@ -1,0 +1,62 @@
+[
+ {
+  "id": "welcome",
+  "text": "Welcome to Haven."
+ },
+ {
+  "id": "around",
+  "text": "Let me show you around."
+ },
+ {
+  "id": "level",
+  "text": "This is your command deck. Your level rises as you finish quests, and most of them finish themselves."
+ },
+ {
+  "id": "now",
+  "text": "When something happens, tap it here. Everything you need is in one place."
+ },
+ {
+  "id": "sos",
+  "text": "In an emergency, tap the red button. Every card is two taps away."
+ },
+ {
+  "id": "guides",
+  "text": "Guides tells you what to do, step by step."
+ },
+ {
+  "id": "family",
+  "text": "Family keeps everyone's medicines, allergies and needs in one place."
+ },
+ {
+  "id": "supplies",
+  "text": "Supplies turns what you have into days you can last."
+ },
+ {
+  "id": "search",
+  "text": "Search finds anything, even inside every manual, with no internet."
+ },
+ {
+  "id": "get",
+  "text": "Now I'm downloading everything this phone needs. Stay on Wi-Fi, and keep me open."
+ },
+ {
+  "id": "home",
+  "text": "One last step. Add Haven to your Home Screen, and open it from the icon."
+ },
+ {
+  "id": "stocked",
+  "text": "This phone already has everything. It works with no internet."
+ },
+ {
+  "id": "preview",
+  "text": "In the app on your Home Screen, everything downloads right here, by itself."
+ },
+ {
+  "id": "equipped",
+  "text": "You're equipped. Everything works with no internet, and nothing leaves this phone."
+ },
+ {
+  "id": "sample",
+  "text": "Welcome to Haven. This is my voice."
+ }
+]

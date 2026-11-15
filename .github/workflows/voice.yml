@@ -1,0 +1,46 @@
+# HAVYN's voice: renders every spoken line in an elegant British woman's voice with Kokoro-82M (Apache-2.0) and
+# commits the MP3s to src/voice/, so every phone plays the same voice offline, whatever voices it has installed.
+# Manual: run it again after changing src/voice/lines.json, or to try another voice or speed.
+name: Voice
+on:
+  workflow_dispatch:
+    inputs:
+      voice:
+        description: "Kokoro voice (British women: bf_emma, bf_isabella, bf_alice, bf_lily)"
+        default: "bf_emma"
+      speed:
+        description: "Speaking speed (1 = normal; lower is slower and calmer)"
+        default: "0.95"
+permissions:
+  contents: write
+concurrency:
+  group: voice
+  cancel-in-progress: false
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v6
+      - name: Tools
+        run: |
+          sudo apt-get update -q && sudo apt-get install -y -q espeak-ng ffmpeg
+          python3 -m pip install -q --upgrade pip
+          python3 -m pip install -q torch --index-url https://download.pytorch.org/whl/cpu
+          python3 -m pip install -q "kokoro>=0.9.4" soundfile
+      - name: Render
+        env:
+          VOICE: ${{ inputs.voice }}
+          SPEED: ${{ inputs.speed }}
+        run: python3 tools/voice_render.py --voice "$VOICE" --speed "$SPEED" --samples
+      - name: Commit
+        env:
+          VOICE: ${{ inputs.voice }}
+          SPEED: ${{ inputs.speed }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/voice
+          if git diff --cached --quiet; then echo "no change"; exit 0; fi
+          git commit -m "Voice: HAVYN's lines in $VOICE at speed $SPEED (Kokoro-82M)"
+          git pull --rebase -q origin main && git push -q origin HEAD:main
