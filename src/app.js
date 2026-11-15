@@ -2573,9 +2573,9 @@
       '<div class="kv"><span>Version</span><span class="mono">' + esc(VERSION) + "</span></div>" +
       '<p class="empty" style="font-size:.85rem">Deleting the app icon deletes its data. Keep Memory Cards on another phone and the vault drive.</p>' +
       '<div class="btnrow"><button class="btn ghost" data-act="wel-replay">' + ic("play") + "Replay the welcome tour</button></div></section>";
-    const vi = Voice.ok() ? Voice.info() : null;
-    h += '<section class="glass panel"><h3>Voice</h3><div class="kv"><span>In use</span><span>' + (vi ? esc(vi.name) + " · " + esc(vi.lang) : Voice.ok() ? "Loading…" : "This browser can't speak") + "</span></div>" +
-      (vi && vi.gb ? "" : '<p class="empty" style="font-size:.85rem">HAVYN speaks with an elegant British woman\'s voice when the iPhone has one: Settings › Accessibility › Spoken Content › Voices › English › English (UK) › Serena or Martha, then download the Enhanced or Premium version. HAVYN picks it up by itself.</p>') +
+    const vi = Voice.ok() ? Voice.info() : null, VV = window.HAVYN_VOICE;
+    h += '<section class="glass panel"><h3>Voice</h3><div class="kv"><span>In use</span><span>' + (VV ? "HAVYN's own British voice (built in, works offline)" : vi ? esc(vi.name) + " · " + esc(vi.lang) : Voice.ok() ? "Loading…" : "This browser can't speak") + "</span></div>" +
+      (VV || (vi && vi.gb) ? "" : '<p class="empty" style="font-size:.85rem">HAVYN speaks with an elegant British woman\'s voice when the iPhone has one: Settings › Accessibility › Spoken Content › Voices › English › English (UK) › Serena or Martha, then download the Enhanced or Premium version. HAVYN picks it up by itself.</p>') +
       '<div class="btnrow"><button class="btn ghost" data-act="voice-test">' + ic("speaker") + "Hear it</button></div></section>";
     h += '<section class="glass panel"><h3>Danger zone</h3><button class="btn ghost danger wide" data-act="erase">Erase everything on this phone</button></section>';
     return h;
@@ -2740,7 +2740,7 @@
       Snd.chime("nav");
     }
     else if (act === "q-save") quickSave();
-    else if (act === "voice-test") { Welcome.muted = false; Voice.say("Welcome to Haven. This is the voice I'll use."); setTimeout(render, 600); }
+    else if (act === "voice-test") { Welcome.muted = false; Snd.ctx(); Voice.unlock(); Voice.say("Welcome to Haven. This is my voice."); setTimeout(render, 600); }
     else if (act === "wel-begin") Welcome.begin();
     else if (act === "wel-skip") Welcome.close("skip");
     else if (act === "wel-sos") Welcome.close("sos");
@@ -2915,13 +2915,42 @@
       if (!this.pick()) try { speechSynthesis.addEventListener("voiceschanged", () => this.pick(), { once: true }); } catch (e) {}
     },
     say(t) {
+      if (Welcome.muted || !t) return;
+      if (Clips.has(t)) { this.stop(); Clips.play(t).then((ok) => { if (!ok) this.speak(t); }); return; }
+      this.speak(t);
+    },
+    speak(t) {
       if (!this.ok() || Welcome.muted || !t) return;
       try { speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(t), v = this.v || this.pick(); if (v) { u.voice = v; u.lang = v.lang; } else u.lang = "en-GB"; u.rate = 0.92; u.pitch = 1.02; speechSynthesis.speak(u); } catch (e) {}
     },
-    stop() { try { if (this.ok()) speechSynthesis.cancel(); } catch (e) {} },
+    stop() { Clips.stop(); try { if (this.ok()) speechSynthesis.cancel(); } catch (e) {} },
     // what System shows: the voice in use, and whether it's the British woman's voice HAVYN was made for
     info() { const v = this.v || this.pick(); return v ? { name: v.name, lang: v.lang, gb: /(Serena|Martha|Kate|Stephanie|Fiona|Libby|Sonia|Maisie|Hazel|Bella|UK English Female)/i.test(v.name) } : null; }
   };
+  // HAVYN's own voice: every line the welcome and the tour speak, pre-rendered in an elegant British woman's voice
+  // (Kokoro-82M, tools/voice_render.py) and shipped with the app, so it sounds the same on every phone, offline.
+  // Played through Web Audio, which the first touch unlocks; a line with no recording falls back to the phone's voice.
+  const Clips = {
+    map: null, buf: {}, played: [], src: null,
+    init() { if (this.map) return; this.map = {}; const V = window.HAVYN_VOICE; if (V && V.lines) for (const k in V.lines) this.map[V.lines[k].text] = "./voice/" + V.lines[k].file + "?" + (V.lines[k].sha || ""); },
+    has(t) { this.init(); return !!this.map[t]; },
+    load(t) {
+      this.init(); const u = this.map[t], a = Snd.ctx(); if (!u || !a) return Promise.resolve(null);
+      if (!this.buf[u]) this.buf[u] = fetch(u).then((r) => (r.ok ? r.arrayBuffer() : Promise.reject(new Error("HTTP " + r.status))))
+        .then((ab) => new Promise((res, rej) => a.decodeAudioData(ab, res, rej))).catch(() => { delete this.buf[u]; return null; });
+      return this.buf[u];
+    },
+    preload() { this.init(); Object.keys(this.map).forEach((t) => this.load(t)); },
+    async play(t) {
+      const b = await this.load(t), a = Snd.ctx(); if (!b || !a || Welcome.muted) return false;
+      this.stop(); if (a.state === "suspended") try { await a.resume(); } catch (e) {}
+      const s = a.createBufferSource(), g = a.createGain(); g.gain.value = 1; s.buffer = b; s.connect(g).connect(a.destination); s.start(); this.src = s; this.played.push(t); return true;
+    },
+    stop() { try { if (this.src) this.src.stop(); } catch (e) {} this.src = null; }
+  };
+  // While the welcome plays, its sound plays like a video (even with the ring switch on silent); after it, back to normal.
+  const AudioMode = { set(t) { try { if (navigator.audioSession) navigator.audioSession.type = t; } catch (e) {} } };
+
   // The open's sound, made on the phone: a low swell that opens into an unresolved A major chord, a bell as the mark lands,
   // and soft ticks as the letters resolve. No audio files.
   const WelSnd = {
@@ -3014,7 +3043,7 @@
       const d = $("#wel"); if (!d) return;
       if (d.classList.contains("go")) { if (d.classList.contains("p2") && !$("#tour")) this.tour(0); return; }
       const seq = this.seq, alive = () => seq === this.seq && this.on && !!$("#wel"), rm = matchMedia("(prefers-reduced-motion: reduce)").matches;
-      Snd.ctx(); Voice.unlock();   // inside the touch: sound and voice are allowed from here on
+      AudioMode.set("playback"); Snd.ctx(); Voice.unlock(); Clips.preload();   // inside the touch: sound and voice are allowed from here on
       d.classList.add("go"); WelSnd.boot();
       await pause(rm ? 80 : 500); if (!alive()) return;
       d.classList.add("p1");
@@ -3024,8 +3053,8 @@
       await pause(rm ? 250 : 1000); if (!alive()) return;
       WelSnd.bell(); Voice.say("Welcome to Haven.");   // spoken as a word: voices spell out capitals
       await pause(rm ? 700 : 1900); if (!alive()) return;
-      d.classList.add("p3");
-      await pause(rm ? 700 : 2000); if (!alive()) return;
+      d.classList.add("p3"); Voice.say("Let me show you around.");
+      await pause(rm ? 900 : 2300); if (!alive()) return;
       this.tour(0);
     },
     steps() {
@@ -3033,7 +3062,7 @@
       const ready = PREVIEW ? { t: "Everything, on every phone", d: "In HAVYN on your Home Screen, this is where the manuals and encyclopedias download by themselves, then work with no internet.", say: "In the app on your Home Screen, everything downloads right here, by itself." }
         : !L.n ? { t: "This phone is stocked", d: "The manuals and encyclopedias are already here and work with no internet. HAVYN tops them up when you open it on Wi-Fi.", say: "This phone already has everything. It works with no internet." }
         : home ? { t: "Getting this phone ready", d: "HAVYN is downloading everything now: " + L.n + " manuals and encyclopedias, " + size + ". Stay on Wi-Fi and keep HAVYN open; if it closes, it picks up where it stopped. Your first quest completes itself.", say: "Now I'm downloading everything this phone needs. Stay on Wi-Fi, and keep me open.", get: true }
-        : { t: "One step left: the Home Screen", d: "Tap Share (in Safari's ••• menu if you don't see it), then Add to Home Screen. Open HAVYN from the new icon and it downloads everything by itself (" + size + " on Wi-Fi).", say: "One last step. Add HAVYN to your Home Screen, and open it from the icon." };
+        : { t: "One step left: the Home Screen", d: "Tap Share (in Safari's ••• menu if you don't see it), then Add to Home Screen. Open HAVYN from the new icon and it downloads everything by itself (" + size + " on Wi-Fi).", say: "One last step. Add Haven to your Home Screen, and open it from the icon." };
       return [
         { go: "#/status", at: "#ready .rdyhead", t: "Your level", d: "Your phone levels up as you finish quests: the downloads, your household, your supplies, a Memory Card. Most of it happens by itself, and every quest is a few taps.", say: "This is your command deck. Your level rises as you finish quests, and most of them finish themselves." },
         { go: "#/status", at: ".nowgrid", t: "What's happening?", d: "Tap what's going on: power out, extreme heat, a storm, smoke, unsafe water, an earthquake. You get everything for it in one place: the steps, the cards, the manual pages and the numbers to call.", say: "When something happens, tap it here. Everything you need is in one place." },
@@ -3098,7 +3127,7 @@
       card.style.top = (below ? Math.min(vh - ch - 18, r.bottom + pad + 16) : Math.max(18, r.top - pad - 16 - ch)) + "px";
     },
     close(how) {
-      this.seq++; this.on = false; this.cur = null; Voice.stop(); clearInterval(this.iv); if (this.onrs) removeEventListener("resize", this.onrs);
+      this.seq++; this.on = false; this.cur = null; Voice.stop(); AudioMode.set("auto"); clearInterval(this.iv); if (this.onrs) removeEventListener("resize", this.onrs);
       WelFx.stop(); const d = $("#wel"), tv = $("#tour");
       if (d) d.remove();
       if (tv) { tv.classList.add("bye"); setTimeout(() => tv.remove(), 350); }
@@ -3130,6 +3159,6 @@
       navigator.serviceWorker.register("./sw.js").then(() => navigator.serviceWorker.ready).then(() => { const s = $("#swst"); if (s) s.textContent = "Saved for offline"; }).catch(() => { const s = $("#swst"); if (s) s.textContent = "Not available"; });
     }
   }
-  window.__HAVYN = { get state() { return S; }, get prefs() { return PR; }, get lib() { return LIB; }, E, C, version: VERSION, arc: Arc, shelf: Shelf, ready: Ready, store: Store, welcome: Welcome, voice: Voice };
+  window.__HAVYN = { get state() { return S; }, get prefs() { return PR; }, get lib() { return LIB; }, E, C, version: VERSION, arc: Arc, shelf: Shelf, ready: Ready, store: Store, welcome: Welcome, voice: Voice, clips: Clips };
   boot();
 })();

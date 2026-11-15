@@ -10,9 +10,10 @@
 | Opening the app makes the next move obvious | PASS (Chrome) | e2e_v15: Home leads with the level (ring, rank), the next three quests with XP, the red Someone's hurt tile, What's happening? (8 situations) and know-how tiles; the welcome tour spotlights the level and What's happening? before the tabs. |
 | One tap from a situation to everything for it | PASS (Chrome) | e2e_v15: all 8 situation screens show their title, playbook link, cards, field answers and 911; Power out starts the outage clock. |
 | Less typing | PASS (Chrome) | e2e_v15: the household is made from counts (2 adults, 1 kid, 1 pet → "Adult 1", "Adult 2", "Kid 1", a pet), supplies from counts with what each holds (cases of water, canned meals, power banks), Home shows days at once, counting again starts from what's saved, zero removes an item, and the quests move. |
-| An elegant British woman's voice | PASS (logic) / not yet heard on an iPhone | e2e_v15: with Serena (Enhanced), Martha, Daniel, Samantha and Fred available, HAVYN picks Serena (Enhanced); with only Daniel, Samantha and Moira, Moira; with only men's voices and Samantha, Samantha. Depends on the voices installed on the phone (System says which is in use and how to get Serena or Martha). |
+| An elegant British woman's voice, the same on every phone | PASS (Chrome) / not yet heard on an iPhone | Every line pre-recorded with Kokoro-82M (Emma, British English, speed 0.95; Voice workflow 2026-11-15), -17.6 LUFS, peaks -2.5 to -4.5 dBFS, 15 lines, 650 KB; e2e_v15: the welcome plays the recording (not the phone's voice). The phone-voice choice below remains the fallback. |
+| Fallback: the phone's own voice | PASS (logic) | e2e_v15: with Serena (Enhanced), Martha, Daniel, Samantha and Fred available, HAVYN picks Serena (Enhanced); with only Daniel, Samantha and Moira, Moira; with only men's voices and Samantha, Samantha. Depends on the voices installed on the phone (System says which is in use and how to get Serena or Martha). |
 
-Test totals for 1.6.0: engine 27/27, archive reader 208/208, end-to-end 91/91 + 76/76 + 31/31 + 71/71, shelf fetcher 27/27.
+Test totals for 1.6.0: engine 28/28, archive reader 208/208, end-to-end 91/91 + 76/76 + 31/31 + 72/72, shelf fetcher 27/27.
 
 ## v1.5 "done when": evidence
 

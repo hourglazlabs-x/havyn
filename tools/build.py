@@ -13,6 +13,12 @@ def read(p): return (SRC / p).read_text(encoding="utf-8")
 def build():
     css = read("styles.css")
     js = "\n".join(read(f) for f in ("content.js", "engine.js", "app.js"))
+    # HAVYN's voice: lines pre-rendered in an elegant British woman's voice (tools/voice_render.py via the Voice workflow).
+    # The page gets text -> file (and each file's hash, so a new voice changes the version); the MP3s ship in ./voice/.
+    vman = SRC / "voice" / "manifest.json"
+    voice = json.loads(vman.read_text(encoding="utf-8")) if vman.exists() else None
+    vfiles = sorted(v["file"] for v in voice["lines"].values()) if voice else []
+    js = "window.HAVYN_VOICE=" + json.dumps({"voice": voice["voice"], "lines": {k: {"text": v["text"], "file": v["file"], "sha": v["sha256"][:12]} for k, v in voice["lines"].items()}} if voice else None, ensure_ascii=False) + ";\n" + js
     tpl = read("index.html")
     vendor = ROOT / "vendor" / "pdfjs"
     vend = b"".join((vendor / f).read_bytes() for f in ("pdf.min.js", "pdf.worker.min.js")) + (ROOT / "vendor" / "pdflib" / "pdf-lib.esm.min.js").read_bytes()
@@ -41,7 +47,7 @@ def build():
     if APP.exists(): shutil.rmtree(APP)
     APP.mkdir(parents=True)
     (APP / "index.html").write_text(page(js, csp), encoding="utf-8")
-    (APP / "sw.js").write_text(read("sw.js").replace("__VERSION__", version), encoding="utf-8")
+    (APP / "sw.js").write_text(read("sw.js").replace("__VERSION__", version).replace("/*VOICE*/", "".join(', "./voice/%s"' % f for f in vfiles)), encoding="utf-8")
     (APP / "zimkit.js").write_text(zimkit, encoding="utf-8")
     manifest = {
         "id": "./", "name": "HAVYN FIELD", "short_name": "HAVYN", "start_url": "./", "scope": "./",
@@ -61,6 +67,9 @@ def build():
         for f in ("pdf.min.js", "pdf.worker.min.js", "LICENSE", "README.txt"): shutil.copy(vendor / f, d / "pdfjs" / f)
         shutil.copytree(ROOT / "vendor" / "pdflib", d / "pdflib", dirs_exist_ok=True)
         shutil.copy(ROOT / "vendor" / "fzstd" / "LICENSE", d / "zimkit-fzstd-LICENSE.txt")
+        if vfiles:
+            (d / "voice").mkdir(exist_ok=True)
+            for f in vfiles: shutil.copy(SRC / "voice" / f, d / "voice" / f)
 
     # Preview build: same app, flagged so it skips the service worker; no CSP so a host page can frame it.
     if PREV.exists(): shutil.rmtree(PREV)
@@ -71,6 +80,7 @@ def build():
     shutil.copytree(APP / "pdfjs", PREV / "pdfjs")
     shutil.copytree(APP / "pdflib", PREV / "pdflib")
     shutil.copy(APP / "zimkit.js", PREV / "zimkit.js")
+    if vfiles: shutil.copytree(APP / "voice", PREV / "voice")
 
     # Protocol cards as markdown, one file each (generated from src/content.js, the single source).
     out = subprocess.run(["node", "-e", "process.stdout.write(JSON.stringify(require(process.argv[1])))", str(SRC / "content.js")],

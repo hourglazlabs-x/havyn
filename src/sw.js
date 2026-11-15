@@ -7,7 +7,7 @@ const VERSION = "__VERSION__";
 const CACHE = "havyn-field-" + VERSION;
 const ASSETS = ["./", "./index.html", "./manifest.webmanifest", "./apple-touch-icon.png", "./icon-192.png", "./icon-512.png", "./icon-maskable-512.png",
   "./pdfjs/pdf.min.js", "./pdfjs/pdf.worker.min.js", "./pdflib/pdf-lib.esm.min.js", "./zimkit.js",
-  "./vault/get-vault.sh", "./vault/get-vault.ps1", "./vault/START-HERE.html"];
+  "./vault/get-vault.sh", "./vault/get-vault.ps1", "./vault/START-HERE.html"/*VOICE*/];
 
 // Archive pages never run scripts and never reach the network.
 const ZCSP = "default-src 'self' data: blob:; script-src 'none'; object-src 'none'; frame-src 'none'; worker-src 'none'; connect-src 'none'; " +

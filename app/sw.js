@@ -3,11 +3,11 @@
    saved on this phone (IndexedDB), with byte ranges so video can seek. Only shelf downloads (./shelf/) reach the network,
    and only HAVYN's own address. */
 importScripts("./zimkit.js");
-const VERSION = "1.6.0+9c32dd890c";
+const VERSION = "1.6.0+06426095aa";
 const CACHE = "havyn-field-" + VERSION;
 const ASSETS = ["./", "./index.html", "./manifest.webmanifest", "./apple-touch-icon.png", "./icon-192.png", "./icon-512.png", "./icon-maskable-512.png",
   "./pdfjs/pdf.min.js", "./pdfjs/pdf.worker.min.js", "./pdflib/pdf-lib.esm.min.js", "./zimkit.js",
-  "./vault/get-vault.sh", "./vault/get-vault.ps1", "./vault/START-HERE.html"];
+  "./vault/get-vault.sh", "./vault/get-vault.ps1", "./vault/START-HERE.html", "./voice/around.mp3", "./voice/equipped.mp3", "./voice/family.mp3", "./voice/get.mp3", "./voice/guides.mp3", "./voice/home.mp3", "./voice/level.mp3", "./voice/now.mp3", "./voice/preview.mp3", "./voice/sample.mp3", "./voice/search.mp3", "./voice/sos.mp3", "./voice/stocked.mp3", "./voice/supplies.mp3", "./voice/welcome.mp3"];
 
 // Archive pages never run scripts and never reach the network.
 const ZCSP = "default-src 'self' data: blob:; script-src 'none'; object-src 'none'; frame-src 'none'; worker-src 'none'; connect-src 'none'; " +

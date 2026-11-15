@@ -345,3 +345,19 @@ test("v1.5 new cards: heart attack, won't wake up, broken bone, poisoning", () =
   const po = C.cards.find((x) => x.id === "poison");
   assert.ok(po.steps.some((s) => s.call && s.call.num === "1-800-222-1222"));
 });
+
+test("v1.6 every line HAVYN speaks has a recording in its own voice (src/voice/lines.json)", () => {
+  const fs = require("fs"), path = require("path");
+  const src = fs.readFileSync(path.join(__dirname, "..", "src", "app.js"), "utf8");
+  const lines = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "src", "voice", "lines.json"), "utf8")).map((l) => l.text);
+  const spoken = [...src.matchAll(/\bsay: "([^"]+)"/g), ...src.matchAll(/Voice\.say\("([^"]+)"\)/g)].map((m) => m[1]);
+  assert.ok(spoken.length >= 12, "spoken lines found: " + spoken.length);
+  for (const t of spoken) assert.ok(lines.includes(t), "no recording for: " + t);
+  // and the recordings, once rendered, match the script
+  const man = path.join(__dirname, "..", "src", "voice", "manifest.json");
+  if (fs.existsSync(man)) {
+    const m = JSON.parse(fs.readFileSync(man, "utf8"));
+    assert.match(m.voice, /^bf_/, "a British woman's voice");
+    for (const t of lines) assert.ok(Object.values(m.lines).some((l) => l.text === t && fs.existsSync(path.join(__dirname, "..", "src", "voice", l.file))), "rendered: " + t);
+  }
+});
