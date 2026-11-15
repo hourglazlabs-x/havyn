@@ -47,7 +47,7 @@
  {
   "name": "one tap downloads a document onto the phone",
   "pass": true,
-  "detail": "[{'id': 'mwhlfjd6q163km', 'type': 'pdf', 'name': 'Emergency Disinfection of Drinking Water', 'shelf': 'sh-epawater', 'pages': 0, 'indexed': False, 'size': 1056}]"
+  "detail": "[{'id': 'mwi95kpu9veb80', 'type': 'pdf', 'name': 'Emergency Disinfection of Drinking Water', 'shelf': 'sh-epawater', 'pages': 0, 'indexed': False, 'size': 1056}]"
  },
  {
   "name": "it is saved under its real title",
@@ -97,7 +97,7 @@
  {
   "name": "the book is titled and complete",
   "pass": true,
-  "detail": "{'id': 'mwhlfkrgfdus72', 'type': 'pdf', 'name': 'Where There Is No Doctor (2025)', 'shelf': 'sh-wtnd', 'pages': 0, 'indexed': False, 'size': 1612}"
+  "detail": "{'id': 'mwi95m7qhnvjer', 'type': 'pdf', 'name': 'Where There Is No Doctor (2025)', 'shelf': 'sh-wtnd', 'pages': 0, 'indexed': False, 'size': 1611}"
  },
  {
   "name": "the joined book opens with every page",

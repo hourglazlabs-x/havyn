@@ -75,7 +75,7 @@ def serve(d, port):
     threading.Thread(target=s.serve_forever, daemon=True).start(); return "http://localhost:%d/" % port
 BASE = serve(site, 8771); BARE = serve(bare, 8772)
 UA = "Mozilla/5.0 (iPhone; CPU iPhone OS 18_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.6 Mobile/15E148 Safari/604.1"
-INIT = "if (window.top === window) { window.__vall = []; document.addEventListener('securitypolicyviolation', e => window.__vall.push(e.violatedDirective + ' ' + e.blockedURI)); }"
+INIT = "window.__HAVYN_NO_INTRO = true; if (window.top === window) { window.__vall = []; document.addEventListener('securitypolicyviolation', e => window.__vall.push(e.violatedDirective + ' ' + e.blockedURI)); }"
 def lib(page): return page.evaluate("__HAVYN.lib.map(x => ({id: x.id, type: x.type || 'pdf', name: x.name, shelf: x.shelf || '', pages: x.pages || 0, indexed: !!x.indexed, size: x.size}))")
 
 with sync_playwright() as p:

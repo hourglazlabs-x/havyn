@@ -61,6 +61,9 @@
     wave: '<circle cx="12" cy="5.5" r="2"/><path d="M3 12c2 0 2-2 4.5-2s2.5 2 4.5 2 2-2 4.5-2 2.5 2 4.5 2"/><path d="M3 17c2 0 2-2 4.5-2s2.5 2 4.5 2 2-2 4.5-2 2.5 2 4.5 2"/>',
     bug: '<ellipse cx="12" cy="15" rx="3.5" ry="4.5"/><path d="M12 10.5V7a3 3 0 0 1 3-3h2l1.5 1.5"/><path d="M8.7 13 5 11.5M8.5 16.5 5 17.5M15.3 13l3.7-1.5M15.5 16.5l3.5 1"/>',
     snake: '<path d="M4 19c3 0 4-3 7-3s3 3 6 3 3-2.5 3-5.5S17.5 8 14.5 8H12"/><circle cx="10" cy="8" r="2.2"/><path d="M7.8 8H5.5l-1 1M5.5 8l-1-1"/>',
+    play: '<circle cx="12" cy="12" r="9"/><path d="M10 8.5v7l5.5-3.5z"/>',
+    speaker: '<path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/>',
+    speakeroff: '<path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M16 9.5l5 5M21 9.5l-5 5"/>',
     bone: '<path d="M9.2 14.8l5.6-5.6"/><circle cx="6.6" cy="15.2" r="2.1"/><circle cx="8.8" cy="17.4" r="2.1"/><circle cx="15.2" cy="6.6" r="2.1"/><circle cx="17.4" cy="8.8" r="2.1"/>',
     poison: '<path d="M9.5 3h5M10.5 3v4.2L6.5 12v8a1 1 0 0 0 1 1h9a1 1 0 0 0 1-1v-8l-4-4.8V3"/><path d="M10 13.5l4 4M14 13.5l-4 4"/>',
     side: '<circle cx="5.5" cy="11" r="2.2"/><path d="M8.5 12.5h6.5l3 3.5"/><path d="M13 12.5l-1.5 4.5"/><path d="M3 19.5h18"/>',
@@ -237,6 +240,7 @@
   let lastPath = "";
   function render() {
     route = parseHash();
+    if (route.path === "welcome") { location.replace("#/status"); setTimeout(() => Welcome.open(true), 60); return; }
     const em = route.path === "emergency";
     document.body.classList.toggle("em", em);
     document.body.classList.toggle("night", PR.theme === "night");
@@ -249,7 +253,11 @@
     const html = fn();
     app().innerHTML = html;
     $$(".tab").forEach((t) => t.classList.toggle("on", t.dataset.tab === TAB_OF[route.path]));
-    if (lastPath !== location.hash) { window.scrollTo(0, 0); lastPath = location.hash; }
+    if (lastPath !== location.hash) {
+      window.scrollTo(0, 0); lastPath = location.hash;
+      // a new screen fades in (not in Emergency, where every millisecond counts, and not when motion is reduced)
+      if (!em && !matchMedia("(prefers-reduced-motion: reduce)").matches) { const a = app(); a.classList.remove("enter"); void a.offsetWidth; a.classList.add("enter"); }
+    }
     afterRender();
   }
   function afterRender() {
@@ -731,6 +739,7 @@
       li("#/binder", "card", "Printable binder", "Plan, numbers, medicines and every card on paper") +
       '</div><div class="sec"><span class="lab">Library</span></div><div class="list">' +
       li("#/field", "book", "How do I…", FIELD().length + " answers, each opening the exact page in the manuals on this phone") +
+      li("#/welcome", "play", "Welcome tour", "One minute: what's where, and what to tap in an emergency") +
       li("#/library", "globe", "Offline library", libSummary() || "Encyclopedias, PDFs, video and audio, all offline") +
       li("#/search", "search", "Search everything", "One box: cards, plan, PDFs and every archive") +
       li("#/archive?t=shelf", "book", "Reference shelf", "Real manuals by system: medicine, water, power, tools, building") +
@@ -1989,7 +1998,9 @@
           if (Shelf.state === "ready" && Arc.idx && Arc.idx.size && PR.autoGet) { PR.autoGet = false; flush(); }   // all done: nothing more to carry on with
           if (!auto) toast(Shelf.state === "ready" ? "Everything is already on this phone" : "Nothing to download right now"); return;
         }
-        if (auto) toast("Carrying on with this phone's downloads (" + sz(sh.reduce((a, i) => a + shelfSize(i), 0) + ar.reduce((a, i) => a + Arc.size(i), 0)) + " left)");
+        const left = sz(sh.reduce((a, i) => a + shelfSize(i), 0) + ar.reduce((a, i) => a + Arc.size(i), 0));
+        if (auto) toast(PR.firstGet ? "Getting this phone ready: downloading " + left + " (best on Wi-Fi; Stop is on Status)" : "Carrying on with this phone's downloads (" + left + " left)");
+        PR.firstGet = false;
         Wake.on();
         if (sh.length) await Shelf.get(sh, { quiet: true });
         if (ar.length && !this.stop && !Shelf.stop) await Arc.get(ar, { quiet: true });
@@ -2039,7 +2050,7 @@
       let h = '<section class="glass panel ready" id="ready"><div class="rdyhead"><div><div class="lab">This phone</div><div class="num"><span class="big" style="font-size:2.4rem">' + sc + '</span><span class="unit">% READY</span> <span class="chip ' + st + '">' + (sc >= 90 ? "READY" : sc >= 50 ? "ALMOST" : "NOT YET") + "</span></div></div></div>" +
         '<div class="bar" style="margin:8px 0 10px"><i style="width:' + sc + '%"></i></div>';
       if (!PREVIEW && !done) {
-        h += '<div class="btnrow">' + '<button class="btn" data-act="get-everything" data-arcget data-shget' + (busy ? " disabled" : "") + ">" + ic("download") + (PR.autoGet ? "Carry on downloading · " : "Download everything · ") + sz(lf.bytes) + "</button>" +
+        h += '<div class="btnrow">' + '<button class="btn" data-act="get-everything" data-arcget data-shget' + (busy ? " disabled" : "") + ">" + ic("download") + (PR.autoGet && !PR.firstGet ? "Carry on downloading · " : "Download everything · ") + sz(lf.bytes) + "</button>" +
           '<button class="btn ghost' + (busy ? "" : " hide") + '" id="rdystop" data-act="get-stop">Stop</button></div>' +
           '<div class="sub" style="font-size:.8rem;margin-top:6px">' + lf.n + " items. Use Wi-Fi and keep HAVYN open (the screen stays on); it picks up where it stopped if you close it.</div>";
       }
@@ -2443,9 +2454,10 @@
       '<div class="kv"><span>Offline copy</span><span id="swst">' + (PREVIEW ? "Preview: none" : navigator.serviceWorker && navigator.serviceWorker.controller ? "Saved for offline" : "Not yet: open once online") + "</span></div>" +
       '<div class="kv"><span>Storage</span><span id="stst">' + (Store.ok ? "On this phone" : "Temporary") + "</span></div>" +
       '<div class="kv"><span>Library</span><span>' + esc(libSummary() || "Empty") + "</span></div>" +
-      '<div class="kv"><span>Network use</span><span>None (blocked by policy)</span></div>' +
+      '<div class="kv"><span>Network use</span><span>Downloads you start, from HAVYN and Kiwix only</span></div>' +
       '<div class="kv"><span>Version</span><span class="mono">' + esc(VERSION) + "</span></div>" +
-      '<p class="empty" style="font-size:.85rem">Deleting the app icon deletes its data. Keep Memory Cards on another phone and the vault drive.</p></section>';
+      '<p class="empty" style="font-size:.85rem">Deleting the app icon deletes its data. Keep Memory Cards on another phone and the vault drive.</p>' +
+      '<div class="btnrow"><button class="btn ghost" data-act="wel-replay">' + ic("play") + "Replay the welcome tour</button></div></section>";
     h += '<section class="glass panel"><h3>Danger zone</h3><button class="btn ghost danger wide" data-act="erase">Erase everything on this phone</button></section>';
     return h;
   }
@@ -2553,6 +2565,7 @@
   /* ---------------- events ---------------- */
   let toastTimer = 0;
   function toast(msg) {
+    if (Welcome.on) return;   // the tour card is saying what's happening
     let el = $(".toast"); if (!el) { el = document.createElement("div"); el.className = "toast"; el.setAttribute("role", "status"); document.body.appendChild(el); }
     el.textContent = msg; el.classList.remove("hide"); clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.add("hide"), 2400);
   }
@@ -2602,6 +2615,15 @@
     else if (act === "pdf-dest") PdfV.dest(num(b.dataset.i));
     else if (act === "pdf-go") { const pn = $("#pdfpanel"); if (pn) pn.classList.add("hide"); PdfV.go(num(b.dataset.n)); }
     else if (act === "get-everything") Everything.run(false);
+    else if (act === "wel-begin") Welcome.begin();
+    else if (act === "wel-skip") Welcome.close("skip");
+    else if (act === "wel-sos") Welcome.close("sos");
+    else if (act === "wel-done") Welcome.close("done");
+    else if (act === "wel-next") Welcome.tour(Welcome.i + 1);
+    else if (act === "wel-back") Welcome.tour(Welcome.i - 1);
+    else if (act === "wel-mute") { Welcome.muted = !Welcome.muted; if (Welcome.muted) Voice.stop(); Welcome.tour(Welcome.i); }
+    else if (act === "wel-pause") { Everything.halt(); toast("Paused. Tap Download everything on Status when you're on Wi-Fi"); }
+    else if (act === "wel-replay") Welcome.open(true);
     else if (act === "get-stop") { Everything.halt(); b.textContent = "Stopping…"; }
     else if (act === "arc-get") { const it = C.archive.items.find((i) => i.id === b.dataset.id); if (it) Arc.get([it]); }
     else if (act === "arc-get-core") Arc.get(coreArchives());
@@ -2738,6 +2760,223 @@
   setInterval(tick, 1000);
 
   /* ---------------- boot ---------------- */
+  /* ---------------- WELCOME: the first-open intro and a guided tour of the real screens ----------------
+     Shown once (and again from System or Guides). Touch to begin (an iPhone only plays sound after a touch), then the
+     LABS ANALYTIX open: a synthesized chime, the HAVYN mark over the PS2 void, and the phone's best English voice (British
+     first). Then a tour with a spotlight on the actual tabs and panels. On the Home Screen the tour ends by starting
+     Download everything by itself. An Emergency button is on screen the whole time: someone opening HAVYN for the first
+     time in an emergency is one tap from the cards, and HAVYN never shows the welcome again. */
+  const Voice = {
+    v: null,
+    ok() { return "speechSynthesis" in window && typeof window.SpeechSynthesisUtterance === "function"; },
+    pick() {
+      if (!this.ok()) return null;
+      const novelty = /(Albert|Bad News|Bahh|Bells|Boing|Bubbles|Cellos|Deranged|Good News|Hysterical|Jester|Junior|Organ|Pipe|Superstar|Trinoids|Whisper|Wobble|Zarvox|Fred|Ralph|Kathy|Grandma|Grandpa|Eddy|Flo|Reed|Rocko|Sandy|Shelley)/i;
+      const score = (x) => { const l = String(x.lang || "").replace("_", "-");
+        return (/premium/i.test(x.name) ? 50 : /enhanced/i.test(x.name) ? 35 : 0) + (/^en-GB/i.test(l) ? 14 : /^en-(AU|IE|NZ|ZA)/i.test(l) ? 6 : 0) +
+          (/(Serena|Daniel|Arthur|Martha|Kate|Oliver|Stephanie|Jamie|Malcolm)/.test(x.name) ? 10 : /(Ava|Zoe|Evan|Nathan|Allison|Susan|Samantha|Tom|Noelle)/.test(x.name) ? 5 : 0) + (x.localService ? 3 : 0); };
+      let vs = []; try { vs = speechSynthesis.getVoices().filter((x) => /^en/i.test(x.lang || "") && !novelty.test(x.name)); } catch (e) {}
+      vs.sort((a, b) => score(b) - score(a));
+      return (this.v = vs[0] || null);
+    },
+    unlock() {   // must run inside the touch
+      if (!this.ok()) return;
+      try { const u = new SpeechSynthesisUtterance(" "); u.volume = 0; speechSynthesis.speak(u); } catch (e) {}
+      if (!this.pick()) try { speechSynthesis.addEventListener("voiceschanged", () => this.pick(), { once: true }); } catch (e) {}
+    },
+    say(t) {
+      if (!this.ok() || Welcome.muted || !t) return;
+      try { speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(t), v = this.v || this.pick(); if (v) { u.voice = v; u.lang = v.lang; } else u.lang = "en-GB"; u.rate = 0.9; u.pitch = 0.94; speechSynthesis.speak(u); } catch (e) {}
+    },
+    stop() { try { if (this.ok()) speechSynthesis.cancel(); } catch (e) {} }
+  };
+  // The open's sound, made on the phone: a low swell that opens into an unresolved A major chord, a bell as the mark lands,
+  // and soft ticks as the letters resolve. No audio files.
+  const WelSnd = {
+    out() {
+      const a = Snd.ctx(); if (!a || Welcome.muted) return null;
+      if (!this.bus || this.bus.context !== a) {
+        const o = a.createGain(), dl = a.createDelay(1), fb = a.createGain(), lp = a.createBiquadFilter(), wet = a.createGain();
+        o.gain.value = 0.9; dl.delayTime.value = 0.29; fb.gain.value = 0.4; lp.type = "lowpass"; lp.frequency.value = 2600; wet.gain.value = 0.33;
+        o.connect(a.destination); o.connect(dl); dl.connect(lp); lp.connect(fb); fb.connect(dl); lp.connect(wet); wet.connect(a.destination);
+        this.bus = o;
+      }
+      return a;
+    },
+    tone(f, at, dur, peak, type, det, atk) {
+      const a = this.out(); if (!a) return;
+      const o = a.createOscillator(), g = a.createGain(); o.type = type || "sine"; o.frequency.value = f; if (det) o.detune.value = det;
+      g.gain.setValueAtTime(0.0001, at); g.gain.exponentialRampToValueAtTime(peak, at + (atk || Math.min(1.4, dur * 0.35))); g.gain.exponentialRampToValueAtTime(0.0001, at + dur);
+      o.connect(g).connect(this.bus); o.start(at); o.stop(at + dur + 0.05);
+    },
+    boot() {
+      const a = this.out(); if (!a) return; const t = a.currentTime + 0.05;
+      this.tone(55, t, 6, 0.05); this.tone(110, t + 0.1, 5.6, 0.03, "triangle");
+      [[164.81, 0.5], [246.94, 0.9], [277.18, 1.3], [415.3, 1.7]].forEach(([f, d]) => { this.tone(f, t + d, 5 - d * 0.6, 0.016, "sine", -5); this.tone(f, t + d, 5 - d * 0.6, 0.011, "sine", 6); });
+    },
+    bell() { const a = this.out(); if (!a) return; const t = a.currentTime + 0.02; [[1760, 0.03, 2.6], [2637, 0.012, 1.7], [3520, 0.005, 1.1]].forEach(([f, g, d]) => this.tone(f, t, d, g, "sine", 0, 0.006)); },
+    tick(i) { const a = this.out(); if (!a) return; this.tone(2200 + (i % 5) * 180, a.currentTime + 0.005, 0.05, 0.006, "sine", 0, 0.003); },
+    step() { const a = this.out(); if (!a) return; const t = a.currentTime + 0.01; this.tone(1318.5, t, 0.22, 0.02, "sine", 0, 0.008); this.tone(1975.5, t + 0.06, 0.3, 0.012, "sine", 0, 0.008); }
+  };
+  // The void behind the open: a perspective floor drifting toward you and dust rising through the light (PS2-era boot).
+  const WelFx = {
+    raf: 0,
+    start(c) {
+      const g = c.getContext && c.getContext("2d"); if (!g) return;
+      const dpr = Math.min(2, window.devicePixelRatio || 1), still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const size = () => { c.width = Math.round(innerWidth * dpr); c.height = Math.round(innerHeight * dpr); };
+      size(); this.size = size; addEventListener("resize", size);
+      const dust = Array.from({ length: 64 }, () => ({ x: Math.random(), y: Math.random(), z: 0.25 + Math.random() * 0.75, s: Math.random() * 6.28 }));
+      const t0 = performance.now();
+      const frame = (nw) => {
+        const w = c.width, h = c.height, t = (nw - t0) / 1000, hy = h * 0.66;
+        g.clearRect(0, 0, w, h);
+        g.lineWidth = dpr; g.strokeStyle = "rgba(92,232,255,0.11)";
+        for (let i = -14; i <= 14; i++) { g.beginPath(); g.moveTo(w / 2 + i * w * 0.018, hy); g.lineTo(w / 2 + i * w * 0.2, h); g.stroke(); }
+        for (let k = 0; k < 16; k++) { const z = (k + (still ? 0 : (t * 0.3) % 1)) / 16, y = hy + (h - hy) * z * z; g.globalAlpha = Math.min(1, z * 1.8); g.beginPath(); g.moveTo(0, y); g.lineTo(w, y); g.stroke(); }
+        g.globalAlpha = 1;
+        const glow = g.createRadialGradient(w / 2, hy, 0, w / 2, hy, w * 0.7); glow.addColorStop(0, "rgba(47,180,255,0.16)"); glow.addColorStop(1, "rgba(47,180,255,0)");
+        g.fillStyle = glow; g.fillRect(0, 0, w, h);
+        for (const q of dust) {
+          if (!still) { q.y -= 0.0007 * q.z; if (q.y < -0.02) { q.y = 1.02; q.x = Math.random(); } }
+          g.fillStyle = "rgba(166,255,240," + (0.12 + q.z * 0.42).toFixed(3) + ")"; g.beginPath(); g.arc(q.x * w + Math.sin(t * 0.5 + q.s) * 5 * dpr, q.y * h, (0.5 + q.z * 1.5) * dpr, 0, 6.2832); g.fill();
+        }
+        this.raf = requestAnimationFrame(frame);
+      };
+      this.raf = requestAnimationFrame(frame);
+    },
+    stop() { cancelAnimationFrame(this.raf); if (this.size) removeEventListener("resize", this.size); this.size = null; }
+  };
+  function scramble(el, text, ms, onStep) {
+    const glyphs = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+=/<>#", t0 = performance.now(); let last = -1;
+    return new Promise((done) => {
+      const frame = () => {
+        const p = Math.min(1, (performance.now() - t0) / ms), n = Math.floor(p * text.length);
+        if (n !== last) { last = n; if (onStep) onStep(n); }
+        el.textContent = Array.from(text, (ch, i) => (ch === " " || i < n ? ch : glyphs[(Math.random() * glyphs.length) | 0])).join("");
+        if (p < 1) requestAnimationFrame(frame); else { el.textContent = text; done(); }
+      };
+      frame();
+    });
+  }
+  const Welcome = {
+    on: false, muted: false, i: -1, seq: 0, iv: 0,
+    should() { return !PR.introSeen && !window.__HAVYN_NO_INTRO && !/^#\/(emergency|library\/|field\?|playbooks\/)/.test(location.hash || ""); },
+    open(replay) {
+      if (this.on) return;
+      this.on = true; this.replay = !!replay; this.muted = !PR.sound; this.i = -1; const seq = ++this.seq;
+      const d = document.createElement("div"); d.id = "wel"; d.className = "wel"; d.setAttribute("role", "dialog"); d.setAttribute("aria-modal", "true"); d.setAttribute("aria-label", "Welcome to HAVYN");
+      d.innerHTML = '<canvas class="welfx" aria-hidden="true"></canvas>' +
+        '<div class="weltop"><button class="welsos" data-act="wel-sos"><span class="d"></span>Emergency now</button><button class="welskip" data-act="wel-skip">Skip</button></div>' +
+        '<div class="welstage" data-act="wel-begin">' +   // a touch anywhere begins; once the mark is up, a touch moves on to the tour
+          '<button class="welbegin" data-act="wel-begin"><span class="ring" aria-hidden="true"><i></i><i></i><i></i></span><span class="t">TOUCH TO BEGIN</span><small>' + (this.muted ? "Sound is off in System" : "Sound on for the welcome") + "</small></button>" +
+          '<div class="wellabs" aria-hidden="true"><div class="scan"></div><b id="wellabs">LABS ANALYTIX</b><small>PRESENTS</small></div>' +
+          '<div class="weltowers" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>' +
+          '<div class="welmark"><div class="w" aria-label="HAVYN">' + Array.from("HAVYN", (c) => "<span>" + c + "</span>").join("") + '</div><div class="s">FIELD · OFFLINE EMERGENCY SYSTEM</div><div class="tag">Ready when the grid isn\'t.</div></div>' +
+        "</div>";
+      document.body.appendChild(d); document.body.classList.add("welcoming");
+      WelFx.start(d.querySelector(".welfx"));
+      requestAnimationFrame(() => requestAnimationFrame(() => { if (seq === this.seq) d.classList.add("in"); }));
+    },
+    async begin() {
+      const d = $("#wel"); if (!d) return;
+      if (d.classList.contains("go")) { if (d.classList.contains("p2") && !$("#tour")) this.tour(0); return; }
+      const seq = this.seq, alive = () => seq === this.seq && this.on && !!$("#wel"), rm = matchMedia("(prefers-reduced-motion: reduce)").matches;
+      Snd.ctx(); Voice.unlock();   // inside the touch: sound and voice are allowed from here on
+      d.classList.add("go"); WelSnd.boot();
+      await pause(rm ? 80 : 500); if (!alive()) return;
+      d.classList.add("p1");
+      await scramble($("#wellabs"), "LABS ANALYTIX", rm ? 150 : 1150, (n) => WelSnd.tick(n)); if (!alive()) return;
+      await pause(rm ? 350 : 1250); if (!alive()) return;
+      d.classList.add("p2");
+      await pause(rm ? 250 : 1000); if (!alive()) return;
+      WelSnd.bell(); Voice.say("Welcome to Haven.");   // spoken as a word: voices spell out capitals
+      await pause(rm ? 700 : 1900); if (!alive()) return;
+      d.classList.add("p3");
+      await pause(rm ? 700 : 2000); if (!alive()) return;
+      this.tour(0);
+    },
+    steps() {
+      const L = Ready.left(), size = L.n ? sz(L.bytes) : "", home = isStandalone();
+      const ready = PREVIEW ? { t: "Everything, on every phone", d: "In HAVYN on your Home Screen, this is where the manuals and encyclopedias download by themselves, then work with no internet.", say: "In the app on your Home Screen, everything downloads right here, by itself." }
+        : !L.n ? { t: "This phone is stocked", d: "The manuals and encyclopedias are already here and work with no internet. HAVYN tops them up when you open it on Wi-Fi.", say: "This phone already has everything. It works with no internet." }
+        : home ? { t: "Getting this phone ready", d: "HAVYN is downloading everything now: " + L.n + " manuals and encyclopedias, " + size + ". Stay on Wi-Fi and keep HAVYN open; if it closes, it picks up where it stopped.", say: "Now I'm downloading everything this phone needs. Stay on Wi-Fi, and keep me open.", get: true }
+        : { t: "One step left: the Home Screen", d: "Tap Share (in Safari's ••• menu if you don't see it), then Add to Home Screen. Open HAVYN from the new icon and it downloads everything by itself (" + size + " on Wi-Fi).", say: "One last step. Add HAVYN to your Home Screen, and open it from the icon." };
+      return [
+        { go: "#/status", at: ".tab[data-tab=status]", t: "Status, your home base", d: "How ready your family is: days of water, food, medicine and power, what's missing, and what to do next.", say: "This is Status, your home base. It shows how ready your family is." },
+        { go: "#/status", at: ".tab.sos", t: "In an emergency, the red button", d: "Twenty step-by-step cards: CPR with a beat to follow, bleeding, choking, heart attack, heat stroke and more. Two taps from anywhere, with one-tap 911.", say: "In an emergency, tap the red button. Every card is two taps away." },
+        { go: "#/guides", at: ".tab[data-tab=guides]", t: "Guides: know what to do", d: "How do I… opens the exact page in the manuals on this phone. Playbooks walk you through blackouts, extreme heat, storms and smoke.", say: "Guides tells you what to do, step by step." },
+        { go: "#/family", at: ".tab[data-tab=family]", t: "Family: your people", d: "Everyone's medicines, allergies and needs. Fill it in once, then copy it to every phone with the Memory Card.", say: "Family keeps everyone's medicines, allergies and needs in one place." },
+        { go: "#/supplies", at: ".tab[data-tab=supplies]", t: "Supplies: what you have", d: "Water, food, medicine and power on hand become days of autonomy, and HAVYN warns you before anything expires.", say: "Supplies turns what you have into days you can last." },
+        { go: "#/status", at: ".tools a[href='#/search']", t: "Find anything", d: "Search looks through the cards, playbooks, your plan, and every page of every manual and encyclopedia on this phone. No internet needed.", say: "Search finds anything, even inside every manual, with no internet." },
+        Object.assign({ go: "#/status", at: "#ready .rdyhead|#rdybar|#rdymsg" }, ready),
+        { fin: true }
+      ];
+    },
+    tour(i) {
+      const d = $("#wel"); if (d && !d.classList.contains("out")) { d.classList.add("out"); setTimeout(() => { WelFx.stop(); d.remove(); }, 650); }
+      let tv = $("#tour");
+      if (!tv) {
+        tv = document.createElement("div"); tv.id = "tour"; tv.className = "tour"; tv.setAttribute("role", "dialog"); tv.setAttribute("aria-modal", "true"); tv.setAttribute("aria-label", "A tour of HAVYN");
+        tv.innerHTML = '<div class="thole"></div><div class="tcard"></div>';
+        document.body.appendChild(tv);
+        clearInterval(this.iv); this.iv = setInterval(() => this.place(), 450);
+        addEventListener("resize", this.onrs = () => this.place());
+      }
+      const steps = this.steps(), s = steps[Math.max(0, Math.min(steps.length - 1, i))]; this.i = steps.indexOf(s); this.cur = s;
+      const card = tv.querySelector(".tcard"), n = steps.length - 1;
+      if (s.fin) {
+        tv.classList.add("fin");
+        card.innerHTML = '<div class="fintop"><div class="lab">HAVYN FIELD · ' + esc(VERSION.split("+")[0]) + '</div><h2>You\'re equipped.</h2><p>Everything here works with no internet, no signal and no account, and nothing you enter leaves this phone.</p></div>' +
+          '<div class="finlist">' + [["heart", C.cards.length + " emergency cards", "Two taps from anywhere"], ["book", FIELD().length + " answers", "The exact page in the manuals"], ["globe", "Offline library", "Medical encyclopedia, manuals, maps help"], ["card", "Memory Card", "One family plan on every phone"]]
+            .map(([icn, b, sm]) => '<div class="fi2">' + ic(icn) + "<span><b>" + esc(b) + "</b><small>" + esc(sm) + "</small></span></div>").join("") + "</div>" +
+          '<div class="btnrow"><button class="btn" data-act="wel-done">Enter HAVYN</button></div><div class="tfoot"><button class="tlink" data-act="wel-back">Back</button><span>Replay this any time: System › Welcome tour</span></div>';
+        WelSnd.bell(); Voice.say("You're equipped. Everything works with no internet, and nothing leaves this phone.");
+        if (location.hash !== "#/status") location.hash = "#/status";
+        this.place(); return;
+      }
+      tv.classList.remove("fin");
+      card.innerHTML = '<div class="tmeta"><span class="lab">' + (this.i + 1) + " of " + n + '</span><span class="tdots">' + Array.from({ length: n }, (_, k) => "<i" + (k === this.i ? ' class="on"' : k < this.i ? ' class="done"' : "") + "></i>").join("") + "</span>" +
+        '<button class="tmute" data-act="wel-mute" aria-label="' + (this.muted ? "Turn the voice on" : "Turn the voice off") + '">' + ic(this.muted ? "speakeroff" : "speaker") + "</button></div>" +
+        "<h3>" + esc(s.t) + "</h3><p>" + esc(s.d) + "</p>" +
+        (s.get ? '<div class="tget"><div class="bar"><i id="tgetbar"></i></div><button class="tlink" data-act="wel-pause">Not on Wi-Fi? Pause</button></div>' : "") +
+        '<div class="btnrow"><button class="btn ghost" data-act="wel-back"' + (this.i ? "" : " disabled") + '>Back</button><button class="btn" data-act="wel-next">' + (this.i === n - 1 ? "Finish" : "Next") + "</button></div>" +
+        '<div class="tfoot"><button class="tlink sos" data-act="wel-sos">Emergency now</button><button class="tlink" data-act="wel-skip">Skip tour</button></div>';
+      if (s.go && location.hash !== s.go) location.hash = s.go;
+      if (s.get && !Everything.busy && !Shelf.busy && !Arc.busy) { PR.autoGet = true; flush(); Everything.run(true); }
+      WelSnd.step(); Voice.say(s.say);
+      card.classList.remove("show"); void card.offsetWidth; card.classList.add("show");
+      requestAnimationFrame(() => requestAnimationFrame(() => this.place(true)));
+    },
+    place(scroll) {
+      const tv = $("#tour"), s = this.cur; if (!tv || !s) return;
+      const hole = tv.querySelector(".thole"), card = tv.querySelector(".tcard"), vh = innerHeight;
+      const bar = $("#tgetbar"); if (bar) { const b = Arc.busy ? Arc.pct() : Shelf.busy ? Shelf.pct() : 0; bar.style.width = Math.max(3, Math.min(100, b || 0)) + "%"; }
+      // The spotlight goes round one element, or round several ("a|b|c") as one box.
+      const els = !s.fin && s.at ? s.at.split("|").map((q) => Array.from(document.querySelectorAll(q)).find((x) => x.getClientRects().length)).filter(Boolean) : [];
+      if (!els.length) { hole.classList.add("none"); Object.assign(hole.style, { left: "50%", top: "45%", width: "0px", height: "0px" }); card.classList.add("mid"); card.style.top = ""; return; }
+      if (scroll) { const r0 = els[0].getBoundingClientRect(); if (r0.top < 60 || r0.bottom > vh - 90) els[0].scrollIntoView({ block: "center" }); }
+      const rs = els.map((x) => x.getBoundingClientRect()), pad = 7;
+      const r = { left: Math.min(...rs.map((x) => x.left)), top: Math.min(...rs.map((x) => x.top)), right: Math.max(...rs.map((x) => x.right)), bottom: Math.max(...rs.map((x) => x.bottom)) };
+      r.width = r.right - r.left; r.height = r.bottom - r.top;
+      hole.classList.remove("none"); card.classList.remove("mid");
+      Object.assign(hole.style, { left: r.left - pad + "px", top: r.top - pad + "px", width: r.width + pad * 2 + "px", height: r.height + pad * 2 + "px" });
+      const ch = card.offsetHeight, below = r.top + r.height / 2 < vh * 0.45;
+      card.style.top = (below ? Math.min(vh - ch - 18, r.bottom + pad + 16) : Math.max(18, r.top - pad - 16 - ch)) + "px";
+    },
+    close(how) {
+      this.seq++; this.on = false; this.cur = null; Voice.stop(); clearInterval(this.iv); if (this.onrs) removeEventListener("resize", this.onrs);
+      WelFx.stop(); const d = $("#wel"), tv = $("#tour");
+      if (d) d.remove();
+      if (tv) { tv.classList.add("bye"); setTimeout(() => tv.remove(), 350); }
+      document.body.classList.remove("welcoming");
+      if (!PR.introSeen) PR.introSeen = Date.now(); flush();
+      if (how === "sos") { location.hash = "#/emergency"; return; }
+      if (location.hash !== "#/status") location.hash = "#/status";
+      if (PR.autoGet && !PREVIEW && navigator.onLine !== false && !document.body.classList.contains("em")) setTimeout(() => Everything.run(true), 700);
+    }
+  };
+
   async function boot() {
     await Store.open();
     const st = await Store.get("state"), pr = await Store.get("prefs");
@@ -2745,15 +2984,19 @@
     if (pr && typeof pr === "object") PR = Object.assign(prefDefaults(), pr);
     const lib = await Store.get("lib"); LIB = Array.isArray(lib) ? lib.filter((x) => x && typeof x.id === "string") : [];
     const v = $(".void"); if (v && !v.children.length) for (let i = 0; i < 14; i++) { const m = document.createElement("i"); m.style.left = (5 + Math.random() * 90) + "%"; m.style.top = (40 + Math.random() * 55) + "%"; m.style.animationDelay = (-Math.random() * 22).toFixed(1) + "s"; v.appendChild(m); }
+    // First open from the Home Screen: get everything onto this phone without being asked (the welcome says so, and Stop stops it).
+    if (isStandalone() && !PREVIEW && !PR.setupAt) { PR.setupAt = Date.now(); PR.autoGet = true; PR.firstGet = true; flush(); }
+    const intro = Welcome.should();
+    if (intro) Welcome.open(false);   // before the first screen is drawn, so the app never flashes up behind it
     render();
     PdfIndex.kick();
-    if (PR.autoGet && !PREVIEW && navigator.onLine !== false) setTimeout(() => { if (!document.body.classList.contains("em")) Everything.run(true); }, 3500);
+    if (!intro && PR.autoGet && !PREVIEW && navigator.onLine !== false) setTimeout(() => { if (!document.body.classList.contains("em") && !Welcome.on) Everything.run(true); }, 3500);
     document.body.dataset.ready = "1";
     window.__HAVYN_READY_MS = Math.round(performance.now() - t0); window.__HAVYN_READY_AT = Math.round(performance.now());
     if (!PREVIEW && "serviceWorker" in navigator) {
       navigator.serviceWorker.register("./sw.js").then(() => navigator.serviceWorker.ready).then(() => { const s = $("#swst"); if (s) s.textContent = "Saved for offline"; }).catch(() => { const s = $("#swst"); if (s) s.textContent = "Not available"; });
     }
   }
-  window.__HAVYN = { get state() { return S; }, get prefs() { return PR; }, get lib() { return LIB; }, E, C, version: VERSION, arc: Arc, shelf: Shelf, ready: Ready, store: Store };
+  window.__HAVYN = { get state() { return S; }, get prefs() { return PR; }, get lib() { return LIB; }, E, C, version: VERSION, arc: Arc, shelf: Shelf, ready: Ready, store: Store, welcome: Welcome };
   boot();
 })();

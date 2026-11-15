@@ -28,7 +28,7 @@ class Quiet(SimpleHTTPRequestHandler):
 srv = ThreadingHTTPServer(("127.0.0.1", PORT), functools.partial(Quiet, directory=str(ROOT / "app")))
 threading.Thread(target=srv.serve_forever, daemon=True).start()
 UA = "Mozilla/5.0 (iPhone; CPU iPhone OS 18_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.6 Mobile/15E148 Safari/604.1"
-INIT = "if (window.top === window) { window.__vall = []; document.addEventListener('securitypolicyviolation', e => window.__vall.push(e.violatedDirective + ' ' + e.blockedURI)); }"
+INIT = "window.__HAVYN_NO_INTRO = true; if (window.top === window) { window.__vall = []; document.addEventListener('securitypolicyviolation', e => window.__vall.push(e.violatedDirective + ' ' + e.blockedURI)); }"
 
 FILES = [FX / "havyn-test.zim", DATA / "nons" / "wikipedia_en_climate_change_mini_2024-06.zim", DATA / "withns" / "small.zim",
          DATA / "withns" / "wikibooks_be_all_nopic_2017-02_splitted.zimaa", DATA / "withns" / "wikibooks_be_all_nopic_2017-02_splitted.zimab",

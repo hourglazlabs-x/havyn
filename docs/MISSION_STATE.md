@@ -13,9 +13,10 @@
 | The real Kiwix servers allow it | PASS (GitHub runners) | Deploy log 2026-11-15: all 9 phone archives resolved with exact sizes and `Access-Control-Allow-Origin: *` from mirror.download.kiwix.org (core set 2.80 GB); probe: `.sha256` on download.kiwix.org → lb.download.kiwix.org, ACAO `*`. Not yet run on an iPhone. |
 | Answers point at the right page | PASS | 64 field answers, 108 page links in 25 phone-set documents, each checked against the text of the shipped file (pdftotext) on 2026-11-15; engine test: every link names a hosted phone-set document and a page inside it. e2e_v15: a link opens the reader at that page and Back returns; cards and playbooks show their pages; Search finds the answers. |
 | New cards are sourced | PASS (review pending) | Heart attack (AHA warning signs; 2024 AHA/Red Cross first aid guideline: aspirin 162–325 mg for alert adults, wait if unsure), Won't wake up (NHS, Resuscitation Council UK), Broken bone (Mayo Clinic), Poisoning (HRSA Poison Help, Arizona poison center, MedlinePlus). Same EMT/nurse review gate as the others. |
+| A new phone needs no setup beyond the icon | PASS (Chrome, standalone emulated) | e2e_v15 welcome checks: touch to begin, the LABS ANALYTIX open, "Welcome to Haven" spoken, a spotlight on each tab and on Search, every step spoken, the last step starts Download everything with no tap on it, and the manuals and all 7 core encyclopedias arrive by themselves; Emergency now goes straight to the cards and never blocks again; a link to a card skips the welcome; no errors or policy violations. Not yet seen on an iPhone: the voice depends on the voices installed on the phone. |
 | v1.0–v1.4 checks still pass | PASS | e2e 91/91, 76/76, 31/31; archive reader 208/208; shelf fetcher 26/26. |
 
-Test totals: engine 27/27, archive reader 208/208, end-to-end 91/91 + 76/76 + 31/31 + 39/39, shelf fetcher 27/27.
+Test totals: engine 27/27, archive reader 208/208, end-to-end 91/91 + 76/76 + 31/31 + 57/57, shelf fetcher 27/27.
 
 Open: on-device test on an iPhone (multi-GB downloads in a Home Screen app; storage quota prompt behavior); GitHub Pages switch; two phone-set documents (ATP 3-34.45 Electric Power, DOT ERG 2024) wait on the daily shelf retry; EMT or nurse review of all twenty cards.
 

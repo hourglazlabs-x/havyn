@@ -52,7 +52,7 @@
  {
   "name": "every downloaded archive was checked",
   "pass": true,
-  "detail": "[{'id': 'mwhlfprp2j9c7l', 'type': 'zim', 'name': 'Test WikiMed: medical encyclopedia', 'shelf': '', 'catalog': 'p-wikimed', 'verified': True, 'check': 'sha256', 'size': 44276, 'file': 'wikipedia_en_medicine_maxi_2026-10.zim'}, {'id': 'mwhlfsemco0tg2', 'type': 'zim', 'name': 'Test Water treatment', 'shelf': '', 'catalog': 'p-water', 'verified': True, 'check': 'md5', 'size': 44248, 'file': 'zimgit-water_en_2026-10.zim'}, {'id': 'mwhlfslwpz5y5v', 'type': 'zim', 'name': 'Test Food for preppers', 'shelf': '', 'catalog': 'p-food', 'verified': True, 'check': 'sha256', 'size': 44261, 'file': 'zimgit-food-preparation_en_2026-10.zim'}, {'id': 'mwhlfssu86jx6v', 'type': 'zim', 'name': 'Test Medical library', 'shelf': '', 'catalog': 'p-medlib', 'verified': True, 'check': 'sha256', 'size': 44251, 'file': 'zimgit-medicine_en_2026-10.zim'}, {'id': 'mwhlft0ajhkixg', 'type': 'zim', 'name': 'Test A library of knots', 'shelf': '', 'catalog': 'p-knots', 'verified': True, 'check': 'sha256', 'size': 44251, 'file': 'zimgit-knots_en_2026-10.zim'}, {'id': 'mwhlft7b8bgxjt', 'type': 'zim', 'name': 'Test Vikidia: encyclopedia for kids', 'shelf': '', 'catalog': 'p-vikidia', 'verified': True, 'check': 'sha256', 'size': 44270, 'file': 'vikidia_en_all_maxi_2026-10.zim'}]"
+  "detail": "[{'id': 'mwi99iiqidyjol', 'type': 'zim', 'name': 'Test WikiMed: medical encyclopedia', 'shelf': '', 'catalog': 'p-wikimed', 'verified': True, 'check': 'sha256', 'size': 44276, 'file': 'wikipedia_en_medicine_maxi_2026-10.zim'}, {'id': 'mwi99l4lv0ngm6', 'type': 'zim', 'name': 'Test Water treatment', 'shelf': '', 'catalog': 'p-water', 'verified': True, 'check': 'md5', 'size': 44248, 'file': 'zimgit-water_en_2026-10.zim'}, {'id': 'mwi99lbnnw10wn', 'type': 'zim', 'name': 'Test Food for preppers', 'shelf': '', 'catalog': 'p-food', 'verified': True, 'check': 'sha256', 'size': 44261, 'file': 'zimgit-food-preparation_en_2026-10.zim'}, {'id': 'mwi99lj2fikl0b', 'type': 'zim', 'name': 'Test Medical library', 'shelf': '', 'catalog': 'p-medlib', 'verified': True, 'check': 'sha256', 'size': 44251, 'file': 'zimgit-medicine_en_2026-10.zim'}, {'id': 'mwi99lqoqblly2', 'type': 'zim', 'name': 'Test A library of knots', 'shelf': '', 'catalog': 'p-knots', 'verified': True, 'check': 'sha256', 'size': 44251, 'file': 'zimgit-knots_en_2026-10.zim'}, {'id': 'mwi99ly1y1f9fu', 'type': 'zim', 'name': 'Test Vikidia: encyclopedia for kids', 'shelf': '', 'catalog': 'p-vikidia', 'verified': True, 'check': 'sha256', 'size': 44270, 'file': 'vikidia_en_all_maxi_2026-10.zim'}]"
  },
  {
   "name": "against Kiwix's SHA-256, or the ZIM's own MD5 when Kiwix has none",
@@ -132,7 +132,7 @@
  {
   "name": "a page link opens the manual at that page",
   "pass": true,
-  "detail": "#/library/mwhlfpq1qye4ut?page=102&from=%23%2Ffield 102 / 268"
+  "detail": "#/library/mwi99igvgytc64?page=102&from=%23%2Ffield 102 / 268"
  },
  {
   "name": "Back returns to the field index",
@@ -167,7 +167,7 @@
  {
   "name": "a playbook lists the pages that go with it",
   "pass": true,
-  "detail": "Run a generator safely\nCARD\nCPSC generator alert \u00b7 p. 1\nCarbon monoxide and backfeeding\nOSHA generator sheet \u00b7 p. 1\nGenerator safety fact sheet \u00b7 not on this phone yet | [{\"id\": \"mwhlfposyb2lql\", \"type\": \"pdf\", \"name\": \"Emergency Disinfection of Drinking Water\", \"shelf\": \"sh-epawater\", \"catalog\": \"\", \"verified\": false, \"check\": \"\", \"size\": 976, \"file\": \"EPA-Emergency-Disinfection-of-Drinking-Water.pdf\"}, {\"id\": \"mwhlfpp0chwgjr\", \"type\": \"pdf\", \"name\": \"Portable Generator Hazards\", \"shelf\": \"sh-cpscgen\", \"catalog\": \"\", \"verified\": false, \"check\": \"\", \"size\": 637, \"file\": \"CPSC-Portable-Generator-Hazards.pdf\"}, {\"id\": \"mwhlfppeea7wi8\", \"type\": \"pdf\", \"name\": \"National Interoperability Field Operations Guide (NIFOG 2.02)\", \"shelf\": \"sh-nifog\", \"catalog\": \"\", \"verified\": false, \"check\": \"\", \"size\": 67800, \"file\": \"CISA-NIFOG-2.02.pdf\"}, {\"id\": \"mwhlfpq1qye4ut\", \"type\": \"pdf\", \"name\": \"CERT Basic Training manual\", \"shelf\": \"sh-cert\", \"catalog\": \"\", \"verified\": false, \"check\": \"\", \"size\": 85516, \"file\": \"FEMA-CERT-Basic-Training-Participant-Manual-2019.pdf\"}]"
+  "detail": "Run a generator safely\nCARD\nCPSC generator alert \u00b7 p. 1\nCarbon monoxide and backfeeding\nOSHA generator sheet \u00b7 p. 1\nGenerator safety fact sheet \u00b7 not on this phone yet | [{\"id\": \"mwi99ies1ll5jx\", \"type\": \"pdf\", \"name\": \"Emergency Disinfection of Drinking Water\", \"shelf\": \"sh-epawater\", \"catalog\": \"\", \"verified\": false, \"check\": \"\", \"size\": 976, \"file\": \"EPA-Emergency-Disinfection-of-Drinking-Water.pdf\"}, {\"id\": \"mwi99ifber6qiq\", \"type\": \"pdf\", \"name\": \"Portable Generator Hazards\", \"shelf\": \"sh-cpscgen\", \"catalog\": \"\", \"verified\": false, \"check\": \"\", \"size\": 637, \"file\": \"CPSC-Portable-Generator-Hazards.pdf\"}, {\"id\": \"mwi99igaq676oi\", \"type\": \"pdf\", \"name\": \"National Interoperability Field Operations Guide (NIFOG 2.02)\", \"shelf\": \"sh-nifog\", \"catalog\": \"\", \"verified\": false, \"check\": \"\", \"size\": 67800, \"file\": \"CISA-NIFOG-2.02.pdf\"}, {\"id\": \"mwi99igvgytc64\", \"type\": \"pdf\", \"name\": \"CERT Basic Training manual\", \"shelf\": \"sh-cert\", \"catalog\": \"\", \"verified\": false, \"check\": \"\", \"size\": 85516, \"file\": \"FEMA-CERT-Basic-Training-Participant-Manual-2019.pdf\"}]"
  },
  {
   "name": "Search everything finds field answers",
@@ -187,11 +187,101 @@
  {
   "name": "parts are separate storage entries that delete cleanly",
   "pass": true,
-  "detail": "(48, 42)"
+  "detail": "(46, 40)"
  },
  {
   "name": "no page errors",
   "pass": true,
   "detail": "[]"
+ },
+ {
+  "name": "welcome: first open waits for a touch, with Emergency and Skip on screen",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "welcome: set to fill the phone by itself, but nothing downloads under the intro",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "welcome: a touch anywhere starts the LABS ANALYTIX open",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "welcome: then the HAVYN mark and the voice says Welcome to Haven",
+  "pass": true,
+  "detail": "[' ', 'Welcome to Haven.']"
+ },
+ {
+  "name": "welcome: then a tour of the real screens",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "welcome: the spotlight lands on each tab and on Search",
+  "pass": true,
+  "detail": "[True, True, True, True, True, True]"
+ },
+ {
+  "name": "welcome: every step is spoken",
+  "pass": true,
+  "detail": "[' ', 'Welcome to Haven.', 'This is Status, your home base. It shows how ready your family is.', 'In an emergency, tap the red button. Every card is two taps away.', 'Guides tells you what to do, step by step.', \"Family keeps everyone's medicines, allergies and needs in one place.\", 'Supplies turns what you have into days you can last.', 'Search finds anything, even inside every manual, with no internet.', \"Now I'm downloading everything this phone needs. Stay on Wi-Fi, and keep me open.\"]"
+ },
+ {
+  "name": "welcome: the last step starts Download everything by itself",
+  "pass": true,
+  "detail": "7 OF 7\nGetting this phone ready\n\nHAVYN is downloading everything now: 11 manuals and encyclopedias, 21 MB. Stay on Wi-Fi and keep HAVYN open; if it closes, it picks up where it stopped.\n\nNot on Wi-Fi?"
+ },
+ {
+  "name": "welcome: it ends with You're equipped",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "welcome: Enter HAVYN lands on Status and is remembered",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "welcome: the phone fills itself with no setup (manuals, then encyclopedias)",
+  "pass": true,
+  "detail": "['sh-epawater', 'sh-cpscgen', 'sh-nifog', 'sh-cert', 'p-wikimed', 'p-postdisaster', 'p-water', 'p-food', 'p-medlib', 'p-knots', 'p-vikidia']"
+ },
+ {
+  "name": "welcome: it doesn't come back",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "welcome: Guides and System replay it",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "welcome: Skip closes it",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "welcome: no errors or policy violations",
+  "pass": true,
+  "detail": "[]"
+ },
+ {
+  "name": "welcome: Emergency now goes straight to the cards",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "welcome: it won't stand in the way again, and in Safari nothing downloads by itself",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "welcome: a link straight to a card skips it",
+  "pass": true,
+  "detail": ""
  }
 ]

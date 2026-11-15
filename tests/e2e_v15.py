@@ -105,7 +105,7 @@ def serve(handler, port):
 serve(functools.partial(Quiet, directory=str(site)), SPORT); serve(Mirror, MPORT)
 BASE = "http://localhost:%d/" % SPORT
 UA = "Mozilla/5.0 (iPhone; CPU iPhone OS 18_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.6 Mobile/15E148 Safari/604.1"
-INIT = "if (window.top === window) { window.__vall = []; document.addEventListener('securitypolicyviolation', e => window.__vall.push(e.violatedDirective + ' ' + e.blockedURI)); }"
+INIT = "window.__HAVYN_NO_INTRO = true; if (window.top === window) { window.__vall = []; document.addEventListener('securitypolicyviolation', e => window.__vall.push(e.violatedDirective + ' ' + e.blockedURI)); }"
 def lib(page): return page.evaluate("__HAVYN.lib.map(x => ({id: x.id, type: x.type || 'pdf', name: x.name, shelf: x.shelf || '', catalog: x.catalog || '', verified: !!x.verified, check: x.check || '', size: x.size, file: x.file || ''}))")
 def zims_on(page): return [x for x in lib(page) if x["type"] == "zim"]
 
@@ -212,6 +212,56 @@ with sync_playwright() as p:
     keys1 = page.evaluate("__HAVYN.store.keys().then(k => k.filter(x => String(x).startsWith('zpart:')).length)")
     ok("parts are separate storage entries that delete cleanly", keys1 < keys0, (keys0, keys1))
     ok("no page errors", not errors, errors)
+
+    # ---------------- the welcome: first open from the Home Screen ----------------
+    WINIT = ("window.__said = []; try { speechSynthesis.speak = (u) => window.__said.push(u.text); speechSynthesis.cancel = () => {}; } catch (e) {} "
+             "if (window.top === window) { window.__vall = []; document.addEventListener('securitypolicyviolation', e => window.__vall.push(e.violatedDirective + ' ' + e.blockedURI)); }")
+    STANDALONE = "Object.defineProperty(navigator, 'standalone', { get: () => true });"
+    def newctx(init):
+        c = br.new_context(viewport={"width": 390, "height": 844}, device_scale_factor=2, is_mobile=True, has_touch=True, user_agent=UA); c.add_init_script(init); return c
+    def rect(pg, sel): return pg.evaluate("(s) => { const r = document.querySelector(s).getBoundingClientRect(); return [r.left, r.top, r.right, r.bottom]; }", sel)
+    def contains(a, b): return a[0] <= b[0] + 1 and a[1] <= b[1] + 1 and a[2] >= b[2] - 1 and a[3] >= b[3] - 1
+    wctx = newctx(STANDALONE + WINIT); w = wctx.new_page(); werr = []; w.on("pageerror", lambda e: werr.append(str(e)))
+    w.goto(BASE); w.wait_for_selector("#wel")
+    ok("welcome: first open waits for a touch, with Emergency and Skip on screen", "TOUCH TO BEGIN" in w.inner_text("#wel").upper() and w.locator("#wel [data-act=wel-sos]").count() == 1 and w.locator("#wel [data-act=wel-skip]").count() == 1)
+    ok("welcome: set to fill the phone by itself, but nothing downloads under the intro", w.evaluate("__HAVYN.prefs.autoGet === true && !!__HAVYN.prefs.setupAt") and not w.evaluate("__HAVYN.arc.busy || __HAVYN.shelf.busy"))
+    w.screenshot(path=str(SHOTS / "v15_welcome_begin.png"))
+    w.mouse.click(70, 600)   # a touch anywhere begins
+    ok("welcome: a touch anywhere starts the LABS ANALYTIX open", until(lambda: w.evaluate("document.querySelector('#wel').classList.contains('p1')") and w.inner_text("#wellabs") == "LABS ANALYTIX", 6))
+    ok("welcome: then the HAVYN mark and the voice says Welcome to Haven", until(lambda: "Welcome to Haven." in w.evaluate("window.__said"), 8), w.evaluate("window.__said"))
+    w.screenshot(path=str(SHOTS / "v15_welcome_mark.png"))
+    ok("welcome: then a tour of the real screens", until(lambda: w.locator("#tour .tcard h3").count() == 1, 10))
+    targets = [".tab[data-tab=status]", ".tab.sos", ".tab[data-tab=guides]", ".tab[data-tab=family]", ".tab[data-tab=supplies]", ".tools a[href='#/search']"]
+    lit = []
+    for k, sel in enumerate(targets):
+        until(lambda: w.inner_text("#tour .tmeta .lab").startswith("%d of" % (k + 1)), 5); time.sleep(0.8)   # the spotlight glides into place
+        lit.append(contains(rect(w, "#tour .thole"), rect(w, sel))); w.click("#tour [data-act=wel-next]")
+    ok("welcome: the spotlight lands on each tab and on Search", all(lit), lit)
+    ok("welcome: every step is spoken", len([x for x in w.evaluate("window.__said") if x.strip()]) >= 8, w.evaluate("window.__said"))
+    ok("welcome: the last step starts Download everything by itself", until(lambda: "Getting this phone ready" in w.inner_text("#tour") and w.evaluate("__HAVYN.shelf.busy || __HAVYN.arc.busy || __HAVYN.lib.length > 0"), 10), w.inner_text("#tour")[:200])
+    w.click("#tour [data-act=wel-next]")
+    ok("welcome: it ends with You're equipped", until(lambda: "equipped" in w.inner_text("#tour"), 5))
+    w.screenshot(path=str(SHOTS / "v15_welcome_end.png"))
+    w.click("#tour [data-act=wel-done]")
+    ok("welcome: Enter HAVYN lands on Status and is remembered", until(lambda: w.locator("#tour, #wel").count() == 0, 5) and w.evaluate("location.hash") == "#/status" and w.evaluate("!!__HAVYN.prefs.introSeen"))
+    ok("welcome: the phone fills itself with no setup (manuals, then encyclopedias)", until(lambda: sum(1 for x in lib(w) if x["shelf"]) == 4 and len(zims_on(w)) == len(core), 60), [x["catalog"] or x["shelf"] for x in lib(w)])
+    w.reload(); w.wait_for_selector("body[data-ready]"); time.sleep(0.6)
+    ok("welcome: it doesn't come back", w.locator("#wel").count() == 0)
+    w.goto(BASE + "#/welcome")
+    ok("welcome: Guides and System replay it", until(lambda: w.locator("#wel").count() == 1, 5))
+    w.click("#wel [data-act=wel-skip]")
+    ok("welcome: Skip closes it", until(lambda: w.locator("#wel, #tour").count() == 0, 5))
+    ok("welcome: no errors or policy violations", not werr and w.evaluate("window.__vall.length") == 0, werr + w.evaluate("window.__vall"))
+    wctx.close()
+    # opened in Safari, in the middle of an emergency
+    sctx = newctx(WINIT); s2 = sctx.new_page(); s2.goto(BASE); s2.wait_for_selector("#wel")
+    s2.click("#wel [data-act=wel-sos]")
+    ok("welcome: Emergency now goes straight to the cards", until(lambda: s2.evaluate("location.hash") == "#/emergency" and s2.locator("#wel").count() == 0, 5))
+    ok("welcome: it won't stand in the way again, and in Safari nothing downloads by itself", s2.evaluate("!!__HAVYN.prefs.introSeen && !__HAVYN.prefs.autoGet"))
+    sctx.close()
+    dctx = newctx(WINIT); d2 = dctx.new_page(); d2.goto(BASE + "#/emergency/cpr"); d2.wait_for_selector("body[data-ready]"); time.sleep(0.6)
+    ok("welcome: a link straight to a card skips it", d2.locator("#wel").count() == 0)
+    dctx.close()
     ctx.close(); br.close()
 
 for s in servers: s.shutdown()
