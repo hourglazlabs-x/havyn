@@ -6,7 +6,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 SRC, APP, PREV = ROOT / "src", ROOT / "app", ROOT / "preview"
-APP_VERSION = "1.1.0"
+APP_VERSION = "1.2.0"
 
 def read(p): return (SRC / p).read_text(encoding="utf-8")
 
@@ -15,7 +15,7 @@ def build():
     js = "\n".join(read(f) for f in ("content.js", "engine.js", "app.js"))
     tpl = read("index.html")
     vendor = ROOT / "vendor" / "pdfjs"
-    vend = b"".join((vendor / f).read_bytes() for f in ("pdf.min.js", "pdf.worker.min.js"))
+    vend = b"".join((vendor / f).read_bytes() for f in ("pdf.min.js", "pdf.worker.min.js")) + (ROOT / "vendor" / "pdflib" / "pdf-lib.esm.min.js").read_bytes()
     digest = hashlib.sha256((css + js + tpl + read("sw.js")).encode() + vend).hexdigest()[:10]
     version = f"{APP_VERSION}+{digest}"
     js = js.replace("__VERSION__", version)
@@ -55,6 +55,7 @@ def build():
     for d in (APP,):
         (d / "pdfjs").mkdir(exist_ok=True)
         for f in ("pdf.min.js", "pdf.worker.min.js", "LICENSE", "README.txt"): shutil.copy(vendor / f, d / "pdfjs" / f)
+        shutil.copytree(ROOT / "vendor" / "pdflib", d / "pdflib", dirs_exist_ok=True)
 
     # Preview build: same app, flagged so it skips the service worker; no CSP so a host page can frame it.
     if PREV.exists(): shutil.rmtree(PREV)
@@ -63,6 +64,7 @@ def build():
     for f in ("manifest.webmanifest", "apple-touch-icon.png", "icon-192.png", "icon-512.png", "icon-maskable-512.png"):
         shutil.copy(APP / f, PREV / f)
     shutil.copytree(APP / "pdfjs", PREV / "pdfjs")
+    shutil.copytree(APP / "pdflib", PREV / "pdflib")
 
     # Protocol cards as markdown, one file each (generated from src/content.js, the single source).
     out = subprocess.run(["node", "-e", "process.stdout.write(JSON.stringify(require(process.argv[1])))", str(SRC / "content.js")],

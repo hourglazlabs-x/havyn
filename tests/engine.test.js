@@ -216,3 +216,9 @@ test("v1.1 content: unique ids and every source key resolves", () => {
   for (const r of [...C.plan.heat, ...C.comms.ladder, ...C.comms.rules]) if (r.s) assert.ok(C.refs[r.s], r.s);
   assert.ok(!C.playbooks.some((p) => /v1\.1/.test(p.sub || "")));
 });
+
+test("v1.2: every phone number has a source page (except 911 and Poison Control) and US spelling", () => {
+  for (const n of C.numbers) if (!["911", "1-800-222-1222"].includes(n.num)) assert.ok(n.s && C.refs[n.s], n.n);
+  assert.ok(!/[Pp]ractise/.test(JSON.stringify(C)));
+  assert.equal(C.missions.phases.find((p) => p.id === "dec").tasks.find((t) => t.id === "m-binder").go, "#/binder");
+});

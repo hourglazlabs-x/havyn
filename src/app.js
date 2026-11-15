@@ -209,9 +209,9 @@
 
   const SCREENS = {
     status: renderStatus, emergency: renderEmergency, playbooks: renderPlaybooks, guides: renderGuides, family: renderFamily, supplies: renderSupplies, buy: renderBuy,
-    missions: renderMissions, plan: renderPlan, comms: renderComms, library: renderLibrary, system: renderSystem
+    missions: renderMissions, plan: renderPlan, comms: renderComms, library: renderLibrary, binder: renderBinder, system: renderSystem
   };
-  const TAB_OF = { status: "status", missions: "status", guides: "guides", playbooks: "guides", plan: "guides", comms: "guides", library: "guides", emergency: "emergency", family: "family", supplies: "supplies", buy: "supplies" };
+  const TAB_OF = { status: "status", missions: "status", guides: "guides", playbooks: "guides", plan: "guides", comms: "guides", library: "guides", binder: "guides", emergency: "emergency", family: "family", supplies: "supplies", buy: "supplies" };
   let lastPath = "";
   function render() {
     route = parseHash();
@@ -637,6 +637,7 @@
       li("#/plan", "flag", "The plan", "Phases, power, Phoenix heat rules, upkeep") +
       li("#/comms", "radio", "Comms", "Who to text, rally points, check-ins, radios") +
       li("#/missions", "check", "Missions", "Step by step, today through May") +
+      li("#/binder", "card", "Printable binder", "Plan, numbers, medicines and every card on paper") +
       '</div><div class="sec"><span class="lab">Library</span></div><div class="list">' +
       li("#/library", "file", "PDF library", LIB.length ? LIB.length + " on this phone" : "Manuals and guides, readable offline") + "</div>";
     h += '<p class="empty" style="margin-top:14px">Each playbook: what to do in the first 10 minutes, hour, day, and the hard rule for leaving. Tick items as you go; reset after the event.</p>';
@@ -808,14 +809,16 @@
     h += '<section class="glass panel"><h3>Check-ins</h3>' + (nc ? '<div class="mono" style="font-size:1.6rem;margin:2px 0">' + nc.at + '</div><div style="color:var(--ink2);margin-bottom:6px" data-tick="checkin">in ' + Math.floor(nc.inMin / 60) + "h " + (nc.inMin % 60) + "m</div>" : '<div class="empty">Set times in the family plan.</div>') +
       kv("Windows", (S.settings.checkins || []).join(" · ") || "—") + kv("GMRS channel", pl.gmrsCh ? esc(pl.gmrsCh) : NOTSET, true) + kv("Meshtastic channel", pl.meshCh ? esc(pl.meshCh) : NOTSET, true) +
       '<p class="note">' + esc(C.comms.rules[1].d) + "</p></section>";
-    h += '<section class="glass panel"><h3>Rally points</h3>' + [["1 · Near home", pl.rally1], ["2 · Neighborhood", pl.rally2], ["3 · Out of area", pl.rally3], ["Heat destination", pl.leaveTo]].map(([k, v]) => kv(k, v ? esc(v) : NOTSET, true)).join("") +
+    h += '<section class="glass panel"><h3>Numbers</h3><div class="list">' + C.numbers.filter((x) => x.num !== "911").map((x) => '<a class="li" href="' + telHref(x.num) + '"><span class="ic">' + ic("phone") + '</span><span class="tx"><b>' + esc(x.n) + "</b><small>" + esc(x.d) + '</small></span><span class="rt" style="font-size:.8rem">' + esc(x.num) + "</span></a>").join("") + "</div></section>";
+    h += '<section class="glass panel"><h3>Rally points</h3>' + [["1 · Near home", pl.rally1], ["2 · Neighborhood", pl.rally2], ["3 · Out of area", pl.rally3], ["Heat destination", pl.leaveTo]].map(([k, v]) => kv(k, v ? esc(v) + ' · <a href="' + esc(mapsHref(v)) + '">Map</a>' : NOTSET, true)).join("") +
+      '<p class="note">Map opens Apple Maps. Download Phoenix in Apple Maps first so it works with no signal (Maps → your picture → Offline Maps).</p>' +
       '<div class="btnrow" style="margin-top:10px"><a class="btn ghost sm" href="#/family/plan">Edit plan and channels</a></div></section>';
     h += '<div class="sec"><span class="lab">The ladder · try in this order</span></div>';
     C.comms.ladder.forEach((r, i) => {
       h += '<section class="glass panel"><h3>' + (i + 1) + " · " + esc(r.rung) + '</h3><b class="big2">' + esc(r.t) + "</b>" + kv("Works when", r.when) + kv("Range", r.range) + '<p class="note">' + esc(r.d) + "</p></section>";
     });
     h += '<section class="glass panel"><h3>Rules</h3>' + C.comms.rules.filter((r, i) => i !== 1).map((r) => '<div class="blk"><b>' + esc(r.t) + "</b><span>" + esc(r.d) + "</span></div>").join("") + "</section>";
-    h += '<p class="empty" style="font-size:.85rem">Sources: ' + srcRefs(["fcc", "text911", "gmrs"]) + ". Ranges are estimates.</p>";
+    h += '<p class="empty" style="font-size:.85rem">Sources: ' + srcRefs(["fcc", "text911", "gmrs", "phxcontacts", "srp", "srpc", "swgas", "phxwater", "phxpd", "applemaps"]) + ". Numbers checked 2026-11-14. Ranges are estimates.</p>";
     return h;
   }
 
@@ -1034,6 +1037,151 @@
     }
   };
 
+  /* ---------------- BINDER: the paper copy (HTML preview + PDF made on the phone) ---------------- */
+  const mapsHref = (q) => "https://maps.apple.com/?q=" + encodeURIComponent(q);
+  const telHref = (num) => "tel:" + String(num).replace(/[^0-9+]/g, "");
+  function binderDoc() {
+    const pl = S.plan || {}, dash = (v) => (v ? String(v) : "—");
+    const sec = [];
+    sec.push({ h: "Family plan", kv: [
+      ["Out-of-area contact", pl.contactName ? pl.contactName + (pl.contactPhone ? " · " + pl.contactPhone : "") : "—"],
+      ["Meeting place 1 · near home", dash(pl.rally1)], ["Meeting place 2 · neighborhood", dash(pl.rally2)], ["Meeting place 3 · out of area", dash(pl.rally3)],
+      ["If heat forces us out", dash(pl.leaveTo)], ["Route and contact", dash(pl.leaveNotes)],
+      ["Check-in times", (S.settings.checkins || []).join(", ") || "—"], ["GMRS channel", dash(pl.gmrsCh)], ["Meshtastic channel", dash(pl.meshCh)],
+      ["Gas shutoff", dash(pl.gas)], ["Water shutoff", dash(pl.water)], ["Power shutoff", dash(pl.power)]] });
+    sec.push({ h: "Phone numbers", kv: C.numbers.map((x) => [x.n, x.num]) });
+    const ppl = L("people");
+    sec.push({ h: "People", items: ppl.map((p) => ({ t: (p.name || "Unnamed") + (AGE[p.ageBand] ? " · " + AGE[p.ageBand] : ""),
+      kv: [["Conditions", p.conditions], ["Medicines", p.meds], ["Allergies", p.allergies], ["Blood type", p.blood], ["Doctor and pharmacy", p.doctor], ["Powered device", p.device], ["Notes", p.notes]].filter(([, v]) => v) })),
+      empty: "No one entered yet. Add the household on the Family screen, then make the binder again." });
+    const pets = L("pets");
+    if (pets.length) sec.push({ h: "Pets", items: pets.map((p) => ({ t: (p.name || "Pet") + (p.species ? " · " + p.species : "") + (p.weightLb ? " · " + p.weightLb + " lb" : ""), kv: p.notes ? [["Notes", p.notes]] : [] })) });
+    const meds = L("items").filter((i) => i.category === "meds");
+    if (meds.length) sec.push({ h: "Medicines in stock", kv: meds.map((i) => [i.name || "Medicine", [i.critical ? "critical" : "", num(i.per_day) ? i.per_day + " doses a day" : "", i.owner && byId("people", i.owner) ? "for " + byId("people", i.owner).name : "", i.location ? "stored: " + i.location : "", i.expires ? "expires " + i.expires : ""].filter(Boolean).join(" · ") || "—"]) });
+    sec.push({ h: "Comms ladder", steps: C.comms.ladder.map((r) => [r.rung + ": " + r.t, "Works when: " + r.when + ". Range: " + r.range + ". " + r.d]) });
+    sec.push({ h: "Comms rules", steps: C.comms.rules.map((r) => [r.t, r.d]) });
+    for (const p of C.playbooks.filter((x) => !x.soon)) {
+      sec.push({ h: "Playbook: " + p.title, sub: p.trigger, page: true, leave: p.leave, phases: p.phases.map((ph) => [ph.label, ph.items.map((it) => it.t + (it.d ? ": " + it.d : ""))]) });
+    }
+    sec.push({ h: "Phoenix heat rules", steps: C.plan.heat.map((r) => [r.t, r.d]) });
+    for (const c of C.cards) sec.push({ h: "Card: " + c.title, sub: c.sub, page: true, steps: c.steps.map((s) => [s.t, s.d + (s.beat ? " (push to a beat of " + s.beat + " a minute)" : "")]), note: c.note, src: "Source: " + c.sources.map((x) => x.n).join("; ") });
+    return { title: "HAVYN binder", date: ymd(now()), gate: "Cards: " + C.gate + ". Checked against sources " + C.reviewed + ". Training beats any app.", sections: sec };
+  }
+  function binderHTML(d) {
+    let h = '<article class="paper"><h1>' + esc(d.title) + '</h1><p class="meta">Made ' + esc(d.date) + " · " + esc(d.gate) + "</p>";
+    for (const s of d.sections) {
+      h += '<section class="' + (s.page ? "pb" : "") + '"><h2>' + esc(s.h) + "</h2>" + (s.sub ? '<p class="sub2">' + esc(s.sub) + "</p>" : "");
+      if (s.kv) h += "<table>" + s.kv.map(([k, v]) => "<tr><th>" + esc(k) + "</th><td>" + esc(v) + "</td></tr>").join("") + "</table>";
+      if (s.items) h += s.items.length ? s.items.map((it) => "<h3>" + esc(it.t) + "</h3>" + (it.kv.length ? "<table>" + it.kv.map(([k, v]) => "<tr><th>" + esc(k) + "</th><td>" + esc(v) + "</td></tr>").join("") + "</table>" : "")).join("") : "<p>" + esc(s.empty || "") + "</p>";
+      if (s.leave) h += '<p class="leave"><b>Leave now if:</b> ' + s.leave.map(esc).join(" · ") + "</p>";
+      if (s.phases) h += s.phases.map(([lab, items]) => "<h3>" + esc(lab) + "</h3><ul>" + items.map((x) => "<li>" + esc(x) + "</li>").join("") + "</ul>").join("");
+      if (s.steps) h += "<ol>" + s.steps.map(([t, x]) => "<li><b>" + esc(t) + ".</b> " + esc(x) + "</li>").join("") + "</ol>";
+      if (s.note) h += '<p class="sub2">' + esc(s.note) + "</p>";
+      if (s.src) h += '<p class="src2">' + esc(s.src) + "</p>";
+      h += "</section>";
+    }
+    return h + "</article>";
+  }
+  let binderFile = null;
+  function renderBinder() {
+    const d = binderDoc();
+    let h = '<div class="noprint">' + backbar("#/guides", "Binder");
+    h += '<section class="glass hero"><div class="lab">Printable binder</div><h2 style="margin:6px 0 4px;font-size:1.4rem">Paper for when the phones are dead.</h2>' +
+      '<div class="sub">Your plan, numbers, medicines, playbooks and all ' + C.cards.length + " cards. Make it again whenever something changes.</div>" +
+      '<div class="btnrow" style="margin-top:12px"><button class="btn" data-act="binder-pdf">Make binder PDF</button></div>' +
+      '<div class="btnrow' + (binderFile ? "" : " hide") + '" id="bdsend" style="margin-top:10px"><button class="btn" data-act="binder-share">Share or print</button><button class="btn ghost" data-act="binder-dl">Download</button></div>' +
+      '<div id="bdmsg" class="empty" style="min-height:1.3em"></div>' +
+      '<div class="btnrow"><button class="btn ghost sm" data-act="binder-print">Print this page</button></div>' +
+      '<p class="note">It holds your family\'s medical details. Keep the paper somewhere safe. A copy also goes into your Library.</p></section></div>';
+    return h + binderHTML(d);
+  }
+  const WINANSI = new Set("€‚ƒ„…†‡ˆ‰Š‹ŒŽ‘’“”•–—˜™š›œžŸ".split(""));
+  const pdfSafe = (s) => Array.from(String(s === undefined || s === null ? "" : s).replace(/→/g, "->").replace(/←/g, "<-").replace(/≥/g, ">=").replace(/≤/g, "<=").replace(/[  ]/g, " ").replace(/\s+/g, " "))
+    .filter((ch) => { const c = ch.charCodeAt(0); return (c >= 32 && c < 127) || (c >= 160 && c <= 255) || WINANSI.has(ch); }).join("");
+  async function makeBinderPdf() {
+    const msg = (m) => { const e = $("#bdmsg"); if (e) e.textContent = m; };
+    msg("Making the binder…");
+    const { PDFDocument, StandardFonts, rgb } = await import("./pdflib/pdf-lib.esm.min.js");
+    const d = binderDoc(), pdf = await PDFDocument.create();
+    pdf.setTitle(d.title + " " + d.date); pdf.setAuthor("HAVYN FIELD"); pdf.setCreator("HAVYN FIELD " + VERSION); pdf.setProducer("HAVYN FIELD");
+    const F = await pdf.embedFont(StandardFonts.Helvetica), FB = await pdf.embedFont(StandardFonts.HelveticaBold);
+    const W = 612, H = 792, M = 54, INK = rgb(0, 0, 0), GREY = rgb(0.35, 0.35, 0.35);
+    let page = null, y = 0;
+    const newPage = () => { page = pdf.addPage([W, H]); y = H - M; };
+    const room = (h) => { if (!page || y - h < M + 18) newPage(); };
+    const wrap = (txt, font, size, maxW) => {
+      const out = []; let cur = "";
+      for (const w of pdfSafe(txt).split(" ")) {
+        const t = cur ? cur + " " + w : w;
+        if (font.widthOfTextAtSize(t, size) <= maxW) { cur = t; continue; }
+        if (cur) out.push(cur);
+        cur = w;
+        while (cur.length > 1 && font.widthOfTextAtSize(cur, size) > maxW) { let k = cur.length - 1; while (k > 1 && font.widthOfTextAtSize(cur.slice(0, k), size) > maxW) k--; out.push(cur.slice(0, k)); cur = cur.slice(k); }
+      }
+      if (cur) out.push(cur);
+      return out;
+    };
+    const text = (txt, o) => {
+      o = o || {}; const font = o.font || F, size = o.size || 10.5, x = o.x || M, maxW = (o.w || W - 2 * M) - (x - M);
+      for (const ln of wrap(txt, font, size, maxW)) { room(size + 2); page.drawText(ln, { x, y: y - size, size, font, color: o.color || INK }); y -= size + (o.gap || 3.5); }
+    };
+    const kvRows = (rows, x0) => {
+      x0 = x0 || M;
+      for (const [k, v] of rows) {
+        const kl = wrap(k, FB, 9.5, 150), vl = wrap(v, F, 10, W - M - x0 - 160), n = Math.max(kl.length, vl.length, 1), lh = 13.5;
+        room(n * lh + 2);
+        kl.forEach((ln, i) => page.drawText(ln, { x: x0, y: y - 10 - i * lh, size: 9.5, font: FB, color: INK }));
+        vl.forEach((ln, i) => page.drawText(ln, { x: x0 + 160, y: y - 10 - i * lh, size: 10, font: F, color: INK }));
+        y -= n * lh + 3;
+      }
+    };
+    newPage();
+    text(d.title.toUpperCase(), { font: FB, size: 22, gap: 6 }); text("Made " + d.date + ". " + d.gate, { size: 9, color: GREY, gap: 12 }); y -= 6;
+    for (const s of d.sections) {
+      if (s.page) newPage(); else room(60);
+      y -= 4; text(s.h, { font: FB, size: 15, gap: 5 });
+      if (s.sub) text(s.sub, { size: 9.5, color: GREY, gap: 6 });
+      y -= 2;
+      if (s.kv) kvRows(s.kv);
+      if (s.items) { if (!s.items.length) text(s.empty || ""); for (const it of s.items) { room(40); y -= 2; text(it.t, { font: FB, size: 11.5, gap: 4 }); kvRows(it.kv, M + 10); } }
+      if (s.leave) { y -= 2; text("Leave now if: " + s.leave.join(" · "), { font: FB, size: 10.5 }); }
+      if (s.phases) for (const [lab, items] of s.phases) { room(40); y -= 4; text(lab, { font: FB, size: 11.5, gap: 4 }); for (const it of items) text("•  " + it, { size: 10, x: M + 8 }); }
+      if (s.steps) s.steps.forEach(([t, x], i) => { y -= 3; room(30); text((i + 1) + ". " + t + ". " + x, { size: s.page ? 12 : 10.5, gap: 4 }); });
+      if (s.note) { y -= 4; text(s.note, { size: 10, color: GREY }); }
+      if (s.src) { y -= 4; text(s.src, { size: 8.5, color: GREY }); }
+      y -= 10;
+    }
+    const pages = pdf.getPages();
+    pages.forEach((pg, i) => pg.drawText(pdfSafe("HAVYN binder · " + d.date + " · page " + (i + 1) + " of " + pages.length), { x: M, y: 30, size: 8, font: F, color: GREY }));
+    const bytes = await pdf.save();
+    const name = "HAVYN-binder-" + d.date + ".pdf";
+    binderFile = new File([bytes], name, { type: "application/pdf" });
+    // keep a copy in the Library so it can be read offline in the reader
+    const id = uid();
+    if (await Store.set("pdf:" + id, binderFile)) {
+      for (const o of LIB.filter((x) => x.binder)) await Store.del("pdf:" + o.id);
+      LIB = LIB.filter((x) => !x.binder);
+      LIB.push({ id, name: "HAVYN binder " + d.date, size: binderFile.size, added: now(), pages: pages.length, lastPage: 1, binder: true });
+      await saveLib();
+    }
+    msg("Ready: " + pages.length + " pages, " + mb(binderFile.size) + ". Saved in your Library too.");
+    const b = $("#bdsend"); if (b) b.classList.remove("hide");
+    Snd.chime("save");
+  }
+  async function shareBinder() {
+    if (!binderFile) return;
+    if (navigator.canShare && navigator.canShare({ files: [binderFile] })) {
+      try { await navigator.share({ files: [binderFile], title: "HAVYN binder" }); return; } catch (e) { if (e && e.name === "AbortError") return; }
+    }
+    downloadBinder();
+  }
+  function downloadBinder() {
+    if (!binderFile) return;
+    if (PREVIEW) { toast("Downloads work in the installed app"); return; }
+    const url = URL.createObjectURL(binderFile), a = document.createElement("a");
+    a.href = url; a.download = binderFile.name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 5000);
+  }
+
   /* ---------------- SYSTEM: memory card + settings ---------------- */
   let pendingCard = null, preparedFile = null;
   function isStandalone() { return window.navigator.standalone === true || (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches); }
@@ -1220,6 +1368,10 @@
     else if (act === "pdf-dest") PdfV.dest(num(b.dataset.i));
     else if (act === "pdf-go") { const pn = $("#pdfpanel"); if (pn) pn.classList.add("hide"); PdfV.go(num(b.dataset.n)); }
     else if (act === "pdf-del") { if (confirmTap(b, "pdfdel", "Tap again to delete")) deletePdf(b.dataset.id); }
+    else if (act === "binder-pdf") { b.disabled = true; makeBinderPdf().catch((e) => { const m = $("#bdmsg"); if (m) m.textContent = "Couldn't make the PDF: " + (e && e.message ? e.message : e); }).finally(() => { b.disabled = false; }); }
+    else if (act === "binder-share") shareBinder();
+    else if (act === "binder-dl") downloadBinder();
+    else if (act === "binder-print") window.print();
     else if (act === "mc-save") prepareCard();
     else if (act === "mc-share") shareCard();
     else if (act === "mc-download") downloadCard();

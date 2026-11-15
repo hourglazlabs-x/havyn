@@ -10,6 +10,16 @@ SHOTS = ROOT / "tests" / "shots"; SHOTS.mkdir(parents=True, exist_ok=True)
 PORT = 8765
 BASE = f"http://localhost:{PORT}/"
 results = []
+def wait_text(page, sel, pattern, timeout=20):
+    """Poll text from Python: the app's CSP (no eval) blocks Playwright's string-based wait_for_function."""
+    import re
+    end = time.time() + timeout
+    while time.time() < end:
+        try:
+            if re.search(pattern, page.inner_text(sel)): return True
+        except Exception: pass
+        time.sleep(0.2)
+    return False
 def ok(name, cond, detail=""):
     results.append((name, bool(cond), detail)); print(("PASS " if cond else "FAIL ") + name + (" — " + str(detail) if detail else ""))
 
@@ -151,6 +161,8 @@ with sync_playwright() as p:
     sms = page.get_attribute("a.btn[href^='sms:5']", "href")
     ok("comms: one-tap OK text to the out-of-area contact", sms.startswith("sms:5550100&body=OK"), sms)
     ok("comms: text-911 and call-911", page.locator("a[href='sms:911']").count() == 1 and page.locator("a[href='tel:911']").count() >= 1)
+    ok("comms: 7 one-tap Phoenix numbers", page.locator("a.li[href^='tel:']").count() == 7, page.locator("a.li[href^='tel:']").count())
+    ok("comms: rally points open in Apple Maps", page.locator("a[href^='https://maps.apple.com/?q=']").count() == 4)
     page.screenshot(path=str(SHOTS / "14_comms.png"), full_page=True)
     page.goto(BASE + "#/guides"); page.wait_for_selector(".li")
     ok("Guides tab is highlighted for guides pages", page.get_attribute("a.tab[data-tab=guides]", "class").endswith("on"))
@@ -185,7 +197,10 @@ with sync_playwright() as p:
     page.wait_for_selector("a.li[href^='#/library/']")
     ok("PDF imported into the library", page.locator("a.li[href^='#/library/']").count() == 1)
     page.click("a.li[href^='#/library/']"); page.wait_for_selector(".pg canvas", timeout=15000)
-    ok("reader renders pages", page.inner_text("#pgnum").strip() == "1 / 4" and page.locator(".pg canvas").count() >= 2, page.inner_text("#pgnum"))
+    for _ in range(50):
+        if page.locator(".pg canvas").count() >= 2: break
+        time.sleep(0.1)
+    ok("reader renders pages", page.inner_text("#pgnum").strip() == "1 / 4" and page.locator(".pg canvas").count() >= 2, page.inner_text("#pgnum") + f" · {page.locator('.pg canvas').count()} drawn")
     page.screenshot(path=str(SHOTS / "15_reader.png"))
     page.click("[data-act=pdf-toc]"); page.wait_for_selector(".toc button")
     ok("reader: table of contents", page.locator(".toc button").all_inner_texts() == ["Water storage", "Dehydration and heat", "Power station care", "Radio channels"])
@@ -198,6 +213,22 @@ with sync_playwright() as p:
     page.goto(BASE + "#/library"); page.wait_for_selector("a.li[href^='#/library/']")
     page.click("a.li[href^='#/library/']"); page.wait_for_selector(".pg canvas", timeout=15000); page.wait_for_timeout(600)
     ok("reader resumes where you left off", page.inner_text("#pgnum").strip() == "4 / 4", page.inner_text("#pgnum"))
+    # binder: built on the phone, saved to the library, readable and searchable
+    page.goto(BASE + "#/family/person/new"); page.wait_for_selector("form[data-form=person]")
+    page.fill("[name=name]", "Binder Test"); page.fill("[name=allergies]", "Penicillin"); page.click("button[type=submit]"); page.wait_for_selector("text=Binder Test")
+    page.goto(BASE + "#/binder"); page.wait_for_selector(".paper")
+    ok("binder preview holds people, numbers and every card", "Penicillin" in page.inner_text(".paper") and "602-261-8000" in page.inner_text(".paper") and all(("Card: " + c["title"]) in page.inner_text(".paper") for c in C["cards"]))
+    page.click("[data-act=binder-pdf]"); page.wait_for_selector("#bdsend:not(.hide)", timeout=20000)
+    with page.expect_download() as dl: page.click("[data-act=binder-dl]")
+    bpath = SHOTS / "binder.pdf"; dl.value.save_as(str(bpath))
+    ok("binder PDF made on the phone", bpath.read_bytes()[:5] == b"%PDF-" and bpath.stat().st_size > 10000, f"{bpath.stat().st_size} bytes")
+    bid = page.evaluate("(async () => await new Promise(r => { const q = indexedDB.open('havyn-field'); q.onsuccess = () => { const t = q.result.transaction('kv').objectStore('kv').get('lib'); t.onsuccess = () => r((t.result || []).filter(x => x.binder).map(x => [x.id, x.pages])); }; }))()")
+    ok("binder copy saved to the library", len(bid) == 1 and bid[0][1] >= 12, bid)
+    page.goto(BASE + "#/library/" + bid[0][0]); page.wait_for_selector(".pg canvas", timeout=15000)
+    page.click("[data-act=pdf-find]"); page.fill("#pdfpanel [name=q]", "Penicillin"); page.click("#pdfpanel button[type=submit]")
+    page.wait_for_selector("#findres .toc button", timeout=15000)
+    ok("binder PDF is searchable in the reader", page.locator("#findres .toc button").count() >= 1)
+    page.screenshot(path=str(SHOTS / "17_binder_reader.png"))
     page.click("[data-act=night]") if page.locator("[data-act=night]").count() else None
     page.evaluate("__HAVYN.prefs.theme = 'night'"); page.goto(BASE + "#/status"); page.go_back(); page.wait_for_selector(".pg canvas", timeout=15000); page.wait_for_timeout(500)
     page.screenshot(path=str(SHOTS / "16_reader_night.png"))
@@ -206,7 +237,7 @@ with sync_playwright() as p:
 
     # 10. offline: reload with the network off
     ctx.set_offline(True)
-    page.goto(BASE + "#/status"); page.wait_for_selector("body[data-ready]", timeout=8000)
+    page.goto(BASE + "#/status"); page.reload(); page.wait_for_selector("body[data-ready]", timeout=8000)
     ok("works offline after first install", page.is_visible(".hero"))
     page.click("a.tab.sos"); page.click('a.emtile[href="#/emergency/bleeding"]')
     page.wait_for_selector(".emstep", timeout=5000)
@@ -214,6 +245,9 @@ with sync_playwright() as p:
     page.goto(BASE + "#/library"); page.wait_for_selector("a.li[href^='#/library/']", timeout=8000)
     page.click("a.li[href^='#/library/']"); page.wait_for_selector(".pg canvas", timeout=15000)
     ok("PDF reader works offline (pdf.js from the offline copy)", page.locator(".pg canvas").count() >= 1)
+    page.goto(BASE + "#/binder"); page.wait_for_selector("[data-act=binder-pdf]")
+    page.click("[data-act=binder-pdf]"); wait_text(page, "#bdmsg", "Ready|Couldn")
+    ok("binder PDF can be made offline (pdf-lib from the offline copy)", "Ready" in page.inner_text("#bdmsg"), page.inner_text("#bdmsg"))
     keep_violations()
     page.screenshot(path=str(SHOTS / "10_offline_bleeding.png"))
     ctx.set_offline(False)

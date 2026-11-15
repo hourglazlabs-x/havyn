@@ -1,6 +1,6 @@
-# HAVYN FIELD v1.1
+# HAVYN FIELD v1.2
 
-HAVYN FIELD is an offline emergency command app for every family iPhone. It is one HTML file plus a service worker, a manifest, icons and a vendored copy of PDF.js for the reader. There is no framework and no build step at runtime, and the app makes no network requests after it is installed.
+HAVYN FIELD is an offline emergency command app for every family iPhone. It is one HTML file plus a service worker, a manifest, icons and vendored copies of PDF.js (the reader) and pdf-lib (the binder PDF). There is no framework and no build step at runtime, and the app makes no network requests after it is installed.
 
 ## What it does
 
@@ -9,7 +9,8 @@ HAVYN FIELD is an offline emergency command app for every family iPhone. It is o
 | **Status** | Days of water, food, critical meds and power, drawn as glass towers. One family autonomy number and the resource that limits it. An outage clock, the next radio check-in, the next three missions, and alerts for expiring items, items stored somewhere hot, shortfalls, upkeep that is due, Black Friday, and an overdue backup. |
 | **Missions** | The mission map as a checklist: Today, This week, Black Friday, December, January–February, Before May, each with its "done when" gate. Add your own missions. Upkeep (monthly, quarterly, spring, yearly) comes due again on its own. |
 | **Emergency** | Ten cards: adult CPR with a 110-per-minute metronome, child and baby CPR, choking, bleeding, anaphylaxis, stroke, heat stroke, CO alarm, burns and seizure. Any card is two taps from launch. Every card shows its source and the date it was checked. White on black, large type, no animation, and the screen stays awake. |
-| **Guides** | Playbooks (Blackout, Extreme heat, each with a hard "leave now" rule), **The plan** (phases, power layers, Phoenix heat rules, upkeep), **Comms** (one-tap "OK" text to the out-of-area contact, call or text 911, check-ins, rally points, radio channels, the four-rung ladder) and the **PDF library**. |
+| **Guides** | Playbooks (Blackout, Extreme heat, each with a hard "leave now" rule), **The plan** (phases, power layers, Phoenix heat rules, upkeep), **Comms** (one-tap "OK" text to the out-of-area contact, call or text 911, seven checked Phoenix numbers for power, gas, water and police, check-ins, rally points that open in Apple Maps, radio channels, the four-rung ladder) and the **PDF library**. |
+| **Binder** | A paper copy made on the phone: family plan, phone numbers, people and their medicines, playbooks, heat rules and all ten cards. Saved to the Library and sent to the share sheet to print, save to Files or AirDrop. |
 | **PDF library** | Import manuals and guides from Files; read them offline inside the app with contents, find, go to page and zoom. PDFs stay on the phone that imported them. |
 | **Family** | People, pets, the out-of-area contact, three meeting places, where to go if heat forces you out, check-in times, radio channels, and utility shutoffs with photos. |
 | **Supplies** | Inventory feeding the autonomy engine, plus the **Buy list**: 43 items in four tiers with quantities sized to your household, the $564 safety floor, To buy / Ordered / Have, deal rules, and one tap to move a bought item into the inventory. |
@@ -45,8 +46,8 @@ Hosting is needed only to install and to receive updates. Once installed, phones
 
 ```
 python3 tools/build.py              # writes app/ (deploy) and preview/ (no service worker)
-node --test tests/engine.test.js    # 20 engine and content tests
-python3 tests/e2e.py                # 57 end-to-end checks in headless Chrome at iPhone size
+node --test tests/engine.test.js    # 21 engine and content tests
+python3 tests/e2e.py                # 64 end-to-end checks in headless Chrome at iPhone size
 ```
 
 Edit `src/`, never `app/`. The build inlines the CSS and JS into one `index.html`, pins the script in the CSP by its SHA-256 hash, stamps a version into the service worker so phones update, and regenerates `content/cards/*.md` from `src/content.js`.
@@ -60,6 +61,7 @@ havyn/
   docs/MISSION_STATE.md    current milestone, acceptance evidence, open items
   src/                     content.js (cards, playbooks, missions, buy list, plan, comms) · engine.js · app.js · styles.css · index.html · sw.js
   vendor/pdfjs/            PDF.js legacy build (Apache-2.0), copied into app/pdfjs/ by the build
+  vendor/pdflib/           pdf-lib 1.17.1 (MIT), copied into app/pdflib/ by the build
   app/                     built app: deploy this folder
   content/cards/*.md       each protocol card with sources and a reviewer sign-off line
   tools/build.py · tools/icons.py

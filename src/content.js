@@ -267,7 +267,7 @@ const HAVYN_CONTENT = {
   missions: {
     phases: [
       { id: "today", label: "Today", when: "Nov 14 · $0", gate: "Airplane-mode test passes", gateD: "Every phone in airplane mode opens HAVYN, an emergency card, WikiMed and a map.", tasks: [
-        { id: "m-downloads", t: "Start the big downloads on Wi-Fi", d: "Kiwix with WikiMed, plus offline maps. Leave the phones plugged in; it takes hours." },
+        { id: "m-downloads", t: "Start the big downloads on Wi-Fi", d: "Kiwix with WikiMed. Apple Maps offline (iOS 17 or later): Maps → your picture → Offline Maps → Download New Map; cover Phoenix and the route to your out-of-area address. Leave the phones plugged in." },
         { id: "m-plan", t: "Family plan: out-of-area contact and 3 meeting places", go: "#/family/plan" },
         { id: "m-medid", t: "Medical ID on every phone", d: "Health app → your picture → Medical ID → Edit. Turn on Show When Locked and add emergency contacts." },
         { id: "m-sat", t: "Satellite demo outside (iPhone 14 and newer)", d: "Settings → Emergency SOS → Try Demo, under open sky." },
@@ -288,7 +288,7 @@ const HAVYN_CONTENT = {
       ] },
       { id: "dec", label: "December", when: "", gate: "Anyone finds any card in under 10 seconds", tasks: [
         { id: "m-library", t: "Load manuals and guides into the Library", d: "Power station and radio manuals, the plan PDF, a first-aid book.", go: "#/library" },
-        { id: "m-binder", t: "Print the binder", d: "The plan, contacts, medical list and cards, in sheet protectors." },
+        { id: "m-binder", t: "Print the binder", d: "Make the binder PDF in HAVYN, print two copies, and keep them in sheet protectors.", go: "#/binder" },
         { id: "m-class", t: "CPR + Stop the Bleed class" },
         { id: "m-drill", t: "First lights-out drill", d: "Two hours with phones in airplane mode: everyone finds three cards, the radios and the rally point." }
       ] },
@@ -410,7 +410,7 @@ const HAVYN_CONTENT = {
   comms: {
     ladder: [
       { rung: "Primary", t: "Cell texts, not calls", when: "Towers up but jammed", range: "Anywhere with signal", d: "Texts need far less network capacity and can wait in line until it frees up.", s: "fcc" },
-      { rung: "Alternate", t: "Messages and Find My via satellite", when: "Towers down, open sky", range: "Outdoors, anywhere", d: "iPhone 14 and newer. Practise the demo before you need it." },
+      { rung: "Alternate", t: "Messages and Find My via satellite", when: "Towers down, open sky", range: "Outdoors, anywhere", d: "iPhone 14 and newer. Practice the demo before you need it." },
       { rung: "Contingency", t: "Meshtastic family mesh", when: "No towers and no sky view: indoors, at night", range: "About 2–5 km per hop (estimate); less in town, more from height", d: "A radio per person paired to their phone, plus a base node placed high at home." },
       { rung: "Emergency", t: "GMRS radios, then the rally point", when: "Phones dead or lost", range: "About 1–3 km handheld (estimate)", d: "Agreed channel; meet at the rally point at the next check-in time." }
     ],
@@ -424,6 +424,18 @@ const HAVYN_CONTENT = {
       { t: "Bitchat", d: "Free. Install it, but count on it only if neighbors run it too." }
     ]
   },
+
+  // ---------------- v1.2: numbers (checked 2026-11-14 on each provider's own page) ----------------
+  numbers: [
+    { n: "Emergency", num: "911", d: "Police, fire, medical. Text 911 if you can't talk." },
+    { n: "Poison Control", num: "1-800-222-1222", d: "Poisoning, medicine mistakes, carbon monoxide, bites and stings. 24/7." },
+    { n: "APS power outage", num: "602-371-7171", d: "If APS is your electric company.", s: "phxcontacts" },
+    { n: "SRP power outage", num: "602-236-8888", d: "If SRP is your electric company. 24/7.", s: "srp" },
+    { n: "SRP power emergency", num: "602-236-8811", d: "Fallen lines, arcing, electric shock. For an injury, call 911 first.", s: "srpc" },
+    { n: "Southwest Gas emergency", num: "877-860-6020", d: "Smell gas? Get everyone out first, then call 911 and Southwest Gas from a safe place.", s: "swgas" },
+    { n: "Phoenix water emergency", num: "602-261-8000", d: "Main breaks and sewer overflows. 24/7.", s: "phxwater" },
+    { n: "Phoenix police non-emergency", num: "602-262-6151", d: "Crime Stop: police help that isn't a 911 emergency.", s: "phxpd" }
+  ],
 
   // ---------------- v1.1: library ----------------
   library: {
@@ -450,7 +462,14 @@ const HAVYN_CONTENT = {
     cdcab: { n: "CDC: about heat and your health (fans)", u: "https://www.cdc.gov/heat-health/about/index.html" },
     cdcillness: { n: "CDC: heat-related illness", u: "https://www.cdc.gov/disasters/extremeheat/pdf/Heat_Related_Illness.pdf" },
     text911: { n: "KTAR: text 911 anywhere in Maricopa County", u: "https://ktar.com/arizona-news/people-in-maricopa-county-can-now-text-911-in-case-of-an-emergency" },
-    gmrs: { n: "Midland: GMRS licensing", u: "https://midlandusa.com/pages/licensing" }
+    gmrs: { n: "Midland: GMRS licensing", u: "https://midlandusa.com/pages/licensing" },
+    phxcontacts: { n: "City of Phoenix: emergency contacts", u: "https://phoenix.gov/emergency/emergency-contacts" },
+    srp: { n: "SRP: power outages and storm safety", u: "https://www.srpnet.com/safety/outage/default.aspx" },
+    srpc: { n: "SRP: contact us", u: "https://srpnet.com/contactus" },
+    swgas: { n: "Southwest Gas: general safety (2026)", u: "https://www.swgas.com/1409225179571/General-Safety-2026.pdf" },
+    phxwater: { n: "Phoenix Water Services: contact", u: "https://www.phoenix.gov/administration/departments/waterservices/contact-us.html" },
+    phxpd: { n: "Phoenix Police: contact", u: "https://www.phoenix.gov/administration/departments/police/contact-us.html" },
+    applemaps: { n: "Apple: download maps to use offline", u: "https://support.apple.com/en-us/105084" }
   }
 };
 if (typeof module !== "undefined") module.exports = HAVYN_CONTENT;

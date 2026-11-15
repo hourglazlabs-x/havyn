@@ -2,7 +2,7 @@
  {
   "check": "first screen under 1 s (6x CPU throttle)",
   "pass": true,
-  "detail": "144 ms normal, 379 ms throttled"
+  "detail": "115 ms normal, 364 ms throttled"
  },
  {
   "check": "service worker controls the page",
@@ -195,6 +195,16 @@
   "detail": ""
  },
  {
+  "check": "comms: 7 one-tap Phoenix numbers",
+  "pass": true,
+  "detail": "7"
+ },
+ {
+  "check": "comms: rally points open in Apple Maps",
+  "pass": true,
+  "detail": ""
+ },
+ {
   "check": "Guides tab is highlighted for guides pages",
   "pass": true,
   "detail": ""
@@ -227,7 +237,7 @@
  {
   "check": "reader renders pages",
   "pass": true,
-  "detail": "1 / 4"
+  "detail": "1 / 4 \u00b7 4 drawn"
  },
  {
   "check": "reader: table of contents",
@@ -250,6 +260,26 @@
   "detail": "4 / 4"
  },
  {
+  "check": "binder preview holds people, numbers and every card",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "check": "binder PDF made on the phone",
+  "pass": true,
+  "detail": "23180 bytes"
+ },
+ {
+  "check": "binder copy saved to the library",
+  "pass": true,
+  "detail": "[['mwh5jwxjel3gqw', 14]]"
+ },
+ {
+  "check": "binder PDF is searchable in the reader",
+  "pass": true,
+  "detail": ""
+ },
+ {
   "check": "works offline after first install",
   "pass": true,
   "detail": ""
@@ -263,6 +293,11 @@
   "check": "PDF reader works offline (pdf.js from the offline copy)",
   "pass": true,
   "detail": ""
+ },
+ {
+  "check": "binder PDF can be made offline (pdf-lib from the offline copy)",
+  "pass": true,
+  "detail": "Ready: 14 pages, 23 KB. Saved in your Library too."
  },
  {
   "check": "CSP blocks fetch (external + same-origin) and external images",
