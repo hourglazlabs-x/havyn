@@ -37,7 +37,7 @@
  {
   "name": "[sw] archive CSS applies, including url() images",
   "pass": true,
-  "detail": "url(\"http://localhost:8766/z/mwhaxb3wuvvrf2/img/drop.png\")"
+  "detail": "url(\"http://localhost:8766/z/mwhdcygywizi6e/img/drop.png\")"
  },
  {
   "name": "[sw] link inside the archive navigates",
@@ -267,7 +267,7 @@
  {
   "name": "[fallback] archive CSS applies, including url() images",
   "pass": true,
-  "detail": "url(\"blob:http://localhost:8766/f46ce945-8666-486a-a42f-0ab2c7c9b5af\")"
+  "detail": "url(\"blob:http://localhost:8766/b7b58e98-1cff-418d-ace5-663f0e42d139\")"
  },
  {
   "name": "[fallback] link inside the archive navigates",

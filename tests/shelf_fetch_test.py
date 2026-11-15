@@ -26,9 +26,13 @@ def covered():
         c.showPage()
     c.save(); return b.getvalue()
 COVERED = covered()
-hits = {}
+hits = {}; REL = {}
 class H(http.server.BaseHTTPRequestHandler):
     def log_message(self, *a): pass
+    def do_HEAD(self):
+        p = urllib.parse.unquote(urllib.parse.urlparse(self.path).path)
+        f = REL.get("dir") and (REL["dir"] / p.rsplit("/", 1)[1])
+        self.send_response(200 if f and f.exists() else 404); self.end_headers()
     def send(self, code, body=b"", ctype="application/pdf"):
         self.send_response(code); self.send_header("Content-Type", ctype); self.send_header("Content-Length", str(len(body))); self.end_headers(); self.wfile.write(body)
     def do_GET(self):
@@ -81,6 +85,9 @@ class H(http.server.BaseHTTPRequestHandler):
         if p == "/server/api/core/items/u1/bundles": return J({"_embedded": {"bundles": [{"name": "THUMBNAIL", "_links": {"bitstreams": {"href": BASE + "/nope"}}}, {"name": "ORIGINAL", "_links": {"bitstreams": {"href": BASE + "/server/api/core/bundles/b1/bitstreams"}}}]}})
         if p == "/server/api/core/bundles/b1/bitstreams": return J({"_embedded": {"bitstreams": [{"name": "9789240045064-fre.pdf", "_links": {"content": {"href": BASE + "/nope"}}}, {"name": "9789240045064-eng.pdf", "_links": {"content": {"href": BASE + "/server/api/core/bitstreams/s1/content"}}}]}})
         if p == "/server/api/core/bitstreams/s1/content": return self.send(200, DOC["Drinking-water quality guidelines"])
+        if REL.get("dir") and p.startswith("/rel/me/havyn/shelf/"):
+            f = REL["dir"] / p.rsplit("/", 1)[1]
+            return self.send(200, f.read_bytes(), "application/octet-stream") if f.exists() else self.send(404, b"no", "text/html")
         if p == "/rel/me/havyn/shelf/shelf-index.json": return J({"built": "2026-10-01T00:00:00+00:00", "items": PREV})
         if p == "/rel/me/havyn/shelf/Stub-Doc.pdf": return self.send(200, PREV_STUB)
         if p == "/rel/me/havyn/shelf/Flaky-Doc.pdf": return self.send(200, DOC["FLAKY doc"])
@@ -144,6 +151,17 @@ check("HAVYN-shelf-phone/Stub-Doc.pdf" in names and "HAVYN-shelf-phone/TB-MED.pd
 rep = (T / "out/report.md").read_text()
 check("↺ | it-stub" in rep and "(Wayback copy)" in rep and "kept from the last build" in rep, "report marks kept and Wayback documents")
 r = idx["it-trunc"]; check(r["ok"] and hits["/trunc/a.pdf"] == 2, "download cut short is noticed and retried")
+
+# Phase 3 (before 2, while the Wayback Machine still answers): re-check two documents and publish, keeping everything else
+REL["dir"] = T / "out/release"; os.environ.update(SHELF_ONLY="it-link,it-gone", SHELF_PUBLISH="1")
+sys.argv = ["shelf_fetch.py", str(T / "catalog.json"), str(T / "out3")]; m.main(); del os.environ["SHELF_PUBLISH"]
+idx3 = {r["id"]: r for r in json.loads((T / "out3/release/shelf-index.json").read_text())["items"]}
+keep3 = (T / "out3/keep.txt").read_text().split(); ch3 = (T / "out3/changed.txt").read_text().split()
+okp1 = {k for k, r in idx.items() if r["ok"]}
+check(okp1 <= set(idx3) and "Right.pdf" in keep3 and "TB-MED.pdf" in keep3 and not set(ch3) - {"shelf-index.json", "shelf-files.tsv", "SHA256SUMS.txt", "HAVYN-shelf-phone.zip"}, "targeted publish keeps every other document and uploads nothing unchanged")
+names3 = zipfile.ZipFile(T / "out3/release/HAVYN-shelf-phone.zip").namelist()
+check("HAVYN-shelf-phone/TB-MED.pdf" in names3 and "HAVYN-shelf-phone/Stub-Doc.pdf" in names3, "phone zip still complete after a targeted publish")
+REL.clear()
 
 # Phase 2: the Wayback Machine starts refusing (429): stop asking after a few refusals instead of waiting out every document
 cat2 = {"release": "shelf", "checked": "2026-11-14", "systems": cat["systems"], "items": [

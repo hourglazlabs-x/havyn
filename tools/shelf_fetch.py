@@ -76,6 +76,12 @@ def is_wb(url): return urllib.parse.urlparse(url).netloc.lower() == WB_HOST
 def refused(e):
     return (isinstance(e, urllib.error.HTTPError) and e.code in (429, 503)) or (isinstance(e, urllib.error.URLError) and "refused" in str(e.reason).lower())
 
+def cool_off(e):
+    """When the Wayback Machine says "too many requests", wait as long as it asks (1-5 minutes) before trying again."""
+    if isinstance(e, urllib.error.HTTPError) and e.code == 429:
+        ra = (e.headers.get("Retry-After") or "") if e.headers else ""
+        time.sleep(min(300, max(60, int(ra) if ra.isdigit() else 90)))
+
 def slow_host(url):
     return urllib.parse.urlparse(url).netloc.lower().endswith("archive.org") or urllib.parse.urlparse(url).netloc.lower() == WB_HOST
 
@@ -95,7 +101,9 @@ def get_text(url, timeout=60, headers=None, tries=3):
                     return r.read(8_000_000).decode("utf-8", "replace")
         except urllib.error.HTTPError as e:
             last = e
-            if is_wb(url) and refused(e): WB.bad()
+            if is_wb(url) and refused(e):
+                WB.bad()
+                if not WB.tripped and a + 1 < tries: cool_off(e)
             if e.code in (400, 401, 403, 404, 410): break
         except Exception as e:
             last = e
@@ -153,7 +161,9 @@ def download(url, dest, tries=None):
             last = str(e); break
         except urllib.error.HTTPError as e:
             last = "HTTP %d" % e.code
-            if is_wb(url) and refused(e): WB.bad()
+            if is_wb(url) and refused(e):
+                WB.bad()
+                if not WB.tripped and attempt + 1 < tries: cool_off(e)
             if e.code in (401, 403, 404, 410, 451): break
         except Exception as e:
             last = "%s: %s" % (type(e).__name__, e)
@@ -361,17 +371,27 @@ def fetch_item1(it, work, rel):
         r.update(ok=False, error=str(e)[:1500])
     return r
 
+def keep_prev(p, repo, tag, rel):
+    """Make sure last build's copy is still in the release; phone-set files are fetched too (they go in the phone zip)."""
+    if not p.get("mirror"): return True
+    url = RELEASES % (repo, tag) + urllib.parse.quote(p["file"])
+    try:
+        if p.get("ph"):
+            size, sha = download(url, rel / p["file"])
+            if sha != p.get("sha256"): raise RuntimeError("checksum differs from last build")
+        else:
+            with req(url, method="HEAD", timeout=60) as r:
+                if r.status != 200: raise RuntimeError("HTTP %d" % r.status)
+        return True
+    except Exception as e:
+        print("could not keep last build's %s: %s" % (p["id"], e)); return False
+
 def carry_over(results, prev, prev_built, repo, tag, rel):
     """A publisher being down on build day shouldn't take a checked document off everyone's shelf: keep last build's copy."""
     for i, r in enumerate(results):
         p = prev.get(r["id"])
         if r.get("ok") or not p or p.get("file") != r.get("file") or bool(p.get("mirror")) != bool(r.get("mirror")): continue
-        if p.get("mirror"):
-            try:
-                size, sha = download(RELEASES % (repo, tag) + urllib.parse.quote(p["file"]), rel / p["file"])
-                if sha != p.get("sha256"): raise RuntimeError("checksum differs from last build")
-            except Exception as e:
-                print("could not keep last build's %s: %s" % (r["id"], e)); continue
+        if not keep_prev(p, repo, tag, rel): continue
         results[i] = dict(p, carried=r.get("error", "")[:600], carried_from=prev_built)
         print("↺ %-16s kept last build's copy (today: %s)" % (r["id"], r.get("error", "")[:160]), flush=True)
 
@@ -382,9 +402,10 @@ def main():
     repo = os.environ.get("GITHUB_REPOSITORY", "hourglazlabs-x/havyn"); tag = cat.get("release", "shelf")
     items = cat["items"]
     only = set(filter(None, os.environ.get("SHELF_ONLY", "").split(",")))
+    merge = bool(only) and os.environ.get("SHELF_PUBLISH") == "1"   # re-check a few documents, keep everything else as it is
     if only: items = [i for i in items if i["id"] in only]
     prev, prev_built = {}, None
-    if not only:
+    if not only or merge:
         try:
             pj = json.loads(get_text(RELEASES % (repo, tag) + "shelf-index.json"))
             prev = {p["id"]: p for p in pj.get("items", []) if p.get("ok")}; prev_built = pj.get("built")
@@ -393,6 +414,12 @@ def main():
     with cf.ThreadPoolExecutor(6) as ex:
         results = list(ex.map(lambda it: fetch_item(it, work, rel), items))
     if prev: carry_over(results, prev, prev_built, repo, tag, rel)
+    if merge:
+        got = {r["id"]: r for r in results}
+        for it in cat["items"]:
+            p = prev.get(it["id"])
+            if it["id"] not in got and p and p.get("file") == it["file"] and keep_prev(p, repo, tag, rel): got[it["id"]] = p
+        results = [got[it["id"]] for it in cat["items"] if it["id"] in got]
     sysdir = {s["id"]: "10-shelf/%s-%s" % (s["n"], re.sub(r"[^a-z0-9]+", "-", s["t"].lower()).strip("-")) for s in cat["systems"]}
     rows, sums = [], []
     for r in results:
@@ -421,6 +448,8 @@ def main():
     meta = ["shelf-index.json", "shelf-files.tsv", "SHA256SUMS.txt", "HAVYN-shelf-phone.zip"]
     changed = meta + [r["file"] for r in results if r.get("ok") and r["mirror"] and prev_sha.get(r["file"]) != r["sha256"]]
     (out / "changed.txt").write_text("\n".join(changed) + "\n", encoding="utf-8")
+    keep = meta + [r["file"] for r in results if r.get("ok") and r["mirror"]]
+    (out / "keep.txt").write_text("\n".join(keep) + "\n", encoding="utf-8")
 
     okn = sum(1 for r in results if r.get("ok")); mb = lambda b: "%.1f MB" % (b / 1e6)
     kept = sum(1 for r in results if r.get("carried") is not None)

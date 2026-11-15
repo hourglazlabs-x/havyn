@@ -2,7 +2,7 @@
  {
   "check": "first screen under 1 s (6x CPU throttle)",
   "pass": true,
-  "detail": "112 ms normal, 329 ms throttled"
+  "detail": "197 ms normal, 391 ms throttled"
  },
  {
   "check": "service worker controls the page",
@@ -362,12 +362,12 @@
  {
   "check": "binder PDF made on the phone",
   "pass": true,
-  "detail": "37368 bytes"
+  "detail": "37369 bytes"
  },
  {
   "check": "binder copy saved to the library",
   "pass": true,
-  "detail": "[['mwhax78rqdcrun', 23]]"
+  "detail": "[['mwhdcr9s78c75c', 23]]"
  },
  {
   "check": "binder PDF is searchable in the reader",
@@ -395,8 +395,8 @@
   "detail": "Ready: 23 pages, 36 KB. Saved in your Library too."
  },
  {
-  "check": "CSP blocks fetch (external + same-origin) and external images",
-  "pass": false,
+  "check": "CSP blocks fetch to other sites and external images; only HAVYN's own address is allowed",
+  "pass": true,
   "detail": "['blocked https://example.com/x', 'allowed /index.html']; violations=['connect-src https://example.com/x', 'img-src https://example.com/pixel.png']"
  },
  {

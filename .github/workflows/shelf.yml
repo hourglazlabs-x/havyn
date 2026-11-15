@@ -7,9 +7,14 @@ on:
   workflow_dispatch:
     inputs:
       only:
-        description: "Comma-separated item ids to test (blank = everything, and publish)"
+        description: "Comma-separated item ids to check (blank = everything, and publish)"
         required: false
         default: ""
+      publish:
+        description: "With ids: publish what they find and keep every other document as it is"
+        type: boolean
+        required: false
+        default: false
   push:
     branches: [main]
     paths: ["shelf/catalog.json", "tools/shelf_fetch.py", ".github/workflows/shelf.yml"]
@@ -32,12 +37,13 @@ jobs:
       - name: Fetch and check every document
         env:
           SHELF_ONLY: ${{ inputs.only }}
+          SHELF_PUBLISH: ${{ inputs.publish && '1' || '' }}
         run: python3 tools/shelf_fetch.py shelf/catalog.json out
       - name: Report
         if: always()
         run: cat out/report.md >> "$GITHUB_STEP_SUMMARY" || true
       - name: Publish to the shelf release
-        if: ${{ !inputs.only }}
+        if: ${{ !inputs.only || inputs.publish }}
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -55,12 +61,11 @@ jobs:
           done
           echo "Uploading ${#up[@]} new or changed files (unchanged ones stay as they are)"
           if [ "${#up[@]}" -gt 0 ]; then gh release upload shelf "${up[@]}" --clobber; fi
-          keep="$(cd out/release && ls)"
           for a in $existing; do
-            grep -qxF "$a" <<<"$keep" || gh release delete-asset shelf "$a" -y
+            grep -qxF "$a" out/keep.txt || gh release delete-asset shelf "$a" -y
           done
       - name: Redeploy HAVYN with the new shelf
-        if: ${{ !inputs.only }}
+        if: ${{ !inputs.only || inputs.publish }}
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh workflow run pages.yml --ref main || echo "Pages deploy not started (is GitHub Pages turned on?)"

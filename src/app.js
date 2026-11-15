@@ -1633,7 +1633,7 @@
   };
   function shelfRow(it) {
     const have = shelfHave(it), info = Shelf.info(it), sy = C.shelf.systems.find((x) => x.id === it.sys);
-    const size = info ? info.size : it.size, pages = info && info.pages;
+    const size = info ? info.size : it.size, pages = (info && info.pages) || it.pg;
     const chips = [it.by + (it.yr ? " · " + it.yr : ""), (info || !it.est ? "" : "~") + sz(size) + (pages ? " · " + fmtN(pages) + " pages" : ""), LICS[it.lic] || it.lic, it.ph ? "Phone set" : "Drive"];
     let h = '<div class="gi' + (have ? " got" : "") + '" id="sh-' + esc(it.id) + '"><div class="gh"><b>' + esc(it.t) + '</b><span class="gc">' +
       chips.map((c, i) => '<span class="chip' + (i === 3 && it.ph ? " core" : i === 2 ? " lic" : "") + '">' + esc(c) + "</span>").join("") + "</span></div>" +
