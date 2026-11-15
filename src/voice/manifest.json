@@ -32,11 +32,11 @@
    "ms": 4118
   },
   "sos": {
-   "text": "In an emergency, tap the red button. Every card is two taps away.",
+   "text": "In an emergency, tap the red button. Each card talks you through it, step by step, and keeps the times for the paramedics.",
    "file": "sos.mp3",
-   "bytes": 50444,
-   "sha256": "c9564d9ac9de2187871a3ccaf97f6c9b3a38cbc9b24a53bc3fed0620d6ba46d0",
-   "ms": 4114
+   "bytes": 85580,
+   "sha256": "07baee1597aa8ce0fa52e26fe32b2fcb26db3a952f55c314b8cc626a013a2b32",
+   "ms": 7039
   },
   "guides": {
    "text": "Guides tells you what to do, step by step.",
