@@ -1,7 +1,18 @@
 # HAVYN: mission state
 
-**Current milestone:** M6, HAVYN FIELD v1.6: a game-style command deck (levels, quests, What's happening?, quick setup) and an elegant British voice, on top of v1.5: everything on the phone with one tap (Download everything: 50 phone-set manuals and 7 core encyclopedias, resumable, checked), "How do I…" (a field index that opens the exact page in the manuals), and four new emergency cards. Live deployment still waits on one GitHub setting (Settings → Pages → Source: GitHub Actions).
-**Build:** 1.5.0 · 2026-11-15 · `app/index.html` 442 KB + `zimkit.js` 54 KB + PDF.js and pdf-lib (cached for offline) · shelf release `shelf` (rebuilding with the wider phone set after the v1.5 push)
+**Current milestone:** M7, HAVYN FIELD v1.7: every emergency card reads its steps aloud in HAVYN's recorded voice, and keeps the times for the paramedics (live timers that warn when a card's wait is up, a log to hand over); a professional status line on Home. Built on v1.6 (game-style command deck, quick setup, the elegant British voice) and v1.5 (Download everything, the field index). Live at https://hourglazlabs-x.github.io/havyn/ (GitHub Pages, deployed on every push to `app/`).
+**Build:** 1.7.0 · 2026-11-15 · `app/index.html` 550 KB + `zimkit.js` 54 KB + PDF.js and pdf-lib + 136 voice recordings (8.0 MB), all cached for offline
+
+## v1.7 "done when": evidence
+
+| Criterion | Status | Evidence |
+| --- | --- | --- |
+| Every card talks you through it, hands-free | PASS (Chrome) / not yet heard on an iPhone | 121 card-step recordings (Kokoro-82M, Emma, speed 0.95; Voice workflow 2026-11-15), the words rewritten for the ear; engine: one recording per step, each matching its words and none empty. e2e_v17: opening a card reads step 1, Next reads step 2, Repeat replays it, off is quiet, on reads the current step, another card reads its first step, leaving stops it. |
+| Works with no internet | PASS (Chrome) | e2e_v17: all 136 recordings are in the app's offline cache; with the network off, a card step's recording loads from the phone; a deleted one is saved again the next time it plays online. |
+| Times for the paramedics | PASS (Chrome) | e2e_v17: a tap stamps the time (with when the card was opened); the timer runs; no warning before 5 minutes, "Over 5 minutes: call 911" after; stopping shows "lasted 5:22" and clears the warning; CALL 911 is logged; the log lists all four entries in order with time since the first; it survives a reload; Clear needs a second tap. Engine: every timer points at the card step about the wait, every stop pairs with a start. |
+| Looks and reads like a professional tool | PASS (Chrome, screenshots) | e2e_v17: Home's status line (offline, stored, backup, network) fills in; sections numbered 01 to 04; no know-how tile cuts words off. Screenshots in `tests/shots/v17-*.png`. |
+
+Test totals for 1.7.0: engine 30/30, archive reader 208/208, end-to-end 91/91 + 76/76 + 31/31 + 72/72 + 35/35, shelf fetcher 27/27.
 
 ## v1.6 "done when": evidence
 
@@ -111,10 +122,11 @@ An independent pass compared every card step with its sources (AHA 2025 adult an
 
 ## Open items
 
-1. **Turn on GitHub Pages** (one setting), then install on every phone and tap Get more › Shelf › Get the phone set.
-2. **Three shelf documents still to fetch** (ATP 3-34.45, ERG 2024, MSF Clinical Guidelines): the daily `shelf` run retries them; check the release's `shelf-index.json`.
-3. **Medical review gate (16 cards).** A trained EMT or nurse must review and sign each file in `content/cards/`; until then every card shows "Awaiting EMT or nurse review".
+1. **Install on every phone** from https://hourglazlabs-x.github.io/havyn/ (Share › Add to Home Screen) and open it from the icon on Wi-Fi: Download everything starts by itself.
+2. **Two shelf documents still to fetch** (ATP 3-34.45, DOT ERG 2024): the daily `shelf` run retries them; check the release's `shelf-index.json`.
+3. **Medical review gate (20 cards, and the v1.7 timer hints).** A trained EMT or nurse must review and sign each file in `content/cards/`; until then every card shows "Awaiting EMT or nurse review".
 4. **On-device checks that headless Chrome can't do:**
+   - v1.7: the card voice on an iPhone (first touch unlocks sound; the ring switch shouldn't silence it while a card talks); the 8 MB of recordings caching on first install over cellular.
    - v1.3: import a 1–2 GB archive on an iPhone (Safari's IndexedDB with a multi-GB file); archive video inside the reader on iOS (service-worker byte ranges in WebKit); the reader frame's link handling and dark pages in WebKit; how much HAVYN may store (`navigator.storage.estimate()` on the family phones).
    - Earlier: the binder share sheet; the PDF reader on long books; the metronome with the silent switch on; wake lock; AirDrop of a Memory Card; Dynamic Type at the largest size; first-screen time on the oldest iPhone.
 5. **Windows vault script:** run once on a Windows PC (only the bash version ran here).

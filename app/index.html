@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-hN8M489ZtH0wDw5E5cjjDquzOaYwjiYGwbw2SfKbbBQ='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://mirror.download.kiwix.org https://download.kiwix.org https://lb.download.kiwix.org; font-src 'none'; media-src 'self' blob:; object-src 'none'; frame-src 'self'; worker-src 'self'; manifest-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-AWfd9PugZvD3SgqFkIVDXbNm1kJbLVaMDClK0KdOUPk='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://mirror.download.kiwix.org https://download.kiwix.org https://lb.download.kiwix.org; font-src 'none'; media-src 'self' blob:; object-src 'none'; frame-src 'self'; worker-src 'self'; manifest-src 'self'; base-uri 'none'; form-action 'none'">
 <title>HAVYN FIELD</title>
 <meta name="theme-color" content="#04050d">
 <meta name="color-scheme" content="dark">
@@ -641,6 +641,57 @@ body:not([data-ready]) .tabbar { opacity: 0; }
 .quests.mini .li { padding: 9px 12px; }
 .quests.mini .li .tx b { font-size: .92rem; }
 
+/* ---------------- v1.7 professional polish ---------------- */
+/* Home's status line: four instrument cells */
+.strip { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; margin: 2px 0 4px; }
+.strip .sc { min-width: 0; padding: 7px 9px 8px; border-radius: 12px; border: 1px solid var(--line); background: rgba(255,255,255,.035); }
+.strip small { display: block; font: 500 .55rem var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--mute); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.strip b { display: flex; align-items: center; gap: 6px; margin-top: 3px; font-size: .8rem; font-weight: 650; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.strip .ok b::before, .strip .warn b::before { content: ""; flex: none; width: 6px; height: 6px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 8px var(--ok); }
+.strip .warn b::before { background: var(--warn); box-shadow: 0 0 8px var(--warn); }
+/* numbered sections, like a system dashboard */
+.sec .lab b { display: inline-block; margin-right: 8px; padding: 1px 6px; border-radius: 6px; font-weight: 600; color: var(--cyan); border: 1px solid color-mix(in srgb, var(--cyan) 40%, transparent); background: color-mix(in srgb, var(--cyan) 8%, transparent); letter-spacing: .08em; }
+.sec.first { margin-top: 8px; }
+/* the voice guide on a card */
+.emvrow { display: flex; gap: 8px; margin: 14px 0 2px; }
+.emvoice, .emagain { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px; border-radius: 12px; border: 1.5px solid rgba(255,255,255,.4); background: #000; color: #fff; font: 700 .95rem var(--sans); }
+.emvoice.on { border-color: #fff; background: rgba(255,255,255,.12); }
+.emvoice svg, .emagain svg { width: 20px; height: 20px; flex: none; }
+/* times for the paramedics */
+.emlog { margin-top: 18px; padding-top: 14px; border-top: 1.5px solid rgba(255,255,255,.25); }
+.emlog .emdh, .emdeep .emdh { display: flex; align-items: center; gap: 8px; }
+.emlog .emdh svg { width: 18px; height: 18px; }
+.emmark { display: grid; gap: 3px; width: 100%; margin-top: 10px; padding: 12px 14px; text-align: left; border-radius: 14px; border: 2px solid #fff; background: #000; color: #fff; }
+.emmark .mw { display: flex; align-items: center; gap: 10px; font-size: 1.25rem; font-weight: 800; }
+.emmark .mw svg { width: 22px; height: 22px; flex: none; }
+.emmark .mtime { font-size: 1rem; color: #cfcfcf; }
+.emmark .mtime b { font: 700 1.05rem var(--mono); color: #fff; }
+.emmark.done { background: #0c0c0c; }
+.emmark.done .mw svg { color: var(--ok); }
+.emmark .mh { display: none; font-weight: 800; font-size: 1.05rem; color: #000; background: var(--warn); border-radius: 8px; padding: 4px 8px; margin-top: 4px; justify-self: start; }
+.emmark.due { border-color: var(--warn); }
+.emmark.due .mh { display: block; }
+.emlogl { display: flex; align-items: center; gap: 10px; margin-top: 10px; min-height: 56px; padding: 0 14px; border-radius: 14px; border: 2px solid #fff; background: #fff; color: #000; text-decoration: none; font-size: 1.15rem; font-weight: 800; }
+.emlogl svg { width: 22px; height: 22px; flex: none; }
+.emlogl span { flex: 1; }
+.emlogl b { font: 800 1rem var(--mono); padding: 2px 9px; border-radius: 999px; background: #000; color: #fff; }
+.emlogbar { display: flex; align-items: center; gap: 12px; margin: 0 0 12px; padding: 12px 14px; border-radius: 16px; background: #fff; color: #000; text-decoration: none; }
+.emlogbar svg { width: 26px; height: 26px; flex: none; }
+.emlogbar b { display: block; font-size: 1.2rem; font-weight: 850; }
+.emlogbar small { font-size: .95rem; }
+.logsub { font-size: 1.05rem; color: #cfcfcf; margin: 10px 0 6px; }
+.loglist { list-style: none; margin: 8px 0 0; padding: 0; }
+.loglist li { display: grid; grid-template-columns: auto 1fr auto; align-items: baseline; gap: 12px; padding: 12px 2px; border-bottom: 1px solid rgba(255,255,255,.22); }
+.loglist time { font: 800 1.15rem var(--mono); }
+.loglist span { font-size: 1.25rem; font-weight: 600; line-height: 1.25; color: #cfcfcf; }
+.loglist .key span { color: #fff; font-weight: 800; }
+.loglist em { font-style: normal; font-weight: 700; color: var(--warn); }
+.loglist small { font: 600 .9rem var(--mono); color: #bdbdbd; }
+.loglive { margin-top: 12px; font-size: 1.05rem; color: #cfcfcf; }
+.loglive b { font: 800 1.15rem var(--mono); color: #fff; }
+/* know-how tiles: two lines instead of cutting words off */
+.mt small { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+
 </style>
 </head>
 <body>
@@ -654,7 +705,7 @@ body:not([data-ready]) .tabbar { opacity: 0; }
 <a class="tab" data-tab="supplies" href="#/supplies"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5z"/><path d="M3 7.5 12 12l9-4.5M12 12v9"/></svg><span>SUPPLIES</span></a>
 </nav></div>
 <noscript><p style="padding:24px;color:#fff">HAVYN FIELD needs JavaScript turned on.</p></noscript>
-<script>window.HAVYN_VOICE={"voice": "bf_emma", "lines": {"welcome": {"text": "Welcome to Haven.", "file": "welcome.mp3", "sha": "c8f7e4b48eda"}, "around": {"text": "Let me show you around.", "file": "around.mp3", "sha": "b55baffaeeb3"}, "level": {"text": "This is your command deck. Your level rises as you finish quests, and most of them finish themselves.", "file": "level.mp3", "sha": "7c40181ca3ca"}, "now": {"text": "When something happens, tap it here. Everything you need is in one place.", "file": "now.mp3", "sha": "5c6a6c730f06"}, "sos": {"text": "In an emergency, tap the red button. Every card is two taps away.", "file": "sos.mp3", "sha": "c9564d9ac9de"}, "guides": {"text": "Guides tells you what to do, step by step.", "file": "guides.mp3", "sha": "b5b311438362"}, "family": {"text": "Family keeps everyone's medicines, allergies and needs in one place.", "file": "family.mp3", "sha": "8b1512beab2a"}, "supplies": {"text": "Supplies turns what you have into days you can last.", "file": "supplies.mp3", "sha": "569ab346d7ed"}, "search": {"text": "Search finds anything, even inside every manual, with no internet.", "file": "search.mp3", "sha": "81de99f154a6"}, "get": {"text": "Now I'm downloading everything this phone needs. Stay on Wi-Fi, and keep me open.", "file": "get.mp3", "sha": "7cedf88e4a36"}, "home": {"text": "One last step. Add Haven to your Home Screen, and open it from the icon.", "file": "home.mp3", "sha": "fae1ee556911"}, "stocked": {"text": "This phone already has everything. It works with no internet.", "file": "stocked.mp3", "sha": "73a1ec57f84b"}, "preview": {"text": "In the app on your Home Screen, everything downloads right here, by itself.", "file": "preview.mp3", "sha": "fc31727c1808"}, "equipped": {"text": "You're equipped. Everything works with no internet, and nothing leaves this phone.", "file": "equipped.mp3", "sha": "0ac0dcd9e7aa"}, "sample": {"text": "Welcome to Haven. This is my voice.", "file": "sample.mp3", "sha": "300894b77f03"}}};
+<script>window.HAVYN_VOICE={"voice": "bf_emma", "lines": {"welcome": {"text": "Welcome to Haven.", "file": "welcome.mp3", "sha": "c8f7e4b48eda"}, "around": {"text": "Let me show you around.", "file": "around.mp3", "sha": "b55baffaeeb3"}, "level": {"text": "This is your command deck. Your level rises as you finish quests, and most of them finish themselves.", "file": "level.mp3", "sha": "7c40181ca3ca"}, "now": {"text": "When something happens, tap it here. Everything you need is in one place.", "file": "now.mp3", "sha": "5c6a6c730f06"}, "sos": {"text": "In an emergency, tap the red button. Each card talks you through it, step by step, and keeps the times for the paramedics.", "file": "sos.mp3", "sha": "07baee1597aa"}, "guides": {"text": "Guides tells you what to do, step by step.", "file": "guides.mp3", "sha": "b5b311438362"}, "family": {"text": "Family keeps everyone's medicines, allergies and needs in one place.", "file": "family.mp3", "sha": "8b1512beab2a"}, "supplies": {"text": "Supplies turns what you have into days you can last.", "file": "supplies.mp3", "sha": "569ab346d7ed"}, "search": {"text": "Search finds anything, even inside every manual, with no internet.", "file": "search.mp3", "sha": "81de99f154a6"}, "get": {"text": "Now I'm downloading everything this phone needs. Stay on Wi-Fi, and keep me open.", "file": "get.mp3", "sha": "7cedf88e4a36"}, "home": {"text": "One last step. Add Haven to your Home Screen, and open it from the icon.", "file": "home.mp3", "sha": "fae1ee556911"}, "stocked": {"text": "This phone already has everything. It works with no internet.", "file": "stocked.mp3", "sha": "73a1ec57f84b"}, "preview": {"text": "In the app on your Home Screen, everything downloads right here, by itself.", "file": "preview.mp3", "sha": "fc31727c1808"}, "equipped": {"text": "You're equipped. Everything works with no internet, and nothing leaves this phone.", "file": "equipped.mp3", "sha": "0ac0dcd9e7aa"}, "sample": {"text": "Welcome to Haven. This is my voice.", "file": "sample.mp3", "sha": "300894b77f03"}, "c-cpr-0": {"text": "C P R. Tap and shout. Breathing normally? Not responding and not breathing normally means start C P R. Gasping is not normal breathing.", "file": "c/c-cpr-0.mp3", "sha": "3314d04cae67"}, "c-cpr-1": {"text": "Call nine one one on speaker. Send someone to find an A E D. The dispatcher can coach you.", "file": "c/c-cpr-1.mp3", "sha": "4fa322315549"}, "c-cpr-2": {"text": "Hands on the center of the chest. Heel of one hand, other hand on top. Arms straight, shoulders over your hands.", "file": "c/c-cpr-2.mp3", "sha": "ad9f103f598a"}, "c-cpr-3": {"text": "Push hard and fast. 100 to 120 a minute, to the beat. At least 2 inches, not more than 2.4 inches. Let the chest come all the way back up.", "file": "c/c-cpr-3.mp3", "sha": "e6aa56dc0e7d"}, "c-cpr-4": {"text": "A E D here? Turn it on. Follow its voice. Keep pushing until it tells you to stop.", "file": "c/c-cpr-4.mp3", "sha": "89452708e04d"}, "c-cpr-5": {"text": "Do not stop. Keep going until help takes over or they breathe normally. If someone can take over, switch about every 2 minutes.", "file": "c/c-cpr-5.mp3", "sha": "052be24938ae"}, "c-cprchild-0": {"text": "C P R child. Tap and shout. Breathing normally? Baby: tap the foot. Not responding and not breathing normally means start C P R. Gasping is not normal breathing.", "file": "c/c-cprchild-0.mp3", "sha": "5bc045309f97"}, "c-cprchild-1": {"text": "Call nine one one on speaker. Alone with no phone at hand: give about 2 minutes of C P R first, then go call.", "file": "c/c-cprchild-1.mp3", "sha": "572e1c54dade"}, "c-cprchild-2": {"text": "Hand position. Child: heel of one or two hands, center of the chest. Baby under 1, heel of one hand, center of the chest just below the nipple line.", "file": "c/c-cprchild-2.mp3", "sha": "b3f97fb147c7"}, "c-cprchild-3": {"text": "Push fast, the right depth. 100 to 120 a minute. Child: about 2 inches. Baby: about 1.5 inches. Let the chest come all the way back up.", "file": "c/c-cprchild-3.mp3", "sha": "1f9d017cafcb"}, "c-cprchild-4": {"text": "If you can: 30 pushes, then 2 breaths. Each breath just enough to make the chest rise. Breaths matter for children and babies.", "file": "c/c-cprchild-4.mp3", "sha": "6600b5dd8ff6"}, "c-cprchild-5": {"text": "Do not stop. Keep going until help takes over or they breathe normally. A E D: use it, with child pads if it has them.", "file": "c/c-cprchild-5.mp3", "sha": "1afd4aea2e63"}, "c-choking-0": {"text": "Choking. Ask: are you choking? If they can cough hard or talk, let them keep coughing and stay with them.", "file": "c/c-choking-0.mp3", "sha": "4bcc02404fc4"}, "c-choking-1": {"text": "Can't breathe, cough or speak? Call nine one one. Or have someone else call while you act.", "file": "c/c-choking-1.mp3", "sha": "cd03495e7490"}, "c-choking-2": {"text": "5 back blows. Stand behind and slightly to the side. Lean them forward. Hit firmly between the shoulder blades with the heel of your hand.", "file": "c/c-choking-2.mp3", "sha": "457df784b532"}, "c-choking-3": {"text": "5 abdominal thrusts. Fist just above the belly button, other hand over it. Quick pulls inward and upward.", "file": "c/c-choking-3.mp3", "sha": "5baea25c42d6"}, "c-choking-4": {"text": "Repeat 5 and 5. Keep alternating until the object comes out or they stop responding.", "file": "c/c-choking-4.mp3", "sha": "a6ae0222e289"}, "c-choking-5": {"text": "Pregnant or too big to reach around? Use 5 chest thrusts instead: hands at the base of the breastbone, quick hard thrusts.", "file": "c/c-choking-5.mp3", "sha": "1b6c775cea4a"}, "c-choking-6": {"text": "They collapse: start C P R. Lower them to the ground, make sure nine one one is called, and start C P R. If you see the object in the mouth, take it out. Never sweep blindly with a finger.", "file": "c/c-choking-6.mp3", "sha": "bad280aa0ffb"}, "c-bleeding-0": {"text": "Bleeding. Make sure you are safe. Call nine one one. Put on gloves if you have them.", "file": "c/c-bleeding-0.mp3", "sha": "d4ebff09fa85"}, "c-bleeding-1": {"text": "Find where the blood comes from. Open or cut away clothing to see the wound.", "file": "c/c-bleeding-1.mp3", "sha": "f98437d53398"}, "c-bleeding-2": {"text": "Press hard with both hands. Directly on the wound, with gauze or any clean cloth. Do not let up.", "file": "c/c-bleeding-2.mp3", "sha": "a945b4ba773c"}, "c-bleeding-3": {"text": "Arm or leg? Tourniquet. 2 to 3 inches above the wound, never on a joint. Tighten until the bleeding stops, even though it hurts.", "file": "c/c-bleeding-3.mp3", "sha": "74b9075239dc"}, "c-bleeding-4": {"text": "Neck, armpit or groin, or no tourniquet? Pack it. Stuff gauze or clean cloth tightly into the wound, then press hard with both hands.", "file": "c/c-bleeding-4.mp3", "sha": "4fcbf3121518"}, "c-bleeding-5": {"text": "Note the time. Never loosen it. Write the time on the tourniquet or skin. Still bleeding? Add a second tourniquet above the first.", "file": "c/c-bleeding-5.mp3", "sha": "81a27a7d153b"}, "c-bleeding-6": {"text": "Keep pressure until help takes over. Do not lift the packing to check it.", "file": "c/c-bleeding-6.mp3", "sha": "22da038a33ea"}, "c-heartattack-0": {"text": "Heart attack. Chest pain or pressure? Call nine one one now. Don't wait to be sure. It can spread to an arm, the back, neck, jaw or stomach, and come with shortness of breath, a cold sweat, nausea or lightheadedness. Women more often have breathlessness, nausea, back or jaw pain.", "file": "c/c-heartattack-0.mp3", "sha": "3a5850204aab"}, "c-heartattack-1": {"text": "Sit them down and keep them still. Loosen tight clothing. Nobody drives them to the hospital: paramedics start treatment on the way.", "file": "c/c-heartattack-1.mp3", "sha": "8a3712153ad1"}, "c-heartattack-2": {"text": "Aspirin: chew and swallow. An alert adult with no aspirin allergy, who hasn't been told by a doctor to avoid it: 162 to 325 milligrams (one regular 325 milligram tablet, or two to four 81 milligram low-dose tablets). Not sure? Wait for the paramedics or ask the nine one one dispatcher.", "file": "c/c-heartattack-2.mp3", "sha": "f0e716a3931a"}, "c-heartattack-3": {"text": "Get ready for the paramedics. Unlock the door. Have their medicines and medicine list ready (Family, their card).", "file": "c/c-heartattack-3.mp3", "sha": "f2a4a1c19b10"}, "c-heartattack-4": {"text": "They collapse and aren't breathing normally: C P R. Start C P R and send someone for an A E D if there is one.", "file": "c/c-heartattack-4.mp3", "sha": "eda39de45aa9"}, "c-anaphylaxis-0": {"text": "Allergy. Spot it. After a food, sting or medicine: trouble breathing or wheezing, tight throat, swollen lips or tongue, hives all over, repeated vomiting, pale or blue skin, dizziness or fainting. Or mild signs in two body areas at once.", "file": "c/c-anaphylaxis-0.mp3", "sha": "a0f3ae95ae3c"}, "c-anaphylaxis-1": {"text": "Epinephrine now. Auto-injector: middle of the outer thigh, through clothing is fine. Nasal spray: into one nostril. Follow the device's own instructions.", "file": "c/c-anaphylaxis-1.mp3", "sha": "7f3329847a61"}, "c-anaphylaxis-2": {"text": "Call nine one one. Say anaphylaxis. They need the E R even if they start to feel better.", "file": "c/c-anaphylaxis-2.mp3", "sha": "c509db202f9c"}, "c-anaphylaxis-3": {"text": "Lay them flat, legs raised. Trouble breathing: let them sit up. Vomiting: turn them on their side.", "file": "c/c-anaphylaxis-3.mp3", "sha": "4e58eee68ff4"}, "c-anaphylaxis-4": {"text": "No better after 5 minutes? Or getting worse: give a second dose with a new device, if you have one.", "file": "c/c-anaphylaxis-4.mp3", "sha": "2696e429c5e2"}, "c-anaphylaxis-5": {"text": "Stops responding, not breathing normally: C P R. Start C P R and keep going until help arrives.", "file": "c/c-anaphylaxis-5.mp3", "sha": "701a4eba88ff"}, "c-stroke-0": {"text": "Stroke. B: Balance. Sudden loss of balance or coordination?", "file": "c/c-stroke-0.mp3", "sha": "1e821d13ff14"}, "c-stroke-1": {"text": "E: Eyes. Sudden loss or change of vision?", "file": "c/c-stroke-1.mp3", "sha": "b1af7c2e0f39"}, "c-stroke-2": {"text": "F: Face. Ask them to smile. Does one side droop?", "file": "c/c-stroke-2.mp3", "sha": "d527d880c963"}, "c-stroke-3": {"text": "A: Arms. Ask them to raise both arms. Does one drift down?", "file": "c/c-stroke-3.mp3", "sha": "eba86cce8d88"}, "c-stroke-4": {"text": "S: Speech. Slurred, strange, or unable to speak?", "file": "c/c-stroke-4.mp3", "sha": "0fb3e2ee5eb9"}, "c-stroke-5": {"text": "T: Time to call nine one one. Any one sign, call now, even if it goes away. Note the time it started or when they were last seen well. Don't drive them yourself unless nine one one can't be reached.", "file": "c/c-stroke-5.mp3", "sha": "462cb60c407f"}, "c-unresponsive-0": {"text": "Won't wake up. Shout, tap their shoulders, check breathing. Look at the chest for up to 10 seconds. Gasping or irregular breathing is not normal breathing: call nine one one and start C P R.", "file": "c/c-unresponsive-0.mp3", "sha": "4ea52681c2eb"}, "c-unresponsive-1": {"text": "Breathing normally: call nine one one. Put the phone on speaker and stay with them.", "file": "c/c-unresponsive-1.mp3", "sha": "0e1ac12f877a"}, "c-unresponsive-2": {"text": "Kneel beside them, straighten their legs. Take off glasses and anything bulky in their pockets.", "file": "c/c-unresponsive-2.mp3", "sha": "f1fa7fa75dae"}, "c-unresponsive-3": {"text": "Near arm out, far hand to cheek. Put the arm nearest you out at a right angle, elbow bent, palm up. Bring the far arm across the chest and hold the back of that hand against the cheek nearest you.", "file": "c/c-unresponsive-3.mp3", "sha": "540f77b9fa11"}, "c-unresponsive-4": {"text": "Far knee up, roll them toward you. Pull the far knee up with the foot flat on the floor, then pull on that leg to roll them onto their side. Bend the top leg at a right angle so they can't roll over.", "file": "c/c-unresponsive-4.mp3", "sha": "739fb1436064"}, "c-unresponsive-5": {"text": "Tilt the head back, keep watching. Lift the chin so the airway stays open and anything in the mouth drains out. Check their breathing until help comes. After 30 minutes, turn them onto the other side.", "file": "c/c-unresponsive-5.mp3", "sha": "349f008ef60c"}, "c-unresponsive-6": {"text": "Breathing stops or turns to gasps: C P R. Roll them onto their back and start C P R.", "file": "c/c-unresponsive-6.mp3", "sha": "9dfdb916711d"}, "c-heatstroke-0": {"text": "Heat stroke. Spot it. Body 103 degrees Fahrenheit or higher. Hot, red, dry or damp skin. Fast, strong pulse. Confusion or passing out. No thermometer? Confusion in the heat is enough.", "file": "c/c-heatstroke-0.mp3", "sha": "f0fa8bdd7923"}, "c-heatstroke-1": {"text": "Call nine one one. Heat stroke is a medical emergency.", "file": "c/c-heatstroke-1.mp3", "sha": "f37378493f9d"}, "c-heatstroke-2": {"text": "Move them somewhere cooler. Shade, indoors, a cool car parked outside.", "file": "c/c-heatstroke-2.mp3", "sha": "e6e87339c4cf"}, "c-heatstroke-3": {"text": "Cool them now. Cold-water immersion up to the neck is best: 15 minutes, or until they are no longer confused. Otherwise soak them with cold water and fan them, and put ice or cold packs on the neck, armpits and groin.", "file": "c/c-heatstroke-3.mp3", "sha": "7f6a93a79f16"}, "c-heatstroke-4": {"text": "Give nothing to drink. C D C's rule for heat stroke.", "file": "c/c-heatstroke-4.mp3", "sha": "874364d79f6e"}, "c-heatstroke-5": {"text": "Keep cooling until they improve or help arrives. Stops responding, not breathing normally: start C P R.", "file": "c/c-heatstroke-5.mp3", "sha": "0ca00b1eb5e1"}, "c-co-0": {"text": "Carbon monoxide alarm. Everyone outside now. Alarm, or headache, dizziness, nausea, confusion. Don't look for the source.", "file": "c/c-co-0.mp3", "sha": "dfddd2b88555"}, "c-co-1": {"text": "Call nine one one from outside. Tell them a carbon monoxide alarm went off.", "file": "c/c-co-1.mp3", "sha": "344b4343a62d"}, "c-co-2": {"text": "Count everyone, pets too. Do not go back inside for anyone or anything.", "file": "c/c-co-2.mp3", "sha": "19509abe0e3a"}, "c-co-3": {"text": "Stay out until responders say it's safe. Don't restart the generator, stove or heater.", "file": "c/c-co-3.mp3", "sha": "77969097594e"}, "c-co-4": {"text": "Anyone sick, sleepy or confused? Tell nine one one it may be carbon monoxide. They need medical care. Can't reach nine one one? Poison Control: one eight hundred, two two two, one two two two.", "file": "c/c-co-4.mp3", "sha": "cfd53b4a1394"}, "c-co-5": {"text": "Not responding, not breathing normally: C P R. Give breaths if you are trained.", "file": "c/c-co-5.mp3", "sha": "8b7d85d35afa"}, "c-burns-0": {"text": "Burns. Stop the burning. Away from the heat. Take off jewelry and clothing near the burn, unless it is stuck.", "file": "c/c-burns-0.mp3", "sha": "662dd64bdeb6"}, "c-burns-1": {"text": "Cool running water, right away. Cool, not ice. At least 10 minutes, ideally 20. No running water? Use a clean, cool wet cloth. Large burn or small child: watch that they don't get too cold.", "file": "c/c-burns-1.mp3", "sha": "f852b25fe878"}, "c-burns-2": {"text": "Cover loosely. Clean, dry, non-stick dressing or clean cloth.", "file": "c/c-burns-2.mp3", "sha": "a442917d6ed5"}, "c-burns-3": {"text": "Don't pop blisters. No butter, oil or toothpaste.", "file": "c/c-burns-3.mp3", "sha": "1e254d1e149b"}, "c-burns-4": {"text": "When to call nine one one. Deep burns, or larger than 3 inches. Face, hands, feet, groin or a major joint. Wraps around an arm, leg, chest or neck. Chemical, electrical or explosion burns. Breathed in smoke, or any trouble breathing. Babies, young children and older adults.", "file": "c/c-burns-4.mp3", "sha": "66bad18ec574"}, "c-fracture-0": {"text": "Broken bone. Call nine one one for big injuries. A bad fall or crash, heavy bleeding, bone through the skin, a limb that looks bent, numb or bluish fingers or toes, a possible broken neck, back or hip, or they won't respond.", "file": "c/c-fracture-0.mp3", "sha": "f08ef4ac7248"}, "c-fracture-1": {"text": "Stop bleeding first. Press with a clean cloth. Bone through the skin: cover the wound and don't push the bone back in.", "file": "c/c-fracture-1.mp3", "sha": "e708ec46e656"}, "c-fracture-2": {"text": "Keep it still. Don't try to straighten it. Support it in the position you found it.", "file": "c/c-fracture-2.mp3", "sha": "d79bbffa042f"}, "c-fracture-3": {"text": "Help is far away: splint it. Pad it, then fix it so the joints above and below the break can't move: a board, rolled magazines or a pillow, tied on with strips of cloth. Fingers or toes should stay warm and pink; loosen it if they go numb or blue.", "file": "c/c-fracture-3.mp3", "sha": "2dbf12e27cc0"}, "c-fracture-4": {"text": "Ice, wrapped in cloth. Never straight on the skin. 15 to 20 minutes at a time, to ease swelling and pain.", "file": "c/c-fracture-4.mp3", "sha": "924acea73d3d"}, "c-fracture-5": {"text": "Watch for shock. Faint, pale, fast shallow breathing: lay them down with the head slightly lower than the body, raise the legs if that doesn't move the injury, and keep them warm.", "file": "c/c-fracture-5.mp3", "sha": "eeb353c6f6fd"}, "c-seizure-0": {"text": "Seizure. Ease them to the ground. Move hard and sharp things away.", "file": "c/c-seizure-0.mp3", "sha": "e16751943311"}, "c-seizure-1": {"text": "Protect the head. Something soft and flat under the head. Take off glasses. Loosen anything around the neck.", "file": "c/c-seizure-1.mp3", "sha": "83ddca1b5c76"}, "c-seizure-2": {"text": "Turn them on their side. Gently, mouth pointing to the ground, to keep the airway clear.", "file": "c/c-seizure-2.mp3", "sha": "b7501168f0e5"}, "c-seizure-3": {"text": "Time it. Hands off. Don't hold them down. Put nothing in their mouth.", "file": "c/c-seizure-3.mp3", "sha": "36b925a0fd52"}, "c-seizure-4": {"text": "Call nine one one if. Over 5 minutes. Another seizure soon after. Trouble breathing or waking. Not back to normal. Injured. In water. First seizure. Pregnant or diabetic.", "file": "c/c-seizure-4.mp3", "sha": "df4f3cc7ef74"}, "c-seizure-5": {"text": "Stay until they are fully awake. No food or drink until fully alert.", "file": "c/c-seizure-5.mp3", "sha": "eb2ef30c81e5"}, "c-drowning-0": {"text": "Drowning. Get them out safely. Reach or throw something that floats; don't jump in unless you're trained. Shout for help. Call nine one one on speaker, or have someone call.", "file": "c/c-drowning-0.mp3", "sha": "8cbd438fc1f2"}, "c-drowning-1": {"text": "Tap and shout. Breathing normally? Look at the chest for up to 10 seconds. Gasping is not normal breathing.", "file": "c/c-drowning-1.mp3", "sha": "e2f5b6caa365"}, "c-drowning-2": {"text": "Not breathing normally: 2 rescue breaths first. Tilt the head back, lift the chin, pinch the nose, seal your mouth over theirs. 1 second each, enough to make the chest rise. Baby: cover the nose and mouth with your mouth. Not trained or can't give breaths? Skip to pushes.", "file": "c/c-drowning-2.mp3", "sha": "52786f946d7c"}, "c-drowning-3": {"text": "Then C P R: 30 pushes, 2 breaths. Hard and fast in the center of the chest. Keep going until they breathe or help takes over. If you can't give breaths, push anyway.", "file": "c/c-drowning-3.mp3", "sha": "72f62aaeba4b"}, "c-drowning-4": {"text": "A E D as soon as one arrives. Quickly wipe the chest dry, put the pads on, follow its voice. Keep C P R going until it's ready.", "file": "c/c-drowning-4.mp3", "sha": "436a6bb8fac9"}, "c-drowning-5": {"text": "Breathing again: on their side, then the E R. Anyone who needed breaths or C P R after being in the water needs a hospital check, even if they seem fine.", "file": "c/c-drowning-5.mp3", "sha": "2db058b57b9a"}, "c-overdose-0": {"text": "Opioid overdose. Shout their name and rub the breastbone hard. Signs: won't wake up, slow or no breathing, blue or gray lips, tiny pupils, gurgling.", "file": "c/c-overdose-0.mp3", "sha": "ab81553f456a"}, "c-overdose-1": {"text": "Call nine one one now. Put it on speaker. Say someone won't wake up and isn't breathing normally.", "file": "c/c-overdose-1.mp3", "sha": "59ad30da36df"}, "c-overdose-2": {"text": "Give naloxone (Narcan). Nasal spray: tip in one nostril, press the plunger all the way. Don't wait to be sure it's opioids.", "file": "c/c-overdose-2.mp3", "sha": "e365910b2125"}, "c-overdose-3": {"text": "Not breathing normally: start C P R with breaths. 30 pushes, 2 breaths. Can't give breaths? Keep pushing.", "file": "c/c-overdose-3.mp3", "sha": "74702fc3ae5f"}, "c-overdose-4": {"text": "No change in 2 to 3 minutes: give a second dose. New device, other nostril. Keep up C P R in between.", "file": "c/c-overdose-4.mp3", "sha": "0d28be320407"}, "c-overdose-5": {"text": "Breathing again: on their side, stay with them. Naloxone can wear off before the drugs do, and breathing can stop again. They still need the E R.", "file": "c/c-overdose-5.mp3", "sha": "2f109aafd0e7"}, "c-poison-0": {"text": "Poisoning. Won't wake up, not breathing, or a seizure? Call nine one one. Start C P R if they aren't breathing normally.", "file": "c/c-poison-0.mp3", "sha": "fb201e651492"}, "c-poison-1": {"text": "Everything else: call Poison Control. one eight hundred, two two two, one two two two, free and open twenty-four seven; it reaches your local poison center. Call right away, before any signs. Keep the container in your hand.", "file": "c/c-poison-1.mp3", "sha": "3135c070850d"}, "c-poison-2": {"text": "Swallowed: don't make them vomit. Don't give anything to eat or drink, and no activated charcoal, unless the poison center tells you to.", "file": "c/c-poison-2.mp3", "sha": "179fd3907a31"}, "c-poison-3": {"text": "On the skin: clothes off, rinse 15 to 20 minutes. Under running water.", "file": "c/c-poison-3.mp3", "sha": "678e3fed5117"}, "c-poison-4": {"text": "In the eyes: rinse 15 to 20 minutes. Running lukewarm water. Take out contact lenses.", "file": "c/c-poison-4.mp3", "sha": "6a9dd6172c7c"}, "c-poison-5": {"text": "Breathed in: get to fresh air. Don't breathe the fumes yourself. Generator, grill or heater indoors: open the carbon monoxide card.", "file": "c/c-poison-5.mp3", "sha": "015ce507645a"}, "c-poison-6": {"text": "Tell them. Age and weight, what it was and how much, when, how (mouth, skin, eyes, breathing), first aid given, whether they vomited, and where you are.", "file": "c/c-poison-6.mp3", "sha": "db18efd153f3"}, "c-asthma-0": {"text": "Asthma attack. After a sting, food or medicine? Epinephrine first. Sudden trouble breathing then may be anaphylaxis.", "file": "c/c-asthma-0.mp3", "sha": "9dbf7256723d"}, "c-asthma-1": {"text": "Sit them upright and stay with them. Keep them calm. Loosen anything tight around the chest or neck.", "file": "c/c-asthma-1.mp3", "sha": "8266672eb778"}, "c-asthma-2": {"text": "Help them use their rescue inhaler. Their own quick-relief inhaler, with a spacer if they have one, as their asthma action plan says. No inhaler? Call nine one one.", "file": "c/c-asthma-2.mp3", "sha": "2025cbae4237"}, "c-asthma-3": {"text": "Call nine one one for any danger sign. Lips or nails blue or gray, struggling to breathe (hunched over, ribs showing), can't walk or talk well, very sleepy or confused, or the inhaler isn't helping.", "file": "c/c-asthma-3.mp3", "sha": "956b06b8b866"}, "c-asthma-4": {"text": "Keep using the inhaler as their plan says, or as nine one one tells you.", "file": "c/c-asthma-4.mp3", "sha": "e3d8732f6c6b"}, "c-asthma-5": {"text": "Won't wake up and not breathing normally: start C P R.", "file": "c/c-asthma-5.mp3", "sha": "64a81577d346"}, "c-lowsugar-0": {"text": "Low blood sugar. Passed out, seizing or can't swallow? Nothing by mouth. Food or drink can choke them. Call nine one one now.", "file": "c/c-lowsugar-0.mp3", "sha": "9de59fcd07f6"}, "c-lowsugar-1": {"text": "Give their glucagon if they have it. Follow the kit. Turn them on their side; they may throw up. Not awake in 15 minutes: a second dose if you have one.", "file": "c/c-lowsugar-1.mp3", "sha": "ff9b5b032d23"}, "c-lowsugar-2": {"text": "Awake and can swallow? 15 grams of fast sugar. Glucose tablets or gel (check the label for 15 grams), half a cup of juice or regular soda, or 1 tablespoon of sugar or honey.", "file": "c/c-lowsugar-2.mp3", "sha": "1190a9570f7c"}, "c-lowsugar-3": {"text": "Wait 15 minutes, then check again. Still low, or the meter reads under 70, another 15 grams. No better, or worse: call nine one one.", "file": "c/c-lowsugar-3.mp3", "sha": "e1310f028f45"}, "c-lowsugar-4": {"text": "Back to normal: eat a meal or snack. Not mealtime? Protein and carbs, like cheese and crackers.", "file": "c/c-lowsugar-4.mp3", "sha": "3ab0645dc0b5"}, "c-lowsugar-5": {"text": "Never give insulin to someone who is low. It drives the sugar even lower.", "file": "c/c-lowsugar-5.mp3", "sha": "2e7727296376"}, "c-scorpion-0": {"text": "Scorpion sting. Call Poison Control. one eight hundred, two two two, one two two two, free and open twenty-four seven. Most stings are handled safely at home with their help. Children are at higher risk: call right away.", "file": "c/c-scorpion-0.mp3", "sha": "11d287ecc908"}, "c-scorpion-1": {"text": "Call nine one one for trouble breathing. Also chest pain, swelling of the face or throat, or hives.", "file": "c/c-scorpion-1.mp3", "sha": "aeecdb2951a9"}, "c-scorpion-2": {"text": "Serious signs at any age: call nine one one. Wild or jerky eye movements, drooling, trouble swallowing or talking, twitching, nonstop crying in a child. Antivenom is given in the hospital.", "file": "c/c-scorpion-2.mp3", "sha": "5226345f8a33"}, "c-scorpion-3": {"text": "Wash it and cool it. Soap and water, then a cool compress, not ice. Rest the arm or leg in a comfortable position.", "file": "c/c-scorpion-3.mp3", "sha": "878cf60979e0"}, "c-scorpion-4": {"text": "Kill the scorpion; don't try to catch it. Knowing the type doesn't change the care.", "file": "c/c-scorpion-4.mp3", "sha": "21f408a43959"}, "c-snake-0": {"text": "Rattlesnake bite. Move away from the snake. Don't try to catch or kill it, and don't touch it even if it looks dead.", "file": "c/c-snake-0.mp3", "sha": "90d79b053f01"}, "c-snake-1": {"text": "Call nine one one. Every bite needs the emergency room; antivenom is given there. Poison Control (one eight hundred, two two two, one two two two) can help too.", "file": "c/c-snake-1.mp3", "sha": "7f61573bf3bd"}, "c-snake-2": {"text": "Keep them calm and still. Walk only if needed to get help or a signal.", "file": "c/c-snake-2.mp3", "sha": "68576ced7cb6"}, "c-snake-3": {"text": "Keep the bitten arm or leg still, at heart level or a little lower.", "file": "c/c-snake-3.mp3", "sha": "ee5956ef9f1c"}, "c-snake-4": {"text": "Take off rings, watches, shoes and tight clothing on that limb. Swelling can come fast.", "file": "c/c-snake-4.mp3", "sha": "7973df61be4a"}, "c-snake-5": {"text": "Don't: tourniquet, ice, cutting or sucking. No tight bands, ice or ice water, cutting, suction, alcohol or medicines. They don't help and can make it worse.", "file": "c/c-snake-5.mp3", "sha": "461760613811"}}};
 /* HAVYN FIELD — protocol content.
    Every card and playbook line is written from the sources listed with it.
    "reviewed" = date the text was checked against those sources (an independent pass, 2026-11-14).
@@ -667,6 +718,7 @@ const HAVYN_CONTENT = {
   cards: [
     {
       id: "cpr", title: "CPR", sub: "Teen or adult not responding, not breathing normally", icon: "heart",
+      log: [{ w: "CPR started" }, { w: "AED shock given" }],
       steps: [
         { t: "Tap and shout. Breathing normally?", d: "Not responding and not breathing normally means start CPR. Gasping is not normal breathing." },
         { t: "Call 911 on speaker", d: "Send someone to find an AED. The dispatcher can coach you." },
@@ -683,6 +735,7 @@ const HAVYN_CONTENT = {
     },
     {
       id: "cprchild", title: "CPR child", sub: "Child or baby not responding, not breathing normally", icon: "heart",
+      log: [{ w: "CPR started" }, { w: "AED shock given" }],
       steps: [
         { t: "Tap and shout. Breathing normally?", d: "Baby: tap the foot. Not responding and not breathing normally means start CPR. Gasping is not normal breathing." },
         { t: "Call 911 on speaker", d: "Alone with no phone at hand: give about 2 minutes of CPR first, then go call." },
@@ -718,6 +771,7 @@ const HAVYN_CONTENT = {
     },
     {
       id: "bleeding", title: "Bleeding", sub: "Life-threatening bleeding", icon: "drop",
+      log: [{ w: "Tourniquet on" }],
       steps: [
         { t: "Make sure you are safe. Call 911", d: "Put on gloves if you have them." },
         { t: "Find where the blood comes from", d: "Open or cut away clothing to see the wound." },
@@ -736,6 +790,7 @@ const HAVYN_CONTENT = {
     },
     {
       id: "heartattack", title: "Heart attack", sub: "Chest pain, pressure or squeezing", icon: "heart", checked: "2026-11-15",
+      log: [{ w: "Aspirin given" }],
       steps: [
         { t: "Chest pain or pressure? Call 911 now", d: "Don't wait to be sure. It can spread to an arm, the back, neck, jaw or stomach, and come with shortness of breath, a cold sweat, nausea or lightheadedness. Women more often have breathlessness, nausea, back or jaw pain.", call: { n: "911", num: "911" } },
         { t: "Sit them down and keep them still", d: "Loosen tight clothing. Nobody drives them to the hospital: paramedics start treatment on the way." },
@@ -752,6 +807,7 @@ const HAVYN_CONTENT = {
     },
     {
       id: "anaphylaxis", title: "Allergy", sub: "Anaphylaxis: severe allergic reaction", icon: "allergy",
+      log: [{ w: "Epinephrine given", due: 5, at: 4, hint: "5 minutes: no better, or worse? Step 5" }],
       steps: [
         { t: "Spot it", d: "After a food, sting or medicine: trouble breathing or wheezing, tight throat, swollen lips or tongue, hives all over, repeated vomiting, pale or blue skin, dizziness or fainting. Or mild signs in two body areas at once." },
         { t: "Epinephrine now", d: "Auto-injector: middle of the outer thigh, through clothing is fine. Nasal spray: into one nostril. Follow the device's own instructions." },
@@ -769,6 +825,7 @@ const HAVYN_CONTENT = {
     },
     {
       id: "stroke", title: "Stroke", sub: "BE FAST", icon: "brain",
+      log: [{ w: "Symptoms noticed" }],
       steps: [
         { t: "B: Balance", d: "Sudden loss of balance or coordination?" },
         { t: "E: Eyes", d: "Sudden loss or change of vision?" },
@@ -805,6 +862,7 @@ const HAVYN_CONTENT = {
     },
     {
       id: "heatstroke", title: "Heat stroke", sub: "Hot, confused, collapsing", icon: "sun",
+      log: [{ w: "Cooling started", due: 15, at: 3, hint: "15 minutes of cooling: step 4" }],
       steps: [
         { t: "Spot it", d: "Body 103°F or higher. Hot, red, dry or damp skin. Fast, strong pulse. Confusion or passing out. No thermometer? Confusion in the heat is enough." },
         { t: "Call 911", d: "Heat stroke is a medical emergency." },
@@ -841,6 +899,7 @@ const HAVYN_CONTENT = {
     },
     {
       id: "burns", title: "Burns", sub: "Heat, chemical, electrical", icon: "flame",
+      log: [{ w: "Cooling started", due: 20, at: 1, hint: "20 minutes of cool water: done" }],
       steps: [
         { t: "Stop the burning", d: "Away from the heat. Take off jewelry and clothing near the burn, unless it is stuck." },
         { t: "Cool running water, right away", d: "Cool, not ice. At least 10 minutes, ideally 20. No running water? Use a clean, cool wet cloth. Large burn or small child: watch that they don't get too cold." },
@@ -875,6 +934,7 @@ const HAVYN_CONTENT = {
     },
     {
       id: "seizure", title: "Seizure", sub: "Shaking, unresponsive", icon: "pulse",
+      log: [{ w: "Seizure started", due: 5, at: 4, hint: "Over 5 minutes: call 911" }, { w: "Seizure stopped", of: "Seizure started" }],
       steps: [
         { t: "Ease them to the ground", d: "Move hard and sharp things away." },
         { t: "Protect the head", d: "Something soft and flat under the head. Take off glasses. Loosen anything around the neck." },
@@ -909,6 +969,7 @@ const HAVYN_CONTENT = {
     },
     {
       id: "overdose", title: "Opioid overdose", sub: "Won't wake up, slow or no breathing", icon: "pill",
+      log: [{ w: "Naloxone given", due: 2, at: 4, hint: "2 to 3 minutes, no change? Step 5" }],
       steps: [
         { t: "Shout their name and rub the breastbone hard", d: "Signs: won't wake up, slow or no breathing, blue or gray lips, tiny pupils, gurgling." },
         { t: "Call 911 now", d: "Put it on speaker. Say someone won't wake up and isn't breathing normally." },
@@ -926,6 +987,7 @@ const HAVYN_CONTENT = {
     },
     {
       id: "poison", title: "Poisoning", sub: "Swallowed, breathed in, on skin or in eyes", icon: "poison", checked: "2026-11-15",
+      log: [{ w: "Rinsing started", due: 15, hint: "15 to 20 minutes of rinsing" }],
       steps: [
         { t: "Won't wake up, not breathing, or a seizure? Call 911", d: "Start CPR if they aren't breathing normally.", call: { n: "911", num: "911" }, link: "cpr" },
         { t: "Everything else: call Poison Control", d: "1-800-222-1222, free and open 24/7; it reaches your local poison center. Call right away, before any signs. Keep the container in your hand.", call: { n: "Poison Control", num: "1-800-222-1222" } },
@@ -944,6 +1006,7 @@ const HAVYN_CONTENT = {
     },
     {
       id: "asthma", title: "Asthma attack", sub: "Wheezing, can't catch their breath", icon: "lungs",
+      log: [{ w: "Inhaler used" }],
       steps: [
         { t: "After a sting, food or medicine? Epinephrine first", d: "Sudden trouble breathing then may be anaphylaxis.", link: "anaphylaxis" },
         { t: "Sit them upright and stay with them", d: "Keep them calm. Loosen anything tight around the chest or neck." },
@@ -959,6 +1022,7 @@ const HAVYN_CONTENT = {
     },
     {
       id: "lowsugar", title: "Low blood sugar", sub: "Diabetes: shaky, sweaty, confused", icon: "candy",
+      log: [{ w: "Sugar given", due: 15, at: 3, hint: "15 minutes: check again (step 4)" }, { w: "Glucagon given", due: 15, at: 1, hint: "15 minutes, not awake? Step 2" }],
       steps: [
         { t: "Passed out, seizing or can't swallow? Nothing by mouth", d: "Food or drink can choke them. Call 911 now." },
         { t: "Give their glucagon if they have it", d: "Follow the kit. Turn them on their side; they may throw up. Not awake in 15 minutes: a second dose if you have one." },
@@ -2204,7 +2268,7 @@ if (typeof module !== "undefined") module.exports = HAVYN_ENGINE;
 (() => {
   "use strict";
   const C = HAVYN_CONTENT, E = HAVYN_ENGINE;
-  const VERSION = "1.6.0+06426095aa";
+  const VERSION = "1.7.0+31d4dd1e30";
   const PREVIEW = !!window.HAVYN_PREVIEW;
   const DAY = 86400000;
   const t0 = performance.now();
@@ -2334,7 +2398,7 @@ if (typeof module !== "undefined") module.exports = HAVYN_ENGINE;
     people: [], pets: [], items: [], log: [], tasks: [], buys: []
   });
   const prefDefaults = () => ({ theme: "void", sound: true, deviceName: "", lastBackup: 0, installHidden: false });
-  let S = defaults(), PR = prefDefaults();
+  let S = defaults(), PR = prefDefaults(), INC = null;
   let saveTimer = null;
   function save() { clearTimeout(saveTimer); saveTimer = setTimeout(flush, 120); }
   function flush() { clearTimeout(saveTimer); Store.set("state", S); Store.set("prefs", PR); }
@@ -2478,6 +2542,8 @@ if (typeof module !== "undefined") module.exports = HAVYN_ENGINE;
     if (route.path === "search") SearchUI.mount();
     if (route.path === "archive") Get.mount();
     if (route.path === "status" || route.path === "" || route.path === "quests") Ready.mount();
+    CardVoice.sync();
+    if (route.path === "status" || route.path === "") Strip.fill();
   }
 
   /* ---------------- shared chrome ---------------- */
@@ -2540,15 +2606,28 @@ if (typeof module !== "undefined") module.exports = HAVYN_ENGINE;
     return out + "</svg>";
   }
 
+  // Home's status line, like an operating system's: works offline, what's stored, the last Memory Card, online or not.
+  const Strip = {
+    html() {
+      const off = !!(navigator.serviceWorker && navigator.serviceWorker.controller) || PREVIEW, card = PR.lastBackup ? Math.floor((now() - PR.lastBackup) / DAY) : -1, net = navigator.onLine !== false;
+      const cell = (k, v, cl, id) => '<div class="sc' + (cl ? " " + cl : "") + '"><small>' + k + "</small><b" + (id ? ' id="' + id + '"' : "") + ">" + v + "</b></div>";
+      return '<div class="strip" aria-label="System status">' + cell("Offline", off ? "Ready" : "Not yet", off ? "ok" : "warn") + cell("Stored", this.used ? sz(this.used) : "…", "", "stuse") +
+        cell("Backup", card < 0 ? "Never" : card === 0 ? "Today" : card + "d ago", card < 0 || card > 30 ? "warn" : "ok") + cell("Network", net ? "Online" : "Offline", net ? "ok" : "") + "</div>";
+    },
+    fill() {
+      if (!navigator.storage || !navigator.storage.estimate) return;
+      navigator.storage.estimate().then((e) => { this.used = e.usage || 0; const el = $("#stuse"); if (el && this.used) el.textContent = sz(this.used); }).catch(() => {});
+    }
+  };
   function deck() {
     // The command deck: the one red button, then "What's happening?", then the rest of HAVYN as tiles.
     let h = '<a class="sostile" href="#/emergency"><span class="sd">' + ic("cross") + '</span><span class="tx"><b>Someone\'s hurt</b><small>Not breathing, bleeding, choking, chest pain: the cards, with one-tap 911</small></span>' + ic("chev") + "</a>";
-    h += '<div class="sec"><span class="lab">What\'s happening?</span></div><div class="nowgrid">' + (C.situations || []).map((x) => {
+    h += '<div class="sec"><span class="lab"><b>02</b> What\'s happening?</span></div><div class="nowgrid">' + (C.situations || []).map((x) => {
       const pb = x.pb && C.playbooks.find((p) => p.id === x.pb && !p.soon), pr = pb ? countChecks(pb) : null;
       return '<a class="gt" href="#/now/' + x.id + '">' + ic(x.icon) + "<b>" + esc(x.t) + "</b>" + (pr && pr.d ? '<small class="on">' + pr.d + " of " + pr.n + " done</small>" : "<small>" + esc(x.sub) + "</small>") + "</a>";
     }).join("") + "</div>";
-    h += '<div class="sec"><span class="lab">Know-how</span></div><div class="menugrid">' +
-      [["#/field", "book", "How do I…", FIELD().length + " answers"], ["#/library", "globe", "Library", libSummary() || "Encyclopedias, manuals"], ["#/plan", "pin", "Plan", "Meeting places, contacts"], ["#/comms", "radio", "Comms", "Radios, check-ins"]]
+    h += '<div class="sec"><span class="lab"><b>03</b> Know-how</span></div><div class="menugrid">' +
+      [["#/field", "book", "How do I…", FIELD().length + " answers"], ["#/library", "globe", "Library", libSummary() || "Books and manuals"], ["#/plan", "pin", "Plan", "Where to meet"], ["#/comms", "radio", "Comms", "Radios, check-ins"]]
         .map(([href, icn, b, sm]) => '<a class="mt" href="' + href + '">' + ic(icn) + "<span><b>" + esc(b) + "</b><small>" + esc(sm) + "</small></span></a>").join("") + "</div>";
     return h;
   }
@@ -2563,8 +2642,8 @@ if (typeof module !== "undefined") module.exports = HAVYN_ENGINE;
     const rs = Ready.score(), lv = level(rs);
     if (PR.level && lv.n > PR.level && !Welcome.on) setTimeout(() => { toast("LEVEL UP · " + lv.rank.toUpperCase() + " · LV " + lv.n); Snd.chime("save"); }, 400);
     if (PR.level !== lv.n) { PR.level = lv.n; flush(); }
-    h += Ready.panel() + deck();
-    h += '<div class="sec"><span class="lab">Family status</span></div>';
+    h += Strip.html() + '<div class="sec first"><span class="lab"><b>01</b> Readiness</span></div>' + Ready.panel() + deck();
+    h += '<div class="sec"><span class="lab"><b>04</b> Family status</span></div>';
     h += '<section class="glass hero"><div class="lab">Family autonomy</div>';
     if (!people.length) {
       h += '<div class="num"><span class="big">—</span><span class="unit">DAYS</span></div><div class="sub">Add your household and supplies to see how long you can last.</div></section>';
@@ -2615,6 +2694,78 @@ if (typeof module !== "undefined") module.exports = HAVYN_ENGINE;
   }
 
   function renderQuests() { return backbar("#/status", "Quests") + Ready.panel(true); }
+
+  // The voice guide reads each step of an emergency card aloud, in HAVYN's own voice, as it comes up (hands-free).
+  const CardVoice = {
+    said: "",
+    sync() {
+      const m = /^#\/emergency\/([\w-]+)/.exec(location.hash || "");
+      const key = m && PR.cardVoice !== false ? "c-" + m[1] + "-" + (cardView.id === m[1] ? cardView.step : 0) : "";
+      if (!key || !Clips.hasId(key)) { if (this.said) this.off(); return; }
+      if (key === this.said) return;
+      this.said = key; this.say(key);
+    },
+    say(key) { AudioMode.set("playback"); Clips.playId(key || this.said); },
+    off() { Clips.stop(); this.said = ""; AudioMode.set("auto"); }
+  };
+
+  // The log for responders: one tap stamps the time of what was done (CPR started, a tourniquet on, a dose given, a
+  // seizure's start and end), with a live timer where the card says to wait. Paramedics see it all on one screen.
+  // Kept on this phone only (not in Memory Cards); a log with nothing new for 6 hours is finished.
+  const mss = (ms) => { const s = Math.max(0, Math.floor(ms / 1000)), h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), x = s % 60; return (h ? h + ":" + String(m).padStart(2, "0") : m) + ":" + String(x).padStart(2, "0"); };
+  const hm = (t) => new Date(t).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+  const STOPS = () => { const o = {}; C.cards.forEach((c) => (c.log || []).forEach((m) => { if (m.of) o[m.w] = m.of; })); return o; };
+  const Inc = {
+    arm: 0,
+    on() { return INC && now() - INC.last < 6 * 3600e3 ? INC : null; },
+    add(w, card) {
+      if (!this.on()) {
+        INC = { last: now(), ev: [] };
+        const c = cardView.id && C.cards.find((x) => x.id === cardView.id);
+        if (c && cardView.at && !/^Opened /.test(w)) INC.ev.push({ t: cardView.at, c: c.id, w: "Opened the " + c.title + " card" });
+      }
+      INC.ev.push({ t: now(), c: card || "", w }); INC.last = now(); Store.set("incident", INC);
+    },
+    opened(c) { // while a log is running, opening a card is part of the story (once per card in 10 minutes)
+      if (!this.on()) return;
+      const l = INC.ev.filter((e) => e.c === c.id && /^Opened /.test(e.w)).pop();
+      if (!l || now() - l.t > 10 * 60e3) this.add("Opened the " + c.title + " card", c.id);
+    },
+    last(w) { const I = this.on(); return I ? I.ev.filter((e) => e.w === w).pop() : null; },
+    count(w) { const I = this.on(); return I ? I.ev.filter((e) => e.w === w).length : 0; },
+    clear() { INC = null; this.arm = 0; Store.set("incident", null); }
+  };
+  function logRow(c) {
+    if (!c.log || !c.log.length) return "";
+    const stopOf = (m, e) => { const x = c.log.find((y) => y.of === m.w), se = x && Inc.last(x.w); return se && se.t >= e.t ? se : null; };
+    return '<div class="emlog"><div class="emdh">' + ic("clock") + "Times for the paramedics</div>" + c.log.map((m) => {
+      const e = Inc.last(m.w), n = Inc.count(m.w);
+      let t = "Tap when it happens", due = false;
+      if (e && m.of) { const st = Inc.last(m.of); t = hm(e.t) + (st && st.t <= e.t ? " · lasted " + mss(e.t - st.t) : ""); }
+      else if (e) {
+        const sp = stopOf(m, e);
+        if (sp) t = hm(e.t) + " · lasted " + mss(sp.t - e.t);
+        else { due = !!m.due && now() - e.t >= m.due * 60e3; t = hm(e.t) + ' · <b data-since="' + e.t + '"' + (m.due ? ' data-due="' + m.due + '"' : "") + ">" + mss(now() - e.t) + "</b> ago"; }
+      }
+      return '<button class="emmark' + (e ? " done" : "") + (due ? " due" : "") + '" data-act="inc-mark" data-w="' + esc(m.w) + '" data-card="' + c.id + '">' +
+        '<span class="mw">' + ic(e ? "check" : "clock") + esc(m.w) + (n > 1 ? " ×" + n : "") + '</span><span class="mtime">' + t + "</span>" +
+        (m.hint && e && !stopOf(m, e) ? '<span class="mh">' + esc(m.hint) + "</span>" : "") + "</button>";
+    }).join("") + (Inc.on() ? '<a class="emlogl" href="#/emergency/log">' + ic("clock") + "<span>Show the log</span><b>" + Inc.on().ev.length + "</b></a>" : "") + "</div>";
+  }
+  function renderLog() {
+    const I = INC, st = STOPS();
+    let h = emTop() + '<div class="emhead"><span>Log for responders</span>' + (I && I.ev.length ? "<span>From " + hm(I.ev[0].t) + "</span>" : "") + "</div>";
+    if (!I || !I.ev.length) return h + '<div class="emdet" style="margin-top:14px">Nothing logged yet. On a card, tap a time button (like "CPR started") when it happens.</div><div class="emnav"><a class="next" href="#/emergency" style="grid-column:1/-1">ALL CARDS</a></div>';
+    const t0 = I.ev[0].t;
+    h += '<p class="logsub">Show this screen to the paramedics, or read it to the 911 dispatcher.' + (Inc.on() ? "" : " It's from " + new Date(t0).toLocaleDateString() + ".") + "</p>";
+    h += '<ol class="loglist">' + I.ev.map((e, i) => {
+      const from = st[e.w] && I.ev.slice(0, i).filter((x) => x.w === st[e.w]).pop();
+      return "<li" + (/^Opened /.test(e.w) ? "" : ' class="key"') + "><time>" + hm(e.t) + "</time><span>" + esc(e.w) + (from ? " <em>lasted " + mss(e.t - from.t) + "</em>" : "") + "</span><small>" + (i ? "+" + mss(e.t - t0) : "first") + "</small></li>";
+    }).join("") + "</ol>";
+    if (Inc.on()) h += '<div class="loglive">Since the first entry <b data-since="' + t0 + '">' + mss(now() - t0) + "</b></div>";
+    h += '<div class="emnav"><button data-act="inc-clear">' + (Inc.arm && now() - Inc.arm < 5000 ? "TAP AGAIN" : "CLEAR LOG") + '</button><a class="next" href="#/emergency">ALL CARDS</a></div>';
+    return h;
+  }
 
   /* ---------------- WHAT'S HAPPENING: one situation, everything for it ---------------- */
   function renderNow() {
@@ -2689,15 +2840,19 @@ if (typeof module !== "undefined") module.exports = HAVYN_ENGINE;
   }
 
   /* ---------------- EMERGENCY ---------------- */
-  const cardView = { id: null, step: 0, beatStep: 0, autoBeat: false };
+  const cardView = { id: null, step: 0, beatStep: 0, autoBeat: false, at: 0 };
   function emTop() {
     return '<div class="emtop"><a class="exit" href="#/status">EXIT</a><a class="call" href="tel:911">' + ic("phone") + "CALL 911</a></div>";
   }
   function renderEmergency() {
     const id = route.parts[1];
+    if (id === "log") return renderLog();
     if (id) return renderCard(id);
     cardView.id = null; cardView.beatStep = 0;
-    let h = emTop() + '<div class="emgrid">';
+    let h = emTop();
+    const I = Inc.on();
+    if (I) h += '<a class="emlogbar" href="#/emergency/log">' + ic("clock") + "<span><b>Log for responders</b><small>" + I.ev.length + (I.ev.length === 1 ? " entry" : " entries") + " since " + hm(I.ev[0].t) + "</small></span></a>";
+    h += '<div class="emgrid">';
     for (const c of C.cards) h += '<a class="emtile" href="#/emergency/' + c.id + '">' + ic(c.icon) + "<span><b>" + esc(c.title) + "</b><br><small>" + esc(c.sub) + "</small></span></a>";
     h += "</div>";
     h += '<div class="emnote">' + esc(C.noSignal) + "</div>";
@@ -2707,13 +2862,16 @@ if (typeof module !== "undefined") module.exports = HAVYN_ENGINE;
   function renderCard(id) {
     const c = C.cards.find((x) => x.id === id);
     if (!c) return renderEmergency();
-    if (cardView.id !== id) { cardView.id = id; cardView.step = 0; }
+    if (cardView.id !== id) { cardView.id = id; cardView.step = 0; cardView.at = now(); Inc.opened(c); }
     const n = c.steps.length, i = Math.min(cardView.step, n - 1), s = c.steps[i];
     cardView.beatStep = s.beat || 0;
     let h = emTop();
+    const vg = Clips.hasId("c-" + c.id + "-" + i);
     h += '<div class="emhead"><span>' + esc(c.title) + "</span><span>Step " + (i + 1) + " of " + n + "</span></div>";
     h += '<div class="dots">' + c.steps.map((_, k) => "<i" + (k <= i ? ' class="on"' : "") + "></i>").join("") + "</div>";
     h += '<div class="emstep">' + esc(s.t) + '</div><div class="emdet">' + esc(s.d) + "</div>";
+    if (vg) h += '<div class="emvrow"><button class="emvoice' + (PR.cardVoice === false ? "" : " on") + '" data-act="card-voice" aria-pressed="' + (PR.cardVoice !== false) + '">' + ic(PR.cardVoice === false ? "speakeroff" : "speaker") + "<span>" + (PR.cardVoice === false ? "Voice guide off" : "Voice guide on") + "</span></button>" +
+      (PR.cardVoice !== false ? '<button class="emagain" data-act="card-say">' + ic("play") + "<span>Repeat</span></button>" : "") + "</div>";
     if (s.beat) {
       h += '<div class="beat" aria-hidden="true"><div><b>PUSH</b><small>' + s.beat + " / min</small></div></div>";
       h += '<div class="cprbar"><span>Time <b class="mono" id="cprtime">0:00</b> <span id="swap" class="swap hide">SWITCH</span></span>' +
@@ -2724,6 +2882,7 @@ if (typeof module !== "undefined") module.exports = HAVYN_ENGINE;
     if (s.link) h += '<a class="emlink" href="#/emergency/' + s.link + '" data-act="card-jump" data-card="' + s.link + '">Open ' + esc(C.cards.find((x) => x.id === s.link).title) + " card</a>";
     h += '<div class="emnav"><button data-act="step-prev"' + (i === 0 ? " disabled" : "") + ">BACK</button>" +
       (i < n - 1 ? '<button class="next" data-act="step-next">NEXT</button>' : '<a class="next" href="#/emergency">ALL CARDS</a>') + "</div>";
+    h += logRow(c);
     if (c.note) h += '<div class="emnote">' + esc(c.note) + "</div>";
     if (c.noteLink) h += '<a class="emlink" href="#/emergency/' + c.noteLink + '" data-act="card-jump">Open ' + esc(C.cards.find((x) => x.id === c.noteLink).title) + " card</a>";
     const deep = deeperRefs("card", c.id), here = deep.filter((r) => pageHref(r[0], r[1]));
@@ -4353,7 +4512,7 @@ if (typeof module !== "undefined") module.exports = HAVYN_ENGINE;
       const st = sc >= 90 ? "ok" : sc >= 50 ? "warn" : "crit", lv = level(sc), circ = 2 * Math.PI * 34;
       let h = '<section class="glass panel ready hud" id="ready"><div class="rdyhead">' +
         '<div class="ring" aria-hidden="true"><svg viewBox="0 0 80 80"><circle cx="40" cy="40" r="34" class="rt"/><circle cx="40" cy="40" r="34" class="rp" style="stroke-dasharray:' + circ.toFixed(1) + ";stroke-dashoffset:" + (circ * (1 - sc / 100)).toFixed(1) + '"/></svg><div class="lv"><small>LV</small><b>' + lv.n + "</b></div></div>" +
-        '<div class="hudtx"><div class="lab">This phone · readiness</div><div class="rank">' + esc(lv.rank) + "</div>" +
+        '<div class="hudtx"><div class="lab">This phone · rank</div><div class="rank">' + esc(lv.rank) + "</div>" +
         '<div class="num"><span class="big">' + sc + '</span><span class="unit">% READY</span>' + (lv.next ? '<span class="xpn">' + (lv.next.at - sc) + " XP to " + esc(lv.next.rank) + "</span>" : '<span class="xpn">Max level</span>') + "</div></div></div>" +
         '<div class="bar xp"><i style="width:' + sc + '%"></i></div>';
       if (!PREVIEW && !done) {
@@ -4942,6 +5101,10 @@ if (typeof module !== "undefined") module.exports = HAVYN_ENGINE;
       Snd.chime("nav");
     }
     else if (act === "q-save") quickSave();
+    else if (act === "inc-mark") { Inc.add(b.dataset.w, b.dataset.card); render(); }
+    else if (act === "inc-clear") { if (Inc.arm && now() - Inc.arm < 5000) { Inc.clear(); go("#/emergency"); } else { Inc.arm = now(); render(); } }
+    else if (act === "card-voice") { PR.cardVoice = PR.cardVoice === false; flush(); if (PR.cardVoice === false) CardVoice.off(); else { Snd.ctx(); CardVoice.said = ""; } render(); }
+    else if (act === "card-say") { Snd.ctx(); const m = /^#\/emergency\/([\w-]+)/.exec(location.hash || ""); if (m) CardVoice.say("c-" + m[1] + "-" + cardView.step); }
     else if (act === "voice-test") { Welcome.muted = false; Snd.ctx(); Voice.unlock(); Voice.say("Welcome to Haven. This is my voice."); setTimeout(render, 600); }
     else if (act === "wel-begin") Welcome.begin();
     else if (act === "wel-skip") Welcome.close("skip");
@@ -5069,6 +5232,14 @@ if (typeof module !== "undefined") module.exports = HAVYN_ENGINE;
     if (Math.abs(dx) > 70 && Math.abs(dy) < 50) stepTo(dx < 0 ? 1 : -1);
   }, { passive: true });
   document.addEventListener("click", (e) => { const t = e.target.closest(".tab, a.li, a.gt, a.mt, a.nc, a.sostile"); if (t && !document.body.classList.contains("em")) Snd.chime("nav"); }, true);
+  document.addEventListener("click", (e) => {
+    const a = e.target.closest('a[href^="tel:"]'); if (!a || !document.body.classList.contains("em")) return;
+    const n = decodeURIComponent(a.getAttribute("href").slice(4)), w = n === "911" ? "Called 911" : "Called " + (a.textContent.trim().replace(/^call\s+/i, "") || n);
+    Inc.add(w, cardView.id || ""); if (route.path === "emergency") setTimeout(render, 50);
+  }, true);
+  // An iPhone lets a page make sound only after a touch: unlock it on the first touch of every session (silently),
+  // so the voice guide can speak the moment a card opens.
+  ["pointerdown", "touchend", "keydown"].forEach((ev) => document.addEventListener(ev, function once() { Snd.ctx(); document.removeEventListener(ev, once, true); }, true));
   window.addEventListener("hashchange", render);
   document.addEventListener("visibilitychange", () => { if (document.hidden) flush(); else { if (document.body.classList.contains("em")) Wake.on(); Everything.carryOn(); } });
   window.addEventListener("online", () => Everything.carryOn());
@@ -5077,12 +5248,13 @@ if (typeof module !== "undefined") module.exports = HAVYN_ENGINE;
     await PdfV.close(); Media.close(); for (const x of LIB) if (typeOf(x) === "zim") ZR.drop(x.id); LIB = [];
     const keys = (await Store.keys()) || [];
     for (const k of keys) await Store.del(k);
-    S = defaults(); PR = prefDefaults(); preparedFile = null; pendingCard = null; flush(); toast("Erased"); go("#/status");
+    S = defaults(); PR = prefDefaults(); preparedFile = null; pendingCard = null; Inc.clear(); flush(); toast("Erased"); go("#/status");
   }
 
   /* ---------------- ticking clocks ---------------- */
   function tick() {
     const o = $("[data-tick=outage]"); if (o && S.outage.active) o.textContent = dur(now() - S.outage.startedAt);
+    $$("[data-since]").forEach((el) => { const ms = now() - Number(el.dataset.since), d = Number(el.dataset.due || 0); el.textContent = mss(ms); if (d) { const b = el.closest(".emmark"); if (b) b.classList.toggle("due", ms >= d * 60e3); } });
     const c = $("[data-tick=checkin]"); if (c) { const n = E.nextCheckin(S.settings.checkins, now()); if (n) c.textContent = "in " + Math.floor(n.inMin / 60) + "h " + (n.inMin % 60) + "m"; }
   }
   setInterval(tick, 1000);
@@ -5118,7 +5290,7 @@ if (typeof module !== "undefined") module.exports = HAVYN_ENGINE;
     },
     say(t) {
       if (Welcome.muted || !t) return;
-      if (Clips.has(t)) { this.stop(); Clips.play(t).then((ok) => { if (!ok) this.speak(t); }); return; }
+      if (Clips.has(t)) { this.stop(); Clips.play(t).then((ok) => { if (ok === false) this.speak(t); }); return; }
       this.speak(t);
     },
     speak(t) {
@@ -5133,8 +5305,10 @@ if (typeof module !== "undefined") module.exports = HAVYN_ENGINE;
   // (Kokoro-82M, tools/voice_render.py) and shipped with the app, so it sounds the same on every phone, offline.
   // Played through Web Audio, which the first touch unlocks; a line with no recording falls back to the phone's voice.
   const Clips = {
-    map: null, buf: {}, played: [], src: null,
-    init() { if (this.map) return; this.map = {}; const V = window.HAVYN_VOICE; if (V && V.lines) for (const k in V.lines) this.map[V.lines[k].text] = "./voice/" + V.lines[k].file + "?" + (V.lines[k].sha || ""); },
+    map: null, buf: {}, played: [], src: null, seq: 0,
+    init() { if (this.map) return; this.map = {}; this.ids = {}; const V = window.HAVYN_VOICE; if (V && V.lines) for (const k in V.lines) { const u = "./voice/" + V.lines[k].file + "?" + (V.lines[k].sha || ""); this.map[V.lines[k].text] = u; this.ids[k] = V.lines[k].text; } },
+    hasId(id) { this.init(); return !!this.ids[id]; },
+    playId(id) { this.init(); return this.ids[id] ? this.play(this.ids[id]) : Promise.resolve(false); },
     has(t) { this.init(); return !!this.map[t]; },
     load(t) {
       this.init(); const u = this.map[t], a = Snd.ctx(); if (!u || !a) return Promise.resolve(null);
@@ -5143,12 +5317,17 @@ if (typeof module !== "undefined") module.exports = HAVYN_ENGINE;
       return this.buf[u];
     },
     preload() { this.init(); Object.keys(this.map).forEach((t) => this.load(t)); },
+    // true: playing; false: can't play it (fall back); null: a newer line or a stop came first (stay quiet).
     async play(t) {
-      const b = await this.load(t), a = Snd.ctx(); if (!b || !a || Welcome.muted) return false;
-      this.stop(); if (a.state === "suspended") try { await a.resume(); } catch (e) {}
+      const my = ++this.seq, b = await this.load(t), a = Snd.ctx();
+      if (my !== this.seq) return null;
+      if (!b || !a || (Welcome.on && Welcome.muted)) return false;
+      this.halt(); if (a.state === "suspended") try { await a.resume(); } catch (e) {}
+      if (my !== this.seq) return null;
       const s = a.createBufferSource(), g = a.createGain(); g.gain.value = 1; s.buffer = b; s.connect(g).connect(a.destination); s.start(); this.src = s; this.played.push(t); return true;
     },
-    stop() { try { if (this.src) this.src.stop(); } catch (e) {} this.src = null; }
+    stop() { this.seq++; this.halt(); },
+    halt() { try { if (this.src) this.src.stop(); } catch (e) {} this.src = null; }
   };
   // While the welcome plays, its sound plays like a video (even with the ring switch on silent); after it, back to normal.
   const AudioMode = { set(t) { try { if (navigator.audioSession) navigator.audioSession.type = t; } catch (e) {} } };
@@ -5268,7 +5447,7 @@ if (typeof module !== "undefined") module.exports = HAVYN_ENGINE;
       return [
         { go: "#/status", at: "#ready .rdyhead", t: "Your level", d: "Your phone levels up as you finish quests: the downloads, your household, your supplies, a Memory Card. Most of it happens by itself, and every quest is a few taps.", say: "This is your command deck. Your level rises as you finish quests, and most of them finish themselves." },
         { go: "#/status", at: ".nowgrid", t: "What's happening?", d: "Tap what's going on: power out, extreme heat, a storm, smoke, unsafe water, an earthquake. You get everything for it in one place: the steps, the cards, the manual pages and the numbers to call.", say: "When something happens, tap it here. Everything you need is in one place." },
-        { go: "#/status", at: ".tab.sos", t: "Someone hurt? The red button", d: "This red button, on every screen (and the red tile on Home), opens twenty step-by-step cards: CPR with a beat to follow, bleeding, choking, heart attack, heat stroke and more, with one-tap 911.", say: "In an emergency, tap the red button. Every card is two taps away." },
+        { go: "#/status", at: ".tab.sos", t: "Someone hurt? The red button", d: "This red button, on every screen (and the red tile on Home), opens twenty step-by-step cards: CPR with a beat to follow, bleeding, choking, heart attack, heat stroke and more. Each card reads its steps aloud, keeps the times for the paramedics, and calls 911 in one tap.", say: "In an emergency, tap the red button. Each card talks you through it, step by step, and keeps the times for the paramedics." },
         { go: "#/guides", at: ".tab[data-tab=guides]", t: "Guides: know what to do", d: "How do I… opens the exact page in the manuals on this phone. Playbooks walk you through blackouts, extreme heat, storms and smoke.", say: "Guides tells you what to do, step by step." },
         { go: "#/family", at: ".tab[data-tab=family]", t: "Family: your people", d: "Everyone's medicines, allergies and needs. Fill it in once, then copy it to every phone with the Memory Card.", say: "Family keeps everyone's medicines, allergies and needs in one place." },
         { go: "#/supplies", at: ".tab[data-tab=supplies]", t: "Supplies: what you have", d: "Water, food, medicine and power on hand become days of autonomy, and HAVYN warns you before anything expires.", say: "Supplies turns what you have into days you can last." },
@@ -5347,6 +5526,7 @@ if (typeof module !== "undefined") module.exports = HAVYN_ENGINE;
     if (st && typeof st === "object") { const d = defaults(); S = Object.assign(d, st); S.settings = Object.assign(d.settings, st.settings || {}); S.plan = Object.assign(d.plan, st.plan || {}); }
     if (pr && typeof pr === "object") PR = Object.assign(prefDefaults(), pr);
     const lib = await Store.get("lib"); LIB = Array.isArray(lib) ? lib.filter((x) => x && typeof x.id === "string") : [];
+    const inc = await Store.get("incident"); INC = inc && Array.isArray(inc.ev) && inc.ev.length ? inc : null;
     const v = $(".void"); if (v && !v.children.length) for (let i = 0; i < 14; i++) { const m = document.createElement("i"); m.style.left = (5 + Math.random() * 90) + "%"; m.style.top = (40 + Math.random() * 55) + "%"; m.style.animationDelay = (-Math.random() * 22).toFixed(1) + "s"; v.appendChild(m); }
     // First open from the Home Screen: get everything onto this phone without being asked (the welcome says so, and Stop stops it).
     if (isStandalone() && !PREVIEW && !PR.setupAt) { PR.setupAt = Date.now(); PR.autoGet = true; PR.firstGet = true; flush(); }
@@ -5361,7 +5541,7 @@ if (typeof module !== "undefined") module.exports = HAVYN_ENGINE;
       navigator.serviceWorker.register("./sw.js").then(() => navigator.serviceWorker.ready).then(() => { const s = $("#swst"); if (s) s.textContent = "Saved for offline"; }).catch(() => { const s = $("#swst"); if (s) s.textContent = "Not available"; });
     }
   }
-  window.__HAVYN = { get state() { return S; }, get prefs() { return PR; }, get lib() { return LIB; }, E, C, version: VERSION, arc: Arc, shelf: Shelf, ready: Ready, store: Store, welcome: Welcome, voice: Voice, clips: Clips };
+  window.__HAVYN = { get incident() { return INC; }, get state() { return S; }, get prefs() { return PR; }, get lib() { return LIB; }, E, C, version: VERSION, arc: Arc, shelf: Shelf, ready: Ready, store: Store, welcome: Welcome, voice: Voice, clips: Clips };
   boot();
 })();
 </script>
