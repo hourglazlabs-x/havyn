@@ -118,7 +118,11 @@
     "https://irp.fas.org/doddir/milmed/ships.pdf",
     "https://purl.fdlp.gov/GPO/gpo20582"
    ],
-   "expect": "Medicine Chest"
+   "ias": {
+    "q": "title:(medicine chest) AND title:(ship) AND mediatype:(texts)"
+   },
+   "expect": "Medicine Chest",
+   "minpages": 200
   },
   {
    "id": "sh-bec",
@@ -206,7 +210,11 @@
    "src": [
     "https://medicalguidelines.msf.org/sites/default/files/pdf/guideline-170-en.pdf"
    ],
-   "expect": "Clinical guidelines"
+   "ias": {
+    "q": "title:(\"clinical guidelines\") AND title:(\"diagnosis and treatment\") AND mediatype:(texts)"
+   },
+   "expect": "Clinical guidelines",
+   "minpages": 200
   },
   {
    "id": "sh-ox-nursing",
@@ -291,7 +299,10 @@
     "https://www.med.navy.mil/Portals/62/Documents/BUMED/Directives/All%20Pubs/5010-10.pdf",
     "https://static.e-publishing.af.mil/production/1/af_sg/publication/afman48-138_ip/afman48-138_ip.pdf"
    ],
-   "expect": "TB MED 577"
+   "ias": {
+    "q": "title:(\"field water supplies\") AND mediatype:(texts)"
+   },
+   "expect": "5010-10"
   },
   {
    "id": "sh-gdwq",
@@ -493,6 +504,9 @@
    "src": [
     "https://irp.fas.org/doddir/army/atp3-34-45.pdf"
    ],
+   "ias": {
+    "q": "\"ATP 3-34.45\" AND mediatype:(texts)"
+   },
    "wb": [
     "2025",
     "2024"
@@ -836,6 +850,9 @@
    "src": [
     "https://dieselduck.ca/machine/04%20auxiliary/1994%20USN%20Basic%20Machines.pdf"
    ],
+   "ias": {
+    "q": "title:(\"basic machines\") AND mediatype:(texts)"
+   },
    "expect": "14037",
    "minpages": 100
   },
@@ -879,7 +896,11 @@
    "src": [
     "https://media.defense.gov/2014/Jun/20/2002655885/-1/-1/1/140620-N-ZZ182-6530.pdf"
    ],
-   "expect": "Construction Electrician"
+   "ias": {
+    "q": "title:(\"construction electrician\") AND mediatype:(texts)"
+   },
+   "expect": "NAVEDTRA 14026(?![A-Z])",
+   "minpages": 150
   },
   {
    "id": "sh-autos",
@@ -945,7 +966,11 @@
    "src": [
     "https://irp.fas.org/doddir/army/atp3-50-21.pdf"
    ],
-   "expect": "3-50\\.21"
+   "ias": {
+    "q": "\"ATP 3-50.21\" AND mediatype:(texts)"
+   },
+   "expect": "3-50\\.21",
+   "minpages": 150
   },
   {
    "id": "sh-landnav",
@@ -977,7 +1002,10 @@
    "src": [
     "https://www.phmsa.dot.gov/sites/phmsa.dot.gov/files/2024-04/ERG2024-Eng-Web-a.pdf"
    ],
-   "expect": "Emergency Response Guidebook"
+   "ias": {
+    "q": "title:(\"emergency response guidebook\") AND title:(2024) AND mediatype:(texts)"
+   },
+   "expect": "GUIDEBOOK\\s*2024|ERG\\s*2024"
   },
   {
    "id": "sh-pfa",

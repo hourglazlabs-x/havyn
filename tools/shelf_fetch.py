@@ -15,8 +15,9 @@ from the last build, so unchanged files aren't uploaded again).
 Documents under the publisher's own terms (lic "link") are downloaded only to check the links; they are never uploaded.
 
 Where each document comes from, in order: the catalog's "src" links; then resolvers ("ia" Internet Archive item,
-"ias" Internet Archive search, "ox" OpenStax book, "dspace" repository handle); then "alt" copies on other sites; then the Internet Archive's Wayback copy of each "src" link,
-byte for byte (for publishers that block cloud servers); then "parts" joined into one PDF. "expect" (a pattern)
+"ox" OpenStax book, "dspace" repository handle); then "alt" copies on other sites; then the Internet Archive's Wayback copy of each "src" link,
+byte for byte (for publishers that block cloud servers); then "ias", a search of other people's Internet Archive uploads;
+then "parts" joined into one PDF. "expect" (a pattern)
 must appear in the first pages, so a mirror can't hand over the wrong document. If a publisher is down on the
 day of a full build, last build's checked copy is kept and the report says so."""
 import concurrent.futures as cf, datetime, hashlib, json, logging, os, re, shutil, sys, threading, time, urllib.error, urllib.parse, urllib.request, zipfile
@@ -322,7 +323,7 @@ def fetch_item1(it, work, rel):
             r.update(ok=True, edition=y, parts=parts, size=sum(p["size"] for p in parts), pages=sum(p["pages"] for p in parts), url=urls[0], probe=first)
             return r
         src = list(it.get("src") or []); cands = list(src)
-        for key, fn in (("ia", resolve_ia), ("ias", resolve_ias), ("ox", resolve_ox), ("dspace", resolve_dspace)):
+        for key, fn in (("ia", resolve_ia), ("ox", resolve_ox), ("dspace", resolve_dspace)):
             if it.get(key):
                 try:
                     got = fn(it[key]); cands += got if isinstance(got, list) else [got]
@@ -343,6 +344,9 @@ def fetch_item1(it, work, rel):
         got = first_good(cands)
         if not got and src and it.get("wb") is not False:   # only now ask the Wayback Machine (it rate-limits)
             got = first_good(wayback(src, it.get("wb") or WB_YEARS))
+        if not got and it.get("ias"):                          # last: other people's uploads to the Internet Archive ("expect" checks them)
+            try: got = first_good(resolve_ias(it["ias"]))
+            except Exception as e: errors.append("ias: %s" % e)
         if got: used, size, sha, note = got
         if not used and it.get("parts"):
             try:
