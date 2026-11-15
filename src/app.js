@@ -69,7 +69,17 @@
     search: '<circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5.5 5.5"/>',
     toc: '<path d="M4 6h2M9 6h11M4 12h2M9 12h11M4 18h2M9 18h11"/>',
     minus: '<path d="M5 12h14"/>',
-    gear: '<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9 7 7M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/>'
+    gear: '<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9 7 7M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/>',
+    globe: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 3 3.9 6 3.9 9s-1.3 6-3.9 9c-2.6-3-3.9-6-3.9-9s1.3-6 3.9-9z"/>',
+    film: '<rect x="3.5" y="5" width="17" height="14" rx="2.5"/><path d="M10 9.3v5.4l4.6-2.7z"/>',
+    music: '<path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/>',
+    dice: '<rect x="4" y="4" width="16" height="16" rx="3.5"/><circle cx="9" cy="9" r="1.2"/><circle cx="15" cy="15" r="1.2"/><circle cx="15" cy="9" r="1.2"/><circle cx="9" cy="15" r="1.2"/>',
+    home: '<path d="M4 11.5 12 5l8 6.5V20H4z"/><path d="M10 20v-5h4v5"/>',
+    textsize: '<path d="M3.5 18 8 6l4.5 12M5.2 14h5.6M14.5 18l3-8 3 8M15.4 15.6h4.2"/>',
+    contrast: '<circle cx="12" cy="12" r="8.5"/><path d="M12 3.5v17a8.5 8.5 0 0 0 0-17z" fill="currentColor" stroke="none"/>',
+    download: '<path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>',
+    drive: '<rect x="3" y="12.5" width="18" height="7.5" rx="2"/><path d="M5 12.5 7.5 5h9l2.5 7.5M7 16.3h.01M15.5 16.3h3"/>',
+    server: '<rect x="4" y="3.5" width="16" height="7" rx="2"/><rect x="4" y="13.5" width="16" height="7" rx="2"/><path d="M8 7h.01M8 17h.01M12 7h4M12 17h4"/>'
   };
   const ic = (n, cls) => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"' + (cls ? ' class="' + cls + '"' : "") + ">" + (P[n] || "") + "</svg>";
   const icFill = (n) => '<svg viewBox="0 0 24 24" aria-hidden="true">' + P[n] + "</svg>";
@@ -214,16 +224,19 @@
 
   const SCREENS = {
     status: renderStatus, emergency: renderEmergency, playbooks: renderPlaybooks, guides: renderGuides, family: renderFamily, supplies: renderSupplies, buy: renderBuy,
-    missions: renderMissions, plan: renderPlan, comms: renderComms, library: renderLibrary, binder: renderBinder, system: renderSystem
+    missions: renderMissions, plan: renderPlan, comms: renderComms, library: renderLibrary, binder: renderBinder, system: renderSystem,
+    search: renderSearch, archive: renderArchive
   };
-  const TAB_OF = { status: "status", missions: "status", guides: "guides", playbooks: "guides", plan: "guides", comms: "guides", library: "guides", binder: "guides", emergency: "emergency", family: "family", supplies: "supplies", buy: "supplies" };
+  const TAB_OF = { status: "status", missions: "status", guides: "guides", playbooks: "guides", plan: "guides", comms: "guides", library: "guides", binder: "guides", search: "guides", archive: "guides", emergency: "emergency", family: "family", supplies: "supplies", buy: "supplies" };
   let lastPath = "";
   function render() {
     route = parseHash();
     const em = route.path === "emergency";
     document.body.classList.toggle("em", em);
     document.body.classList.toggle("night", PR.theme === "night");
-    document.body.classList.toggle("reader", route.path === "library" && !!route.parts[1]);
+    const lx = route.path === "library" && route.parts[1] ? LIB.find((d) => d.id === route.parts[1]) : null;
+    document.body.classList.toggle("reader", !!lx && typeOf(lx) === "pdf");
+    document.body.classList.toggle("zread", !!lx && typeOf(lx) === "zim" && route.parts[2] === "read");
     if (em) Wake.on(); else { Wake.off(); Metro.stop(); cardView.id = null; cardView.autoBeat = false; }
     if (!(route.path === "supplies" && route.parts[1] === "edit")) draft = null;
     const fn = SCREENS[route.path] || renderStatus;
@@ -238,15 +251,19 @@
     hydratePhotos();
     if (route.path === "emergency" && cardView.beatStep && Metro.on === false && cardView.autoBeat) { Metro.start(cardView.beatStep); }
     if (!$(".beat")) Metro.stop(); else if (Metro.on) Metro.loop();
-    if (route.path === "library" && route.parts[1]) PdfV.mount(route.parts[1]);
-    else if (PdfV.id) PdfV.close();
-    if (route.path === "library" && !route.parts[1]) libQuota();
+    const lx = route.path === "library" && route.parts[1] ? LIB.find((d) => d.id === route.parts[1]) : null, lt = lx ? typeOf(lx) : "";
+    if (lt === "pdf") PdfV.mount(lx.id); else if (PdfV.id) PdfV.close();
+    if (lt === "zim" && route.parts[2] === "read") ZR.mount(lx.id, route.q.p); else ZR.unmount();
+    if (lt === "video" || lt === "audio") Media.mount(lx.id); else if (Media.id) Media.close();
+    if (route.path === "library" && !route.parts[1]) { libQuota(); PdfIndex.kick(); }
+    if (route.path === "search") SearchUI.mount();
+    if (route.path === "archive") Get.mount();
   }
 
   /* ---------------- shared chrome ---------------- */
   function topbar(title) {
     return '<header class="top"><a class="brand" href="#/status" aria-label="HAVYN FIELD home">' + MARK + "<b>HAVYN</b><span>FIELD</span></a>" +
-      '<div class="tools"><button class="ibtn' + (PR.theme === "night" ? " on" : "") + '" data-act="night" aria-label="Night mode">' + ic("moon") + "</button>" +
+      '<div class="tools"><a class="ibtn" href="#/search" aria-label="Search everything">' + ic("search") + '</a><button class="ibtn' + (PR.theme === "night" ? " on" : "") + '" data-act="night" aria-label="Night mode">' + ic("moon") + "</button>" +
       '<a class="ibtn" href="#/system" aria-label="Memory card and settings">' + ic("card") + "</a></div></header>" +
       (title ? '<div class="sec" style="margin-top:4px"><span class="lab">' + esc(title) + "</span></div>" : "");
   }
@@ -646,7 +663,9 @@
       li("#/missions", "check", "Missions", "Step by step, today through May") +
       li("#/binder", "card", "Printable binder", "Plan, numbers, medicines and every card on paper") +
       '</div><div class="sec"><span class="lab">Library</span></div><div class="list">' +
-      li("#/library", "file", "PDF library", LIB.length ? LIB.length + " on this phone" : "Manuals and guides, readable offline") + "</div>";
+      li("#/library", "globe", "Offline library", libSummary() || "Encyclopedias, PDFs, video and audio, all offline") +
+      li("#/search", "search", "Search everything", "One box: cards, plan, PDFs and every archive") +
+      li("#/archive", "download", "Get more", "Wikipedia, WikiMed, manuals, maps and the vault drive") + "</div>";
     h += '<p class="empty" style="margin-top:14px">Each playbook: what to do in the first 10 minutes, hour, day, and the hard rule for leaving. Tick items as you go; reset after the event.</p>';
     return h;
   }
@@ -829,18 +848,60 @@
     return h;
   }
 
-  /* ---------------- LIBRARY (PDFs stay on this phone) ---------------- */
+  /* ---------------- LIBRARY: archives (ZIM), PDFs, video and audio, all stored on this phone ---------------- */
   let LIB = [];
   async function saveLib() { await Store.set("lib", LIB); }
+  const typeOf = (x) => (x && x.type) || "pdf";
+  const KINDS = [["zim", "globe", "Encyclopedias and archives"], ["pdf", "file", "Documents"], ["video", "film", "Video"], ["audio", "music", "Audio"]];
+  const KEY = { zim: "zim:", pdf: "pdf:", video: "media:", audio: "media:" };
+  // Apple shows storage in decimal units, so the library does too.
+  const sz = (b) => { b = b || 0; return b >= 1e9 ? (b / 1e9).toFixed(b >= 1e11 ? 0 : 1) + " GB" : b >= 1e6 ? Math.round(b / 1e6) + " MB" : Math.max(1, Math.round(b / 1e3)) + " KB"; };
+  const clock = (s) => { s = Math.max(0, Math.floor(s || 0)); const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), x = s % 60; return (h ? h + ":" + String(m).padStart(2, "0") : m) + ":" + String(x).padStart(2, "0"); };
+  const LANGS = { eng: "English", en: "English", spa: "Español", es: "Español", fra: "Français", fr: "Français", deu: "Deutsch", de: "Deutsch", por: "Português", pt: "Português", ita: "Italiano", it: "Italiano", zho: "中文", zh: "中文", ara: "العربية", ar: "العربية", rus: "Русский", ru: "Русский", hin: "हिन्दी", hi: "हिन्दी", vie: "Tiếng Việt", tgl: "Tagalog", kor: "한국어", jpn: "日本語", bel: "Беларуская", mul: "Multilingual" };
+  const langName = (c) => String(c || "").split(",").map((x) => LANGS[x.trim()] || x.trim().toUpperCase()).filter(Boolean).join(", ");
+  const zHref = (id, p) => "#/library/" + encodeURIComponent(id) + "/read?p=" + encodeURIComponent(p || "");
+  const dec = (s) => { try { return decodeURIComponent(s); } catch (e) { return s; } };
+  function libCounts() { const c = { zim: 0, pdf: 0, video: 0, audio: 0 }; for (const x of LIB) c[typeOf(x)] = (c[typeOf(x)] || 0) + 1; return c; }
+  function libSummary() {
+    const c = libCounts(), parts = [];
+    if (c.zim) parts.push(c.zim + (c.zim === 1 ? " archive" : " archives"));
+    if (c.pdf) parts.push(c.pdf + " PDF" + (c.pdf === 1 ? "" : "s"));
+    if (c.video) parts.push(c.video + " video" + (c.video === 1 ? "" : "s"));
+    if (c.audio) parts.push(c.audio + " audio");
+    return parts.length ? parts.join(" · ") + " · " + sz(LIB.reduce((a, x) => a + (x.size || 0), 0)) : "";
+  }
+  function libRow(x) {
+    const t = typeOf(x), icon = t === "zim" ? "globe" : t === "video" ? "film" : t === "audio" ? "music" : "file";
+    const sub = t === "zim" ? [x.articles ? fmtN(x.articles) + (x.articles === 1 ? " article" : " articles") : "", sz(x.size), x.date].filter(Boolean).join(" · ")
+      : t === "pdf" ? [sz(x.size), x.pages ? x.pages + " pages" : "", x.lastPage > 1 ? "at p. " + x.lastPage : "", x.indexed ? "searchable" : ""].filter(Boolean).join(" · ")
+      : [sz(x.size), x.dur ? clock(x.dur) : "", x.pos > 5 ? "at " + clock(x.pos) : ""].filter(Boolean).join(" · ");
+    return '<a class="li" href="#/library/' + esc(x.id) + '"><span class="ic">' + (t === "zim" && x.fav ? '<img class="fav" alt="" src="' + esc(x.fav) + '">' : ic(icon)) + '</span><span class="tx"><b>' + esc(x.name) + "</b><small>" + esc(sub) + "</small></span>" + ic("chev") + "</a>";
+  }
   function renderLibrary() {
-    if (route.parts[1]) return renderReader(route.parts[1]);
+    const id = route.parts[1];
+    if (id) {
+      const x = LIB.find((d) => d.id === id);
+      if (!x) { route.parts = ["library"]; return renderLibrary(); }
+      const t = typeOf(x);
+      if (t === "zim") return route.parts[2] === "read" ? renderZimRead(x) : renderZimHome(x);
+      if (t === "video" || t === "audio") return renderMedia(x);
+      return renderReader(id);
+    }
     const total = LIB.reduce((a, x) => a + (x.size || 0), 0);
     let h = backbar("#/guides", "Library");
-    h += '<section class="glass hero"><div class="lab">PDF library · this phone</div><div class="num"><span class="big" style="font-size:2.8rem">' + LIB.length + '</span><span class="unit">' + (LIB.length === 1 ? "PDF" : "PDFS") + (LIB.length ? " · " + mb(total) : "") + "</span></div>" +
+    h += '<section class="glass hero"><div class="lab">Offline library · this phone</div><div class="num"><span class="big" style="font-size:2.8rem">' + LIB.length + '</span><span class="unit">' + (LIB.length === 1 ? "ITEM" : "ITEMS") + (LIB.length ? " · " + sz(total) : "") + "</span></div>" +
       '<div class="sub">' + esc(C.library.note) + '</div><div class="sub mono" id="libq" style="font-size:.75rem;margin-top:6px"></div>' +
-      '<div class="btnrow" style="margin-top:12px"><label class="btn">' + ic("plus") + 'Import PDFs<input class="sr" type="file" accept="application/pdf,.pdf" multiple id="pdffile"></label></div><div id="libmsg" class="empty" style="min-height:1.3em"></div></section>';
-    h += LIB.length ? '<div class="list">' + LIB.slice().sort((a, b) => (b.opened || b.added) - (a.opened || a.added)).map((x) => li("#/library/" + x.id, "file", x.name, [mb(x.size || 0), x.pages ? x.pages + " pages" : "", x.lastPage > 1 ? "at p. " + x.lastPage : ""].filter(Boolean).join(" · "))).join("") + "</div>" : '<div class="empty">No PDFs yet. Import from Files, or from Safari after a download.</div>';
-    h += '<section class="glass panel" style="margin-top:14px"><h3>Worth importing</h3>' + C.library.suggest.map((s) => '<div class="blk"><b>' + esc(s.t) + "</b><span>" + esc(s.d) + (s.u ? ' <a href="' + esc(s.u) + '" target="_blank" rel="noopener">Open site</a>' : "") + "</span></div>").join("") + "</section>";
+      '<div class="btnrow" style="margin-top:12px"><label class="btn">' + ic("plus") + 'Add files<input class="sr" type="file" multiple id="libfile"></label><a class="btn ghost" href="#/archive">' + ic("download") + "Get more</a></div>" +
+      (hubUrl() ? '<div class="btnrow" style="margin-top:8px"><a class="btn ghost" href="' + esc(hubUrl()) + '" target="_blank" rel="noopener">' + ic("server") + "Home library (full-text search)</a></div>" : "") +
+      '<div class="bar hide" id="libbar" style="margin-top:12px"><i class="indet"></i></div><div id="libmsg" class="empty" style="min-height:1.3em"></div></section>';
+    h += '<div class="list"><a class="li" href="#/search"><span class="ic">' + ic("search") + '</span><span class="tx"><b>Search everything</b><small>Cards, playbooks, your plan, PDFs and every archive</small></span>' + ic("chev") + "</a></div>";
+    for (const [k, , label] of KINDS) {
+      const xs = LIB.filter((x) => typeOf(x) === k).sort((a, b) => (b.opened || b.added) - (a.opened || a.added));
+      if (!xs.length) continue;
+      h += '<div class="sec"><span class="lab">' + esc(label) + '</span><span class="mono" style="color:var(--mute);font-size:.8rem">' + xs.length + " · " + sz(xs.reduce((a, x) => a + (x.size || 0), 0)) + '</span></div><div class="list">' + xs.map(libRow).join("") + "</div>";
+    }
+    if (!LIB.length) h += '<div class="empty" style="margin-top:12px">Nothing here yet. Tap Get more for the recommended archives, or Add files to bring in a ZIM archive, PDF, video or audio file from the Files app.</div>';
+    h += '<section class="glass panel" style="margin-top:14px"><h3>How files get here</h3>' + C.library.how.map((s) => '<div class="blk"><b>' + esc(s.t) + "</b><span>" + esc(s.d) + "</span></div>").join("") + "</section>";
     return h;
   }
   function renderReader(id) {
@@ -851,36 +912,609 @@
       '<form data-form="pdfgo" class="rgo"><input name="p" inputmode="numeric" placeholder="Page" aria-label="Go to page" autocomplete="off"><button class="btn sm" type="submit">Go</button></form>' +
       '<button class="ibtn" data-act="pdf-zoom" data-z="-1" aria-label="Zoom out">' + ic("minus") + '</button><button class="ibtn" data-act="pdf-zoom" data-z="1" aria-label="Zoom in">' + ic("plus") + "</button></div></div>";
     h += '<div id="pdfpanel" class="glass panel hide"></div><div id="pdfmsg" class="empty">Opening…</div><div class="pgwrap"><div id="pdfpages" class="pdfv"></div></div>';
-    h += '<div class="btnrow" style="margin-top:16px"><button class="btn ghost danger" data-act="pdf-del" data-id="' + esc(id) + '">Delete from this phone</button></div>';
+    h += '<div class="btnrow" style="margin-top:16px"><button class="btn ghost danger" data-act="lib-del" data-id="' + esc(id) + '">Delete from this phone</button></div>';
     return h;
   }
-  async function importPdfs(files) {
-    const msg = $("#libmsg"); let n = 0;
-    for (const f of Array.from(files || [])) {
-      if (msg) msg.textContent = "Saving " + f.name + "…";
-      let head = "";
-      try { head = await f.slice(0, 1024).text(); } catch (e) {}
-      if (!head.includes("%PDF-")) { toast(f.name + " isn't a PDF"); continue; }
-      const id = uid();
-      if (!(await Store.set("pdf:" + id, f))) { toast("Not enough space for " + f.name); continue; }
-      LIB.push({ id, name: f.name.replace(/\.pdf$/i, "").slice(0, 140) || "Untitled", size: f.size, added: now(), pages: 0, lastPage: 1 });
-      n++;
+
+  /* encyclopedia home: title search, main page, random, continue */
+  function renderZimHome(x) {
+    let h = backbar("#/library", "Archive");
+    h += '<section class="glass hero zhero">' + (x.fav ? '<img class="zfav" alt="" src="' + esc(x.fav) + '">' : "") + '<div class="lab">' + esc([langName(x.lang), x.flavour].filter(Boolean).join(" · ") || "Archive") + '</div><h2 class="ztitle">' + esc(x.name) + "</h2>" +
+      (x.desc ? '<div class="sub">' + esc(x.desc) + "</div>" : "") +
+      '<div class="sub mono" style="font-size:.78rem;margin-top:8px">' + esc([x.articles ? fmtN(x.articles) + (x.articles === 1 ? " article" : " articles") : "", x.media ? fmtN(x.media) + " video and audio" : "", sz(x.size), x.date ? "made " + x.date : ""].filter(Boolean).join(" · ")) + "</div></section>";
+    if (x.needsScripts) h += '<div class="alert"><span class="dot"></span><span><b>This archive needs the Kiwix app</b><small>It is a copy of a website that runs its own scripts. HAVYN keeps archive scripts off for safety, so its pages may not work here. Open it in Kiwix, or on the home library.</small></span></div>';
+    if (x.search !== false) h += '<form data-form="zsearch" data-id="' + esc(x.id) + '" class="zs"><input id="zq" name="q" type="search" enterkeyhint="search" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Search ' + (x.articles ? esc(fmtN(x.articles)) + (x.articles === 1 ? " title" : " titles") : "titles") + '" aria-label="Search titles in ' + esc(x.name) + '"></form><div id="zres" class="list" style="margin-top:8px"></div>';
+    h += '<div class="btnrow" style="margin-top:12px">' + (x.main ? '<a class="btn" href="' + zHref(x.id, x.main) + '">' + ic("home") + "Main page</a>" : "") + '<button class="btn ghost" data-act="zim-random" data-id="' + esc(x.id) + '">' + ic("dice") + "Random</button></div>";
+    if (x.lastPath && x.lastPath !== x.main) h += '<div class="list" style="margin-top:10px">' + li(zHref(x.id, x.lastPath), "book", "Continue reading", x.lastTitle || x.lastPath) + "</div>";
+    h += '<p class="empty" style="font-size:.85rem;margin-top:12px">' + (x.search === false ? "This archive has no title index, so search is off here. Use Main page and its links." : "Search finds titles that start with what you type. Full-text search of every word runs on the home library (see Get more).") + "</p>";
+    h += '<div class="btnrow" style="margin-top:16px"><button class="btn ghost danger" data-act="lib-del" data-id="' + esc(x.id) + '">Delete from this phone</button></div>';
+    return h;
+  }
+  function renderZimRead(x) {
+    return '<div class="zhead"><a class="ibtn" data-act="zr-back" href="#/library/' + esc(x.id) + '" aria-label="Back">' + ic("back") + '</a><span class="rtitle" id="ztitle">' + esc(x.lastTitle || x.name) + "</span>" +
+      '<button class="ibtn" data-act="zr-size" aria-label="Text size">' + ic("textsize") + '</button><button class="ibtn' + (PR.zDark !== false ? " on" : "") + '" data-act="zr-dark" aria-label="Dark pages">' + ic("contrast") + '</button><a class="ibtn" href="#/library/' + esc(x.id) + '" aria-label="Search this archive">' + ic("search") + "</a></div>" +
+      '<div id="zmsg" class="empty zmsg">Opening…</div><iframe id="zframe" class="zframe" title="' + esc(x.name) + '" sandbox="allow-same-origin" referrerpolicy="no-referrer"></iframe>';
+  }
+
+  // Archive reader. Installed app: the service worker serves archive pages at ./z/<id>/<path>, read straight
+  // from the file saved on this phone. Preview or no service worker: pages are rebuilt here with blob: links.
+  // Either way archive scripts never run: the frame is sandboxed without scripts and pages carry a no-script policy.
+  const ZR = {
+    mod: null, open: new Map(), id: null, cur: "", qp: null, pending: null, stack: [], token: 0, urls: [], amap: new Map(), saveT: 0,
+    async lib() {
+      if (!this.mod) { await import("./zimkit.js"); this.mod = globalThis.HavynZim; if (!this.mod) throw new Error("The archive reader didn't load."); }
+      return this.mod;
+    },
+    archive(id) {
+      let p = this.open.get(id);
+      if (!p) {
+        p = (async () => {
+          const Z = await this.lib(), blob = await Store.get("zim:" + id);
+          if (!blob) throw Object.assign(new Error("This archive is missing on this phone. Add it again."), { name: "Missing" });
+          return Z.Archive.open(blob);
+        })();
+        this.open.set(id, p); p.catch(() => this.open.delete(id));
+        while (this.open.size > 3) this.open.delete(this.open.keys().next().value);
+      }
+      return p;
+    },
+    drop(id) { this.open.delete(id); try { const c = navigator.serviceWorker && navigator.serviceWorker.controller; if (c) c.postMessage({ t: "zim-drop", id }); } catch (e) {} },
+    sw() { return !PREVIEW && !!(navigator.serviceWorker && navigator.serviceWorker.controller); },
+    url(id, p) { return "./z/" + encodeURIComponent(id) + "/" + String(p || "").split("/").map(encodeURIComponent).join("/"); },
+    msg(m) { const e = $("#zmsg"); if (e) { e.textContent = m || ""; e.classList.toggle("hide", !m); } },
+    async mount(id, qp) {
+      const fr = $("#zframe"); if (!fr) return;
+      const x = LIB.find((d) => d.id === id);
+      if (this.id !== id) { this.stack = []; this.cur = ""; this.qp = null; }
+      let path;
+      if (this.id === id && this.cur && qp === this.qp) path = this.cur;          // re-render: stay on the current page
+      else { path = qp || (x && x.main) || ""; if (this.id === id && this.cur && path !== this.cur) this.stack.push(this.cur); }
+      this.id = id; this.qp = qp;
+      fr.addEventListener("load", () => this.loaded(fr));
+      this.show(fr, path, "");
+    },
+    unmount() { this.token++; this.revoke(); },
+    async show(fr, path, hash) {
+      const tk = ++this.token; this.pending = path; fr.classList.remove("ready"); this.msg("Opening…");
+      try {
+        const a = await this.archive(this.id);
+        if (tk !== this.token) return;
+        if (path) {
+          let d = await a.byPath(path);
+          if (d) d = await a.resolve(d);
+          if (d && a.mimeOf(d) === "application/pdf") { await this.savePdf(a, d); return; }
+        }
+      } catch (e) { if (tk === this.token) this.msg(e && e.message ? e.message : "Couldn't open this archive."); return; }
+      if (this.sw()) {
+        const u = this.url(this.id, path) + (hash || "");
+        try { if (fr.contentWindow && fr.getAttribute("src")) fr.contentWindow.location.replace(u); else fr.src = u; } catch (e) { fr.src = u; }
+      } else await this.renderDoc(fr, path, hash, tk);
+    },
+    go(path, hash) { if (this.cur) this.stack.push(this.cur); if (this.stack.length > 80) this.stack.shift(); const fr = $("#zframe"); if (fr) this.show(fr, path, hash); },
+    back() { const p = this.stack.pop(); if (p === undefined) return false; const fr = $("#zframe"); if (fr) this.show(fr, p, ""); return true; },
+    framePath(fr) {
+      try {
+        const pn = fr.contentWindow.location.pathname, pre = "/z/" + encodeURIComponent(this.id) + "/", k = pn.indexOf(pre);
+        if (k >= 0) return pn.slice(k + pre.length).split("/").map(dec).join("/");
+      } catch (e) {}
+      return null;
+    },
+    loaded(fr) {
+      if (!fr.isConnected) return;
+      let doc = null; try { doc = fr.contentDocument; } catch (e) {}
+      if (!doc || !doc.documentElement || (fr.getAttribute("src") === null && !fr.srcdoc)) return;
+      const actual = this.sw() ? this.framePath(fr) : this.pending;
+      if (actual === null) return;
+      if (this.pending === null && this.cur && actual !== this.cur) this.stack.push(this.cur); // a link we didn't catch
+      this.cur = actual; this.pending = null;
+      this.style(doc);
+      const x = LIB.find((d) => d.id === this.id);
+      const t = (doc.title || "").trim() || (x && x.name) || "";
+      const te = $("#ztitle"); if (te) te.textContent = t;
+      if (x) { x.lastPath = actual; x.lastTitle = t; x.opened = now(); clearTimeout(this.saveT); this.saveT = setTimeout(saveLib, 800); }
+      doc.addEventListener("click", (ev) => this.click(ev, doc), true);
+      for (const m of doc.querySelectorAll("video,audio")) { m.setAttribute("controls", ""); m.setAttribute("playsinline", ""); m.removeAttribute("autoplay"); m.setAttribute("preload", "metadata"); }
+      const b = $("[data-act=zr-back]"); if (b) b.classList.toggle("on", this.stack.length > 0);
+      this.msg(""); fr.classList.add("ready");
+    },
+    style(doc) {
+      const z = PR.zScale || 1, dark = PR.zDark !== false, night = PR.theme === "night";
+      let css = "html{-webkit-text-size-adjust:100%;min-height:100%}body{zoom:" + z + ";overflow-wrap:break-word}img,video{max-width:100%;height:auto}table{max-width:100%}pre{white-space:pre-wrap}";
+      if (night) css += "html{background:#fff;filter:invert(1) sepia(1) saturate(5) hue-rotate(-50deg) brightness(.8)}";
+      else if (dark) css += "html{background:#fff;filter:invert(1) hue-rotate(180deg)}img,video,picture,canvas,svg image,iframe,[style*='background-image']{filter:invert(1) hue-rotate(180deg)}";
+      let s = doc.getElementById("havyn-zr");
+      if (!s) { s = doc.createElement("style"); s.id = "havyn-zr"; (doc.head || doc.documentElement).appendChild(s); }
+      s.textContent = css;
+    },
+    restyle() { const fr = $("#zframe"); try { if (fr && fr.contentDocument) this.style(fr.contentDocument); } catch (e) {} },
+    click(ev, doc) {
+      const a = ev.target.closest && ev.target.closest("a[href]"); if (!a) return;
+      const raw = a.getAttribute("href") || "";
+      if (raw.startsWith("#")) {
+        ev.preventDefault();
+        const name = dec(raw.slice(1)), el = name && (doc.getElementById(name) || doc.getElementsByName(name)[0]);
+        if (el) el.scrollIntoView({ block: "start" });
+        return;
+      }
+      ev.preventDefault();
+      let tgt = null;
+      if (a.dataset.zx) tgt = { ext: a.dataset.zx };
+      else if (a.dataset.zp !== undefined) tgt = { p: a.dataset.zp, h: a.dataset.zh || "" };
+      else {
+        try {
+          const u = new URL(a.href), pre = new URL(this.url(this.id, ""), location.href);
+          if (u.origin === location.origin && u.pathname.startsWith(pre.pathname)) tgt = { p: u.pathname.slice(pre.pathname.length).split("/").map(dec).join("/"), h: u.hash };
+          else tgt = { ext: u.href };
+        } catch (e) { return; }
+      }
+      if (tgt.ext) { if (/^https?:/i.test(tgt.ext) && navigator.onLine) window.open(tgt.ext, "_blank", "noopener"); else toast("That link goes to the internet"); return; }
+      if (tgt.p === this.cur && tgt.h) { const el = doc.getElementById(dec(tgt.h.slice(1))); if (el) el.scrollIntoView({ block: "start" }); return; }
+      this.go(tgt.p, tgt.h);
+    },
+    // PDFs inside archives open in HAVYN's PDF reader (copied into the library once).
+    async savePdf(a, d) {
+      const name = (d.title || d.url).replace(/\.pdf$/i, "").split("/").pop().slice(0, 140) || "Document";
+      let x = LIB.find((p) => typeOf(p) === "pdf" && p.fromZim === this.id + "|" + d.index);
+      if (!x) {
+        const blob = await a.blobOf(d, "application/pdf");
+        if (!(await roomFor(blob.size))) { this.msg("Not enough space to open this PDF."); return; }
+        const id = uid();
+        if (!(await Store.set("pdf:" + id, blob))) { this.msg("Couldn't save this PDF."); return; }
+        x = { id, name, size: blob.size, added: now(), pages: 0, lastPage: 1, fromZim: this.id + "|" + d.index };
+        LIB.push(x); await saveLib(); toast("Saved to your library");
+      }
+      go("#/library/" + x.id);
+    },
+    revoke() { for (const u of this.urls) URL.revokeObjectURL(u); this.urls = []; this.amap = new Map(); },
+    blobUrl(b) { const u = URL.createObjectURL(b); this.urls.push(u); return u; },
+    async asset(a, p) {
+      if (this.amap.has(p)) return this.amap.get(p);
+      const job = (async () => {
+        let d = await a.byPath(p); if (!d) return "";
+        d = await a.resolve(d); if (!d || d.special) return "";
+        return this.blobUrl(await a.blobOf(d, a.mimeOf(d)));
+      })().catch(() => "");
+      this.amap.set(p, job); return job;
+    },
+    async css(a, text, base, depth) {
+      const refs = new Map(), re = /url\(\s*(['"]?)([^'")]+)\1\s*\)|@import\s+(['"])([^'"]+)\3/g;
+      let m; while ((m = re.exec(text))) { const r = (m[2] || m[4] || "").trim(); if (r && !/^(data|blob):/i.test(r) && !refs.has(r)) refs.set(r, null); }
+      for (const r of refs.keys()) {
+        const t = this.resolveRef(r, base);
+        if (!t || t.ext) { refs.set(r, ""); continue; }
+        if (/@import/.test(text) && depth < 2 && /\.css$/i.test(t.p)) {
+          try { let d = await a.byPath(t.p); d = d && (await a.resolve(d)); if (d && a.mimeOf(d).startsWith("text/css")) { const inner = await this.css(a, await a.text(d), this.base(t.p), depth + 1); refs.set(r, this.blobUrl(new Blob([inner], { type: "text/css" }))); continue; } } catch (e) {}
+        }
+        refs.set(r, await this.asset(a, t.p));
+      }
+      return text.replace(re, (all, q1, u1, q2, u2) => { const r = (u1 || u2 || "").trim(), v = refs.get(r); if (v === undefined || v === null) return all; return u1 !== undefined ? "url(" + JSON.stringify(v) + ")" : '@import "' + v + '"'; });
+    },
+    base(p) { return "https://zim.invalid/" + String(p).split("/").map(encodeURIComponent).join("/"); },
+    resolveRef(ref, base) {
+      try { const u = new URL(ref, base); if (u.origin !== "https://zim.invalid") return { ext: u.href }; return { p: u.pathname.slice(1).split("/").map(dec).join("/"), h: u.hash }; } catch (e) { return null; }
+    },
+    async renderDoc(fr, path, hash, tk) {
+      try {
+        const a = await this.archive(this.id);
+        let d = path ? await a.byPath(path) : await a.mainEntry();
+        if (d) d = await a.resolve(d);
+        if (tk !== this.token) return;
+        if (!d) { this.pending = path; fr.srcdoc = '<!doctype html><meta charset="utf-8"><body style="font:17px -apple-system,sans-serif;padding:24px"><h3>Not in this archive</h3><p>' + esc(path) + "</p></body>"; return; }
+        path = a.pathOf(d);
+        const mime = a.mimeOf(d);
+        this.revoke();
+        const base = this.base(path);
+        let html;
+        if (mime.startsWith("text/html")) {
+          const doc = new DOMParser().parseFromString(await a.text(d), "text/html");
+          doc.querySelectorAll("script,noscript,iframe,frame,object,embed,base,meta[http-equiv],link[rel~=preload],link[rel~=prefetch],link[rel~=manifest],link[rel~=icon],form").forEach((n) => n.remove());
+          doc.querySelectorAll("*").forEach((el) => { for (const at of Array.from(el.attributes)) if (/^on/i.test(at.name) || /^\s*javascript:/i.test(at.value)) el.removeAttribute(at.name); });
+          const jobs = [];
+          const src = (el, at) => { const t = this.resolveRef(el.getAttribute(at), base); if (!t || t.ext) { el.removeAttribute(at); return; } jobs.push(this.asset(a, t.p).then((u) => { if (u) el.setAttribute(at, u); else el.removeAttribute(at); })); };
+          doc.querySelectorAll("img[src],source[src],video[src],audio[src],track[src]").forEach((el) => src(el, "src"));
+          doc.querySelectorAll("video[poster]").forEach((el) => src(el, "poster"));
+          doc.querySelectorAll("[srcset]").forEach((el) => { if (el.tagName === "IMG") el.removeAttribute("srcset"); else el.remove(); });
+          doc.querySelectorAll("link[rel~=stylesheet][href]").forEach((el) => {
+            const t = this.resolveRef(el.getAttribute("href"), base);
+            if (!t || t.ext) { el.remove(); return; }
+            jobs.push((async () => { let e = await a.byPath(t.p); e = e && (await a.resolve(e)); const s = doc.createElement("style"); s.textContent = e ? await this.css(a, await a.text(e), this.base(t.p), 0) : ""; el.replaceWith(s); })().catch(() => el.remove()));
+          });
+          doc.querySelectorAll("style").forEach((el) => jobs.push(this.css(a, el.textContent, base, 0).then((c) => { el.textContent = c; })));
+          doc.querySelectorAll("a[href]").forEach((el) => {
+            const raw = el.getAttribute("href"); if (raw.startsWith("#")) return;
+            const t = this.resolveRef(raw, base); if (!t) return;
+            if (t.ext) el.dataset.zx = t.ext; else { el.dataset.zp = t.p; if (t.h) el.dataset.zh = t.h; }
+          });
+          await Promise.all(jobs);
+          if (!doc.querySelector("meta[name=viewport]")) { const mv = doc.createElement("meta"); mv.name = "viewport"; mv.content = "width=device-width, initial-scale=1"; doc.head.prepend(mv); }
+          html = "<!doctype html>" + doc.documentElement.outerHTML;
+        } else if (/^(image|video|audio)\//.test(mime)) {
+          const u = this.blobUrl(await a.blobOf(d, mime));
+          html = '<!doctype html><meta name="viewport" content="width=device-width"><body style="margin:0;background:#000;display:grid;place-items:center;min-height:100vh">' +
+            (mime.startsWith("image/") ? '<img style="max-width:100%" src="' + u + '">' : mime.startsWith("video/") ? '<video controls playsinline style="max-width:100%" src="' + u + '"></video>' : '<audio controls src="' + u + '"></audio>') + "</body>";
+        } else html = '<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width"><pre style="white-space:pre-wrap;font:15px ui-monospace,monospace;padding:14px">' + esc((await a.text(d)).slice(0, 400000)) + "</pre>";
+        if (tk !== this.token) return;
+        this.pending = path;
+        fr.srcdoc = html;
+        if (hash) setTimeout(() => { try { const el = fr.contentDocument.getElementById(dec(hash.slice(1))); if (el) el.scrollIntoView({ block: "start" }); } catch (e) {} }, 120);
+      } catch (e) { if (tk === this.token) this.msg(e && e.message ? e.message : "Couldn't open that page."); }
+    },
+    async random(id) {
+      try { const a = await this.archive(id), d = await a.random(); if (d) go(zHref(id, a.pathOf(d))); else toast("No articles to pick from"); }
+      catch (e) { toast(e && e.message ? e.message : "Couldn't open this archive"); }
+    },
+    async search(id, q, box) {
+      const tk = (this.stoken = (this.stoken || 0) + 1);
+      if (!box) return;
+      if (!String(q || "").trim()) { box.innerHTML = ""; return; }
+      try {
+        const a = await this.archive(id), res = await a.search(q, 30);
+        if (tk !== this.stoken) return;
+        box.innerHTML = res.length ? res.map((r) => li(zHref(id, r.path), "book", r.title, r.redirect ? "Redirect" : "")).join("") : '<div class="empty">No titles start with that. Try fewer letters or another spelling.</div>';
+      } catch (e) { if (tk === this.stoken) box.innerHTML = '<div class="empty">' + esc(e && e.message ? e.message : "Search failed") + "</div>"; }
     }
-    await saveLib(); requestPersist();
-    if (n) { Snd.chime("save"); toast(n === 1 ? "PDF saved on this phone" : n + " PDFs saved on this phone"); }
+  };
+
+  /* video and audio */
+  function renderMedia(x) {
+    const v = typeOf(x) === "video";
+    let h = backbar("#/library", v ? "Video" : "Audio");
+    h += '<section class="glass panel media">' + (v ? '<video id="mplayer" controls playsinline preload="metadata"></video>' : '<div class="aud">' + ic("music") + '</div><audio id="mplayer" controls preload="metadata"></audio>') +
+      '<div class="mtitle">' + esc(x.name) + '</div><div class="sub mono" style="font-size:.78rem;color:var(--mute)">' + esc([sz(x.size), x.dur ? clock(x.dur) : "", x.mime || ""].filter(Boolean).join(" · ")) + '</div><div id="mmsg" class="empty"></div></section>';
+    h += '<div class="btnrow"><button class="btn ghost" data-act="m-skip" data-s="-15">Back 15 s</button><button class="btn ghost" data-act="m-skip" data-s="30">Forward 30 s</button></div>';
+    h += '<div class="btnrow" style="margin-top:16px"><button class="btn ghost danger" data-act="lib-del" data-id="' + esc(x.id) + '">Delete from this phone</button></div>';
+    return h;
+  }
+  const Media = {
+    id: null, url: "", saveT: 0,
+    async mount(id) {
+      const el = $("#mplayer"); if (!el) return;
+      if (this.id !== id) this.close();
+      this.id = id;
+      const x = LIB.find((d) => d.id === id), blob = await Store.get("media:" + id);
+      if (!blob) { const m = $("#mmsg"); if (m) m.textContent = "This file is missing on this phone. Add it again."; return; }
+      if (!this.url) this.url = URL.createObjectURL(blob);
+      if (!el.isConnected) return;
+      el.addEventListener("loadedmetadata", () => { if (!x) return; x.dur = el.duration || 0; if (x.pos > 5 && x.pos < el.duration - 5) el.currentTime = x.pos; }, { once: true });
+      const keep = () => { if (!x) return; x.pos = el.currentTime || 0; x.opened = now(); clearTimeout(this.saveT); this.saveT = setTimeout(saveLib, 1500); };
+      el.addEventListener("timeupdate", keep);
+      el.addEventListener("pause", () => { keep(); saveLib(); });
+      el.addEventListener("error", () => { const m = $("#mmsg"); if (m) m.textContent = "This phone can't play this file's format. MP4 (H.264) video and M4A or MP3 audio play on every iPhone."; });
+      el.src = this.url;
+    },
+    skip(s) { const el = $("#mplayer"); if (el && el.duration) el.currentTime = Math.max(0, Math.min(el.duration - 0.5, el.currentTime + s)); },
+    close() { const el = $("#mplayer"); if (el) { try { el.pause(); } catch (e) {} } if (this.url) { URL.revokeObjectURL(this.url); this.url = ""; } this.id = null; }
+  };
+
+  /* import: one button for every kind of file; the type comes from the file's contents */
+  async function roomFor(bytes) {
+    try { if (navigator.storage && navigator.storage.estimate) { const e = await navigator.storage.estimate(); if (e && e.quota) return e.quota - (e.usage || 0) > bytes * 1.02 + 5e6; } } catch (e) {}
+    return true;
+  }
+  const VEXT = ["mp4", "m4v", "mov", "webm", "mkv", "3gp"], AEXT = ["mp3", "m4a", "m4b", "aac", "wav", "ogg", "oga", "opus", "flac", "caf"];
+  const MIMES = { mp4: "video/mp4", m4v: "video/mp4", mov: "video/quicktime", webm: "video/webm", mkv: "video/x-matroska", "3gp": "video/3gpp", mp3: "audio/mpeg", m4a: "audio/mp4", m4b: "audio/mp4", aac: "audio/aac", wav: "audio/wav", ogg: "audio/ogg", oga: "audio/ogg", opus: "audio/ogg", flac: "audio/flac", caf: "audio/x-caf" };
+  async function sniff(f) {
+    let h = new Uint8Array(0); try { h = new Uint8Array(await f.slice(0, 16).arrayBuffer()); } catch (e) {}
+    if (h[0] === 0x5A && h[1] === 0x49 && h[2] === 0x4D && h[3] === 0x04) return "zim";
+    try { if ((await f.slice(0, 1024).text()).includes("%PDF-")) return "pdf"; } catch (e) {}
+    const t = (f.type || "").toLowerCase(), ext = (String(f.name).split(".").pop() || "").toLowerCase();
+    if (AEXT.includes(ext) || (t.startsWith("audio/") && !VEXT.includes(ext))) return "audio";
+    if (VEXT.includes(ext) || t.startsWith("video/")) return "video";
+    return "";
+  }
+  async function toDataUrl(fav) {
+    let s = ""; for (let i = 0; i < fav.bytes.length; i++) s += String.fromCharCode(fav.bytes[i]);
+    return "data:" + fav.mime.split(";")[0] + ";base64," + btoa(s);
+  }
+  async function addZim(blob, fileName, say) {
+    say("Checking " + fileName + "…");
+    let info, fav = "";
+    try { const Z = await ZR.lib(); const a = await Z.Archive.open(blob); info = await a.info(); const f = await a.favicon().catch(() => null); if (f) fav = await toDataUrl(f); }
+    catch (e) { toast(fileName + ": " + (e && e.message ? e.message : "not a readable archive")); return false; }
+    if (LIB.some((x) => typeOf(x) === "zim" && x.uuid === info.uuid)) { toast(info.title + " is already on this phone"); return false; }
+    if (!(await roomFor(blob.size))) { toast("Not enough space for " + info.title + " (" + sz(blob.size) + ")"); return false; }
+    say("Saving " + info.title + " (" + sz(blob.size) + ") to this phone. Keep HAVYN open…");
+    const id = uid();
+    if (!(await Store.set("zim:" + id, blob))) { toast("Couldn't save " + info.title + ". The phone may be out of space."); return false; }
+    LIB.push({ id, type: "zim", name: info.title, file: fileName, size: blob.size, added: now(), uuid: info.uuid, date: info.date, lang: info.language, desc: info.description,
+      articles: info.articles, media: info.media, main: info.main, mainTitle: info.mainTitle, fav, needsScripts: info.needsScripts, search: info.titleSearch, flavour: info.flavour, zname: info.name, creator: info.creator });
+    return true;
+  }
+  async function addPdf(f, say) {
+    say("Saving " + f.name + "…");
+    if (!(await roomFor(f.size))) { toast("Not enough space for " + f.name); return false; }
+    const id = uid();
+    if (!(await Store.set("pdf:" + id, f))) { toast("Not enough space for " + f.name); return false; }
+    LIB.push({ id, name: f.name.replace(/\.pdf$/i, "").slice(0, 140) || "Untitled", file: String(f.name).slice(0, 200), size: f.size, added: now(), pages: 0, lastPage: 1 });
+    return true;
+  }
+  async function addMedia(f, kind, say) {
+    say("Saving " + f.name + " (" + sz(f.size) + ")…");
+    if (!(await roomFor(f.size))) { toast("Not enough space for " + f.name); return false; }
+    const ext = (String(f.name).split(".").pop() || "").toLowerCase(), mime = f.type || MIMES[ext] || (kind === "video" ? "video/mp4" : "audio/mpeg");
+    const blob = f.type ? f : new Blob([f], { type: mime });
+    const id = uid();
+    if (!(await Store.set("media:" + id, blob))) { toast("Not enough space for " + f.name); return false; }
+    LIB.push({ id, type: kind, name: f.name.replace(/\.[A-Za-z0-9]{2,4}$/, "").slice(0, 140) || "Untitled", size: f.size, added: now(), mime, pos: 0, dur: 0 });
+    return true;
+  }
+  let importing = false;
+  async function importFiles(files) {
+    files = Array.from(files || []); if (!files.length || importing) return;
+    importing = true;
+    const say = (m) => { const e = $("#libmsg"); if (e) e.textContent = m; const b = $("#libbar"); if (b) b.classList.toggle("hide", !m); };
+    let n = 0;
+    try {
+      const groups = new Map(), singles = [];
+      for (const f of files) { const m = /^(.*\.zim)a[a-z]$/i.exec(f.name); if (m) { const k = m[1].toLowerCase(); if (!groups.has(k)) groups.set(k, []); groups.get(k).push(f); } else singles.push(f); }
+      for (const [, parts] of groups) { parts.sort((a, b) => (a.name < b.name ? -1 : 1)); if (await addZim(new Blob(parts), parts[0].name.replace(/a[a-z]$/i, ""), say)) n++; }
+      for (const f of singles) {
+        const kind = await sniff(f);
+        if (kind === "zim") { if (await addZim(f, f.name, say)) n++; }
+        else if (kind === "pdf") { if (await addPdf(f, say)) n++; }
+        else if (kind) { if (await addMedia(f, kind, say)) n++; }
+        else toast(f.name + ": HAVYN reads ZIM archives, PDFs, video and audio");
+      }
+      await saveLib(); requestPersist();
+    } finally { importing = false; say(""); }
+    if (n) { Snd.chime("save"); toast(n === 1 ? "Saved on this phone" : n + " files saved on this phone"); }
+    PdfIndex.kick();
     render();
   }
-  async function deletePdf(id) {
-    await PdfV.close(); await Store.del("pdf:" + id);
+  async function deleteItem(id) {
+    const x = LIB.find((d) => d.id === id); if (!x) return;
+    const t = typeOf(x);
+    if (t === "pdf") await PdfV.close();
+    if (t === "zim") ZR.drop(id);
+    if (t === "video" || t === "audio") Media.close();
+    await Store.del(KEY[t] + id); await Store.del("ptext:" + id);
     LIB = LIB.filter((d) => d.id !== id); await saveLib(); toast("Deleted from this phone"); go("#/library");
   }
   async function libQuota() {
     const el = $("#libq"); if (!el || !navigator.storage || !navigator.storage.estimate) return;
     try {
       const e = await navigator.storage.estimate(), kept = navigator.storage.persisted ? await navigator.storage.persisted() : false;
-      el.textContent = "Storage: " + mb(e.usage || 0) + " used of " + mb(e.quota || 0) + (kept ? " · kept safe from cleanup" : "");
+      el.textContent = "Storage: " + sz(e.usage || 0) + " used · about " + sz(Math.max(0, (e.quota || 0) - (e.usage || 0))) + " more allowed" + (kept ? " · kept safe from cleanup" : "");
     } catch (e) {}
   }
+
+  /* PDF text, extracted once in the background so Search can find words inside PDFs */
+  const PdfIndex = {
+    busy: false,
+    kick() { if (!this.busy) setTimeout(() => this.run(), 1500); },
+    async run() {
+      if (this.busy) return; this.busy = true;
+      try {
+        for (;;) {
+          const x = LIB.find((d) => typeOf(d) === "pdf" && !d.indexed && !d.noText && (d.size || 0) < 150e6);
+          if (!x) break;
+          await this.one(x);
+        }
+      } finally { this.busy = false; }
+    },
+    async one(x) {
+      let doc = null;
+      try {
+        const blob = await Store.get("pdf:" + x.id); if (!blob) { x.noText = true; return; }
+        const lib = await PdfV.engine();
+        doc = await lib.getDocument({ data: new Uint8Array(await blob.arrayBuffer()), useWorkerFetch: false, useWasm: false, isEvalSupported: false, verbosity: 0 }).promise;
+        const pages = [];
+        for (let n = 1; n <= doc.numPages; n++) {
+          const tc = await (await doc.getPage(n)).getTextContent();
+          pages.push(tc.items.map((it) => it.str).join(" ").replace(/\s+/g, " ").trim());
+          if (n % 8 === 0) await new Promise((r) => setTimeout(r, 30));
+        }
+        const chars = pages.reduce((a, p) => a + p.length, 0);
+        if (chars < 20) { x.noText = true; } else { await Store.set("ptext:" + x.id, pages); x.indexed = true; }
+        x.pages = doc.numPages;
+      } catch (e) { x.noText = true; }
+      finally { if (doc) try { doc.destroy(); } catch (e) {} await saveLib(); }
+    }
+  };
+
+  /* SEARCH: one box over HAVYN, your household, the library and every archive */
+  const fold = (s) => String(s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+  let IDX = null;
+  function localIndex() {
+    if (IDX) return IDX;
+    // w: tie-break weight, so life-safety content ranks above shopping and catalog entries.
+    const out = [], add = (kind, icon, title, text, href, w) => out.push({ kind, icon, title, text: String(text || ""), href, w: w || 0, ft: fold(title), fx: fold(title + " \n " + text) });
+    for (const c of C.cards) add("Emergency card", c.icon, c.title, [c.sub].concat(c.steps.map((s) => s.t + ". " + (s.d || "")), c.note || "").join(" "), "#/emergency/" + c.id, 8);
+    for (const p of C.playbooks) add("Playbook", p.icon, p.title, [p.sub, p.trigger].concat(p.leave || [], ...(p.phases || []).map((ph) => ph.items.map((it) => it.t + ". " + (it.d || "")))).join(" "), "#/playbooks/" + p.id, 6);
+    for (const n of C.numbers) add("Phone number", "phone", n.n, n.num + " " + (n.d || ""), "#/comms", 5);
+    for (const r of C.comms.ladder) add("Comms", "radio", r.rung + ": " + r.t, [r.when, r.range, r.d].join(" "), "#/comms", 2);
+    for (const r of C.comms.rules) add("Comms rule", "radio", r.t, r.d, "#/comms", 2);
+    for (const s of C.plan.stages) add("Plan", "flag", s.t, s.d, "#/plan", 1);
+    for (const r of C.plan.heat) add("Heat rule", "sun", r.t, r.d, "#/plan", 3);
+    for (const r of C.plan.power) add("Power", "bolt", r.n, [r.cap, r.runs].join(" "), "#/plan", 1);
+    for (const ph of C.missions.phases) for (const t of ph.tasks) add("Mission · " + ph.label, "check", t.t, t.d || "", "#/missions", 1);
+    for (const t of C.missions.recurring) add("Upkeep", "check", t.t, t.d || "", "#/missions", 1);
+    for (const b of C.buy.items) add("Buy list", "cart", b.n, [b.pick, b.why, b.note].join(" "), "#/buy/" + b.id, 0);
+    if (C.archive) for (const a of C.archive.items) add("Get more", a.kind === "app" ? "download" : a.kind === "video" ? "film" : "globe", a.t, [a.d, a.tier].join(" "), "#/archive?t=" + a.tier, 0);
+    IDX = out; return out;
+  }
+  function liveIndex() {
+    const out = [], add = (kind, icon, title, text, href, w) => out.push({ kind, icon, title: title || "", text: String(text || ""), href, w: w || 0, ft: fold(title), fx: fold(title + " \n " + text) });
+    for (const p of L("people")) add("Family", "people", p.name || "Unnamed", [p.conditions, p.meds, p.allergies, p.blood, p.doctor, p.device, p.notes].filter(Boolean).join(" · "), "#/family/person/" + p.id, 4);
+    for (const p of L("pets")) add("Pet", "paw", p.name || "Pet", [p.species, p.notes].filter(Boolean).join(" · "), "#/family", 3);
+    for (const it of L("items")) add("Supplies", RES[it.category] ? RES[it.category].icon : "box", it.name || "Item", [it.location, it.notes, it.owner].filter(Boolean).join(" · "), "#/supplies/item/" + it.id, 3);
+    for (const x of LIB) add("Library", typeOf(x) === "zim" ? "globe" : typeOf(x) === "pdf" ? "file" : typeOf(x) === "video" ? "film" : "music", x.name, [x.desc, x.file].filter(Boolean).join(" "), "#/library/" + x.id, 2);
+    return out;
+  }
+  function snippet(text, words) {
+    const ft = fold(text); let i = -1;
+    for (const w of words) { i = ft.indexOf(w); if (i >= 0) break; }
+    if (i < 0) return text.slice(0, 120);
+    let s = Math.max(0, i - 50); const e = Math.min(text.length, i + 90);
+    if (s > 0) { const sp = text.indexOf(" ", s); if (sp > -1 && sp < i) s = sp + 1; }
+    return (s ? "…" : "") + text.slice(s, e).trim() + (e < text.length ? "…" : "");
+  }
+  function scoreDoc(d, q, words) {
+    for (const w of words) if (!d.fx.includes(w)) return 0;
+    let s = 1;
+    if (d.ft === q) s += 40; else if (d.ft.startsWith(q)) s += 25; else if (d.ft.includes(q)) s += 15;
+    for (const w of words) { if (d.ft.includes(w)) s += 5; if (new RegExp("(^|[^a-z0-9])" + w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).test(d.ft)) s += 3; }
+    return s + d.w;
+  }
+  function hitRow(href, icon, title, kind, snip) {
+    return '<a class="li hit" href="' + esc(href) + '"><span class="ic">' + ic(icon) + '</span><span class="tx"><b>' + esc(title) + '</b><small class="hk">' + esc(kind) + "</small>" + (snip ? '<span class="snip">' + esc(snip) + "</span>" : "") + "</span>" + ic("chev") + "</a>";
+  }
+  function renderSearch() {
+    const q = route.q.q || "";
+    let h = backbar("#/guides", "Search everything");
+    h += '<form data-form="search" class="zs"><input id="sq" name="q" type="search" enterkeyhint="search" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Water, CPR, scorpion, generator…" aria-label="Search everything" value="' + esc(q) + '"></form>';
+    if (hubUrl()) h += '<div class="btnrow" style="margin-top:8px"><a class="btn ghost sm" href="' + esc(hubUrl()) + '" target="_blank" rel="noopener">' + ic("server") + "Full-text search on the home library</a></div>";
+    h += '<div id="sres" style="margin-top:10px"></div>';
+    return h;
+  }
+  const SearchUI = {
+    token: 0, t: 0,
+    mount() { const i = $("#sq"); if (!i) return; if (!i.value) setTimeout(() => { try { i.focus(); } catch (e) {} }, 60); this.run(i.value); },
+    later(q) { clearTimeout(this.t); this.t = setTimeout(() => this.run(q), 160); },
+    async run(q) {
+      const tk = ++this.token, box = $("#sres"); if (!box) return;
+      try { history.replaceState(null, "", "#/search" + (q ? "?q=" + encodeURIComponent(q) : "")); lastPath = location.hash; } catch (e) {}
+      const fq = fold(q).trim(); const words = fq.split(/\s+/).filter((w) => w.length > 0);
+      if (!fq) { box.innerHTML = '<p class="empty">Searches the emergency cards, playbooks, plan, phone numbers, missions, buy list, your family and supplies, words inside your PDFs, and the titles in every archive on this phone. Everything works with no internet.</p>'; return; }
+      const docs = localIndex().concat(liveIndex()).map((d) => ({ d, s: scoreDoc(d, fq, words) })).filter((x) => x.s > 0).sort((a, b) => b.s - a.s).slice(0, 25);
+      let h = '<div class="sec"><span class="lab">In HAVYN</span><span class="mono" style="color:var(--mute);font-size:.8rem">' + docs.length + "</span></div>";
+      h += docs.length ? '<div class="list">' + docs.map((x) => hitRow(x.d.href, x.d.icon, x.d.title, x.d.kind, x.d.ft.includes(fq) ? "" : snippet(x.d.text, words))).join("") + "</div>" : '<div class="empty">Nothing in the cards, plan or your records.</div>';
+      h += '<div id="spdf"></div>';
+      const zims = LIB.filter((x) => typeOf(x) === "zim" && x.search !== false);
+      for (const z of zims) h += '<div id="sz-' + esc(z.id) + '"></div>';
+      if (!zims.length) h += '<div class="sec"><span class="lab">Archives</span></div><div class="empty">No archives on this phone yet. <a href="#/archive">Get Wikipedia, WikiMed and more</a>.</div>';
+      box.innerHTML = h;
+      // PDF text
+      const pdfs = LIB.filter((x) => typeOf(x) === "pdf" && x.indexed);
+      const phits = [];
+      for (const x of pdfs) {
+        const pages = await Store.get("ptext:" + x.id); if (tk !== this.token) return;
+        if (!Array.isArray(pages)) continue;
+        let k = 0;
+        for (let i = 0; i < pages.length && k < 3; i++) { const f = fold(pages[i]); if (words.every((w) => f.includes(w))) { phits.push({ x, page: i + 1, snip: snippet(pages[i], words) }); k++; } }
+      }
+      const pe = $("#spdf");
+      if (pe && (phits.length || pdfs.length)) pe.innerHTML = '<div class="sec"><span class="lab">Inside your PDFs</span><span class="mono" style="color:var(--mute);font-size:.8rem">' + phits.length + "</span></div>" + (phits.length ? '<div class="list">' + phits.slice(0, 15).map((r) => hitRow("#/library/" + r.x.id + "?page=" + r.page, "file", r.x.name, "Page " + r.page, r.snip)).join("") + "</div>" : '<div class="empty">No PDF pages contain all of those words.</div>');
+      // archive titles, one archive at a time so the first results show quickly
+      for (const z of zims) {
+        if (tk !== this.token) return;
+        const el = $("#sz-" + z.id); if (!el) continue;
+        el.innerHTML = '<div class="sec"><span class="lab">' + esc(z.name) + '</span><span class="mono" style="color:var(--mute);font-size:.8rem">…</span></div>';
+        try {
+          const a = await ZR.archive(z.id), res = await a.search(q, 8);
+          if (tk !== this.token) return;
+          el.innerHTML = '<div class="sec"><span class="lab">' + esc(z.name) + '</span><span class="mono" style="color:var(--mute);font-size:.8rem">' + res.length + (res.length === 8 ? "+" : "") + "</span></div>" +
+            (res.length ? '<div class="list">' + res.map((r) => hitRow(zHref(z.id, r.path), "book", r.title, "Article", "")).join("") + '</div>' + (res.length === 8 ? '<div class="btnrow" style="margin-top:6px"><a class="btn ghost sm" href="#/library/' + esc(z.id) + '">More in ' + esc(z.name) + "</a></div>" : "") : '<div class="empty">No titles start with that.</div>');
+        } catch (e) { el.innerHTML = '<div class="sec"><span class="lab">' + esc(z.name) + '</span></div><div class="empty">' + esc(e && e.message ? e.message : "Couldn't search this archive") + "</div>"; }
+      }
+    }
+  };
+
+  /* ---------------- GET MORE: the archive catalog, the vault drive kit and the home library ---------------- */
+  const KIWIX_DL = "https://download.kiwix.org/zim/";
+  const hubUrl = () => { const u = String((S.plan && S.plan.hub) || "").trim(); return /^https?:\/\/[^\s"'<>]{3,200}$/i.test(u) ? u : ""; };
+  function haveOnPhone(it) {
+    const stem = it.get && it.get.stem;
+    return LIB.find((x) => {
+      if (it.kind === "zim" && typeOf(x) === "zim") {
+        const zn = (x.zname || "") + (x.flavour ? "_" + x.flavour : "");
+        return !!stem && (zn === stem || (x.zname || "") === stem || String(x.file || "").startsWith(stem + "_"));
+      }
+      if (it.kind === "pdf" && typeOf(x) === "pdf") return !!(it.get && it.get.name) && (x.file === it.get.name || x.name === it.get.name.replace(/\.pdf$/i, ""));
+      return false;
+    }) || null;
+  }
+  function getLink(it) {
+    if (it.u) return it.u;
+    if (it.kind === "zim" || it.kind === "video") {
+      if (it.file && it.get && it.get.zim) return KIWIX_DL + it.get.zim + "/" + it.file;
+      if (it.get && it.get.stem) return "https://library.kiwix.org/#lang=eng&q=" + encodeURIComponent(it.get.stem);
+    }
+    if (it.get && it.get.url) return it.get.url;
+    if (it.get && it.get.gh) return "https://github.com/" + it.get.gh + "/releases/latest";
+    if (it.get && it.get.kx) return it.get.kx;
+    return "";
+  }
+  const sizeTxt = (it) => (it.size ? (it.est ? "~" : "") + sz(it.size) : "");
+  function getRow(it, tier) {
+    const have = tier === "phone" ? haveOnPhone(it) : null;
+    const marked = !!(S.checks.archive && S.checks.archive[it.id]);
+    const link = getLink(it);
+    const chips = [sizeTxt(it), it.kind === "app" ? "App Store" : it.kind === "ai" ? "AI" : it.kind === "soft" ? "Software" : it.kind === "video" ? "Video" : it.kind === "pdf" ? "PDF" : it.kind === "zim" ? "Archive" : "",
+      it.opens === "havyn" ? "Opens in HAVYN" : it.opens === "kiwix" ? "Needs Kiwix" : "", it.core ? "Core" : ""].filter(Boolean);
+    let h = '<div class="gi' + (have || marked ? " got" : "") + '" id="gi-' + esc(it.id) + '"><div class="gh"><b>' + esc(it.t) + '</b><span class="gc">' + chips.map((c) => '<span class="chip' + (c === "Core" ? " core" : "") + '">' + esc(c) + "</span>").join("") + "</span></div>" +
+      '<div class="gd">' + esc(it.d) + "</div>";
+    const btns = [];
+    if (have) btns.push('<a class="btn sm" href="#/library/' + esc(have.id) + '">' + ic("check") + "On this phone · open</a>");
+    else if (link && it.kind !== "hub" && it.kind !== "own") btns.push('<a class="btn sm' + (tier === "phone" || tier === "apps" ? "" : " ghost") + '" href="' + esc(link) + '" target="_blank" rel="noopener">' + ic("download") + (it.kind === "app" || (it.kind === "ai" && tier === "apps") ? "App Store" : tier === "drive" ? "Source" : "Download") + "</a>");
+    if (!have && tier !== "phone") btns.push('<label class="mk"><input type="checkbox" data-chk="archive|' + esc(it.id) + '"' + (marked ? " checked" : "") + "><span>" + (tier === "apps" ? "Installed" : tier === "drive" ? "On the drive" : "Set up") + "</span></label>");
+    if (!have && tier === "phone" && it.kind !== "own") btns.push('<label class="mk"><input type="checkbox" data-chk="archive|' + esc(it.id) + '"' + (marked ? " checked" : "") + "><span>Downloaded</span></label>");
+    if (btns.length) h += '<div class="gb">' + btns.join("") + "</div>";
+    return h + "</div>";
+  }
+  function renderArchive() {
+    const A = C.archive, t = ["phone", "apps", "drive", "hub"].includes(route.q.t) ? route.q.t : Get.tier;
+    Get.tier = t;
+    const items = A.items.filter((i) => i.tier === t), T = A.tiers.find((x) => x.id === t);
+    let h = backbar("#/library", "Get more");
+    h += '<div class="seg wide" style="margin:0 0 12px">' + A.tiers.map((x) => '<a href="#/archive?t=' + x.id + '"' + (x.id === t ? ' class="on"' : "") + ">" + esc(x.id === "hub" ? "HOME" : x.id.toUpperCase()) + "</a>").join("") + "</div>";
+    h += '<section class="glass hero"><div class="lab">' + esc(T.t) + " · checked " + esc(A.checked) + '</div><div class="sub" style="margin-top:6px">' + esc(T.d) + "</div>";
+    if (t === "phone") {
+      const core = items.filter((i) => i.core), cs = core.reduce((a, i) => a + (i.size || 0), 0), got = core.filter((i) => haveOnPhone(i)).length;
+      h += '<div class="num" style="margin-top:10px"><span class="big" style="font-size:2.4rem">' + got + "/" + core.length + '</span><span class="unit">CORE ON THIS PHONE · ' + sz(cs) + "</span></div>" +
+        '<div class="bar" style="margin:6px 0 4px"><i style="width:' + Math.round((got / Math.max(1, core.length)) * 100) + '%"></i></div><div class="sub mono" id="getq" style="font-size:.75rem"></div>' +
+        '<div class="btnrow" style="margin-top:12px"><a class="btn" href="#/library">' + ic("plus") + "Add downloaded files</a></div>";
+    }
+    if (t === "drive") {
+      const all = A.items.filter((i) => i.tier === "drive" || i.tier === "phone");
+      const core = all.filter((i) => i.core && i.get), cs = core.reduce((a, i) => a + (i.size || 0), 0), fs = all.filter((i) => i.get).reduce((a, i) => a + (i.size || 0), 0);
+      const marked = items.filter((i) => S.checks.archive && S.checks.archive[i.id]).length;
+      const cp = sz(cs).split(" ");
+      h += '<div class="num" style="margin-top:10px"><span class="big" style="font-size:2.6rem">~' + cp[0] + '</span><span class="unit">' + cp[1] + " CORE SET<br>~" + sz(fs) + " EVERYTHING</span></div>" +
+        '<div class="sub">' + marked + " of " + items.length + " marked on the drive. A 1 TB drive holds everything twice over.</div>";
+    }
+    h += "</section>";
+    if (t === "drive") {
+      h += '<section class="glass panel"><h3>Fill the drive tonight</h3>' +
+        '<div class="blk"><b>1 · Plug in the drive</b><span>A 1–2 TB USB SSD on a Mac or Windows PC. Format it exFAT and name it HAVYN-VAULT: Macs, PCs and iPhones can all read exFAT, and it holds files over 4 GB.</span></div>' +
+        '<div class="blk"><b>2 · Run one command</b><span>Mac or Linux, in Terminal:</span><code class="cmd">curl -fsSL ' + esc(Get.raw("get-vault.sh")) + " | bash -s -- /Volumes/HAVYN-VAULT</code>" +
+        "<span>Windows, in PowerShell (change E: to the drive's letter):</span><code class=\"cmd\">irm " + esc(Get.raw("get-vault.ps1")) + " -OutFile get-vault.ps1; powershell -ExecutionPolicy Bypass -File .\\get-vault.ps1 -Drive E:\\</code>" +
+        "<span>Add <b>--full</b> (Mac) or <b>-Full</b> (Windows) for everything instead of the core set.</span></div>" +
+        '<div class="blk"><b>3 · Leave it overnight</b><span>It downloads the newest copy of each item, resumes after any interruption, checks every archive against Kiwix\'s published checksum, and writes START-HERE.html on the drive. Run it again any time to finish or update.</span></div>' +
+        '<div class="btnrow" style="margin-top:6px"><a class="btn ghost sm" href="./vault/get-vault.sh" download>Save Mac script</a><a class="btn ghost sm" href="./vault/get-vault.ps1" download>Save Windows script</a></div>' +
+        '<p class="empty" style="font-size:.82rem;margin-top:8px">No computer? Download items one at a time from this page; in Safari\'s download prompt choose the drive in Files.</p></section>';
+    }
+    if (t === "hub") {
+      const u = hubUrl();
+      h += '<form class="glass panel" data-form="hub"><h3>Your home library address</h3>' + fld("hub", "Address", (S.plan && S.plan.hub) || "", { ph: "http://192.168.1.20:8080", hint: "Kiwix shows it (and a QR code) when you start its Hotspot. It works only on the same Wi-Fi." }) +
+        '<div class="btnrow"><button class="btn" type="submit">Save</button>' + (u ? '<a class="btn ghost" href="' + esc(u) + '" target="_blank" rel="noopener">' + ic("server") + "Open it</a>" : "") + "</div></form>";
+    }
+    if (t === "drive") {
+      const G = [["02", "Encyclopedias"], ["03", "Medical"], ["04", "Skills and repair"], ["05", "Video (opens in Kiwix)"], ["06", "Books"], ["07", "Offline AI"], ["08", "Software"], ["09", "Builder (optional)"]];
+      const ph = A.items.filter((i) => i.tier === "phone" && i.get);
+      h += '<p class="empty" style="font-size:.85rem">The drive also gets the phone set (' + ph.length + " items, ~" + sz(ph.reduce((a, i) => a + (i.size || 0), 0)) + "), so any phone can be refilled from it.</p>";
+      for (const [k, label] of G) {
+        const xs = items.filter((i) => String(i.dir || "").startsWith(k)).sort((a, b) => (b.core ? 1 : 0) - (a.core ? 1 : 0));
+        if (!xs.length) continue;
+        h += '<div class="sec"><span class="lab">' + esc(label) + '</span><span class="mono" style="color:var(--mute);font-size:.8rem">' + xs.length + " · ~" + sz(xs.reduce((a, i) => a + (i.size || 0), 0)) + '</span></div><div class="glist">' + xs.map((i) => getRow(i, t)).join("") + "</div>";
+      }
+    } else h += '<div class="glist">' + items.map((i) => getRow(i, t)).join("") + "</div>";
+    if (t === "apps") h += '<p class="empty" style="font-size:.85rem;margin-top:10px">HAVYN can\'t install apps for you: Apple allows App Store installs only. Bluetooth mesh chat (Bitchat) and satellite messaging stay in their own apps for the same reason.</p>';
+    h += '<p class="empty" style="font-size:.82rem;margin-top:12px">' + esc(A.note) + " Sources: " + srcRefs(["kiwix", "kiwixprep", "kiwixmirror", "kiwixapple", "webkitstore"]) + ".</p>";
+    return h;
+  }
+  const Get = {
+    tier: "phone",
+    raw: (f) => "https://raw.githubusercontent.com/hourglazlabs-x/havyn/main/vault/" + f,
+    async mount() {
+      const el = $("#getq"); if (!el || !navigator.storage || !navigator.storage.estimate) return;
+      try {
+        const e = await navigator.storage.estimate(), free = Math.max(0, (e.quota || 0) - (e.usage || 0));
+        const need = C.archive.items.filter((i) => i.tier === "phone" && i.core && !haveOnPhone(i)).reduce((a, i) => a + (i.size || 0), 0);
+        el.textContent = "HAVYN can use about " + sz(free) + " more on this phone" + (need ? " · the rest of the core set needs about " + sz(need) : " · core set complete");
+      } catch (e) {}
+    }
+  };
 
   // PDF reader: pdf.js renders pages to canvas on demand; pages far off screen are released to save memory.
   const PdfV = {
@@ -917,7 +1551,7 @@
         this.msg("");
         this.layout($("#pdfpages"));
         const meta = LIB.find((d) => d.id === id);
-        const start = Math.min(this.n, Math.max(1, (meta && meta.lastPage) || 1));
+        const start = Math.min(this.n, Math.max(1, Math.round(num(route.q.page)) || (meta && meta.lastPage) || 1));
         this.setNum(start); if (start > 1) this.go(start);
       } catch (e) {
         if (this.id !== id) return;
@@ -1215,7 +1849,7 @@
       '<div class="kv"><span>Installed to Home Screen</span><span>' + (isStandalone() ? "Yes" : "No") + "</span></div>" +
       '<div class="kv"><span>Offline copy</span><span id="swst">' + (PREVIEW ? "Preview: none" : navigator.serviceWorker && navigator.serviceWorker.controller ? "Saved for offline" : "Not yet: open once online") + "</span></div>" +
       '<div class="kv"><span>Storage</span><span id="stst">' + (Store.ok ? "On this phone" : "Temporary") + "</span></div>" +
-      '<div class="kv"><span>PDF library</span><span>' + LIB.length + (LIB.length === 1 ? " file" : " files") + " · " + mb(LIB.reduce((a, x) => a + (x.size || 0), 0)) + "</span></div>" +
+      '<div class="kv"><span>Library</span><span>' + esc(libSummary() || "Empty") + "</span></div>" +
       '<div class="kv"><span>Network use</span><span>None (blocked by policy)</span></div>' +
       '<div class="kv"><span>Version</span><span class="mono">' + esc(VERSION) + "</span></div>" +
       '<p class="empty" style="font-size:.85rem">Deleting the app icon deletes its data. Keep Memory Cards on another phone and the vault drive.</p></section>';
@@ -1374,7 +2008,13 @@
     else if (act === "pdf-zoom") PdfV.setZoom(num(b.dataset.z));
     else if (act === "pdf-dest") PdfV.dest(num(b.dataset.i));
     else if (act === "pdf-go") { const pn = $("#pdfpanel"); if (pn) pn.classList.add("hide"); PdfV.go(num(b.dataset.n)); }
-    else if (act === "pdf-del") { if (confirmTap(b, "pdfdel", "Tap again to delete")) deletePdf(b.dataset.id); }
+    else if (act === "lib-del") { if (confirmTap(b, "libdel" + b.dataset.id, "Tap again to delete")) deleteItem(b.dataset.id); }
+    else if (act === "zim-random") ZR.random(b.dataset.id);
+    else if (act === "zr-back") { if (ZR.back()) ev.preventDefault(); }
+    else if (act === "zr-size") { const Z = [1, 1.15, 1.3, 1.5, 0.9]; PR.zScale = Z[(Z.indexOf(PR.zScale || 1) + 1) % Z.length]; flush(); ZR.restyle(); toast("Text " + Math.round(PR.zScale * 100) + "%"); }
+    else if (act === "zr-dark") { PR.zDark = PR.zDark === false; flush(); b.classList.toggle("on", PR.zDark !== false); ZR.restyle(); }
+    else if (act === "m-skip") Media.skip(num(b.dataset.s));
+
     else if (act === "binder-pdf") { b.disabled = true; makeBinderPdf().catch((e) => { const m = $("#bdmsg"); if (m) m.textContent = "Couldn't make the PDF: " + (e && e.message ? e.message : e); }).finally(() => { b.disabled = false; }); }
     else if (act === "binder-share") shareBinder();
     else if (act === "binder-dl") downloadBinder();
@@ -1392,14 +2032,17 @@
     const t = ev.target;
     if (t.dataset && t.dataset.chk) {
       const [pid, k] = t.dataset.chk.split("|"); const c = Object.assign({}, S.checks); c[pid] = Object.assign({}, c[pid]); if (t.checked) c[pid][k] = now(); else delete c[pid][k];
-      S.checks = touch(c); save(); t.closest(".chk").classList.toggle("done", t.checked); if (t.checked) Snd.chime("nav"); return;
+      S.checks = touch(c); save();
+      const row = t.closest(".chk"); if (row) row.classList.toggle("done", t.checked);
+      const gi = t.closest(".gi"); if (gi) gi.classList.toggle("got", t.checked);
+      if (t.checked) Snd.chime("nav"); return;
     }
     if (t.dataset && t.dataset.task) {
       setTask(t.dataset.task, { done: t.checked, doneAt: t.checked ? now() : 0 });
       if (t.checked) Snd.chime("ok"); render(); return;
     }
     if (t.id === "mcfile") { await readCardFile(t.files && t.files[0]); t.value = ""; return; }
-    if (t.id === "pdffile") { const fs = Array.from(t.files || []); t.value = ""; await importPdfs(fs); return; }
+    if (t.id === "libfile") { const fs = Array.from(t.files || []); t.value = ""; await importFiles(fs); return; }
     if (t.dataset && t.dataset.photoFor) {
       const f = t.files && t.files[0]; if (!f) return;
       try { const url = await shrinkPhoto(f); const id = uid(); await Store.set("photo:" + id, url); const old = S.plan[t.dataset.photoFor + "Photo"]; if (old) Store.del("photo:" + old); const p = {}; p[t.dataset.photoFor + "Photo"] = id; setOne("plan", p); toast("Photo saved"); render(); } catch (e) { toast("Could not read that photo"); }
@@ -1407,6 +2050,12 @@
     }
     const form = t.closest && t.closest("form[data-form=item]");
     if (form && t.name === "category") { draft = { id: form.dataset.id || "", vals: formVals(form), fromBuy: draft && draft.fromBuy }; render(); }
+  });
+  let zqT = 0;
+  document.addEventListener("input", (ev) => {
+    const t = ev.target;
+    if (t.id === "sq") SearchUI.later(t.value);
+    else if (t.id === "zq") { clearTimeout(zqT); const id = t.closest("form").dataset.id; zqT = setTimeout(() => ZR.search(id, t.value, $("#zres")), 140); }
   });
   function formVals(f) { const o = {}; new FormData(f).forEach((v, k) => { o[k] = typeof v === "string" ? v.trim() : v; }); return o; }
   document.addEventListener("submit", (ev) => {
@@ -1440,6 +2089,14 @@
     } else if (kind === "pdfgo") {
       const n = Math.round(num(v.p)); const inp = f.querySelector("input"); if (inp) { inp.value = ""; inp.blur(); }
       if (n >= 1 && n <= PdfV.n) PdfV.go(n); else toast("Pages 1 to " + PdfV.n);
+    } else if (kind === "hub") {
+      const u = String(v.hub || "").trim().slice(0, 200);
+      if (u && !/^https?:\/\/[^\s"'<>]{3,200}$/i.test(u)) { toast("Use the full address, starting with http://"); return; }
+      setOne("plan", { hub: u }); toast(u ? "Home library saved" : "Home library cleared"); Snd.chime("ok"); render();
+    } else if (kind === "search") {
+      const inp = f.querySelector("input"); if (inp) inp.blur(); SearchUI.run(v.q || "");
+    } else if (kind === "zsearch") {
+      const inp = f.querySelector("input"); if (inp) inp.blur(); ZR.search(id, v.q || "", $("#zres"));
     } else if (kind === "pdffind") {
       const inp = f.querySelector("input"); if (inp) inp.blur(); PdfV.search(v.q);
     } else if (kind === "use") {
@@ -1462,7 +2119,7 @@
   document.addEventListener("visibilitychange", () => { if (document.hidden) flush(); else if (document.body.classList.contains("em")) Wake.on(); });
 
   async function eraseAll() {
-    await PdfV.close(); LIB = [];
+    await PdfV.close(); Media.close(); for (const x of LIB) if (typeOf(x) === "zim") ZR.drop(x.id); LIB = [];
     const keys = (await Store.keys()) || [];
     for (const k of keys) await Store.del(k);
     S = defaults(); PR = prefDefaults(); preparedFile = null; pendingCard = null; flush(); toast("Erased"); go("#/status");
@@ -1484,12 +2141,13 @@
     const lib = await Store.get("lib"); LIB = Array.isArray(lib) ? lib.filter((x) => x && typeof x.id === "string") : [];
     const v = $(".void"); if (v && !v.children.length) for (let i = 0; i < 14; i++) { const m = document.createElement("i"); m.style.left = (5 + Math.random() * 90) + "%"; m.style.top = (40 + Math.random() * 55) + "%"; m.style.animationDelay = (-Math.random() * 22).toFixed(1) + "s"; v.appendChild(m); }
     render();
+    PdfIndex.kick();
     document.body.dataset.ready = "1";
     window.__HAVYN_READY_MS = Math.round(performance.now() - t0); window.__HAVYN_READY_AT = Math.round(performance.now());
     if (!PREVIEW && "serviceWorker" in navigator) {
       navigator.serviceWorker.register("./sw.js").then(() => navigator.serviceWorker.ready).then(() => { const s = $("#swst"); if (s) s.textContent = "Saved for offline"; }).catch(() => { const s = $("#swst"); if (s) s.textContent = "Not available"; });
     }
   }
-  window.__HAVYN = { get state() { return S; }, get prefs() { return PR; }, E, C, version: VERSION };
+  window.__HAVYN = { get state() { return S; }, get prefs() { return PR; }, get lib() { return LIB; }, E, C, version: VERSION };
   boot();
 })();

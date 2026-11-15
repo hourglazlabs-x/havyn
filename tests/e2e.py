@@ -139,7 +139,8 @@ with sync_playwright() as p:
     page.click(f"[data-task='{first}']"); page.wait_for_timeout(250)
     page.reload(); page.wait_for_selector("body[data-ready]")
     ok("mission tick on Status persists", page.evaluate(f"__HAVYN.state.tasks.some(t => t.id === '{first}' && t.done)"))
-    ok("Status shows mission progress", "1 of 25 done" in page.inner_text(".ph .rt"), page.inner_text(".ph .rt"))
+    n_ms = sum(len(ph["tasks"]) for ph in C["missions"]["phases"])
+    ok("Status shows mission progress", f"1 of {n_ms} done" in page.inner_text(".ph .rt"), page.inner_text(".ph .rt"))
     page.goto(BASE + "#/missions"); page.wait_for_selector("form[data-form=task]")
     page.fill("form[data-form=task] [name=t]", "Test mission"); page.select_option("form[data-form=task] [name=phase]", "bf"); page.click("form[data-form=task] button[type=submit]")
     page.wait_for_timeout(250)
@@ -199,8 +200,8 @@ with sync_playwright() as p:
 
 
     # 9b. v1.1: PDF library (after the erase, which also clears PDFs)
-    page.goto(BASE + "#/library"); page.wait_for_selector("#pdffile", state="attached")
-    page.set_input_files("#pdffile", str(ROOT / "tests" / "fixtures" / "havyn-test.pdf"))
+    page.goto(BASE + "#/library"); page.wait_for_selector("#libfile", state="attached")
+    page.set_input_files("#libfile", str(ROOT / "tests" / "fixtures" / "havyn-test.pdf"))
     page.wait_for_selector("a.li[href^='#/library/']")
     ok("PDF imported into the library", page.locator("a.li[href^='#/library/']").count() == 1)
     page.click("a.li[href^='#/library/']"); page.wait_for_selector(".pg canvas", timeout=15000)

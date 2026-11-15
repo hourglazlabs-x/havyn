@@ -6,7 +6,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 SRC, APP, PREV = ROOT / "src", ROOT / "app", ROOT / "preview"
-APP_VERSION = "1.2.0"
+APP_VERSION = "1.3.0"
 
 def read(p): return (SRC / p).read_text(encoding="utf-8")
 
@@ -16,7 +16,9 @@ def build():
     tpl = read("index.html")
     vendor = ROOT / "vendor" / "pdfjs"
     vend = b"".join((vendor / f).read_bytes() for f in ("pdf.min.js", "pdf.worker.min.js")) + (ROOT / "vendor" / "pdflib" / "pdf-lib.esm.min.js").read_bytes()
-    digest = hashlib.sha256((css + js + tpl + read("sw.js")).encode() + vend).hexdigest()[:10]
+    # Archive reader: fzstd (vendored, MIT) + HAVYN's ZIM engine, one file for the page and the service worker.
+    zimkit = (ROOT / "vendor" / "fzstd" / "fzstd.js").read_text(encoding="utf-8") + "\n" + read("zimkit.js")
+    digest = hashlib.sha256((css + js + tpl + read("sw.js") + zimkit + (ROOT / "tools" / "vault.py").read_text(encoding="utf-8")).encode() + vend).hexdigest()[:10]
     version = f"{APP_VERSION}+{digest}"
     js = js.replace("__VERSION__", version)
 
@@ -33,12 +35,13 @@ def build():
     sha = base64.b64encode(hashlib.sha256(js.encode("utf-8")).digest()).decode()
     csp = ("<meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'self'; "
            f"script-src 'self' 'sha256-{sha}'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; "
-           "connect-src 'none'; font-src 'none'; media-src 'none'; object-src 'none'; frame-src 'none'; "
+           "connect-src 'none'; font-src 'none'; media-src 'self' blob:; object-src 'none'; frame-src 'self'; "
            "worker-src 'self'; manifest-src 'self'; base-uri 'none'; form-action 'none'\">")
     if APP.exists(): shutil.rmtree(APP)
     APP.mkdir(parents=True)
     (APP / "index.html").write_text(page(js, csp), encoding="utf-8")
     (APP / "sw.js").write_text(read("sw.js").replace("__VERSION__", version), encoding="utf-8")
+    (APP / "zimkit.js").write_text(zimkit, encoding="utf-8")
     manifest = {
         "id": "./", "name": "HAVYN FIELD", "short_name": "HAVYN", "start_url": "./", "scope": "./",
         "display": "standalone", "orientation": "portrait", "background_color": "#04050d", "theme_color": "#04050d",
@@ -56,6 +59,7 @@ def build():
         (d / "pdfjs").mkdir(exist_ok=True)
         for f in ("pdf.min.js", "pdf.worker.min.js", "LICENSE", "README.txt"): shutil.copy(vendor / f, d / "pdfjs" / f)
         shutil.copytree(ROOT / "vendor" / "pdflib", d / "pdflib", dirs_exist_ok=True)
+        shutil.copy(ROOT / "vendor" / "fzstd" / "LICENSE", d / "zimkit-fzstd-LICENSE.txt")
 
     # Preview build: same app, flagged so it skips the service worker; no CSP so a host page can frame it.
     if PREV.exists(): shutil.rmtree(PREV)
@@ -65,11 +69,19 @@ def build():
         shutil.copy(APP / f, PREV / f)
     shutil.copytree(APP / "pdfjs", PREV / "pdfjs")
     shutil.copytree(APP / "pdflib", PREV / "pdflib")
+    shutil.copy(APP / "zimkit.js", PREV / "zimkit.js")
 
     # Protocol cards as markdown, one file each (generated from src/content.js, the single source).
     out = subprocess.run(["node", "-e", "process.stdout.write(JSON.stringify(require(process.argv[1])))", str(SRC / "content.js")],
                          check=True, capture_output=True, text=True).stdout
     content = json.loads(out)
+    # Vault drive kit (scripts + START-HERE page), generated from the same catalog the app shows.
+    sys.path.insert(0, str(ROOT / "tools"))
+    import vault
+    rows = vault.write(ROOT, content, version)
+    for d in (APP, PREV):
+        (d / "vault").mkdir(exist_ok=True)
+        for f in ("get-vault.sh", "get-vault.ps1", "START-HERE.html"): shutil.copy(ROOT / "vault" / f, d / "vault" / f)
     cards_dir = ROOT / "content" / "cards"
     if cards_dir.exists(): shutil.rmtree(cards_dir)
     cards_dir.mkdir(parents=True)
@@ -83,7 +95,7 @@ def build():
         (cards_dir / f"{c['id']}.md").write_text("\n".join(lines), encoding="utf-8")
 
     size = (APP / "index.html").stat().st_size
-    print(f"built {version}: index.html {size/1024:.1f} KB, {len(content['cards'])} cards")
+    print(f"built {version}: index.html {size/1024:.1f} KB, {len(content['cards'])} cards, zimkit {len(zimkit)/1024:.1f} KB, vault manifest {len(rows)} items")
     return version
 
 if __name__ == "__main__":

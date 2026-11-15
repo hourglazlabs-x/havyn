@@ -1,0 +1,382 @@
+[
+ {
+  "name": "[sw] service worker controls the page",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "[sw] one Add files button imports archives, a split archive, a PDF, video and audio",
+  "pass": true,
+  "detail": "{'zim': 4, 'pdf': 1, 'video': 1, 'audio': 1}"
+ },
+ {
+  "name": "[sw] the same archive twice is refused",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "[sw] library groups archives, documents, video, audio",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "[sw] title search as you type",
+  "pass": true,
+  "detail": "Water purification"
+ },
+ {
+  "name": "[sw] article opens in the reader",
+  "pass": true,
+  "detail": "Water purification"
+ },
+ {
+  "name": "[sw] article image loads",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "[sw] archive CSS applies, including url() images",
+  "pass": true,
+  "detail": "url(\"http://localhost:8766/z/mwh94gn9o4g7sk/img/drop.png\")"
+ },
+ {
+  "name": "[sw] link inside the archive navigates",
+  "pass": true,
+  "detail": "HAVYN Test Library"
+ },
+ {
+  "name": "[sw] archive scripts never run (inline script and onerror)",
+  "pass": true,
+  "detail": "HAVYN Test Library"
+ },
+ {
+  "name": "[sw] page in a subfolder opens",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "[sw] ../ relative image resolves",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "[sw] reader Back returns to the previous page",
+  "pass": true,
+  "detail": "Deep page"
+ },
+ {
+  "name": "[sw] Back walks the whole trail (deep \u2192 home \u2192 water)",
+  "pass": true,
+  "detail": "Water purification"
+ },
+ {
+  "name": "[sw] redirect entry lands on its target",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "[sw] in-page anchor scrolls, stays on the page",
+  "pass": true,
+  "detail": "2576"
+ },
+ {
+  "name": "[sw] outside link doesn't hijack the reader",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "[sw] text size control restyles the page",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "[sw] dark pages on by default, toggles off",
+  "pass": true,
+  "detail": "(True, False)"
+ },
+ {
+  "name": "[sw] archive video gets native controls",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "[sw] archive video plays from the archive (byte ranges)",
+  "pass": true,
+  "detail": "3"
+ },
+ {
+  "name": "[sw] PDF inside an archive opens in HAVYN's PDF reader",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "[sw] ...and is kept in the library once",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "[sw] Random opens an article",
+  "pass": true,
+  "detail": "Video lesson"
+ },
+ {
+  "name": "[sw] Wikipedia archive: search finds many titles",
+  "pass": true,
+  "detail": "30"
+ },
+ {
+  "name": "[sw] Wikipedia main page renders with its images (WebP)",
+  "pass": true,
+  "detail": "Wikipedia"
+ },
+ {
+  "name": "[sw] old-layout XZ archive opens its main page",
+  "pass": true,
+  "detail": "Test ZIM file"
+ },
+ {
+  "name": "[sw] split archive (.zimaa/.zimab/.zimac) opens",
+  "pass": true,
+  "detail": "\u041f\u0435\u0440\u0448\u0430\u044f \u0441\u0442\u0430\u0440\u043e\u043d\u043a\u0430"
+ },
+ {
+  "name": "[sw] video plays in the player",
+  "pass": true,
+  "detail": "3"
+ },
+ {
+  "name": "[sw] audio plays in the player",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "[sw] PDF text is indexed in the background",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "[sw] search finds HAVYN content (cards, playbooks, plan)",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "[sw] search finds words inside PDFs",
+  "pass": true,
+  "detail": "INSIDE YOUR PDFS\n1\nhavyn-test\nPAGE 1\n1. Water storage Store 2 gallons per person per day in heat mode. Line 1 of page 1: practice\u2026"
+ },
+ {
+  "name": "[sw] search finds archive titles",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "[sw] search updates as you type",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "[sw] Get more lists the phone set with sizes",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "[sw] a Downloaded mark persists",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "[sw] drive tab shows the one-line commands",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "[sw] Mac script downloads from the app",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "[sw] home library refuses a non-web address",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "[sw] home library address saved, Open it appears",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "[sw] library shows the home library button",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "[sw] OFFLINE: archive page opens",
+  "pass": true,
+  "detail": "Water purification"
+ },
+ {
+  "name": "[sw] OFFLINE: archive image loads",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "[sw] OFFLINE: search across archives",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "[sw] delete removes the archive and its file",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "[sw] zero CSP violations in HAVYN itself",
+  "pass": true,
+  "detail": "[]"
+ },
+ {
+  "name": "[sw] no page errors",
+  "pass": true,
+  "detail": "[]"
+ },
+ {
+  "name": "[fallback] no service worker",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "[fallback] one Add files button imports archives, a split archive, a PDF, video and audio",
+  "pass": true,
+  "detail": "{'zim': 4, 'pdf': 1, 'video': 1, 'audio': 1}"
+ },
+ {
+  "name": "[fallback] title search as you type",
+  "pass": true,
+  "detail": "Water purification"
+ },
+ {
+  "name": "[fallback] article opens in the reader",
+  "pass": true,
+  "detail": "Water purification"
+ },
+ {
+  "name": "[fallback] article image loads",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "[fallback] archive CSS applies, including url() images",
+  "pass": true,
+  "detail": "url(\"blob:http://localhost:8766/afe1878b-6a9e-4d3a-a211-37c3be9829ad\")"
+ },
+ {
+  "name": "[fallback] link inside the archive navigates",
+  "pass": true,
+  "detail": "HAVYN Test Library"
+ },
+ {
+  "name": "[fallback] archive scripts never run (inline script and onerror)",
+  "pass": true,
+  "detail": "HAVYN Test Library"
+ },
+ {
+  "name": "[fallback] page in a subfolder opens",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "[fallback] ../ relative image resolves",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "[fallback] reader Back returns to the previous page",
+  "pass": true,
+  "detail": "Deep page"
+ },
+ {
+  "name": "[fallback] Back walks the whole trail (deep \u2192 home \u2192 water)",
+  "pass": true,
+  "detail": "Water purification"
+ },
+ {
+  "name": "[fallback] redirect entry lands on its target",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "[fallback] in-page anchor scrolls, stays on the page",
+  "pass": true,
+  "detail": "2573"
+ },
+ {
+  "name": "[fallback] outside link doesn't hijack the reader",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "[fallback] text size control restyles the page",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "[fallback] dark pages on by default, toggles off",
+  "pass": true,
+  "detail": "(True, False)"
+ },
+ {
+  "name": "[fallback] archive video gets native controls",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "[fallback] archive video plays from the archive (byte ranges)",
+  "pass": true,
+  "detail": "3"
+ },
+ {
+  "name": "[fallback] PDF inside an archive opens in HAVYN's PDF reader",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "[fallback] ...and is kept in the library once",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "[fallback] Random opens an article",
+  "pass": true,
+  "detail": "HAVYN Test Library"
+ },
+ {
+  "name": "[fallback] Wikipedia archive: search finds many titles",
+  "pass": true,
+  "detail": "30"
+ },
+ {
+  "name": "[fallback] Wikipedia main page renders with its images (WebP)",
+  "pass": true,
+  "detail": "Wikipedia"
+ },
+ {
+  "name": "[fallback] old-layout XZ archive opens its main page",
+  "pass": true,
+  "detail": "Test ZIM file"
+ },
+ {
+  "name": "[fallback] split archive (.zimaa/.zimab/.zimac) opens",
+  "pass": true,
+  "detail": "\u041f\u0435\u0440\u0448\u0430\u044f \u0441\u0442\u0430\u0440\u043e\u043d\u043a\u0430"
+ },
+ {
+  "name": "[fallback] zero CSP violations in HAVYN itself",
+  "pass": true,
+  "detail": "[]"
+ },
+ {
+  "name": "[fallback] no page errors",
+  "pass": true,
+  "detail": "[]"
+ }
+]

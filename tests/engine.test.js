@@ -178,11 +178,11 @@ test("buy list: overrides and statuses", () => {
 test("missions: progress, next steps, custom tasks", () => {
   const S = EMPTY();
   let m = E.missions(C.missions, S, NOV);
-  assert.equal(m.n, 25); assert.equal(m.d, 0);
+  assert.equal(m.n, C.missions.phases.reduce((a, ph) => a + ph.tasks.length, 0)); assert.equal(m.d, 0);
   assert.deepEqual(m.next.map((x) => x.def.id), ["m-downloads", "m-plan", "m-medid"]);
   S.tasks = [{ id: "m-downloads", done: true, updated: 2 }, { id: "c1", custom: true, t: "Second can opener", phase: "today", done: false, updated: 2 }];
   m = E.missions(C.missions, S, NOV);
-  assert.equal(m.n, 26); assert.equal(m.d, 1);
+  assert.equal(m.n, C.missions.phases.reduce((a, ph) => a + ph.tasks.length, 0) + 1); assert.equal(m.d, 1);
   assert.equal(m.phases[0].tasks.at(-1).def.id, "c1");
   assert.deepEqual(m.next.map((x) => x.def.id), ["m-plan", "m-medid", "m-sat"]);
 });
@@ -221,4 +221,29 @@ test("v1.2: every phone number has a source page (except 911 and Poison Control)
   for (const n of C.numbers) if (!["911", "1-800-222-1222"].includes(n.num)) assert.ok(n.s && C.refs[n.s], n.n);
   assert.ok(!/[Pp]ractise/.test(JSON.stringify(C)));
   assert.equal(C.missions.phases.find((p) => p.id === "dec").tasks.find((t) => t.id === "m-binder").go, "#/binder");
+});
+
+test("v1.3 archive catalog: complete, sourced, and consistent", () => {
+  const A = C.archive, ids = new Set();
+  assert.ok(/^\d{4}-\d{2}-\d{2}$/.test(A.checked));
+  for (const it of A.items) {
+    assert.ok(!ids.has(it.id), "duplicate id " + it.id); ids.add(it.id);
+    assert.ok(A.tiers.some((t) => t.id === it.tier), it.id + " tier");
+    assert.ok(it.t && it.d, it.id + " text");
+    if (it.src) assert.ok(C.refs[it.src], it.id + " source " + it.src);
+    if (it.get) {
+      const g = it.get, kinds = ["zim", "url", "gh", "kx"].filter((k) => g[k]);
+      assert.equal(kinds.length, 1, it.id + " exactly one way to fetch");
+      if (g.zim) assert.ok(/^[\w.-]+$/.test(g.stem) && !/_\d{4}-\d{2}$/.test(g.stem), it.id + " undated stem");
+      if (g.url) assert.ok(/^https:\/\//.test(g.url) && g.name, it.id + " https url + file name");
+      if (g.gh || g.kx) new RegExp(g.match);
+      assert.ok(it.dir, it.id + " drive folder");
+    }
+    if (it.file) assert.ok(it.get && it.file.startsWith(it.get.stem + "_"), it.id + " dated file matches stem");
+    if (it.u) assert.ok(/^https:\/\//.test(it.u), it.id + " https link");
+    if (it.tier === "phone" && it.kind === "zim") assert.equal(it.opens, "havyn", it.id + " phone archives must open in HAVYN");
+  }
+  const core = A.items.filter((i) => i.tier === "phone" && i.core).reduce((a, i) => a + (i.size || 0), 0);
+  assert.ok(core > 2.5e9 && core < 3.1e9, "phone core set about 2.8 GB: " + core);
+  assert.ok(A.items.some((i) => i.id === "p-wikimed" && i.core));
 });

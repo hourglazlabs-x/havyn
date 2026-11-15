@@ -452,7 +452,7 @@ const HAVYN_CONTENT = {
   missions: {
     phases: [
       { id: "today", label: "Today", when: "Nov 14 · $0", gate: "Airplane-mode test passes", gateD: "Every phone in airplane mode opens HAVYN, an emergency card, WikiMed and a map.", tasks: [
-        { id: "m-downloads", t: "Start the big downloads on Wi-Fi", d: "Kiwix with WikiMed. Apple Maps offline (iOS 17 or later): Maps → your picture → Offline Maps → Download New Map; cover Phoenix and the route to your out-of-area address. Leave the phones plugged in." },
+        { id: "m-downloads", t: "Start the big downloads on Wi-Fi", d: "In HAVYN: Get more › Every phone, download the core set (WikiMed and the survival archives, about 2.8 GB) and Add files. Install the apps on the Apps tab. Apple Maps offline (iOS 17 or later): Maps → your picture → Offline Maps → Download New Map; cover Phoenix and the route to your out-of-area address. Leave the phones plugged in.", go: "#/archive" },
         { id: "m-plan", t: "Family plan: out-of-area contact and 3 meeting places", go: "#/family/plan" },
         { id: "m-medid", t: "Medical ID on every phone", d: "Health app → your picture → Medical ID → Edit. Turn on Show When Locked and add emergency contacts." },
         { id: "m-sat", t: "Satellite demo outside (iPhone 14 and newer)", d: "Settings → Emergency SOS → Try Demo, under open sky." },
@@ -469,7 +469,8 @@ const HAVYN_CONTENT = {
         { id: "m-power", t: "1 kWh LiFePO4 power station + 200 W solar", go: "#/buy?f=bf" },
         { id: "m-mesh", t: "Meshtastic radios (T1000-E)", go: "#/buy?f=bf" },
         { id: "m-gmrs", t: "GMRS radios + $35 license", d: "Apply online with the FCC. No exam; the holder must be 18 or older.", go: "#/buy?f=bf" },
-        { id: "m-vault", t: "Vault drives: 1 TB SSD + 2 TB HDD", go: "#/buy?f=bf" }
+        { id: "m-vault", t: "Vault drives: 1 TB SSD + 2 TB HDD", go: "#/buy?f=bf" },
+        { id: "m-vaultfill", t: "Fill the vault drive overnight", d: "Format it exFAT, run the vault script on a computer, then copy the phone set to every phone.", go: "#/archive?t=drive" }
       ] },
       { id: "dec", label: "December", when: "", gate: "Anyone finds any card in under 10 seconds", tasks: [
         { id: "m-library", t: "Load manuals and guides into the Library", d: "Power station and radio manuals, the plan PDF, a first-aid book.", go: "#/library" },
@@ -478,15 +479,15 @@ const HAVYN_CONTENT = {
         { id: "m-drill", t: "First lights-out drill", d: "Two hours with phones in airplane mode: everyone finds three cards, the radios and the rally point." }
       ] },
       { id: "jan", label: "January–February", when: "hub + vault", gate: "Every phone browses the hub offline", tasks: [
-        { id: "m-hub", t: "Hub: Raspberry Pi 5 or an old laptop running Kiwix" },
-        { id: "m-vaultsync", t: "Vault: two drives, synced, with checksums" },
+        { id: "m-hub", t: "Home library: a laptop, iPad or Raspberry Pi sharing the drive", d: "Kiwix Hotspot on the home Wi-Fi; save its address in HAVYN so every phone can open it.", go: "#/archive?t=hub" },
+        { id: "m-vaultsync", t: "Vault: two drives, synced, with checksums", d: "Run the vault script on each drive; it verifies every download against Kiwix's checksums.", go: "#/archive?t=drive" },
         { id: "m-tier3", t: "Tier 3: 2 kWh station, extinguishers, camp stove", go: "#/buy?f=d90" }
       ] },
       { id: "may", label: "Before May", when: "heat season", gate: "Drill run, destination confirmed", tasks: [
         { id: "m-dest", t: "Confirm where you'd go if heat forces you out", go: "#/family/plan" },
         { id: "m-cool", t: "Window covers, battery fans, car AC service" },
         { id: "m-heatdrill", t: "Heat drill: run the leave-now rule", go: "#/playbooks/heat" },
-        { id: "m-ai", t: "Optional: AI librarian on the hub" }
+        { id: "m-ai", t: "Optional: offline AI on a laptop or the hub", d: "The llamafile on the vault drive runs on any laptop. It can be wrong: the emergency cards win.", go: "#/archive?t=drive" }
       ] }
     ],
     // Upkeep from the plan's maintenance schedule. every = days, or "spring" (due from March 1 each year).
@@ -622,18 +623,128 @@ const HAVYN_CONTENT = {
     { n: "Phoenix police non-emergency", num: "602-262-6151", d: "Crime Stop: police help that isn't a 911 emergency.", s: "phxpd" }
   ],
 
-  // ---------------- v1.1: library ----------------
+  // ---------------- v1.1 + v1.3: library ----------------
   library: {
-    note: "PDFs stay on this phone and are not part of Memory Cards. AirDrop the files to each phone and import them there.",
-    suggest: [
-      { t: "The HAVYN plan PDF", d: "The Offline Survival Plan you were sent." },
-      { t: "Manuals for your power station, radios and filter", d: "Download them from each maker's site while you have internet." },
-      { t: "Where There Is No Doctor (Hesperian)", d: "A free download from hesperian.org.", u: "https://hesperian.org/" },
-      { t: "Your own papers", d: "Insurance, prescriptions, copies of IDs. They never leave this phone." }
+    note: "Encyclopedias, manuals, video and audio that work with no internet. Files stay on this phone and are not part of Memory Cards.",
+    how: [
+      { t: "1 · Download on Wi-Fi", d: "Tap Get more, then a Download button. Safari saves the file to Files › Downloads. Big files go faster on a computer (see the vault drive)." },
+      { t: "2 · Add it to HAVYN", d: "Tap Add files and choose the file in Files. HAVYN checks it and keeps its own copy, so you can delete the download afterwards." },
+      { t: "3 · Copy to every phone", d: "AirDrop the file to each phone, or plug in the vault drive and pick it in Files, then Add files on that phone." },
+      { t: "4 · Keep the master copies on the drive", d: "Library files are too big for Memory Cards. The vault drive holds the originals; re-add from it any time." }
+    ]
+  },
+
+  // ---------------- v1.3: the archive catalog (Get more) ----------------
+  // size: bytes. est: true when the size is an estimate rather than read from a listing.
+  // get: how the vault script finds the newest copy. zim = Kiwix folder + file stem; url = fixed link; gh = latest GitHub release asset; kx = newest file in a download folder.
+  // opens: where it reads. "havyn" = HAVYN's own reader (no scripts needed); "kiwix" = needs the Kiwix app or the home library.
+  archive: {
+    checked: "2026-11-14",
+    note: "Sizes come from the Kiwix mirror listings and publisher pages on 2026-11-14 (marked ~ where estimated). Archives are rebuilt every few months, so the drive script always fetches the newest copy. 1 GB = 1,000 MB, as on iPhone.",
+    tiers: [
+      { id: "phone", t: "Every phone", d: "Small, life-saving archives and manuals that open inside HAVYN with no internet. The core set is about 2.8 GB." },
+      { id: "apps", t: "Apps to install now", d: "iPhone apps come only from the App Store, so install these on every phone while you have internet." },
+      { id: "drive", t: "Vault drive", d: "The master copy of everything on a 1–2 TB USB SSD, filled by one script on a computer overnight." },
+      { id: "hub", t: "Home library", d: "One device shares the whole drive over home Wi-Fi: full-text search, videos and websites on every phone." }
+    ],
+    items: [
+      // ----- every phone (opens in HAVYN) -----
+      { id: "p-wikimed", tier: "phone", kind: "zim", core: true, t: "WikiMed: medical encyclopedia", d: "Wikipedia's medical articles with pictures: conditions, injuries, medicines, anatomy. The most useful single archive for a family.", size: 1825361100, file: "wikipedia_en_medicine_maxi_2026-10.zim", get: { zim: "wikipedia", stem: "wikipedia_en_medicine_maxi" }, opens: "havyn", dir: "01-phone-set", src: "kiwix" },
+      { id: "p-postdisaster", tier: "phone", kind: "zim", core: true, t: "Post-disaster library", d: "Manuals for shelter, sanitation, water and recovery after a disaster.", size: 644874240, est: true, get: { zim: "other", stem: "zimgit-post-disaster_en" }, opens: "havyn", dir: "01-phone-set", src: "kiwixprep" },
+      { id: "p-water", tier: "phone", kind: "zim", core: true, t: "Water treatment", d: "Making water safe to drink: boiling, filters, chemicals, storage.", size: 20971520, est: true, get: { zim: "other", stem: "zimgit-water_en" }, opens: "havyn", dir: "01-phone-set", src: "kiwixprep" },
+      { id: "p-food", tier: "phone", kind: "zim", core: true, t: "Food for preppers", d: "Food storage, preservation and safe preparation.", size: 97517568, est: true, get: { zim: "other", stem: "zimgit-food-preparation_en" }, opens: "havyn", dir: "01-phone-set", src: "kiwixprep" },
+      { id: "p-medlib", tier: "phone", kind: "zim", core: true, t: "Medical library", d: "A small collection of field medical guides.", size: 70254592, est: true, get: { zim: "other", stem: "zimgit-medicine_en" }, opens: "havyn", dir: "01-phone-set", src: "kiwixprep" },
+      { id: "p-knots", tier: "phone", kind: "zim", core: true, t: "A library of knots", d: "How to tie the knots you need for tarps, loads and rescue.", size: 28311552, est: true, get: { zim: "other", stem: "zimgit-knots_en" }, opens: "havyn", dir: "01-phone-set", src: "kiwixprep" },
+      { id: "p-vikidia", tier: "phone", kind: "zim", core: true, t: "Vikidia: encyclopedia for kids", d: "A children's encyclopedia written for ages 8 to 13. Keeps kids reading and learning when screens are all they have.", size: 69415731, file: "vikidia_en_all_maxi_2025-12.zim", get: { zim: "vikidia", stem: "vikidia_en_all_maxi" }, opens: "havyn", dir: "01-phone-set", src: "kiwix" },
+      { id: "p-wptop", tier: "phone", kind: "zim", t: "Wikipedia: the top articles, with pictures", d: "The most-read English articles in full. Pick this if the phone has about 10 GB free; the text-only edition is 2.8 GB.", size: 6979321856, file: "wikipedia_en_top_maxi_2026-09.zim", get: { zim: "wikipedia", stem: "wikipedia_en_top_maxi" }, opens: "havyn", dir: "01-phone-set", src: "kiwix" },
+      { id: "p-wpmini", tier: "phone", kind: "zim", t: "Wikipedia: every article, short form", d: "The opening section of all 7 million English articles. For phones with about 15 GB free.", size: 13958643712, file: "wikipedia_en_all_mini_2026-09.zim", get: { zim: "wikipedia", stem: "wikipedia_en_all_mini" }, opens: "havyn", dir: "01-phone-set", src: "kiwix" },
+      { id: "p-atp", tier: "phone", kind: "pdf", core: true, t: "US Army Survival manual (ATP 3-50.21)", d: "Water, fire, shelter, navigation, signaling and first aid. Approved for public release; distribution unlimited.", size: 15000000, est: true, u: "https://irp.fas.org/doddir/army/atp3-50-21.pdf", get: { url: "https://irp.fas.org/doddir/army/atp3-50-21.pdf", name: "ATP-3-50.21-Survival-2018.pdf" }, opens: "havyn", dir: "01-phone-set", src: "atp" },
+      { id: "p-cert", tier: "phone", kind: "pdf", core: true, t: "FEMA CERT Basic Training manual", d: "Disaster first aid, light search and rescue, fire safety and team organization, from FEMA's community response course.", size: 25000000, est: true, u: "https://www.ready.gov/sites/default/files/2019.CERT_.Basic_.PM_FINAL_508c.pdf", get: { url: "https://www.ready.gov/sites/default/files/2019.CERT_.Basic_.PM_FINAL_508c.pdf", name: "FEMA-CERT-Basic-Training-Participant-Manual-2019.pdf" }, opens: "havyn", dir: "01-phone-set", src: "cert" },
+      { id: "p-wtnd", tier: "phone", kind: "pdf", t: "Where There Is No Doctor (Hesperian)", d: "The classic village health handbook. Free chapter PDFs from Hesperian; the publisher allows free copies for non-profit use.", size: 30000000, est: true, u: "https://en.hesperian.org/hhg/Where_There_Is_No_Doctor", opens: "havyn", src: "hesperian" },
+      { id: "p-own", tier: "phone", kind: "own", t: "Record your own house videos", d: "One minute each, filmed on your phone and added here: shutting off the gas meter, the water main and the main breaker; starting the power station and the generator; which radio channel to use. Nobody else can make these for you." },
+
+      // ----- apps to install now (App Store) -----
+      { id: "a-kiwix", tier: "apps", kind: "app", t: "Kiwix", d: "Reads the big archives, including video and website copies HAVYN can't run, and can share them over Wi-Fi with its Hotspot feature. Video archives need iOS 17 or later.", u: "https://apps.apple.com/app/kiwix/id997079563", src: "kiwixapple" },
+      { id: "a-maps", tier: "apps", kind: "app", t: "Organic Maps (or CoMaps)", d: "Offline maps and turn-by-turn directions from OpenStreetMap. Download Arizona inside the app. Apple Maps offline (Missions) is the built-in backup.", u: "https://organicmaps.app/", src: "omaps" },
+      { id: "a-mesh", tier: "apps", kind: "app", t: "Meshtastic", d: "Texts over LoRa radios with no towers. Needs a radio per person (see the buy list).", u: "https://meshtastic.org/docs/software/apple/installation/", src: "mesh" },
+      { id: "a-vlc", tier: "apps", kind: "app", t: "VLC", d: "Plays any video format, including files straight from the vault drive.", u: "https://apps.apple.com/app/vlc-media-player/id650377962", src: "vlc" },
+      { id: "a-pocketpal", tier: "apps", kind: "ai", t: "PocketPal AI (optional)", d: "A private AI assistant that runs on the phone with no internet. Needs an iPhone 14 Pro or newer for useful models; download a 1–3 GB model first. It can be wrong: the emergency cards win.", u: "https://apps.apple.com/us/app/pocketpal-ai/id6502579498", src: "pocketpal" },
+
+      // ----- vault drive -----
+      { id: "d-wpmaxi", tier: "drive", kind: "zim", core: true, t: "All of Wikipedia, with pictures", d: "Every English article and image: the whole encyclopedia.", size: 127775277056, get: { zim: "wikipedia", stem: "wikipedia_en_all_maxi" }, opens: "havyn", dir: "02-encyclopedias", src: "kiwix" },
+      { id: "d-wpnopic", tier: "drive", kind: "zim", t: "All of Wikipedia, text only", d: "Every article without images. For a phone with 60 GB free, through Kiwix or HAVYN.", size: 52613349376, get: { zim: "wikipedia", stem: "wikipedia_en_all_nopic" }, opens: "havyn", dir: "02-encyclopedias", src: "kiwix" },
+      { id: "d-mdwiki", tier: "drive", kind: "zim", core: true, t: "MDWiki: second medical encyclopedia", d: "Medical articles curated by WikiProject Medicine, with images.", size: 2254857830, est: true, get: { zim: "other", stem: "mdwiki_en_all_maxi" }, opens: "havyn", dir: "03-medical", src: "kiwix" },
+      { id: "d-medline", tier: "drive", kind: "zim", core: true, t: "MedlinePlus (US National Library of Medicine)", d: "Health topics, drugs and supplements in plain English.", size: 1825361100, get: { zim: "zimit", stem: "medlineplus.gov_en_all" }, opens: "kiwix", dir: "03-medical", src: "kiwixmirror" },
+      { id: "d-nhsmeds", tier: "drive", kind: "zim", core: true, t: "NHS medicines A to Z", d: "What common medicines are for, doses and side effects.", size: 24117248, get: { zim: "zimit", stem: "nhs.uk_en_medicines" }, opens: "kiwix", dir: "03-medical", src: "kiwixmirror" },
+      { id: "d-milmed", tier: "drive", kind: "zim", core: true, t: "Military medicine manuals (FAS archive)", d: "Field medical and emergency war surgery handbooks.", size: 81788928, get: { zim: "zimit", stem: "fas-military-medicine_en" }, opens: "kiwix", dir: "03-medical", src: "kiwixmirror" },
+      { id: "d-ready", tier: "drive", kind: "zim", core: true, t: "Ready.gov (FEMA)", d: "The full US government preparedness site: every hazard, kit and plan.", size: 4939212390, get: { zim: "zimit", stem: "www.ready.gov_en" }, opens: "kiwix", dir: "04-skills-and-repair", src: "kiwixmirror" },
+      { id: "d-ifixit", tier: "drive", kind: "zim", core: true, t: "iFixit repair guides", d: "Step-by-step repairs for phones, appliances, cars and tools.", size: 3000000000, est: true, get: { zim: "ifixit", stem: "ifixit_en_all" }, opens: "havyn", dir: "04-skills-and-repair", src: "ifixit" },
+      { id: "d-appropedia", tier: "drive", kind: "zim", core: true, t: "Appropedia", d: "Low-tech solutions: water, energy, cooking, building, sanitation.", size: 581959680, est: true, get: { zim: "other", stem: "appropedia_en_all_maxi" }, opens: "havyn", dir: "04-skills-and-repair", src: "kiwix" },
+      { id: "d-se-diy", tier: "drive", kind: "zim", core: true, t: "Home Improvement Q&A (Stack Exchange)", d: "Plumbing, electrical, HVAC and repair questions answered by tradespeople.", size: 1500000000, est: true, get: { zim: "stack_exchange", stem: "diy.stackexchange.com_en_all" }, opens: "havyn", dir: "04-skills-and-repair", src: "kiwixprep" },
+      { id: "d-se-mech", tier: "drive", kind: "zim", core: true, t: "Motor Vehicle Repair Q&A", d: "Car problems, diagnosis and fixes.", size: 600000000, est: true, get: { zim: "stack_exchange", stem: "mechanics.stackexchange.com_en_all" }, opens: "havyn", dir: "04-skills-and-repair", src: "kiwixprep" },
+      { id: "d-se-garden", tier: "drive", kind: "zim", core: true, t: "Gardening Q&A", d: "Growing food, soil, pests and desert gardening.", size: 600000000, est: true, get: { zim: "stack_exchange", stem: "gardening.stackexchange.com_en_all" }, opens: "havyn", dir: "04-skills-and-repair", src: "kiwixprep" },
+      { id: "d-se-ham", tier: "drive", kind: "zim", core: true, t: "Amateur Radio Q&A", d: "Radios, antennas, licensing and emergency communication.", size: 200000000, est: true, get: { zim: "stack_exchange", stem: "ham.stackexchange.com_en_all" }, opens: "havyn", dir: "04-skills-and-repair", src: "kiwixprep" },
+      { id: "d-se-cook", tier: "drive", kind: "zim", core: true, t: "Cooking Q&A (Seasoned Advice)", d: "Food safety, substitutions and cooking without a kitchen.", size: 600000000, est: true, get: { zim: "stack_exchange", stem: "cooking.stackexchange.com_en_all" }, opens: "havyn", dir: "04-skills-and-repair", src: "kiwix" },
+      { id: "d-se-outdoors", tier: "drive", kind: "zim", core: true, t: "The Great Outdoors Q&A", d: "Camping, hiking, navigation and wilderness survival.", size: 400000000, est: true, get: { zim: "stack_exchange", stem: "outdoors.stackexchange.com_en_all" }, opens: "havyn", dir: "04-skills-and-repair", src: "kiwix" },
+      { id: "d-gut-ag", tier: "drive", kind: "zim", core: true, t: "Project Gutenberg: agriculture books", d: "Thousands of free classic books on farming, gardening and rural skills.", size: 4509715660, est: true, get: { zim: "gutenberg", stem: "gutenberg_en_lcc-s" }, opens: "havyn", dir: "06-books", src: "kiwix" },
+      { id: "d-gut-tech", tier: "drive", kind: "zim", t: "Project Gutenberg: technology books", d: "Classic books on engineering, building, chemistry and household skills.", size: 12884901888, est: true, get: { zim: "gutenberg", stem: "gutenberg_en_lcc-t" }, opens: "havyn", dir: "06-books", src: "kiwix" },
+      { id: "d-voyage", tier: "drive", kind: "zim", core: true, t: "Wikivoyage", d: "Travel guides for every town: useful when you have to leave.", size: 1181116006, est: true, get: { zim: "wikivoyage", stem: "wikivoyage_en_all_maxi" }, opens: "havyn", dir: "02-encyclopedias", src: "kiwix" },
+      { id: "d-wiktionary", tier: "drive", kind: "zim", t: "Wiktionary: the dictionary", d: "Every English word with meanings and translations.", size: 8804682956, est: true, get: { zim: "wiktionary", stem: "wiktionary_en_all_nopic" }, opens: "havyn", dir: "02-encyclopedias", src: "kiwix" },
+      { id: "d-wikibooks", tier: "drive", kind: "zim", t: "Wikibooks: free textbooks", d: "Open textbooks on every school subject, for keeping kids learning.", size: 5476083302, est: true, get: { zim: "wikibooks", stem: "wikibooks_en_all_maxi" }, opens: "havyn", dir: "02-encyclopedias", src: "kiwix" },
+      { id: "d-wpes", tier: "drive", kind: "zim", t: "Wikipedia en español", d: "All of Spanish Wikipedia with pictures, for Spanish-speaking family and neighbors.", size: 40802189312, est: true, get: { zim: "wikipedia", stem: "wikipedia_es_all_maxi" }, opens: "havyn", dir: "02-encyclopedias", src: "kiwix" },
+      { id: "d-v-medguides", tier: "drive", kind: "video", core: true, t: "Video: quick guides for medicine", d: "Short medical explainer videos.", size: 527433728, get: { zim: "videos", stem: "quickguidesformedicine_en_all" }, opens: "kiwix", dir: "05-video", src: "kiwixmirror" },
+      { id: "d-v-selfrel", tier: "drive", kind: "video", core: true, t: "Video: Learn Self Reliance", d: "Food preservation, foraging, wood stoves and homestead skills.", size: 3972844748, get: { zim: "videos", stem: "lrnselfreliance_en_all" }, opens: "kiwix", dir: "05-video", src: "kiwixmirror" },
+      { id: "d-v-food", tier: "drive", kind: "video", core: true, t: "Video: prepping food (Canadian Prepper)", d: "Long-term food storage and cooking during outages.", size: 2147483648, get: { zim: "videos", stem: "canadian-prepper_en_preppingfood" }, opens: "kiwix", dir: "05-video", src: "kiwixmirror" },
+      { id: "d-v-tedhealth", tier: "drive", kind: "video", t: "Video: TED talks on health", d: "Health and medicine talks with transcripts.", size: 7516192768, est: true, get: { zim: "ted", stem: "ted_mul_health" }, opens: "kiwix", dir: "05-video", src: "kiwix" },
+      { id: "d-v-crash", tier: "drive", kind: "video", t: "Video: Crash Course (school subjects)", d: "Fast, clear lessons in science, history and more for teens.", size: 22548578304, est: true, get: { zim: "videos", stem: "crashcourse_en_all" }, opens: "kiwix", dir: "05-video", src: "kiwix" },
+      { id: "d-ai-llama", tier: "drive", kind: "ai", core: true, t: "Offline AI assistant (llamafile, Llama 3.2 3B)", d: "One file that runs a private AI chat on any Windows, Mac or Linux laptop with no install and no internet. It can be wrong: never use it over the emergency cards.", size: 2810000000, get: { url: "https://huggingface.co/Mozilla/Llama-3.2-3B-Instruct-llamafile/resolve/main/Llama-3.2-3B-Instruct.Q6_K.llamafile", name: "Llama-3.2-3B-Instruct.Q6_K.llamafile" }, u: "https://huggingface.co/Mozilla/Llama-3.2-3B-Instruct-llamafile", dir: "07-ai", src: "llamafile" },
+      { id: "s-kiwix-win", tier: "drive", kind: "soft", core: true, t: "Kiwix for Windows", d: "Reads every archive and shares them over Wi-Fi.", size: 121000000, est: true, get: { kx: "https://download.kiwix.org/release/kiwix-desktop/", match: "kiwix-desktop_windows_x64_[0-9][0-9.-]*\\.zip" }, dir: "08-software/windows", src: "kiwixdl" },
+      { id: "s-kiwix-linux", tier: "drive", kind: "soft", t: "Kiwix for Linux (AppImage)", d: "The same reader for Linux laptops.", size: 121000000, est: true, get: { kx: "https://download.kiwix.org/release/kiwix-desktop/", match: "kiwix-desktop_x86_64_[0-9][0-9.-]*\\.appimage" }, dir: "08-software/linux", src: "kiwixdl" },
+      { id: "s-kiwix-mac", tier: "drive", kind: "soft", core: true, t: "Kiwix for Mac", d: "The reader for Macs; also free on the Mac App Store.", size: 60000000, est: true, get: { kx: "https://download.kiwix.org/release/kiwix-macos/", match: "kiwix-macos_[0-9][0-9.]*\\.dmg" }, dir: "08-software/mac", src: "kiwixdl" },
+      { id: "s-kiwix-tools", tier: "drive", kind: "soft", core: true, t: "kiwix-serve (server for any computer or Raspberry Pi)", d: "Turns any computer into the home library server. Builds for Windows, Mac, Linux and Raspberry Pi.", size: 80000000, est: true, get: { kx: "https://download.kiwix.org/release/kiwix-tools/", match: "kiwix-tools_(win-x86_64|linux-x86_64|linux-aarch64|macos-arm64|macos-x86_64)-[0-9][0-9.]*\\.(zip|tar\\.gz)", all: true }, dir: "08-software/server", src: "kiwixdl" },
+      { id: "s-kiwix-android", tier: "drive", kind: "soft", t: "Kiwix for Android (APK)", d: "For any Android phone or tablet in the house.", size: 80000000, est: true, get: { kx: "https://download.kiwix.org/release/kiwix-android/", match: "kiwix-[0-9][0-9.]*\\.apk" }, dir: "08-software/android", src: "kiwixdl" },
+      { id: "s-vlc-win", tier: "drive", kind: "soft", core: true, t: "VLC for Windows", d: "Plays every video format.", size: 45000000, est: true, get: { kx: "https://get.videolan.org/vlc/last/win64/", match: "vlc-[0-9][0-9.]*-win64\\.exe" }, dir: "08-software/windows", src: "vlc" },
+      { id: "s-vlc-mac", tier: "drive", kind: "soft", core: true, t: "VLC for Mac", d: "Plays every video format.", size: 60000000, est: true, get: { kx: "https://get.videolan.org/vlc/last/macosx/", match: "vlc-[0-9][0-9.]*-universal\\.dmg" }, dir: "08-software/mac", src: "vlc" },
+      { id: "s-mesh-fw", tier: "drive", kind: "soft", core: true, t: "Meshtastic radio firmware", d: "Re-flash or set up the LoRa radios with no internet.", size: 150000000, est: true, get: { gh: "meshtastic/firmware", match: "firmware-.*\\.zip" }, dir: "08-software/radios", src: "mesh" },
+      { id: "s-mesh-android", tier: "drive", kind: "soft", t: "Meshtastic for Android (APK)", d: "For Android phones in the group.", size: 40000000, est: true, get: { gh: "meshtastic/Meshtastic-Android", match: "\\.apk$" }, dir: "08-software/android", src: "mesh" },
+      { id: "s-omaps-android", tier: "drive", kind: "soft", t: "Organic Maps for Android (APK)", d: "Offline maps for Android phones.", size: 64000000, est: true, get: { gh: "organicmaps/organicmaps", match: "\\.apk$" }, dir: "08-software/android", src: "omaps" },
+      { id: "s-keepass", tier: "drive", kind: "soft", t: "KeePassXC password vault", d: "Keep account passwords in an encrypted file on the drive, readable on any computer.", size: 45000000, est: true, get: { gh: "keepassxreboot/keepassxc", match: "(Win64\\.msi|\\.dmg)$", all: true }, dir: "08-software", src: "keepass" },
+      { id: "s-rpi", tier: "drive", kind: "soft", t: "Raspberry Pi Imager", d: "Sets up a Raspberry Pi home library server.", size: 40000000, est: true, get: { gh: "raspberrypi/rpi-imager", match: "(\\.exe|\\.dmg)$", all: true }, dir: "08-software/server", src: "rpi" },
+      { id: "s-nomad", tier: "drive", kind: "soft", t: "Project N.O.M.A.D. (source)", d: "Offline server bundle: Kiwix, Khan Academy, maps and local AI. Install it while online; see Home library.", size: 5000000, est: true, get: { url: "https://github.com/Crosstalk-Solutions/project-nomad/archive/refs/heads/main.zip", name: "project-nomad-main.zip" }, dir: "08-software/server", src: "nomad" },
+      { id: "s-havyn", tier: "drive", kind: "soft", core: true, t: "HAVYN itself (source)", d: "The whole app, so it can be rebuilt or served from any computer.", size: 3000000, est: true, get: { url: "https://github.com/hourglazlabs-x/havyn/archive/refs/heads/main.zip", name: "havyn-main.zip" }, dir: "08-software", src: "havyn" },
+      { id: "b-so", tier: "drive", kind: "zim", t: "Builder: Stack Overflow", d: "Every programming question and answer, for keeping your own systems running.", size: 80530636800, est: true, get: { zim: "stack_exchange", stem: "stackoverflow.com_en_all" }, opens: "havyn", dir: "09-builder", src: "kiwix" },
+      { id: "b-superuser", tier: "drive", kind: "zim", t: "Builder: Super User", d: "Computer troubleshooting Q&A.", size: 3972844748, est: true, get: { zim: "stack_exchange", stem: "superuser.com_en_all" }, opens: "havyn", dir: "09-builder", src: "kiwix" },
+      { id: "b-electronics", tier: "drive", kind: "zim", t: "Builder: Electrical Engineering Q&A", d: "Circuits, batteries, solar and repair.", size: 4187593113, est: true, get: { zim: "stack_exchange", stem: "electronics.stackexchange.com_en_all" }, opens: "havyn", dir: "09-builder", src: "kiwix" },
+      { id: "b-fcc", tier: "drive", kind: "zim", t: "Builder: freeCodeCamp curriculum", d: "A full programming course in a few megabytes.", size: 8000000, est: true, get: { zim: "freecodecamp", stem: "freecodecamp_en_all" }, opens: "havyn", dir: "09-builder", src: "kiwix" },
+
+      // ----- home library (guides; nothing to download here) -----
+      { id: "h-laptop", tier: "hub", kind: "hub", t: "Easiest: a laptop plus the drive", d: "Plug the vault drive into any laptop with Kiwix, open the archives, then turn on its Hotspot (Kiwix calls it that; it shares over your home Wi-Fi). Phones scan the QR code or open the address it shows in Safari. Put the laptop and the Wi-Fi router on the power station: the router keeps working without internet." },
+      { id: "h-phone", tier: "hub", kind: "hub", t: "No laptop: one iPhone or iPad with Kiwix", d: "Kiwix for iPhone, iPad and Mac can share chosen archives the same way (Hotspot, then show the QR code). Load the big archives on the device with the most storage." },
+      { id: "h-pi", tier: "hub", kind: "hub", t: "Always-on: Raspberry Pi 5 with an SSD", d: "A small, low-power server running kiwix-serve from the drive, on the router or its own Wi-Fi. Kiwix Hotspot supports Pi 3B through Pi 500." },
+      { id: "h-nomad", tier: "hub", kind: "hub", t: "Everything: a mini PC with Project N.O.M.A.D.", d: "Free, open-source server that adds Khan Academy courses, offline maps and a local AI assistant to Kiwix. Install and download its content while you still have internet." }
     ]
   },
 
   refs: {
+    kiwix: { n: "Kiwix library and download mirror listing (checked 2026-11-14)", u: "https://library.kiwix.org/" },
+    kiwixmirror: { n: "Kiwix mirror listing, video and website archives", u: "https://ftp.fau.de/kiwix/zim/videos/" },
+    kiwixprep: { n: "Kiwix: the preppers selection", u: "https://hub.kiwix.org/weblog/2024/02/for-all-preppers-out-there/" },
+    kiwixapple: { n: "Kiwix for iOS and macOS: Hotspot feature", u: "https://hub.kiwix.org/weblog/2025/08/kiwix-for-ios-macos-has-been-released-and-brings-the-hotspot-feature-to-your-device/" },
+    kiwixdl: { n: "Kiwix downloads", u: "https://download.kiwix.org/release/" },
+    atp: { n: "ATP 3-50.21 Survival (2018), FAS archive", u: "https://irp.fas.org/doddir/army/atp3-50-21.pdf" },
+    cert: { n: "Ready.gov: CERT training materials", u: "https://www.ready.gov/cert" },
+    hesperian: { n: "Hesperian: Where There Is No Doctor", u: "https://en.hesperian.org/hhg/Where_There_Is_No_Doctor" },
+    omaps: { n: "Organic Maps", u: "https://organicmaps.app/" },
+    mesh: { n: "Meshtastic", u: "https://meshtastic.org/" },
+    vlc: { n: "VideoLAN: VLC", u: "https://www.videolan.org/vlc/" },
+    pocketpal: { n: "PocketPal AI (open source)", u: "https://github.com/a-ghorbani/pocketpal-ai" },
+    llamafile: { n: "Mozilla.ai: llamafile", u: "https://mozilla.ai/open-tools/llamafile" },
+    ifixit: { n: "iFixit: download every guide free", u: "https://www.ifixit.com/News/64006/download-every-ifixit-guide-for-free" },
+    keepass: { n: "KeePassXC", u: "https://keepassxc.org/" },
+    rpi: { n: "Raspberry Pi Imager", u: "https://www.raspberrypi.com/software/" },
+    nomad: { n: "Project N.O.M.A.D.", u: "https://github.com/Crosstalk-Solutions/project-nomad" },
+    havyn: { n: "HAVYN on GitHub", u: "https://github.com/hourglazlabs-x/havyn" },
+    webkitstore: { n: "WebKit: storage policy (Home Screen web apps)", u: "https://webkit.org/blog/14403/updates-to-storage-policy/" },
     cdcfood: { n: "CDC: keep food safe after an emergency", u: "https://www.cdc.gov/food-safety/foods/keep-food-safe-after-emergency.html" },
     usda: { n: "USDA FSIS: how temperatures affect food", u: "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/how-temperatures-affect-food" },
     co: { n: "CDC: avoiding carbon monoxide poisoning", u: "https://www.cdc.gov/natural-disasters/psa-toolkit/avoiding-carbon-monoxide-poisoning.html" },

@@ -1,7 +1,25 @@
 # HAVYN: mission state
 
-**Current milestone:** M2, HAVYN FIELD v1.2: the "fully loaded" pass (binder, numbers, maps, three playbooks, six Phoenix cards). Live deployment waits on one GitHub setting (Settings → Pages → Source: GitHub Actions).
-**Build:** 1.2.0+1b517beb1a · 2026-11-14 · `app/index.html` 239 KB + PDF.js and pdf-lib (2.3 MB, cached for offline)
+**Current milestone:** M3, HAVYN FIELD v1.3: the offline library ("our own Google offline"): archive reader, one Add files button, PDF text search, video and audio, Search everything, the Get more catalog, the vault drive kit and the home library. Live deployment still waits on one GitHub setting (Settings → Pages → Source: GitHub Actions).
+**Build:** 1.3.0 · 2026-11-14 · `app/index.html` 322 KB + `zimkit.js` 54 KB + PDF.js and pdf-lib (2.3 MB, cached for offline)
+
+## v1.3 "done when": evidence
+
+| Criterion | Status | Evidence |
+| --- | --- | --- |
+| HAVYN reads Kiwix ZIM archives offline, without Kiwix code | PASS | Clean-room reader (`src/zimkit.js`) from the openZIM format: header, MIME list, directory, title listings v0/v1, redirects, uncompressed/Zstandard/XZ clusters, extended clusters, split archives. 208/208 checks on openzim's own test suite: every entry of all three layouts readable, XZ and Zstandard copies byte-identical, 40+ damaged archives rejected without crashing or hanging. |
+| XZ decoder is exact | PASS | Byte-for-byte against Python `lzma` and the `xz` tool: presets 0/6/9e, all check types, multi-block, uncompressed chunks, odd lc/lp/pb, tiny dictionaries; trailing bytes ignored; truncated input throws. |
+| Archive pages work like the web, offline | PASS (Chrome) | e2e: title search, articles, images, CSS `url()`, links, `../` paths, redirects, in-page anchors, Back through the whole trail, Random, Main page, text size, dark pages, video with byte-range seeking, PDFs inside archives opened in the PDF reader; a real Wikipedia archive's main page renders 10+ WebP images; all with the network off. |
+| Archive content can't run code or reach the network | PASS | Service worker serves archive pages with `script-src 'none'`, `connect-src 'none'`; reader frame sandboxed without scripts. Fixture archive's inline `<script>` and `onerror` handler never run (e2e, both modes). Zimit website copies are flagged "needs Kiwix". |
+| Works without the service worker (preview, first launch) | PASS (Chrome) | All 28 reader checks pass with service workers blocked: pages rebuilt with blob: resources, scripts and handlers stripped. |
+| One Add files button for every kind of file | PASS | e2e: archives (incl. `.zimaa/.zimab/.zimac`), PDF, MP4, M4A in one pick; type from file contents; duplicate archive refused. |
+| Video and audio play offline and resume | PASS (Chrome) | e2e: MP4 and M4A play from the library; position saved. |
+| Search everything | PASS | e2e: one query returns cards and playbooks, words inside PDFs (text indexed in the background) and archive titles; updates as you type; works offline. |
+| Get more catalog is sourced and consistent | PASS | Unit test: unique ids, every item sourced, one fetch method each, undated stems, https links, phone archives open in HAVYN, phone core set 2.5–3.1 GB. Sizes from Kiwix mirror listings 2026-11-14 (~ marks estimates). |
+| Vault drive kit | PASS (bash) | Against a local fake Kiwix server: picks newest version, resumes a half-finished download to an identical file, verifies SHA-256, deletes a corrupt file and says so, removes the superseded copy, re-run does nothing, missing drive explained. PowerShell version reviewed, not run (no Windows here). |
+| v1.0–v1.2 checks still pass | PASS | e2e 83/83 (mission count now read from content). |
+
+Test totals: engine 22/22, archive reader 208/208, end-to-end 83/83 + 76/76.
 
 ## v1.1 "done when": evidence
 
@@ -50,13 +68,15 @@ An independent pass compared every card step with its sources (AHA 2025 adult an
 ## Open items
 
 1. **Turn on GitHub Pages** (one setting), then install on every phone.
-2. **Medical review gate (16 cards).** The six Phoenix cards added in v1.2 were checked by an independent reviewer against AHA, Red Cross, ADA, CDC and Banner Poison Center. A trained EMT or nurse must still review and sign each file in `content/cards/`; until then the app shows "Awaiting EMT or nurse review" on every card.
-3. **On-device checks that headless Chrome can't do:** the binder share sheet (Print, Save to Files); the PDF reader on an iPhone (memory on long books, iOS Files import); the metronome with the ring/silent switch on; screen wake lock; AirDrop of a Memory Card; Dynamic Type at the largest size; first-screen time on the oldest family iPhone.
-4. **Codex audit** against these tables, then **founder acceptance**.
+2. **Medical review gate (16 cards).** A trained EMT or nurse must review and sign each file in `content/cards/`; until then every card shows "Awaiting EMT or nurse review".
+3. **On-device checks that headless Chrome can't do:**
+   - v1.3: import a 1–2 GB archive on an iPhone (Safari's IndexedDB with a multi-GB file); archive video inside the reader on iOS (service-worker byte ranges in WebKit); the reader frame's link handling and dark pages in WebKit; how much HAVYN may store (`navigator.storage.estimate()` on the family phones).
+   - Earlier: the binder share sheet; the PDF reader on long books; the metronome with the silent switch on; wake lock; AirDrop of a Memory Card; Dynamic Type at the largest size; first-screen time on the oldest iPhone.
+4. **Windows vault script:** run once on a Windows PC (only the bash version ran here).
+5. **Codex audit** against these tables, then **founder acceptance**.
 
 ## Next
 
-- **Next:** the encyclopedia inside HAVYN (Kiwix JS), then the CORE hub and VAULT drives.
-- **Maps:** Apple Maps offline download (iOS 17+) instead of maps built into HAVYN; rally points link into it.
-- **v1.3:** the Kiwix encyclopedia inside HAVYN.
-- **CORE hub, VAULT:** a Pi 5 or laptop serving Kiwix and this app over its own Wi-Fi; two drives, a sync script, SHA-256 checks.
+- **Home library (CORE):** set up Kiwix Hotspot on a laptop or iPad on the home Wi-Fi; save its address in HAVYN (Get more › Home).
+- **VAULT:** buy the drives (Black Friday), run the vault script, keep a second drive in sync.
+- **Later:** full-text search inside archives on the phone (needs a Xapian reader); Zimit archives inside HAVYN (needs a sandboxed replay engine); maps inside HAVYN (Apple Maps offline covers it for now).

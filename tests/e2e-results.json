@@ -2,7 +2,7 @@
  {
   "check": "first screen under 1 s (6x CPU throttle)",
   "pass": true,
-  "detail": "129 ms normal, 308 ms throttled"
+  "detail": "142 ms normal, 457 ms throttled"
  },
  {
   "check": "service worker controls the page",
@@ -242,7 +242,7 @@
  {
   "check": "Status shows mission progress",
   "pass": true,
-  "detail": "1 of 25 done"
+  "detail": "1 of 26 done"
  },
  {
   "check": "custom mission added to its phase",
@@ -362,12 +362,12 @@
  {
   "check": "binder PDF made on the phone",
   "pass": true,
-  "detail": "37364 bytes"
+  "detail": "37369 bytes"
  },
  {
   "check": "binder copy saved to the library",
   "pass": true,
-  "detail": "[['mwh6n7bjqo1jiq', 23]]"
+  "detail": "[['mwh95mn2n0hqyp', 23]]"
  },
  {
   "check": "binder PDF is searchable in the reader",

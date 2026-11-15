@@ -2,3 +2,4 @@ preview/
 tests/shots/
 node_modules/
 .DS_Store
+tools/__pycache__/
