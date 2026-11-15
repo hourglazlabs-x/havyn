@@ -90,9 +90,9 @@ h = h.replace("https://mirror.download.kiwix.org https://download.kiwix.org", MI
 items = {it["id"]: it for it in CONTENT["shelf"]["items"]}
 from tinypdf import pdf  # noqa: E402
 sh = []
-for k in ("sh-epawater", "sh-cpscgen", "sh-nifog"):
-    b = pdf([items[k]["t"], "Test page"], pages=2); (site / "shelf" / items[k]["file"]).write_bytes(b)
-    sh.append({"id": k, "file": items[k]["file"], "size": len(b), "sha256": hashlib.sha256(b).hexdigest(), "pages": 2})
+for k, n in (("sh-epawater", 2), ("sh-cpscgen", 1), ("sh-nifog", 192), ("sh-cert", 268)):   # page counts as in the real files
+    b = pdf([items[k]["t"], "Test page"], pages=n); (site / "shelf" / items[k]["file"]).write_bytes(b)
+    sh.append({"id": k, "file": items[k]["file"], "size": len(b), "sha256": hashlib.sha256(b).hexdigest(), "pages": n})
 (site / "shelf" / "index.json").write_text(json.dumps({"built": "2026-11-15T06:00:00+00:00", "items": sh}))
 (site / "shelf" / "archives.json").write_text(json.dumps({"built": "2026-11-15T06:00:00+00:00", "mirror": MIRROR + "/zim/", "list": MIRROR + "/list/zim/", "items": [a for a in arch if a["id"] != LISTED]}))
 
@@ -118,14 +118,14 @@ with sync_playwright() as p:
     ok("service worker controls the page", page.evaluate("!!navigator.serviceWorker.controller"))
     page.wait_for_selector("#ready")
     ok("Status shows how ready this phone is", until(lambda: "% READY" in page.inner_text("#ready").upper()), page.inner_text("#ready")[:200])
-    ok("one button offers to download everything", until(lambda: "Download everything for this phone" in page.inner_text("#ready")), page.inner_text("#ready")[:300])
+    ok("one button offers to download everything", until(lambda: "DOWNLOAD EVERYTHING ·" in page.inner_text("#ready").upper()), page.inner_text("#ready")[:300])
     rows = page.inner_text("#ready")
     ok("the checklist covers manuals, encyclopedias, plan and backup", all(k in rows for k in ("Manuals and guides", "Encyclopedias", "Family plan", "Memory Card")), rows[:400])
     page.screenshot(path=str(SHOTS / "v15_ready.png"), full_page=False)
     page.evaluate("__HAVYN.arc.PART = 8192")   # small parts, so each test archive is stored in several
     page.click("button[data-act='get-everything']")
     ok("progress shows while downloading", until(lambda: "Downloading" in page.inner_text("#rdymsg"), 10), page.inner_text("#ready")[:300])
-    ok("the shelf documents arrive first", until(lambda: sum(1 for x in lib(page) if x["shelf"]) == 3, 30), [x["shelf"] for x in lib(page)])
+    ok("the shelf documents arrive first", until(lambda: sum(1 for x in lib(page) if x["shelf"]) == 4, 30), [x["shelf"] for x in lib(page)])
     ok("archives download from the Kiwix mirror into HAVYN", until(lambda: len(zims_on(page)) >= len(core) - 1, 60), [x["catalog"] for x in zims_on(page)])
     ok("a dropped connection carries on from the last byte saved (Range)", any(i == DROP and not r.startswith("bytes=0-") for i, r in state["ranges"]) and any(x["catalog"] == DROP for x in zims_on(page)), state["ranges"][:5])
     ok("an archive missing from HAVYN's list is found in Kiwix's directory", any(x["catalog"] == LISTED for x in zims_on(page)) and state["hits"].get("/list/zim/%s/" % core[2]["get"]["zim"], 0) >= 1, state["hits"])
@@ -165,6 +165,35 @@ with sync_playwright() as p:
     ok("after closing and reopening, it finishes from where it stopped", until(lambda: any(x["catalog"] == core[3]["id"] for x in zims_on(page)), 40) and any(i == core[3]["id"] for i, _ in state["ranges"][n_before:]), state["ranges"][n_before:])
     page.goto(BASE + "#/status")
     ok("Status says the downloads are done", until(lambda: "Encyclopedias: %d of %d" % (len(core), len(core)) in page.inner_text("#app"), 15), page.inner_text("#app")[:400])
+    # the field index: "How do I…" opens the exact page in a manual on this phone, and comes back
+    page.goto(BASE + "#/field"); page.wait_for_selector("#fq")
+    hero = page.inner_text(".hero")
+    ok("the field index lists answers and how many manuals are here", "64 answers" in hero and "4 of 25 on this phone" in hero, hero[-160:])
+    page.fill("#fq", "tourniquet")
+    vis = page.evaluate("Array.from(document.querySelectorAll('.fi')).filter(e => !e.classList.contains('hide')).map(e => e.id)")
+    ok("typing filters the answers", vis == ["f-bleed"], vis)
+    page.fill("#fq", "")
+    page.click("#f-bleed a.ref[href*='page=102']")
+    ok("a page link opens the manual at that page", until(lambda: page.inner_text("#pgnum").startswith("102 /"), 15), page.evaluate("location.hash") + " " + (page.inner_text("#pgnum") if page.locator("#pgnum").count() else ""))
+    page.click(".rhead a[aria-label='Back']")
+    ok("Back returns to the field index", until(lambda: page.evaluate("location.hash").startswith("#/field"), 5), page.evaluate("location.hash"))
+    off = page.locator("#f-latrine a.ref.off").count()
+    ok("pages in manuals not on this phone say so", off == 1 and "not on this phone yet" in page.inner_text("#f-latrine"), page.inner_text("#f-latrine"))
+    page.goto(BASE + "#/emergency/bleeding"); page.wait_for_selector(".emhead")
+    deep = page.inner_text(".emdeep") if page.locator(".emdeep").count() else ""
+    ok("an emergency card links to the pages behind it", "CERT manual p. 102" in deep and "Basic Emergency Care" not in deep, deep)
+    page.click(".emdeep a.emlink")
+    ok("and the card's page link opens the manual there", until(lambda: page.inner_text("#pgnum").startswith("102 /"), 15))
+    page.click(".rhead a[aria-label='Back']")
+    ok("Back returns to the card", until(lambda: page.evaluate("location.hash") == "#/emergency/bleeding", 5), page.evaluate("location.hash"))
+    page.goto(BASE + "#/emergency/heartattack"); page.wait_for_selector(".emhead")
+    ok("new cards: heart attack, won't wake up, broken bone, poisoning", all(page.goto(BASE + "#/emergency/" + c) or page.wait_for_selector(".emhead") for c in ("heartattack", "unresponsive", "fracture", "poison")))
+    page.goto(BASE + "#/playbooks/blackout"); page.wait_for_selector(".panel")
+    ok("a playbook lists the pages that go with it", "READ MORE ON THIS PHONE" in page.inner_text("#app").upper() and page.locator("#f-gen a.ref:not(.off)").count() >= 1, page.inner_text("#f-gen") + " | " + json.dumps([x for x in lib(page) if x["shelf"]]))
+    page.goto(BASE + "#/search?q=tourniquet"); 
+    ok("Search everything finds field answers", until(lambda: "Stop heavy bleeding" in page.inner_text("#sres"), 10), page.inner_text("#sres")[:300] if page.locator("#sres").count() else "")
+    page.screenshot(path=str(SHOTS / "v15_search.png"), full_page=False)
+    page.goto(BASE + "#/field"); page.wait_for_selector("#fq"); page.screenshot(path=str(SHOTS / "v15_field.png"), full_page=False)
     # deleting an archive removes its parts
     page.goto(BASE + "#/library/" + zid); time.sleep(0.5)
     keys0 = page.evaluate("__HAVYN.store.keys().then(k => k.filter(x => String(x).startsWith('zpart:')).length)")

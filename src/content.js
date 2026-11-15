@@ -78,6 +78,22 @@ const HAVYN_CONTENT = {
       ]
     },
     {
+      id: "heartattack", title: "Heart attack", sub: "Chest pain, pressure or squeezing", icon: "heart", checked: "2026-11-15",
+      steps: [
+        { t: "Chest pain or pressure? Call 911 now", d: "Don't wait to be sure. It can spread to an arm, the back, neck, jaw or stomach, and come with shortness of breath, a cold sweat, nausea or lightheadedness. Women more often have breathlessness, nausea, back or jaw pain.", call: { n: "911", num: "911" } },
+        { t: "Sit them down and keep them still", d: "Loosen tight clothing. Nobody drives them to the hospital: paramedics start treatment on the way." },
+        { t: "Aspirin: chew and swallow", d: "An alert adult with no aspirin allergy, who hasn't been told by a doctor to avoid it: 162 to 325 mg (one regular 325 mg tablet, or two to four 81 mg low-dose tablets). Not sure? Wait for the paramedics or ask the 911 dispatcher." },
+        { t: "Get ready for the paramedics", d: "Unlock the door. Have their medicines and medicine list ready (Family › their card)." },
+        { t: "They collapse and aren't breathing normally: CPR", d: "Start CPR and send someone for an AED if there is one.", link: "cpr" }
+      ],
+      note: "Aspirin never replaces the 911 call. Don't give it to children for chest pain.",
+      sources: [
+        { n: "AHA: warning signs of a heart attack", u: "https://www.heart.org/en/health-topics/heart-attack/warning-signs-of-a-heart-attack" },
+        { n: "2024 AHA and Red Cross first aid guidelines", u: "https://professional.heart.org/en/science-news/2024-aha-and-american-red-cross-guidelines-for-first-aid" },
+        { n: "AHA Heartsaver: 2024 first aid guideline changes (aspirin, chest pain)", u: "https://cpr.heart.org/-/media/CPR2-Files/Tools-and-Resources/Training-Updates/2024-Training-Updates/2024Guidelines_on_FA_241106_FINAL.pdf" }
+      ]
+    },
+    {
       id: "anaphylaxis", title: "Allergy", sub: "Anaphylaxis: severe allergic reaction", icon: "allergy",
       steps: [
         { t: "Spot it", d: "After a food, sting or medicine: trouble breathing or wheezing, tight throat, swollen lips or tongue, hives all over, repeated vomiting, pale or blue skin, dizziness or fainting. Or mild signs in two body areas at once." },
@@ -110,6 +126,24 @@ const HAVYN_CONTENT = {
         { n: "American Stroke Association: warning signs", u: "https://www.stroke.org/en/help-and-support/resource-library/lets-talk-about-stroke/stroke-tia-and-warning-signs" },
         { n: "CDC: stroke signs (don't drive)", u: "https://www.cdc.gov/stroke/signs-symptoms/index.html" },
         { n: "Harvard Health: last seen well", u: "https://www.health.harvard.edu/heart-health/recognizing-the-most-common-warning-signs-of-a-stroke" }
+      ]
+    },
+    {
+      id: "unresponsive", title: "Won't wake up", sub: "Unresponsive but breathing normally", icon: "side", checked: "2026-11-15",
+      steps: [
+        { t: "Shout, tap their shoulders, check breathing", d: "Look at the chest for up to 10 seconds. Gasping or irregular breathing is not normal breathing: call 911 and start CPR.", link: "cpr" },
+        { t: "Breathing normally: call 911", d: "Put the phone on speaker and stay with them.", call: { n: "911", num: "911" } },
+        { t: "Kneel beside them, straighten their legs", d: "Take off glasses and anything bulky in their pockets." },
+        { t: "Near arm out, far hand to cheek", d: "Put the arm nearest you out at a right angle, elbow bent, palm up. Bring the far arm across the chest and hold the back of that hand against the cheek nearest you." },
+        { t: "Far knee up, roll them toward you", d: "Pull the far knee up with the foot flat on the floor, then pull on that leg to roll them onto their side. Bend the top leg at a right angle so they can't roll over." },
+        { t: "Tilt the head back, keep watching", d: "Lift the chin so the airway stays open and anything in the mouth drains out. Check their breathing until help comes. After 30 minutes, turn them onto the other side." },
+        { t: "Breathing stops or turns to gasps: CPR", d: "Roll them onto their back and start CPR.", link: "cpr" }
+      ],
+      note: "Fall, crash or diving accident (possible neck or back injury)? If they're breathing normally, leave them as they are and keep the head still; move them only if they vomit or you must keep the airway clear. Never leave someone unresponsive on their back.",
+      sources: [
+        { n: "NHS: how to put someone in the recovery position", u: "https://www.nhs.uk/tests-and-treatments/first-aid/recovery-position/" },
+        { n: "2024 AHA and Red Cross first aid guidelines", u: "https://professional.heart.org/en/science-news/2024-aha-and-american-red-cross-guidelines-for-first-aid" },
+        { n: "Resuscitation Council UK: adult basic life support (recovery position)", u: "https://best.barnsleyccg.nhs.uk/media/smkn1hsy/adult-basic-life-support-guidelines.pdf" }
       ]
     },
     {
@@ -166,6 +200,23 @@ const HAVYN_CONTENT = {
       ]
     },
     {
+      id: "fracture", title: "Broken bone", sub: "Deformed, can't bear weight, bone showing", icon: "bone", checked: "2026-11-15",
+      steps: [
+        { t: "Call 911 for big injuries", d: "A bad fall or crash, heavy bleeding, bone through the skin, a limb that looks bent, numb or bluish fingers or toes, a possible broken neck, back or hip, or they won't respond.", call: { n: "911", num: "911" } },
+        { t: "Stop bleeding first", d: "Press with a clean cloth. Bone through the skin: cover the wound and don't push the bone back in.", link: "bleeding" },
+        { t: "Keep it still", d: "Don't try to straighten it. Support it in the position you found it." },
+        { t: "Help is far away: splint it", d: "Pad it, then fix it so the joints above and below the break can't move: a board, rolled magazines or a pillow, tied on with strips of cloth. Fingers or toes should stay warm and pink; loosen it if they go numb or blue." },
+        { t: "Ice, wrapped in cloth", d: "Never straight on the skin. 15 to 20 minutes at a time, to ease swelling and pain." },
+        { t: "Watch for shock", d: "Faint, pale, fast shallow breathing: lay them down with the head slightly lower than the body, raise the legs if that doesn't move the injury, and keep them warm." }
+      ],
+      note: "Possible broken neck or back (fall from height, crash, diving): don't move them unless they're in danger. Keep the head still and in line with the body until help arrives.",
+      sources: [
+        { n: "Mayo Clinic: fractures (broken bones), first aid", u: "https://www.mayoclinic.org/first-aid/first-aid-fractures/basics/art-20056641" },
+        { n: "Mayo Clinic: dislocation, first aid", u: "https://www.mayoclinic.org/first-aid/first-aid-dislocation/basics/art-20056693" },
+        { n: "FEMA CERT Basic Training manual (2019): splinting", u: "https://www.ready.gov/cert" }
+      ]
+    },
+    {
       id: "seizure", title: "Seizure", sub: "Shaking, unresponsive", icon: "pulse",
       steps: [
         { t: "Ease them to the ground", d: "Move hard and sharp things away." },
@@ -214,6 +265,24 @@ const HAVYN_CONTENT = {
         { n: "CDC: 5 things to know about naloxone", u: "https://www.cdc.gov/overdose-prevention/reversing-overdose/about-naloxone.html" },
         { n: "CDC/NIOSH: using naloxone to reverse opioid overdose", u: "https://stacks.cdc.gov/view/cdc/77297/cdc_77297_DS1.pdf" },
         { n: "Washington State DOH: naloxone", u: "https://doh.wa.gov/node/5308" }
+      ]
+    },
+    {
+      id: "poison", title: "Poisoning", sub: "Swallowed, breathed in, on skin or in eyes", icon: "poison", checked: "2026-11-15",
+      steps: [
+        { t: "Won't wake up, not breathing, or a seizure? Call 911", d: "Start CPR if they aren't breathing normally.", call: { n: "911", num: "911" }, link: "cpr" },
+        { t: "Everything else: call Poison Control", d: "1-800-222-1222, free and open 24/7; it reaches your local poison center. Call right away, before any signs. Keep the container in your hand.", call: { n: "Poison Control", num: "1-800-222-1222" } },
+        { t: "Swallowed: don't make them vomit", d: "Don't give anything to eat or drink, and no activated charcoal, unless the poison center tells you to." },
+        { t: "On the skin: clothes off, rinse 15 to 20 minutes", d: "Under running water." },
+        { t: "In the eyes: rinse 15 to 20 minutes", d: "Running lukewarm water. Take out contact lenses." },
+        { t: "Breathed in: get to fresh air", d: "Don't breathe the fumes yourself. Generator, grill or heater indoors: open the carbon monoxide card.", link: "co" },
+        { t: "Tell them", d: "Age and weight, what it was and how much, when, how (mouth, skin, eyes, breathing), first aid given, whether they vomited, and where you are." }
+      ],
+      note: "Keep medicines and chemicals locked up and in their own containers. Not sure it's a poison? Call anyway: the experts would rather hear from you.",
+      sources: [
+        { n: "HRSA Poison Help: what you can do", u: "https://poisonhelp.hrsa.gov/what-you-can-do" },
+        { n: "Arizona poison center: first aid for poisoning", u: "https://dhbazpoisoncom2.pharmacy.arizona.edu/node/14" },
+        { n: "MedlinePlus: poisoning first aid", u: "https://medlineplus.gov/ency/article/007579.htm" }
       ]
     },
     {
@@ -631,6 +700,95 @@ const HAVYN_CONTENT = {
       { t: "2 · Add your own files", d: "Tap Add files to bring in anything else from the Files app: a bigger archive, a PDF, video or audio. HAVYN checks it and keeps its own copy, so you can delete the download afterwards." },
       { t: "3 · Every phone, even without internet", d: "Each phone taps Download everything on Wi-Fi. With no internet, AirDrop a file to each phone, or plug in the vault drive and pick it in Files, then Add files on that phone." },
       { t: "4 · Keep the master copies on the drive", d: "Library files are too big for Memory Cards. The vault drive holds the originals; re-add from it any time." }
+    ]
+  },
+
+  // ---------------- v1.5: field index ("How do I…") ----------------
+  // Each answer points to the exact page in the shelf documents on this phone. r: [shelf id, page, what's there].
+  // Pages are the PDF's own page numbers in HAVYN's copies (the same files on every phone, checked by SHA-256), which is
+  // what the reader shows. Checked against the text of those files on 2026-11-15.
+  field: {
+    checked: "2026-11-15",
+    note: "The exact page in the manuals on this phone, for the things you're most likely to need. Training and the emergency cards come first; these pages are the detail behind them.",
+    groups: [["med", "Injuries and illness"], ["water", "Water"], ["sanit", "Toilets and hygiene"], ["food", "Food"], ["haz", "Fire, storms and shelter"], ["power", "Power"], ["radio", "Radio"], ["nav", "Maps and direction"], ["fam", "Family and kits"]],
+    docs: { "sh-cert": "CERT manual", "sh-bec": "Basic Emergency Care", "sh-shipmed": "Ship's Medicine Chest", "sh-ox-birth": "Maternal-Newborn Nursing", "sh-ox-nursing": "Clinical Nursing Skills", "sh-ox-pharm": "Pharmacology for Nurses",
+      "sh-epawater": "EPA water disinfection", "sh-foodwater": "FEMA Food and Water", "sh-ayr": "Are You Ready?", "sh-survival": "Survival manual", "sh-fieldsan": "Field Sanitation", "sh-canning": "USDA Home Canning",
+      "sh-wrigleycope": "Ready Wrigley: Coping", "sh-wrigleyfire": "Ready Wrigley: Wildfires", "sh-wrigleyheat": "Ready Wrigley: Heat", "sh-cpscgen": "CPSC generator alert", "sh-oshagen": "OSHA generator sheet",
+      "sh-solar": "DOE solar guide", "sh-liec1": "Electric Circuits: DC", "sh-electrician": "Construction Electrician", "sh-neets4": "NEETS 4: Wiring", "sh-nifog": "NIFOG radio guide", "sh-neets10": "NEETS 10: Antennas",
+      "sh-landnav": "Map Reading and Land Navigation", "sh-topo": "USGS map symbols" },
+    items: [
+      { id: "f-bleed", g: "med", q: "Stop heavy bleeding", k: "blood tourniquet wound packing pressure hemorrhage", card: "bleeding", r: [["sh-cert", 102, "Direct pressure and tourniquets"], ["sh-bec", 169, "Pressure and wound packing"], ["sh-bec", 180, "Skills: pressure, packing, tourniquet"]] },
+      { id: "f-shock", g: "med", q: "Spot and treat shock", k: "pale cold clammy fast pulse faint", r: [["sh-cert", 103, "Recognizing shock"], ["sh-bec", 78, "Signs of shock after an injury"]] },
+      { id: "f-check", g: "med", q: "Check someone who is hurt, head to toe", k: "assessment primary survey abcde injuries exam", r: [["sh-bec", 55, "The primary survey (ABCDE)"], ["sh-cert", 131, "Head-to-toe check, step by step"]] },
+      { id: "f-unresp", g: "med", q: "Unresponsive but breathing: recovery position", k: "unconscious passed out fainted airway side", card: "unresponsive", r: [["sh-cert", 105, "Recovery position"], ["sh-bec", 190, "Skill: recovery position"], ["sh-cert", 104, "Opening the airway"]] },
+      { id: "f-heart", g: "med", q: "Heart attack", k: "chest pain pressure aspirin cardiac", card: "heartattack", r: [["sh-bec", 119, "Suspected heart attack"]] },
+      { id: "f-burn", g: "med", q: "Treat a burn", k: "scald blister fire chemical burn", card: "burns", r: [["sh-cert", 107, "Treating burns"], ["sh-bec", 201, "Skill: burn wound care"]] },
+      { id: "f-wound", g: "med", q: "Clean and bandage a wound", k: "cut laceration dressing infection impaled amputation", r: [["sh-cert", 109, "Wound care and bandaging"], ["sh-cert", 110, "Amputations and impaled objects"]] },
+      { id: "f-fracture", g: "med", q: "Splint a broken bone", k: "fracture splint sling dislocation", card: "fracture", r: [["sh-cert", 111, "Fractures"], ["sh-cert", 112, "Splinting with cardboard or a pillow"], ["sh-bec", 191, "Skill: splints"]] },
+      { id: "f-sprain", g: "med", q: "Sprain or strain", k: "ankle twisted swelling", r: [["sh-cert", 112, "Sprains and strains"]] },
+      { id: "f-head", g: "med", q: "Head, neck or back injury", k: "concussion spine skull fall", r: [["sh-cert", 132, "Signs of head, neck or spine injury"], ["sh-bec", 77, "Head injuries"], ["sh-bec", 187, "Keeping the spine still"]] },
+      { id: "f-heat", g: "med", q: "Heat exhaustion and heat stroke", k: "hot overheated cramps sun", card: "heatstroke", pb: "heat", r: [["sh-cert", 115, "Heat exhaustion and heat stroke"], ["sh-shipmed", 49, "Heat stroke"]] },
+      { id: "f-cold", g: "med", q: "Hypothermia and frostbite", k: "cold shivering freezing", r: [["sh-cert", 114, "Hypothermia and frostbite"], ["sh-shipmed", 44, "Hypothermia"]] },
+      { id: "f-ors", g: "med", q: "Make a rehydration drink", k: "ors oral rehydration salts sugar dehydration electrolytes", pb: "heat", r: [["sh-shipmed", 42, "Home rehydration drink (WHO formula)"], ["sh-shipmed", 363, "Rehydration for severe diarrhea"]] },
+      { id: "f-diarrhea", g: "med", q: "Diarrhea and vomiting", k: "stomach bug gastroenteritis food poisoning dehydration", r: [["sh-shipmed", 367, "Gastroenteritis"], ["sh-bec", 120, "Dehydration: the skin pinch test"]] },
+      { id: "f-eye", g: "med", q: "Eye injury", k: "eye chemical splash object", r: [["sh-bec", 228, "Eye injuries (table of conditions)"]] },
+      { id: "f-birth", g: "med", q: "The baby is coming fast", k: "labor childbirth delivery pregnant birth cord", r: [["sh-ox-birth", 849, "Precipitous (very fast) birth"], ["sh-ox-birth", 806, "The birth and cord clamping"], ["sh-ox-birth", 978, "The newborn's first minutes"]] },
+      { id: "f-vitals", g: "med", q: "Take pulse, breathing and temperature", k: "vital signs heart rate respiration blood pressure", r: [["sh-ox-nursing", 627, "Vital signs"]] },
+      { id: "f-dose", g: "med", q: "Work out a medicine dose", k: "dosage milligrams calculation liquid medicine", r: [["sh-ox-pharm", 101, "Dosage arithmetic (check with a pharmacist when you can)"]] },
+      { id: "f-move", g: "med", q: "Move an injured person", k: "drag carry lift rescue", r: [["sh-cert", 217, "Blanket drag and other drags"], ["sh-cert", 218, "Carries"]] },
+      { id: "f-stress", g: "med", q: "Stress after a disaster", k: "anxiety coping trauma mental health sleep", r: [["sh-cert", 144, "Normal stress reactions"], ["sh-wrigleycope", 12, "Slow breathing, for kids"]] },
+      { id: "f-kids", g: "fam", q: "Help children cope", k: "kids scared nightmares fear children", r: [["sh-wrigleycope", 5, "It's not your fault"], ["sh-wrigleycope", 13, "When a child needs more help"]] },
+
+      { id: "f-boil", g: "water", q: "Make water safe: boil it", k: "boil water advisory drinking", pb: "boil", r: [["sh-epawater", 1, "Boiling; settle and filter cloudy water first"], ["sh-foodwater", 13, "Ways to treat water"]] },
+      { id: "f-bleach", g: "water", q: "Make water safe: bleach", k: "chlorine drops gallon disinfect", pb: "boil", r: [["sh-epawater", 2, "Drops of bleach for each amount of water (6% and 8.25%)"]] },
+      { id: "f-waterstore", g: "water", q: "How much water to store, and how", k: "gallon per person storage containers", r: [["sh-foodwater", 9, "How much water"], ["sh-foodwater", 10, "Storing it safely"], ["sh-ayr", 34, "Water for the kit"]] },
+      { id: "f-hidden", g: "water", q: "Water already in your house", k: "water heater tank pipes ice", pb: "blackout", r: [["sh-foodwater", 12, "Water heater, pipes and ice cubes"]] },
+      { id: "f-outdoor", g: "water", q: "Find water outdoors", k: "wild source rain still vine", r: [["sh-survival", 55, "Water: where to find it, how to make it drinkable"], ["sh-survival", 64, "Solar still"]] },
+
+      { id: "f-latrine", g: "sanit", q: "Make an emergency toilet", k: "latrine bathroom sewage waste", r: [["sh-fieldsan", 34, "Cat-hole and trench latrines"]] },
+      { id: "f-handwash", g: "sanit", q: "Set up a handwashing station", k: "wash hands hygiene soap", r: [["sh-fieldsan", 200, "A handwashing device made from cans"]] },
+      { id: "f-pests", g: "sanit", q: "Keep flies and mosquitoes down", k: "insects bugs repellent deet", r: [["sh-fieldsan", 42, "Flies and biting insects"], ["sh-fieldsan", 142, "Repellent on the skin"]] },
+
+      { id: "f-fridge", g: "food", q: "Power's out: is the food still safe?", k: "refrigerator freezer spoiled outage", pb: "blackout", r: [["sh-foodwater", 7, "If the electricity goes off"], ["sh-ayr", 42, "Thawed food: when it's still safe"]] },
+      { id: "f-foodstore", g: "food", q: "What food to store, and for how long", k: "pantry shelf life stockpile", r: [["sh-foodwater", 4, "Emergency food supplies"], ["sh-foodwater", 6, "Shelf life of stored foods"]] },
+      { id: "f-cook", g: "food", q: "Cook without power", k: "stove grill fireplace", pb: "blackout", r: [["sh-foodwater", 8, "How to cook if the power goes out"]] },
+      { id: "f-can", g: "food", q: "Can food at home safely", k: "canning jars pressure canner botulism preserve", r: [["sh-canning", 5, "For safety's sake (botulism)"], ["sh-canning", 6, "Altitude changes the times (Phoenix is about 1,100 ft)"], ["sh-canning", 28, "Water-bath and pressure canners"]] },
+
+      { id: "f-extinguish", g: "haz", q: "Put out a small fire", k: "extinguisher pass kitchen fire", r: [["sh-cert", 172, "Using an extinguisher: P.A.S.S."], ["sh-cert", 168, "Fire safety: when to fight, when to leave"]] },
+      { id: "f-utilities", g: "haz", q: "Shut off gas, water and power", k: "utilities valve meter breaker gas leak", r: [["sh-cert", 177, "Gas shutoff"], ["sh-cert", 175, "Electrical, gas and fuel hazards"], ["sh-ayr", 27, "Shutting off the water"]] },
+      { id: "f-housefire", g: "haz", q: "Home fire: plan your escape", k: "smoke alarm escape house fire", r: [["sh-ayr", 116, "Home fires"]] },
+      { id: "f-wildfire", g: "haz", q: "Wildfire: get ready, leave early", k: "evacuate brush fire", pb: "smoke", r: [["sh-ayr", 124, "Wildfires"], ["sh-wrigleyfire", 12, "Leaving, for kids"]] },
+      { id: "f-smoke", g: "haz", q: "Smoke outside: make a clean room", k: "air quality mask haze wildfire smoke", pb: "smoke", r: [["sh-wrigleyfire", 11, "A clean room at home"], ["sh-wrigleyfire", 6, "Who smoke hurts most"]] },
+      { id: "f-heatwave", g: "haz", q: "Extreme heat at home", k: "heat wave no ac cooling", pb: "heat", r: [["sh-ayr", 86, "Extreme heat"], ["sh-wrigleyheat", 16, "When the AC goes out, for kids"]] },
+      { id: "f-flood", g: "haz", q: "Flood or flash flood", k: "monsoon wash water road", pb: "storm", r: [["sh-ayr", 50, "Floods"]] },
+      { id: "f-storm", g: "haz", q: "Thunderstorm and lightning", k: "monsoon dust storm lightning", pb: "storm", r: [["sh-ayr", 74, "Thunderstorms and lightning"]] },
+      { id: "f-tornado", g: "haz", q: "Tornado", k: "twister warning shelter", r: [["sh-ayr", 58, "Tornadoes"]] },
+      { id: "f-quake", g: "haz", q: "Earthquake", k: "shaking drop cover", r: [["sh-ayr", 94, "Earthquakes"]] },
+      { id: "f-lift", g: "haz", q: "Lift debris off someone safely", k: "trapped rescue lever cribbing", r: [["sh-cert", 210, "Leverage and cribbing"]] },
+      { id: "f-shelter", g: "haz", q: "Make a shelter outdoors", k: "camp lean-to tarp exposure", r: [["sh-survival", 139, "Shelter: picking a site"], ["sh-survival", 146, "A lean-to"]] },
+      { id: "f-firestart", g: "haz", q: "Start a fire outdoors", k: "campfire tinder kindling", r: [["sh-survival", 121, "Tinder, kindling and fuel"]] },
+
+      { id: "f-gen", g: "power", q: "Run a generator safely", k: "generator carbon monoxide backfeed extension cord", card: "co", pb: "blackout", r: [["sh-cpscgen", 1, "Carbon monoxide and backfeeding"], ["sh-oshagen", 1, "Generator safety fact sheet"]] },
+      { id: "f-solar", g: "power", q: "Solar power for a home", k: "panels inverter battery", r: [["sh-solar", 4, "How solar electricity works"], ["sh-solar", 8, "Choosing a system"]] },
+      { id: "f-battery", g: "power", q: "Batteries: amp-hours and banks", k: "battery bank capacity series parallel", r: [["sh-liec1", 410, "Battery ratings and banks"]] },
+      { id: "f-ohm", g: "power", q: "Volts, amps and watts", k: "ohm's law power calculate", r: [["sh-liec1", 157, "Using Ohm's law"]] },
+      { id: "f-wire", g: "power", q: "Pick a wire size for a load", k: "gauge awg ampacity extension cord", r: [["sh-electrician", 141, "Current-carrying capacity"], ["sh-neets4", 18, "Wire sizes"]] },
+
+      { id: "f-frs", g: "radio", q: "Walkie-talkie channels (FRS and GMRS)", k: "walkie talkie channel frequency family radio", r: [["sh-nifog", 122, "FRS channels"], ["sh-nifog", 123, "GMRS channels"]] },
+      { id: "f-noaa", g: "radio", q: "Weather radio frequencies", k: "noaa weather alert", r: [["sh-nifog", 44, "NOAA Weather Radio"]] },
+      { id: "f-ham", g: "radio", q: "Amateur radio calling frequencies", k: "ham 2 meter simplex 146.52", r: [["sh-nifog", 112, "Amateur radio calling frequencies"]] },
+      { id: "f-marine", g: "radio", q: "Marine distress channels", k: "boat channel 16 vhf", r: [["sh-nifog", 108, "Maritime distress frequencies"]] },
+      { id: "f-antenna", g: "radio", q: "A simple wire antenna", k: "dipole half-wave antenna", r: [["sh-neets10", 187, "Half-wave antennas and how to feed them"]] },
+
+      { id: "f-contour", g: "nav", q: "Read contour lines", k: "topographic elevation hills map", r: [["sh-landnav", 124, "Contour lines"]] },
+      { id: "f-compass", g: "nav", q: "Use a compass", k: "bearing azimuth direction", r: [["sh-landnav", 110, "The compass and how to use it"]] },
+      { id: "f-north", g: "nav", q: "Find north without a compass", k: "sun shadow stars north star", r: [["sh-landnav", 117, "Shadow-tip method"], ["sh-landnav", 118, "The North Star"]] },
+      { id: "f-pace", g: "nav", q: "Measure distance by pacing", k: "distance steps pace count", r: [["sh-landnav", 60, "Pace count"]] },
+      { id: "f-backaz", g: "nav", q: "Retrace your route", k: "back azimuth return", r: [["sh-landnav", 66, "Back azimuth"]] },
+      { id: "f-symbols", g: "nav", q: "Map symbols", k: "legend topographic symbols", r: [["sh-topo", 1, "USGS topographic map symbols"]] },
+
+      { id: "f-plan", g: "fam", q: "Family communication plan", k: "contact meeting place plan form", r: [["sh-ayr", 26, "Family communications"], ["sh-ayr", 201, "Fill-in family plan"]] },
+      { id: "f-kit", g: "fam", q: "Build a disaster supplies kit", k: "go bag kit checklist supplies", r: [["sh-ayr", 36, "Basic disaster supplies kit"], ["sh-foodwater", 15, "A kit to grab if you must leave"]] }
     ]
   },
 

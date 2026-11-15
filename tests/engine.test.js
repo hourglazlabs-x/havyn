@@ -126,7 +126,7 @@ test("sanitize drops malformed records", () => {
 });
 
 test("content: every card has steps, sources, and a reviewed date", () => {
-  assert.equal(C.cards.length, 16);
+  assert.equal(C.cards.length, 20);
   for (const c of C.cards) {
     assert.ok(c.steps.length >= 4, c.id);
     assert.ok(c.sources.length >= 1, c.id);
@@ -290,4 +290,41 @@ test("v1.5 resumable SHA-256 (archive downloads) matches Node's, across random c
     assert.equal(h.hex(), want, "length " + n);
   }
   assert.equal(new Sha256().update(new TextEncoder().encode("abc")).hex(), "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad");
+});
+
+// ---------------- v1.5 ----------------
+test("v1.5 field index: every answer points at a real page of a phone-set document HAVYN hosts", () => {
+  const F = C.field, ids = new Set(), groups = new Set(F.groups.map((g) => g[0]));
+  assert.ok(F.items.length >= 60, "answers: " + F.items.length);
+  assert.match(F.checked, /^\d{4}-\d{2}-\d{2}$/);
+  for (const f of F.items) {
+    assert.ok(!ids.has(f.id), "duplicate " + f.id); ids.add(f.id);
+    assert.ok(groups.has(f.g), f.id + " group " + f.g);
+    assert.ok(f.q && f.r.length >= 1, f.id);
+    if (f.card) assert.ok(C.cards.some((c) => c.id === f.card), f.id + " card " + f.card);
+    if (f.pb) assert.ok(C.playbooks.some((p) => p.id === f.pb && !p.soon), f.id + " playbook " + f.pb);
+    for (const [doc, page, what] of f.r) {
+      const it = C.shelf.items.find((i) => i.id === doc);
+      assert.ok(it, f.id + ": no shelf document " + doc);
+      assert.ok(it.ph && it.lic !== "link", f.id + ": " + doc + " must be in the phone set and hosted by HAVYN (same file, same pages)");
+      assert.ok(Number.isInteger(page) && page >= 1 && page <= it.pg, f.id + ": " + doc + " p. " + page + " of " + it.pg);
+      assert.ok(what && what.length > 3, f.id);
+      assert.ok(F.docs[doc], "short name for " + doc);
+    }
+  }
+  // every emergency card with a matching answer gets "Go deeper" pages; the new cards are among them
+  for (const id of ["bleeding", "burns", "heatstroke", "heartattack", "unresponsive", "fracture"]) assert.ok(F.items.some((f) => f.card === id), "deeper pages for " + id);
+});
+
+test("v1.5 new cards: heart attack, won't wake up, broken bone, poisoning", () => {
+  for (const id of ["heartattack", "unresponsive", "fracture", "poison"]) {
+    const c = C.cards.find((x) => x.id === id);
+    assert.ok(c && c.steps.length >= 5 && c.sources.length >= 3, id);
+    assert.match(c.checked, /^\d{4}-\d{2}-\d{2}$/);
+    assert.ok(c.steps.some((s) => s.call), id + " has a call step");
+  }
+  const ha = C.cards.find((x) => x.id === "heartattack");
+  assert.match(ha.steps.map((s) => s.d).join(" "), /162 to 325 mg/);   // 2024 AHA/Red Cross first aid guideline
+  const po = C.cards.find((x) => x.id === "poison");
+  assert.ok(po.steps.some((s) => s.call && s.call.num === "1-800-222-1222"));
 });

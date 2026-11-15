@@ -61,6 +61,9 @@
     wave: '<circle cx="12" cy="5.5" r="2"/><path d="M3 12c2 0 2-2 4.5-2s2.5 2 4.5 2 2-2 4.5-2 2.5 2 4.5 2"/><path d="M3 17c2 0 2-2 4.5-2s2.5 2 4.5 2 2-2 4.5-2 2.5 2 4.5 2"/>',
     bug: '<ellipse cx="12" cy="15" rx="3.5" ry="4.5"/><path d="M12 10.5V7a3 3 0 0 1 3-3h2l1.5 1.5"/><path d="M8.7 13 5 11.5M8.5 16.5 5 17.5M15.3 13l3.7-1.5M15.5 16.5l3.5 1"/>',
     snake: '<path d="M4 19c3 0 4-3 7-3s3 3 6 3 3-2.5 3-5.5S17.5 8 14.5 8H12"/><circle cx="10" cy="8" r="2.2"/><path d="M7.8 8H5.5l-1 1M5.5 8l-1-1"/>',
+    bone: '<path d="M9.2 14.8l5.6-5.6"/><circle cx="6.6" cy="15.2" r="2.1"/><circle cx="8.8" cy="17.4" r="2.1"/><circle cx="15.2" cy="6.6" r="2.1"/><circle cx="17.4" cy="8.8" r="2.1"/>',
+    poison: '<path d="M9.5 3h5M10.5 3v4.2L6.5 12v8a1 1 0 0 0 1 1h9a1 1 0 0 0 1-1v-8l-4-4.8V3"/><path d="M10 13.5l4 4M14 13.5l-4 4"/>',
+    side: '<circle cx="5.5" cy="11" r="2.2"/><path d="M8.5 12.5h6.5l3 3.5"/><path d="M13 12.5l-1.5 4.5"/><path d="M3 19.5h18"/>',
     candy: '<circle cx="12" cy="12" r="4.5"/><path d="M7.6 11 3 8v8l4.6-3M16.4 11 21 8v8l-4.6-3"/>',
     lungs: '<path d="M12 4v8"/><path d="M12 11c-1.2-.8-2.2-1-3.4-1C6 10 4 13 4 16.5 4 19 5 20 6.5 20 9 20 10 18.5 10 16v-3.5"/><path d="M12 11c1.2-.8 2.2-1 3.4-1 2.6 0 4.6 3 4.6 6.5 0 2.5-1 3.5-2.5 3.5-2.5 0-3.5-1.5-3.5-4v-3.5"/>',
     cart: '<path d="M3 4h2l2.4 11h10.2L20 8H6.2"/><circle cx="9.5" cy="19.5" r="1.4"/><circle cx="16.5" cy="19.5" r="1.4"/>',
@@ -227,10 +230,10 @@
 
   const SCREENS = {
     status: renderStatus, emergency: renderEmergency, playbooks: renderPlaybooks, guides: renderGuides, family: renderFamily, supplies: renderSupplies, buy: renderBuy,
-    missions: renderMissions, plan: renderPlan, comms: renderComms, library: renderLibrary, binder: renderBinder, system: renderSystem,
+    missions: renderMissions, plan: renderPlan, comms: renderComms, library: renderLibrary, binder: renderBinder, system: renderSystem, field: renderField,
     search: renderSearch, archive: renderArchive
   };
-  const TAB_OF = { status: "status", missions: "status", guides: "guides", playbooks: "guides", plan: "guides", comms: "guides", library: "guides", binder: "guides", search: "guides", archive: "guides", emergency: "emergency", family: "family", supplies: "supplies", buy: "supplies" };
+  const TAB_OF = { status: "status", missions: "status", guides: "guides", playbooks: "guides", plan: "guides", comms: "guides", library: "guides", binder: "guides", search: "guides", field: "guides", archive: "guides", emergency: "emergency", family: "family", supplies: "supplies", buy: "supplies" };
   let lastPath = "";
   function render() {
     route = parseHash();
@@ -421,7 +424,9 @@
       (i < n - 1 ? '<button class="next" data-act="step-next">NEXT</button>' : '<a class="next" href="#/emergency">ALL CARDS</a>') + "</div>";
     if (c.note) h += '<div class="emnote">' + esc(c.note) + "</div>";
     if (c.noteLink) h += '<a class="emlink" href="#/emergency/' + c.noteLink + '" data-act="card-jump">Open ' + esc(C.cards.find((x) => x.id === c.noteLink).title) + " card</a>";
-    h += '<div class="emsrc">' + esc(C.noSignal) + '<br><br>Source: ' + srcLine(c.sources) + "<br>Checked " + esc(C.reviewed) + " · " + esc(C.gate) + "</div>";
+    const deep = deeperRefs("card", c.id), here = deep.filter((r) => pageHref(r[0], r[1]));
+    if (deep.length) h += '<div class="emdeep"><div class="emdh">Go deeper on this phone</div>' + (here.length ? here.map((r) => '<a class="emlink" href="' + pageHref(r[0], r[1], "#/emergency/" + c.id) + '">' + ic("book") + esc(fieldDoc(r[0])) + " p. " + r[1] + ": " + esc(r[2]) + "</a>").join("") : '<div class="emdn">The manuals behind this card aren\'t on this phone yet. When this is over: Status › Download everything.</div>') + "</div>";
+    h += '<div class="emsrc">' + esc(C.noSignal) + '<br><br>Source: ' + srcLine(c.sources) + "<br>Checked " + esc(c.checked || C.reviewed) + " · " + esc(C.gate) + "</div>";
     return h;
   }
   function stepTo(delta) {
@@ -430,6 +435,58 @@
     const s = c.steps[cardView.step];
     if (s.beat) { cardView.autoBeat = true; Snd.ctx(); } else { Metro.stop(); }
     render();
+  }
+
+  /* ---------------- FIELD INDEX: "How do I…" → the exact page in the manuals on this phone ---------------- */
+  const FIELD = () => (C.field && C.field.items) || [];
+  const shelfItem = (id) => C.shelf.items.find((i) => i.id === id);
+  const fieldDoc = (id) => (C.field && C.field.docs && C.field.docs[id]) || (shelfItem(id) || {}).t || id;
+  // A page link that opens the reader at that page and comes back to where you were (from = a route inside HAVYN).
+  function pageHref(docId, page, from) {
+    const it = shelfItem(docId), have = it && shelfHave(it);
+    return have ? "#/library/" + have.id + "?page=" + page + (from ? "&from=" + encodeURIComponent(from) : "") : "";
+  }
+  function refRow(r, from) {
+    const href = pageHref(r[0], r[1], from);
+    return '<a class="ref' + (href ? "" : " off") + '" href="' + (href || "#/archive?t=shelf&s=" + esc((shelfItem(r[0]) || {}).sys || "")) + '">' + ic(href ? "book" : "download") +
+      '<span class="tx"><b>' + esc(fieldDoc(r[0])) + " · p. " + r[1] + "</b><small>" + esc(r[2]) + (href ? "" : " · not on this phone yet") + "</small></span></a>";
+  }
+  // Unique pages behind a card or playbook (the field entries that name it).
+  function deeperRefs(kind, id) {
+    const seen = new Set(), out = [];
+    for (const f of FIELD()) if (f[kind] === id) for (const r of f.r) { const k = r[0] + ":" + r[1]; if (!seen.has(k)) { seen.add(k); out.push(r); } }
+    return out;
+  }
+  function fieldRow(f, from) {
+    const pb = f.pb && !String(from || "").endsWith("/" + f.pb) && C.playbooks.find((x) => x.id === f.pb && !x.soon);   // no link to the playbook you're in
+    return '<div class="fi" id="' + esc(f.id) + '" data-k="' + esc(fold(f.q + " " + (f.k || "") + " " + f.r.map((r) => r[2] + " " + fieldDoc(r[0])).join(" "))) + '"><div class="fq"><b>' + esc(f.q) + "</b>" +
+      (f.card ? '<a class="chip crit" href="#/emergency/' + esc(f.card) + '">Card</a>' : "") + (pb ? '<a class="chip" href="#/playbooks/' + esc(pb.id) + '">' + esc(pb.title) + "</a>" : "") + "</div>" +
+      f.r.map((r) => refRow(r, from)).join("") + "</div>";
+  }
+  function renderField() {
+    const F = C.field, sel = FIELD().find((f) => f.id === route.q.f);
+    let h = backbar(sel ? "#/field" : "#/guides", "How do I…");
+    const docs = Array.from(new Set(FIELD().flatMap((f) => f.r.map((r) => r[0])))), have = docs.filter((id) => { const it = shelfItem(id); return it && shelfHave(it); }).length;
+    if (sel) {
+      h += '<div class="list fl" style="margin-top:6px">' + fieldRow(sel, "#/field?f=" + sel.id) + "</div>" + '<div class="btnrow" style="margin-top:10px"><a class="btn ghost sm" href="#/field">Every answer</a></div>';
+      return h;
+    }
+    h += '<section class="glass hero"><div class="lab">Field index · pages checked ' + esc(F.checked) + '</div><h2 style="margin:6px 0 4px;font-size:1.6rem">How do I…</h2><div class="sub">' + esc(F.note) + "</div>" +
+      '<div class="sub mono" style="font-size:.78rem;margin-top:8px">' + FIELD().length + " answers · " + docs.length + " documents · " + have + " of " + docs.length + " on this phone</div>" +
+      (have < docs.length && !PREVIEW ? '<div class="btnrow" style="margin-top:10px"><a class="btn sm" href="#/status">' + ic("download") + "Download everything</a></div>" : "") + "</section>";
+    h += '<div class="zs fsearch"><input id="fq" type="search" enterkeyhint="search" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Bleeding, bleach, generator, compass…" aria-label="Filter the field index"></div>';
+    for (const [g, label] of F.groups) {
+      const xs = FIELD().filter((f) => f.g === g); if (!xs.length) continue;
+      h += '<div class="sec" data-fg="' + g + '"><span class="lab">' + esc(label) + '</span></div><div class="list fl" data-fg="' + g + '">' + xs.map((f) => fieldRow(f, "#/field")).join("") + "</div>";
+    }
+    h += '<div id="fnone" class="empty hide">No answer here for that. Try Search everything: it also looks inside every PDF and archive on this phone.</div>';
+    return h;
+  }
+  function fieldFilter(v) {
+    const words = fold(v).trim().split(/\s+/).filter(Boolean); let any = false;
+    document.querySelectorAll(".fi").forEach((el) => { const ok = words.every((w) => el.dataset.k.includes(w)); el.classList.toggle("hide", !ok); if (ok) any = true; });
+    document.querySelectorAll("[data-fg]").forEach((el) => { const g = el.dataset.fg, list = document.querySelector('.fl[data-fg="' + g + '"]'); el.classList.toggle("hide", !!list && !list.querySelector(".fi:not(.hide)")); });
+    const n = $("#fnone"); if (n) n.classList.toggle("hide", any);
   }
 
   /* ---------------- PLAYBOOKS ---------------- */
@@ -467,6 +524,8 @@
       });
       h += "</section>";
     });
+    const more = FIELD().filter((f) => f.pb === p.id);
+    if (more.length) h += '<section class="glass panel"><h3>Read more on this phone</h3><div class="list fl">' + more.map((f) => fieldRow(f, "#/playbooks/" + p.id)).join("") + "</div></section>";
     h += '<div class="btnrow"><button class="btn ghost" data-act="reset-checks" data-id="' + p.id + '">Reset checklist</button></div>';
     h += '<p class="empty" style="margin-top:14px;font-size:.85rem">Sources: ' + srcLine(p.sources.map((k) => C.refs[k])) + "<br>Checked " + esc(C.reviewed) + ".</p>";
     return h;
@@ -671,6 +730,7 @@
       li("#/missions", "check", "Missions", "Step by step, today through May") +
       li("#/binder", "card", "Printable binder", "Plan, numbers, medicines and every card on paper") +
       '</div><div class="sec"><span class="lab">Library</span></div><div class="list">' +
+      li("#/field", "book", "How do I…", FIELD().length + " answers, each opening the exact page in the manuals on this phone") +
       li("#/library", "globe", "Offline library", libSummary() || "Encyclopedias, PDFs, video and audio, all offline") +
       li("#/search", "search", "Search everything", "One box: cards, plan, PDFs and every archive") +
       li("#/archive?t=shelf", "book", "Reference shelf", "Real manuals by system: medicine, water, power, tools, building") +
@@ -917,7 +977,8 @@
   function renderReader(id) {
     const x = LIB.find((d) => d.id === id);
     if (!x) { route.parts = ["library"]; return renderLibrary(); }
-    let h = '<div class="rhead"><header class="top"><a class="ibtn" href="#/library" aria-label="Back to library">' + ic("back") + '</a><span class="rtitle">' + esc(x.name) + '</span><span class="mono rpg" id="pgnum">' + (x.lastPage || 1) + " / " + (x.pages || "…") + "</span></header>" +
+    const from = /^#\/[\w\-/?=&.%]{1,200}$/.test(route.q.from || "") ? route.q.from : "#/library";
+    let h = '<div class="rhead"><header class="top"><a class="ibtn" href="' + esc(from) + '" aria-label="Back">' + ic("back") + '</a><span class="rtitle">' + esc(x.name) + '</span><span class="mono rpg" id="pgnum">' + (x.lastPage || 1) + " / " + (x.pages || "…") + "</span></header>" +
       '<div class="rbar"><button class="ibtn" data-act="pdf-toc" aria-label="Contents">' + ic("toc") + '</button><button class="ibtn" data-act="pdf-find" aria-label="Find text">' + ic("search") + "</button>" +
       '<form data-form="pdfgo" class="rgo"><input name="p" inputmode="numeric" placeholder="Page" aria-label="Go to page" autocomplete="off"><button class="btn sm" type="submit">Go</button></form>' +
       '<button class="ibtn" data-act="pdf-zoom" data-z="-1" aria-label="Zoom out">' + ic("minus") + '</button><button class="ibtn" data-act="pdf-zoom" data-z="1" aria-label="Zoom in">' + ic("plus") + "</button></div></div>";
@@ -1363,6 +1424,7 @@
     // w: tie-break weight, so life-safety content ranks above shopping and catalog entries.
     const out = [], add = (kind, icon, title, text, href, w) => out.push({ kind, icon, title, text: String(text || ""), href, w: w || 0, ft: fold(title), fx: fold(title + " \n " + text) });
     for (const c of C.cards) add("Emergency card", c.icon, c.title, [c.sub].concat(c.steps.map((s) => s.t + ". " + (s.d || "")), c.note || "").join(" "), "#/emergency/" + c.id, 8);
+    for (const f of FIELD()) add("How do I", "book", f.q, f.r.map((r) => fieldDoc(r[0]) + " p. " + r[1] + ": " + r[2]).join(" · ") + " · " + (f.k || ""), "#/field?f=" + f.id, 7);
     for (const p of C.playbooks) add("Playbook", p.icon, p.title, [p.sub, p.trigger].concat(p.leave || [], ...(p.phases || []).map((ph) => ph.items.map((it) => it.t + ". " + (it.d || "")))).join(" "), "#/playbooks/" + p.id, 6);
     for (const n of C.numbers) add("Phone number", "phone", n.n, n.num + " " + (n.d || ""), "#/comms", 5);
     for (const r of C.comms.ladder) add("Comms", "radio", r.rung + ": " + r.t, [r.when, r.range, r.d].join(" "), "#/comms", 2);
@@ -2536,6 +2598,7 @@
   document.addEventListener("input", (ev) => {
     const t = ev.target;
     if (t.id === "sq") SearchUI.later(t.value);
+    else if (t.id === "fq") fieldFilter(t.value);
     else if (t.id === "zq") { clearTimeout(zqT); const id = t.closest("form").dataset.id; zqT = setTimeout(() => ZR.search(id, t.value, $("#zres")), 140); }
   });
   function formVals(f) { const o = {}; new FormData(f).forEach((v, k) => { o[k] = typeof v === "string" ? v.trim() : v; }); return o; }

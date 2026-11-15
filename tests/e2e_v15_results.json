@@ -7,27 +7,27 @@
  {
   "name": "Status shows how ready this phone is",
   "pass": true,
-  "detail": "THIS PHONE\n10% READY NOT YET\nDownload everything for this phone \u00b7 21 MB\n10 items. Use Wi-Fi and keep HAVYN open (the screen stays on); it picks up where it stopped if you close it.\nOn the Home Screen\n"
+  "detail": "THIS PHONE\n10% READY NOT YET\nDownload everything \u00b7 21 MB\n11 items. Use Wi-Fi and keep HAVYN open (the screen stays on); it picks up where it stopped if you close it.\nOn the Home Screen\nIn Safari: Shar"
  },
  {
   "name": "one button offers to download everything",
   "pass": true,
-  "detail": "THIS PHONE\n10% READY NOT YET\nDownload everything for this phone \u00b7 21 MB\n10 items. Use Wi-Fi and keep HAVYN open (the screen stays on); it picks up where it stopped if you close it.\nOn the Home Screen\nIn Safari: Share \u203a Add to Home Screen, then open HAVYN from its icon. Downloads made in a Safari tab"
+  "detail": "THIS PHONE\n10% READY NOT YET\nDownload everything \u00b7 21 MB\n11 items. Use Wi-Fi and keep HAVYN open (the screen stays on); it picks up where it stopped if you close it.\nOn the Home Screen\nIn Safari: Share \u203a Add to Home Screen, then open HAVYN from its icon. Downloads made in a Safari tab stay in that t"
  },
  {
   "name": "the checklist covers manuals, encyclopedias, plan and backup",
   "pass": true,
-  "detail": "THIS PHONE\n10% READY NOT YET\nDownload everything for this phone \u00b7 21 MB\n10 items. Use Wi-Fi and keep HAVYN open (the screen stays on); it picks up where it stopped if you close it.\nOn the Home Screen\nIn Safari: Share \u203a Add to Home Screen, then open HAVYN from its icon. Downloads made in a Safari tab stay in that tab.\nWorks with no internet\nThe app itself is saved on this phone.\nManuals and guides:"
+  "detail": "THIS PHONE\n10% READY NOT YET\nDownload everything \u00b7 21 MB\n11 items. Use Wi-Fi and keep HAVYN open (the screen stays on); it picks up where it stopped if you close it.\nOn the Home Screen\nIn Safari: Share \u203a Add to Home Screen, then open HAVYN from its icon. Downloads made in a Safari tab stay in that tab.\nWorks with no internet\nManuals and guides: 0 of 50\nFirst aid, water, food, power, radio, repair "
  },
  {
   "name": "progress shows while downloading",
   "pass": true,
-  "detail": "THIS PHONE\n10% READY NOT YET\nDownload everything for this phone \u00b7 21 MB\nStop\n10 items. Use Wi-Fi and keep HAVYN open (the screen stays on); it picks up where it stopped if you close it.\nDownloading 2 of 3: Portable Generator Hazards \u00b7 65%. Keep HAVYN open; the screen stays on.\nOn the Home Screen\nIn "
+  "detail": "THIS PHONE\n10% READY NOT YET\nDownload everything \u00b7 21 MB\nStop\n11 items. Use Wi-Fi and keep HAVYN open (the screen stays on); it picks up where it stopped if you close it.\nDownloading 2 of 4: Portable Generator Hazards \u00b7 1%. Keep HAVYN open; the screen stays on.\nOn the Home Screen\nIn Safari: Share \u203a "
  },
  {
   "name": "the shelf documents arrive first",
   "pass": true,
-  "detail": "['sh-epawater', 'sh-cpscgen', 'sh-nifog']"
+  "detail": "['sh-epawater', 'sh-cpscgen', 'sh-nifog', 'sh-cert']"
  },
  {
   "name": "archives download from the Kiwix mirror into HAVYN",
@@ -52,7 +52,7 @@
  {
   "name": "every downloaded archive was checked against SHA-256",
   "pass": true,
-  "detail": "[{'id': 'mwhit2d9bv2s35', 'type': 'zim', 'name': 'Test WikiMed: medical encyclopedia', 'shelf': '', 'catalog': 'p-wikimed', 'verified': True, 'size': 44276, 'file': 'wikipedia_en_medicine_maxi_2026-10.zim'}, {'id': 'mwhit4yvr30pls', 'type': 'zim', 'name': 'Test Water treatment', 'shelf': '', 'catalog': 'p-water', 'verified': True, 'size': 44248, 'file': 'zimgit-water_en_2026-10.zim'}, {'id': 'mwhit55otx1rei', 'type': 'zim', 'name': 'Test Food for preppers', 'shelf': '', 'catalog': 'p-food', 'verified': True, 'size': 44261, 'file': 'zimgit-food-preparation_en_2026-10.zim'}, {'id': 'mwhit5cneqzcbs', 'type': 'zim', 'name': 'Test Medical library', 'shelf': '', 'catalog': 'p-medlib', 'verified': True, 'size': 44251, 'file': 'zimgit-medicine_en_2026-10.zim'}, {'id': 'mwhit5jibq09o4', 'type': 'zim', 'name': 'Test A library of knots', 'shelf': '', 'catalog': 'p-knots', 'verified': True, 'size': 44251, 'file': 'zimgit-knots_en_2026-10.zim'}, {'id': 'mwhit5q6s5qlk5', 'type': 'zim', 'name': 'Test Vikidia: encyclopedia for kids', 'shelf': '', 'catalog': 'p-vikidia', 'verified': True, 'size': 44270, 'file': 'vikidia_en_all_maxi_2026-10.zim'}]"
+  "detail": "[{'id': 'mwhjgipzgkw1s3', 'type': 'zim', 'name': 'Test WikiMed: medical encyclopedia', 'shelf': '', 'catalog': 'p-wikimed', 'verified': True, 'size': 44276, 'file': 'wikipedia_en_medicine_maxi_2026-10.zim'}, {'id': 'mwhjgld3iglyua', 'type': 'zim', 'name': 'Test Water treatment', 'shelf': '', 'catalog': 'p-water', 'verified': True, 'size': 44248, 'file': 'zimgit-water_en_2026-10.zim'}, {'id': 'mwhjglki95bhhv', 'type': 'zim', 'name': 'Test Food for preppers', 'shelf': '', 'catalog': 'p-food', 'verified': True, 'size': 44261, 'file': 'zimgit-food-preparation_en_2026-10.zim'}, {'id': 'mwhjglrox99aox', 'type': 'zim', 'name': 'Test Medical library', 'shelf': '', 'catalog': 'p-medlib', 'verified': True, 'size': 44251, 'file': 'zimgit-medicine_en_2026-10.zim'}, {'id': 'mwhjglz59unrl7', 'type': 'zim', 'name': 'Test A library of knots', 'shelf': '', 'catalog': 'p-knots', 'verified': True, 'size': 44251, 'file': 'zimgit-knots_en_2026-10.zim'}, {'id': 'mwhjgm67s1hjrb', 'type': 'zim', 'name': 'Test Vikidia: encyclopedia for kids', 'shelf': '', 'catalog': 'p-vikidia', 'verified': True, 'size': 44270, 'file': 'vikidia_en_all_maxi_2026-10.zim'}]"
  },
  {
   "name": "archives are stored in parts (no second full copy)",
@@ -107,12 +107,67 @@
  {
   "name": "Status says the downloads are done",
   "pass": true,
-  "detail": "HAVYN\nFIELD\nFAMILY AUTONOMY\n\u2014\nDAYS\nAdd your household and supplies to see how long you can last.\n\u2014\nWATER\nNO DATA\n\u2014\nFOOD\nNO DATA\n\u2014\nMEDS\nNO DATA\n\u2014\nPOWER\nNO DATA\nTHIS PHONE\n37% READY NOT YET\nOn the Home Screen\nIn Safari: Share \u203a Add to Home Screen, then open HAVYN from its icon. Downloads made in a Safari tab stay in that tab.\nWorks with no internet\nThe app itself is saved on this phone.\nManuals and "
+  "detail": "HAVYN\nFIELD\nFAMILY AUTONOMY\n\u2014\nDAYS\nAdd your household and supplies to see how long you can last.\nTHIS PHONE\n37% READY NOT YET\nOn the Home Screen\nIn Safari: Share \u203a Add to Home Screen, then open HAVYN from its icon. Downloads made in a Safari tab stay in that tab.\nWorks with no internet\nManuals and guides: 4 of 50\nFirst aid, water, food, power, radio, repair and survival manuals (492 MB to go).\nEnc"
+ },
+ {
+  "name": "the field index lists answers and how many manuals are here",
+  "pass": true,
+  "detail": "d the emergency cards come first; these pages are the detail behind them.\n64 answers \u00b7 25 documents \u00b7 4 of 25 on this phone\nGet the manuals: Download everything"
+ },
+ {
+  "name": "typing filters the answers",
+  "pass": true,
+  "detail": "['f-bleed']"
+ },
+ {
+  "name": "a page link opens the manual at that page",
+  "pass": true,
+  "detail": "#/library/mwhjgio7j7u4ds?page=102&from=%23%2Ffield 102 / 268"
+ },
+ {
+  "name": "Back returns to the field index",
+  "pass": true,
+  "detail": "#/field"
+ },
+ {
+  "name": "pages in manuals not on this phone say so",
+  "pass": true,
+  "detail": "Make an emergency toilet\nField Sanitation \u00b7 p. 34\nCat-hole and trench latrines \u00b7 not on this phone yet"
+ },
+ {
+  "name": "an emergency card links to the pages behind it",
+  "pass": true,
+  "detail": "GO DEEPER ON THIS PHONE\nCERT manual p. 102: Direct pressure and tourniquets"
+ },
+ {
+  "name": "and the card's page link opens the manual there",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "Back returns to the card",
+  "pass": true,
+  "detail": "#/emergency/bleeding"
+ },
+ {
+  "name": "new cards: heart attack, won't wake up, broken bone, poisoning",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "a playbook lists the pages that go with it",
+  "pass": true,
+  "detail": "Run a generator safely\nCARD\nCPSC generator alert \u00b7 p. 1\nCarbon monoxide and backfeeding\nOSHA generator sheet \u00b7 p. 1\nGenerator safety fact sheet \u00b7 not on this phone yet | [{\"id\": \"mwhjgimkd9v5ko\", \"type\": \"pdf\", \"name\": \"Emergency Disinfection of Drinking Water\", \"shelf\": \"sh-epawater\", \"catalog\": \"\", \"verified\": false, \"size\": 976, \"file\": \"EPA-Emergency-Disinfection-of-Drinking-Water.pdf\"}, {\"id\": \"mwhjginaoay6yx\", \"type\": \"pdf\", \"name\": \"Portable Generator Hazards\", \"shelf\": \"sh-cpscgen\", \"catalog\": \"\", \"verified\": false, \"size\": 637, \"file\": \"CPSC-Portable-Generator-Hazards.pdf\"}, {\"id\": \"mwhjginomryhtg\", \"type\": \"pdf\", \"name\": \"National Interoperability Field Operations Guide (NIFOG 2.02)\", \"shelf\": \"sh-nifog\", \"catalog\": \"\", \"verified\": false, \"size\": 67800, \"file\": \"CISA-NIFOG-2.02.pdf\"}, {\"id\": \"mwhjgio7j7u4ds\", \"type\": \"pdf\", \"name\": \"CERT Basic Training manual\", \"shelf\": \"sh-cert\", \"catalog\": \"\", \"verified\": false, \"size\": 85516, \"file\": \"FEMA-CERT-Basic-Training-Participant-Manual-2019.pdf\"}]"
+ },
+ {
+  "name": "Search everything finds field answers",
+  "pass": true,
+  "detail": "IN HAVYN\n7\nTourniquets\nBUY LIST\nBleeding\nEMERGENCY CARD\n\u2026or any clean cloth. Do not let up. Arm or leg? Tourniquet. 2 to 3 in above the wound, never on a joint. Tighten until the bleeding stops,\u2026\nRattlesnake bite\nEMERGENCY CARD\n\u2026on that limb. Swelling can come fast. Don't: tourniquet, ice, cutting o"
  },
  {
   "name": "parts are separate storage entries that delete cleanly",
   "pass": true,
-  "detail": "(41, 35)"
+  "detail": "(45, 39)"
  },
  {
   "name": "no page errors",

@@ -73,7 +73,7 @@ with sync_playwright() as p:
         txt = page.inner_text(".emstep")
         ok(f"card '{c['id']}' in 2 taps", txt.strip() == c["steps"][0]["t"], txt)
         src = page.inner_text(".emsrc")
-        ok(f"card '{c['id']}' shows source + checked date", "Source:" in src and C["reviewed"] in src)
+        ok(f"card '{c['id']}' shows source + checked date", "Source:" in src and c.get("checked", C["reviewed"]) in src)
     page.goto(BASE + "#/emergency"); page.wait_for_selector(".emgrid")
     page.screenshot(path=str(SHOTS / "03_emergency_grid.png"))
     page.click('a.emtile[href="#/emergency/cpr"]')

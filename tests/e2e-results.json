@@ -2,7 +2,7 @@
  {
   "check": "first screen under 1 s (6x CPU throttle)",
   "pass": true,
-  "detail": "121 ms normal, 400 ms throttled"
+  "detail": "126 ms normal, 275 ms throttled"
  },
  {
   "check": "service worker controls the page",
@@ -50,6 +50,16 @@
   "detail": ""
  },
  {
+  "check": "card 'heartattack' in 2 taps",
+  "pass": true,
+  "detail": "Chest pain or pressure? Call 911 now"
+ },
+ {
+  "check": "card 'heartattack' shows source + checked date",
+  "pass": true,
+  "detail": ""
+ },
+ {
   "check": "card 'anaphylaxis' in 2 taps",
   "pass": true,
   "detail": "Spot it"
@@ -66,6 +76,16 @@
  },
  {
   "check": "card 'stroke' shows source + checked date",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "check": "card 'unresponsive' in 2 taps",
+  "pass": true,
+  "detail": "Shout, tap their shoulders, check breathing"
+ },
+ {
+  "check": "card 'unresponsive' shows source + checked date",
   "pass": true,
   "detail": ""
  },
@@ -100,6 +120,16 @@
   "detail": ""
  },
  {
+  "check": "card 'fracture' in 2 taps",
+  "pass": true,
+  "detail": "Call 911 for big injuries"
+ },
+ {
+  "check": "card 'fracture' shows source + checked date",
+  "pass": true,
+  "detail": ""
+ },
+ {
   "check": "card 'seizure' in 2 taps",
   "pass": true,
   "detail": "Ease them to the ground"
@@ -126,6 +156,16 @@
  },
  {
   "check": "card 'overdose' shows source + checked date",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "check": "card 'poison' in 2 taps",
+  "pass": true,
+  "detail": "Won't wake up, not breathing, or a seizure? Call 911"
+ },
+ {
+  "check": "card 'poison' shows source + checked date",
   "pass": true,
   "detail": ""
  },
@@ -362,12 +402,12 @@
  {
   "check": "binder PDF made on the phone",
   "pass": true,
-  "detail": "37378 bytes"
+  "detail": "43424 bytes"
  },
  {
   "check": "binder copy saved to the library",
   "pass": true,
-  "detail": "[['mwhiwfh9i9llmn', 23]]"
+  "detail": "[['mwhjjgu2h9pxd6', 27]]"
  },
  {
   "check": "binder PDF is searchable in the reader",
@@ -392,7 +432,7 @@
  {
   "check": "binder PDF can be made offline (pdf-lib from the offline copy)",
   "pass": true,
-  "detail": "Ready: 23 pages, 37 KB. Saved in your Library too."
+  "detail": "Ready: 27 pages, 42 KB. Saved in your Library too."
  },
  {
   "check": "CSP blocks fetch to other sites and external images; only HAVYN's own address is allowed",
