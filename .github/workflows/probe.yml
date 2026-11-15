@@ -1,0 +1,21 @@
+# Check how servers answer (status, size, CORS, small text bodies such as checksum files) from GitHub's network,
+# which reaches sites the maintainers' own networks sometimes can't. Manual only; reads nothing from the repo but the tool.
+name: Probe servers
+on:
+  workflow_dispatch:
+    inputs:
+      urls:
+        description: "URLs, or kiwix:<dir>/<stem>, separated by spaces"
+        required: true
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - name: Probe
+        env:
+          URLS: ${{ inputs.urls }}
+        run: python3 tools/shelf_probe.py "$URLS"

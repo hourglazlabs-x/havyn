@@ -22,6 +22,7 @@ def kiwix(spec):
     if not names: raise RuntimeError("no %s in %s" % (stem, base))
     return base + names[-1]
 
+BODY = {}
 def hop(url, method="GET"):
     h = {"User-Agent": UA, "Origin": ORIGIN, "Range": "bytes=0-1023"}
     if method == "OPTIONS": h = {"User-Agent": UA, "Origin": ORIGIN, "Access-Control-Request-Method": "GET", "Access-Control-Request-Headers": "range"}
@@ -30,6 +31,9 @@ def hop(url, method="GET"):
     except urllib.error.HTTPError as e:
         r = e
     hd = r.headers
+    if method == "GET":
+        try: BODY[url] = r.read(300)
+        except Exception: BODY[url] = b""
     return r.status if hasattr(r, "status") else r.code, hd
 
 def probe(spec):
@@ -41,6 +45,8 @@ def probe(spec):
               hd.get("Access-Control-Allow-Origin"), hd.get("Access-Control-Expose-Headers")))
         if code in (301, 302, 303, 307, 308) and hd.get("Location"):
             url = urllib.parse.urljoin(url, hd["Location"]); continue
+        b = BODY.get(url, b"")
+        if b and (b"<" not in b[:1] and all(32 <= c < 127 or c in (9, 10, 13) for c in b[:120])): print("  body: %r" % b[:200])   # small text answers (checksums, metalinks)
         oc, oh = hop(url, "OPTIONS")
         print("  preflight %d | ACAO=%s ACAM=%s ACAH=%s" % (oc, oh.get("Access-Control-Allow-Origin"), oh.get("Access-Control-Allow-Methods"), oh.get("Access-Control-Allow-Headers")))
         break
