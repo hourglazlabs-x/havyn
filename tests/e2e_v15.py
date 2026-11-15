@@ -196,6 +196,12 @@ with sync_playwright() as p:
     ok("Search everything finds field answers", until(lambda: "Stop heavy bleeding" in page.inner_text("#sres"), 10), page.inner_text("#sres")[:300] if page.locator("#sres").count() else "")
     page.screenshot(path=str(SHOTS / "v15_search.png"), full_page=False)
     page.goto(BASE + "#/field"); page.wait_for_selector("#fq"); page.screenshot(path=str(SHOTS / "v15_field.png"), full_page=False)
+    # back online (or back on screen): downloads you started carry on by themselves, then stop asking
+    v2 = next(x for x in zims_on(page) if x["catalog"] == core[4]["id"])
+    page.evaluate("(async () => { await __HAVYN.store.del('zim:' + %r); const L = __HAVYN.lib; L.splice(L.findIndex(x => x.id === %r), 1); await __HAVYN.store.set('lib', L); __HAVYN.prefs.autoGet = true; })()" % (v2["id"], v2["id"]))
+    page.evaluate("window.dispatchEvent(new Event('online'))")
+    ok("back online, HAVYN carries on with the downloads by itself", until(lambda: any(x["catalog"] == core[4]["id"] for x in zims_on(page)), 40), [x["catalog"] for x in zims_on(page)])
+    ok("and stops carrying on once everything is here", until(lambda: page.evaluate("!__HAVYN.prefs.autoGet"), 20))
     # deleting an archive removes its parts
     page.goto(BASE + "#/library/" + zid); time.sleep(0.5)
     keys0 = page.evaluate("__HAVYN.store.keys().then(k => k.filter(x => String(x).startsWith('zpart:')).length)")

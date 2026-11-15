@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-4l4PFboZ/ManO7nsmKPlFIrQnrR+UVYwGPrU0WKT7zQ='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://mirror.download.kiwix.org https://download.kiwix.org https://lb.download.kiwix.org; font-src 'none'; media-src 'self' blob:; object-src 'none'; frame-src 'self'; worker-src 'self'; manifest-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-5e+EAm43+PbTwPWdEB1uBvgIUehIJNejwpglve35uIE='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://mirror.download.kiwix.org https://download.kiwix.org https://lb.download.kiwix.org; font-src 'none'; media-src 'self' blob:; object-src 'none'; frame-src 'self'; worker-src 'self'; manifest-src 'self'; base-uri 'none'; form-action 'none'">
 <title>HAVYN FIELD</title>
 <meta name="theme-color" content="#04050d">
 <meta name="color-scheme" content="dark">
@@ -1935,7 +1935,7 @@ if (typeof module !== "undefined") module.exports = HAVYN_ENGINE;
 (() => {
   "use strict";
   const C = HAVYN_CONTENT, E = HAVYN_ENGINE;
-  const VERSION = "1.5.0+67b137d309";
+  const VERSION = "1.5.0+f113e8057b";
   const PREVIEW = !!window.HAVYN_PREVIEW;
   const DAY = 86400000;
   const t0 = performance.now();
@@ -3918,16 +3918,28 @@ if (typeof module !== "undefined") module.exports = HAVYN_ENGINE;
       try {
         Shelf.mount(); await Promise.all([Shelf.loading || Promise.resolve(), Arc.load()]);
         const sh = Shelf.state === "ready" ? Shelf.todo(C.shelf.items.filter((i) => i.ph)) : [], ar = Arc.todo(coreArchives());
-        if (!sh.length && !ar.length) { if (!auto) toast(Shelf.state === "ready" ? "Everything is already on this phone" : "Nothing to download right now"); return; }
+        if (!sh.length && !ar.length) {
+          if (Shelf.state === "ready" && Arc.idx && Arc.idx.size && PR.autoGet) { PR.autoGet = false; flush(); }   // all done: nothing more to carry on with
+          if (!auto) toast(Shelf.state === "ready" ? "Everything is already on this phone" : "Nothing to download right now"); return;
+        }
         if (auto) toast("Carrying on with this phone's downloads (" + sz(sh.reduce((a, i) => a + shelfSize(i), 0) + ar.reduce((a, i) => a + Arc.size(i), 0)) + " left)");
         Wake.on();
         if (sh.length) await Shelf.get(sh, { quiet: true });
         if (ar.length && !this.stop && !Shelf.stop) await Arc.get(ar, { quiet: true });
         const failed = Shelf.failed.length + Arc.failed.length;
-        if (!this.stop && !Shelf.stop && !Arc.stop) toast(failed ? failed + " item" + (failed > 1 ? "s" : "") + " didn't finish: open Get more to see which and try again" : "This phone has everything it needs offline");
+        if (!this.stop && !Shelf.stop && !Arc.stop) {
+          if (!failed && PR.autoGet) { PR.autoGet = false; flush(); }
+          toast(failed ? failed + " item" + (failed > 1 ? "s" : "") + " didn't finish: it carries on when HAVYN is open on Wi-Fi, or tap Download everything" : "This phone has everything it needs offline");
+        }
       } finally { this.busy = false; if (!document.body.classList.contains("em")) Wake.off(); render(); }
     },
-    halt() { this.stop = true; Shelf.stop = true; Arc.stop = true; }
+    halt() { this.stop = true; Shelf.stop = true; Arc.stop = true; if (PR.autoGet) { PR.autoGet = false; flush(); } },
+    // iOS pauses a web app that isn't on screen, which breaks its downloads: carry on when it's back on screen or back online.
+    carryOn() {
+      const idle = () => !(this.busy || Shelf.busy || Arc.busy);
+      if (!PR.autoGet || PREVIEW || document.hidden || navigator.onLine === false || document.body.classList.contains("em") || !idle()) return;
+      clearTimeout(this.t); this.t = setTimeout(() => { if (PR.autoGet && !document.hidden && idle() && !document.body.classList.contains("em")) this.run(true); }, 2000);
+    }
   };
   const Ready = {
     rows() {
@@ -4639,7 +4651,8 @@ if (typeof module !== "undefined") module.exports = HAVYN_ENGINE;
   }, { passive: true });
   document.addEventListener("click", (e) => { const t = e.target.closest(".tab, a.li"); if (t && !document.body.classList.contains("em")) Snd.chime("nav"); }, true);
   window.addEventListener("hashchange", render);
-  document.addEventListener("visibilitychange", () => { if (document.hidden) flush(); else if (document.body.classList.contains("em")) Wake.on(); });
+  document.addEventListener("visibilitychange", () => { if (document.hidden) flush(); else { if (document.body.classList.contains("em")) Wake.on(); Everything.carryOn(); } });
+  window.addEventListener("online", () => Everything.carryOn());
 
   async function eraseAll() {
     await PdfV.close(); Media.close(); for (const x of LIB) if (typeOf(x) === "zim") ZR.drop(x.id); LIB = [];

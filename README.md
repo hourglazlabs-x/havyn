@@ -55,8 +55,8 @@ node tests/zimkit.test.js           # 208 archive-reader checks (openzim test su
 python3 tests/e2e.py                # 91 end-to-end checks in headless Chrome at iPhone size
 python3 tests/e2e_v13.py            # 76 library, reader, search and Get more checks (with and without the service worker)
 python3 tests/e2e_v14.py            # 31 reference shelf checks: one-tap downloads with checksums, chapter joining, search, offline and no-shelf fallbacks
-python3 tests/e2e_v15.py            # 36 checks: Download everything against a fake cross-origin Kiwix mirror (parts, drop and resume, reload and resume, corrupt file refused, SHA-256 and ZIM MD5 checks), the field index and its page links
-python3 tests/shelf_fetch_test.py   # 26 checks of the shelf fetcher against a fake web (needs reportlab)
+python3 tests/e2e_v15.py            # 38 checks: Download everything against a fake cross-origin Kiwix mirror (parts, drop and resume, reload and resume, back online, corrupt file refused, SHA-256 and ZIM MD5 checks), the field index and its page links
+python3 tests/shelf_fetch_test.py   # 27 checks of the shelf fetcher against a fake web (needs reportlab)
 ```
 
 `tests/zimkit.test.js` needs the openzim test archives (`git clone https://github.com/openzim/zim-testing-suite`) and XZ vectors made by `python3 tests/xzvec.py` (see `tests/README-zim.md`). `tests/mkzim.py` writes the hostile fixture archive used by the end-to-end tests.

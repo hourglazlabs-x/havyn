@@ -1985,16 +1985,28 @@
       try {
         Shelf.mount(); await Promise.all([Shelf.loading || Promise.resolve(), Arc.load()]);
         const sh = Shelf.state === "ready" ? Shelf.todo(C.shelf.items.filter((i) => i.ph)) : [], ar = Arc.todo(coreArchives());
-        if (!sh.length && !ar.length) { if (!auto) toast(Shelf.state === "ready" ? "Everything is already on this phone" : "Nothing to download right now"); return; }
+        if (!sh.length && !ar.length) {
+          if (Shelf.state === "ready" && Arc.idx && Arc.idx.size && PR.autoGet) { PR.autoGet = false; flush(); }   // all done: nothing more to carry on with
+          if (!auto) toast(Shelf.state === "ready" ? "Everything is already on this phone" : "Nothing to download right now"); return;
+        }
         if (auto) toast("Carrying on with this phone's downloads (" + sz(sh.reduce((a, i) => a + shelfSize(i), 0) + ar.reduce((a, i) => a + Arc.size(i), 0)) + " left)");
         Wake.on();
         if (sh.length) await Shelf.get(sh, { quiet: true });
         if (ar.length && !this.stop && !Shelf.stop) await Arc.get(ar, { quiet: true });
         const failed = Shelf.failed.length + Arc.failed.length;
-        if (!this.stop && !Shelf.stop && !Arc.stop) toast(failed ? failed + " item" + (failed > 1 ? "s" : "") + " didn't finish: open Get more to see which and try again" : "This phone has everything it needs offline");
+        if (!this.stop && !Shelf.stop && !Arc.stop) {
+          if (!failed && PR.autoGet) { PR.autoGet = false; flush(); }
+          toast(failed ? failed + " item" + (failed > 1 ? "s" : "") + " didn't finish: it carries on when HAVYN is open on Wi-Fi, or tap Download everything" : "This phone has everything it needs offline");
+        }
       } finally { this.busy = false; if (!document.body.classList.contains("em")) Wake.off(); render(); }
     },
-    halt() { this.stop = true; Shelf.stop = true; Arc.stop = true; }
+    halt() { this.stop = true; Shelf.stop = true; Arc.stop = true; if (PR.autoGet) { PR.autoGet = false; flush(); } },
+    // iOS pauses a web app that isn't on screen, which breaks its downloads: carry on when it's back on screen or back online.
+    carryOn() {
+      const idle = () => !(this.busy || Shelf.busy || Arc.busy);
+      if (!PR.autoGet || PREVIEW || document.hidden || navigator.onLine === false || document.body.classList.contains("em") || !idle()) return;
+      clearTimeout(this.t); this.t = setTimeout(() => { if (PR.autoGet && !document.hidden && idle() && !document.body.classList.contains("em")) this.run(true); }, 2000);
+    }
   };
   const Ready = {
     rows() {
@@ -2706,7 +2718,8 @@
   }, { passive: true });
   document.addEventListener("click", (e) => { const t = e.target.closest(".tab, a.li"); if (t && !document.body.classList.contains("em")) Snd.chime("nav"); }, true);
   window.addEventListener("hashchange", render);
-  document.addEventListener("visibilitychange", () => { if (document.hidden) flush(); else if (document.body.classList.contains("em")) Wake.on(); });
+  document.addEventListener("visibilitychange", () => { if (document.hidden) flush(); else { if (document.body.classList.contains("em")) Wake.on(); Everything.carryOn(); } });
+  window.addEventListener("online", () => Everything.carryOn());
 
   async function eraseAll() {
     await PdfV.close(); Media.close(); for (const x of LIB) if (typeOf(x) === "zim") ZR.drop(x.id); LIB = [];

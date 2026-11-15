@@ -15,7 +15,7 @@
 | New cards are sourced | PASS (review pending) | Heart attack (AHA warning signs; 2024 AHA/Red Cross first aid guideline: aspirin 162–325 mg for alert adults, wait if unsure), Won't wake up (NHS, Resuscitation Council UK), Broken bone (Mayo Clinic), Poisoning (HRSA Poison Help, Arizona poison center, MedlinePlus). Same EMT/nurse review gate as the others. |
 | v1.0–v1.4 checks still pass | PASS | e2e 91/91, 76/76, 31/31; archive reader 208/208; shelf fetcher 26/26. |
 
-Test totals: engine 27/27, archive reader 208/208, end-to-end 91/91 + 76/76 + 31/31 + 36/36, shelf fetcher 26/26.
+Test totals: engine 27/27, archive reader 208/208, end-to-end 91/91 + 76/76 + 31/31 + 38/38, shelf fetcher 27/27.
 
 Open: on-device test on an iPhone (multi-GB downloads in a Home Screen app; storage quota prompt behavior); GitHub Pages switch; two phone-set documents (ATP 3-34.45 Electric Power, DOT ERG 2024) wait on the daily shelf retry; EMT or nurse review of all twenty cards.
 
