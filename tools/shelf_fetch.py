@@ -12,7 +12,8 @@ Writes out/release/ (uploaded to the repository's "shelf" release):
   * HAVYN-shelf-phone.zip   the shareable phone set in one file, for phones without HAVYN's own address
 and out/report.md (job summary) and out/notes.md (release notes).
 Documents under the publisher's own terms (lic "link") are downloaded only to check the links; they are never uploaded."""
-import concurrent.futures as cf, datetime, hashlib, json, os, re, shutil, sys, time, urllib.error, urllib.parse, urllib.request, zipfile
+import concurrent.futures as cf, datetime, hashlib, json, logging, os, re, shutil, sys, time, urllib.error, urllib.parse, urllib.request, zipfile
+logging.getLogger("pypdf").setLevel(logging.ERROR)
 from pathlib import Path
 
 UA = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 HAVYN-shelf/1.4 (+https://github.com/hourglazlabs-x/havyn)"
@@ -100,25 +101,23 @@ def resolve_ia(item, match):
     if not names: raise RuntimeError("no file in %s matches %s" % (item, match))
     return "https://archive.org/download/%s/%s" % (urllib.parse.quote(item), urllib.parse.quote(names[0]))
 
-OX_CACHE = {}
+OX_API = "https://openstax.org/apps/cms/api/v2/pages/"
 def resolve_ox(slug):
-    if "books" not in OX_CACHE:
-        books = []
-        for api in ("https://openstax.org/apps/cms/api/v2/pages/?type=books.Book&fields=title,slug,book_state,high_resolution_pdf_url,low_resolution_pdf_url&limit=250",
-                    "https://openstax.org/apps/cms/api/books/?format=json"):
-            try:
-                j = json.loads(get_text(api))
-                books = j.get("items") or j.get("books") or []
-                if books: break
-            except Exception as e:
-                print("openstax api", api, e, file=sys.stderr)
-        OX_CACHE["books"] = books
-    for b in OX_CACHE["books"]:
-        s = b.get("slug") or (b.get("meta") or {}).get("slug")
-        if s == slug:
+    """OpenStax's CMS (Wagtail) API: find the book page, then read its PDF links (low resolution first: smaller)."""
+    tries = [OX_API + "?type=books.Book&slug=%s&fields=high_resolution_pdf_url,low_resolution_pdf_url" % slug,
+             OX_API + "?type=books.Book&slug=%s&fields=*" % slug, OX_API + "?slug=%s" % slug]
+    for u in tries:
+        try:
+            items = json.loads(get_text(u)).get("items") or []
+        except Exception as e:
+            print("openstax", u, e, file=sys.stderr); continue
+        for b in items:
+            if not (b.get("low_resolution_pdf_url") or b.get("high_resolution_pdf_url")) and b.get("id"):
+                try: b = json.loads(get_text(OX_API + "%d/" % b["id"]))
+                except Exception as e: print("openstax page", b.get("id"), e, file=sys.stderr); continue
             for k in ("low_resolution_pdf_url", "high_resolution_pdf_url"):
                 if b.get(k): return b[k]
-    raise RuntimeError("OpenStax book %s not found" % slug)
+    raise RuntimeError("OpenStax book %s: no PDF link in the API" % slug)
 
 HP_SUFFIX = ["fm", "if", "toc", "intro", "how", "wo"] + ["%02d" % i for i in range(0, 46)] + ["gp", "green", "voc", "vocab", "resc", "res", "indx", "index", "bm", "ib", "ob"]
 def resolve_hp(code, years):
