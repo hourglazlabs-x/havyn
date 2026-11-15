@@ -1,0 +1,58 @@
+name: Build HAVYN shelf
+# Downloads every document on the reference shelf from its publisher, checks it (PDF, size, SHA-256, pages),
+# attaches the shareable ones (public domain, Creative Commons) to the "shelf" release, then redeploys the app
+# so phones can fetch the phone set from HAVYN's own address. Re-runs monthly to pick up publishers' updates.
+on:
+  workflow_dispatch:
+    inputs:
+      only:
+        description: "Comma-separated item ids to test (blank = everything, and publish)"
+        required: false
+        default: ""
+  push:
+    branches: [main]
+    paths: ["shelf/catalog.json", "tools/shelf_fetch.py", ".github/workflows/shelf.yml"]
+  schedule:
+    - cron: "23 10 1 * *"
+permissions:
+  contents: write
+  actions: write
+concurrency:
+  group: shelf
+  cancel-in-progress: false
+jobs:
+  shelf:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v6
+      - name: Install the PDF checker
+        run: python3 -m pip install --quiet --user "pypdf>=5,<7"
+      - name: Fetch and check every document
+        env:
+          SHELF_ONLY: ${{ inputs.only }}
+        run: python3 tools/shelf_fetch.py shelf/catalog.json out
+      - name: Report
+        if: always()
+        run: cat out/report.md >> "$GITHUB_STEP_SUMMARY" || true
+      - name: Publish to the shelf release
+        if: ${{ !inputs.only }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -e
+          if gh release view shelf >/dev/null 2>&1; then
+            gh release edit shelf --notes-file out/notes.md
+          else
+            gh release create shelf --title "HAVYN reference shelf" --notes-file out/notes.md --latest=false
+          fi
+          gh release upload shelf out/release/* --clobber
+          keep="$(cd out/release && ls)"
+          for a in $(gh release view shelf --json assets -q '.assets[].name'); do
+            printf '%s\n' "$keep" | grep -qxF "$a" || gh release delete-asset shelf "$a" -y
+          done
+      - name: Redeploy HAVYN with the new shelf
+        if: ${{ !inputs.only }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run pages.yml --ref main || echo "Pages deploy not started (is GitHub Pages turned on?)"
