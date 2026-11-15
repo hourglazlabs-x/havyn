@@ -260,7 +260,7 @@ with sync_playwright() as p:
     page.screenshot(path=str(SHOTS / "10_offline_bleeding.png"))
     ctx.set_offline(False)
 
-    # 11. CSP blocks network from the page
+    # 11. CSP blocks network from the page (except HAVYN's own address, for shelf downloads)
     page.goto(BASE + "#/status"); page.wait_for_selector("body[data-ready]")
     page.evaluate("window.__v = []; document.addEventListener('securitypolicyviolation', e => window.__v.push(e.violatedDirective + ' ' + e.blockedURI))")
     n_before = len(reqs)
@@ -270,7 +270,8 @@ with sync_playwright() as p:
       await new Promise(res => setTimeout(res, 300)); return r; })()""")
     viol = page.evaluate("window.__v")
     external = [u for u in reqs[n_before:] if not u.startswith(BASE) and not u.startswith("data:")]
-    ok("CSP blocks fetch (external + same-origin) and external images", all(b.startswith("blocked") for b in blocked) and not external and any("img-src" in v for v in viol), f"{blocked}; violations={viol}")
+    # v1.4: the page may fetch its own address (the reference shelf), never anywhere else.
+    ok("CSP blocks fetch to other sites and external images; only HAVYN's own address is allowed", blocked == ["blocked https://example.com/x", "allowed /index.html"] and not external and any("img-src" in v for v in viol) and any("connect-src" in v for v in viol), f"{blocked}; violations={viol}")
     ext_all = sorted({u for u in reqs if not (u.startswith(BASE) or u.startswith("data:") or u.startswith("blob:"))})
     ok("no external requests during the whole session", not ext_all, ext_all)
     ok("no CSP violations in normal use (incl. pdf.js)", not vio_all, vio_all[:5])

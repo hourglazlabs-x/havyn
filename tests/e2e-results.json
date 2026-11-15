@@ -2,7 +2,7 @@
  {
   "check": "first screen under 1 s (6x CPU throttle)",
   "pass": true,
-  "detail": "142 ms normal, 457 ms throttled"
+  "detail": "112 ms normal, 329 ms throttled"
  },
  {
   "check": "service worker controls the page",
@@ -362,12 +362,12 @@
  {
   "check": "binder PDF made on the phone",
   "pass": true,
-  "detail": "37369 bytes"
+  "detail": "37368 bytes"
  },
  {
   "check": "binder copy saved to the library",
   "pass": true,
-  "detail": "[['mwh95mn2n0hqyp', 23]]"
+  "detail": "[['mwhax78rqdcrun', 23]]"
  },
  {
   "check": "binder PDF is searchable in the reader",
@@ -396,8 +396,8 @@
  },
  {
   "check": "CSP blocks fetch (external + same-origin) and external images",
-  "pass": true,
-  "detail": "['blocked https://example.com/x', 'blocked /index.html']; violations=['connect-src https://example.com/x', 'connect-src http://localhost:8765/index.html', 'img-src https://example.com/pixel.png']"
+  "pass": false,
+  "detail": "['blocked https://example.com/x', 'allowed /index.html']; violations=['connect-src https://example.com/x', 'img-src https://example.com/pixel.png']"
  },
  {
   "check": "no external requests during the whole session",
@@ -412,6 +412,6 @@
  {
   "check": "no script errors",
   "pass": true,
-  "detail": "['Connecting to \\'https://example.com/x\\' violates the following Content Security Policy directive: \"connect-src \\'none\\'\". The action has been blocked.', \"Fetch API cannot load https://example.com/x. Refused to connect because it violates the document's Content Security Policy.\", 'Connecting to \\'http://localhost:8765/index.html\\' violates the following Content Security Policy directive: \"connect-src \\'none\\'\". The action has been blocked.', \"Fetch API cannot load http://localhost:8765/index.html. Refused to connect because it violates the document's Content Security Policy.\", 'Loading the image \\'https://example.com/pixel.png\\' violates the following Content Security Policy directive: \"img-src \\'self\\' data: blob:\". The action has been blocked.']"
+  "detail": "['Connecting to \\'https://example.com/x\\' violates the following Content Security Policy directive: \"connect-src \\'self\\'\". The action has been blocked.', \"Fetch API cannot load https://example.com/x. Refused to connect because it violates the document's Content Security Policy.\", 'Loading the image \\'https://example.com/pixel.png\\' violates the following Content Security Policy directive: \"img-src \\'self\\' data: blob:\". The action has been blocked.']"
  }
 ]

@@ -665,7 +665,8 @@
       '</div><div class="sec"><span class="lab">Library</span></div><div class="list">' +
       li("#/library", "globe", "Offline library", libSummary() || "Encyclopedias, PDFs, video and audio, all offline") +
       li("#/search", "search", "Search everything", "One box: cards, plan, PDFs and every archive") +
-      li("#/archive", "download", "Get more", "Wikipedia, WikiMed, manuals, maps and the vault drive") + "</div>";
+      li("#/archive?t=shelf", "book", "Reference shelf", "Real manuals by system: medicine, water, power, tools, building") +
+      li("#/archive?t=phone", "download", "Get more", "Wikipedia, WikiMed, apps, the vault drive and the home library") + "</div>";
     h += '<p class="empty" style="margin-top:14px">Each playbook: what to do in the first 10 minutes, hour, day, and the hard rule for leaving. Tick items as you go; reset after the event.</p>';
     return h;
   }
@@ -894,7 +895,8 @@
       '<div class="btnrow" style="margin-top:12px"><label class="btn">' + ic("plus") + 'Add files<input class="sr" type="file" multiple id="libfile"></label><a class="btn ghost" href="#/archive">' + ic("download") + "Get more</a></div>" +
       (hubUrl() ? '<div class="btnrow" style="margin-top:8px"><a class="btn ghost" href="' + esc(hubUrl()) + '" target="_blank" rel="noopener">' + ic("server") + "Home library (full-text search)</a></div>" : "") +
       '<div class="bar hide" id="libbar" style="margin-top:12px"><i class="indet"></i></div><div id="libmsg" class="empty" style="min-height:1.3em"></div></section>';
-    h += '<div class="list"><a class="li" href="#/search"><span class="ic">' + ic("search") + '</span><span class="tx"><b>Search everything</b><small>Cards, playbooks, your plan, PDFs and every archive</small></span>' + ic("chev") + "</a></div>";
+    h += '<div class="list"><a class="li" href="#/search"><span class="ic">' + ic("search") + '</span><span class="tx"><b>Search everything</b><small>Cards, playbooks, your plan, PDFs and every archive</small></span>' + ic("chev") + "</a>" +
+      '<a class="li" href="#/archive?t=shelf"><span class="ic">' + ic("book") + '</span><span class="tx"><b>Reference shelf</b><small>' + (C.shelf ? C.shelf.items.length + " manuals and guides in " + C.shelf.systems.length + " systems: medicine, water, power, tools…" : "") + "</small></span>" + ic("chev") + "</a></div>";
     for (const [k, , label] of KINDS) {
       const xs = LIB.filter((x) => typeOf(x) === k).sort((a, b) => (b.opened || b.added) - (a.opened || a.added));
       if (!xs.length) continue;
@@ -1220,13 +1222,40 @@
       articles: info.articles, media: info.media, main: info.main, mainTitle: info.mainTitle, fav, needsScripts: info.needsScripts, search: info.titleSearch, flavour: info.flavour, zname: info.name, creator: info.creator });
     return true;
   }
-  async function addPdf(f, say) {
-    say("Saving " + f.name + "…");
+  async function addPdf(f, say, meta) {
+    meta = meta || {};
+    const sh = C.shelf && C.shelf.items.find((i) => (meta.shelf && i.id === meta.shelf) || i.file === f.name);
+    if (sh && shelfHave(sh)) { toast(sh.t + " is already on this phone"); return false; }
+    say("Saving " + (meta.name || (sh && sh.t) || f.name) + "…");
     if (!(await roomFor(f.size))) { toast("Not enough space for " + f.name); return false; }
     const id = uid();
     if (!(await Store.set("pdf:" + id, f))) { toast("Not enough space for " + f.name); return false; }
-    LIB.push({ id, name: f.name.replace(/\.pdf$/i, "").slice(0, 140) || "Untitled", file: String(f.name).slice(0, 200), size: f.size, added: now(), pages: 0, lastPage: 1 });
+    LIB.push({ id, name: (meta.name || (sh && sh.t) || f.name.replace(/\.pdf$/i, "")).slice(0, 140) || "Untitled", file: String(f.name).slice(0, 200), size: f.size, added: now(), pages: 0, lastPage: 1, shelf: sh ? sh.id : undefined });
     return true;
+  }
+  // Hesperian publishes its books as chapter PDFs (en_wtnd_2025_01.pdf …). Added together, HAVYN joins them into one book.
+  const HPRE = /^en_([a-z]+)_(\d{4})_([a-z0-9]+)\.pdf$/i;
+  const HP_ORDER = ["fm", "if", "toc", "intro", "how", "wo"].concat(Array.from({ length: 46 }, (_, i) => String(i).padStart(2, "0"))).concat(["gp", "green", "voc", "vocab", "resc", "res", "indx", "index", "bm", "ib", "ob"]);
+  async function joinChapters(key, parts, say) {
+    const [code, year] = key.split("_");
+    const it = C.shelf && C.shelf.items.find((i) => i.hp && i.hp.code === code);
+    const title = (it ? it.t : "Hesperian " + code.toUpperCase()) + " (" + year + ")";
+    const rank = (s) => { const k = HP_ORDER.indexOf(s); return k < 0 ? 999 : k; };
+    parts.sort((a, b) => rank(a.s) - rank(b.s) || (a.f.name < b.f.name ? -1 : 1));
+    if (!(await roomFor(parts.reduce((a, p) => a + p.f.size, 0) * 2))) { toast("Not enough space to join " + title); return null; }
+    try {
+      const { PDFDocument } = await import("./pdflib/pdf-lib.esm.min.js");
+      const out = await PDFDocument.create();
+      let i = 0;
+      for (const p of parts) {
+        say("Joining " + title + ": chapter " + (++i) + " of " + parts.length + "…");
+        const src = await PDFDocument.load(await p.f.arrayBuffer(), { ignoreEncryption: true });
+        for (const pg of await out.copyPages(src, src.getPageIndices())) out.addPage(pg);
+      }
+      out.setTitle(title); out.setCreator("HAVYN (joined from Hesperian's chapter PDFs)");
+      const bytes = await out.save({ useObjectStreams: true });
+      return { file: new File([bytes], it ? it.file : "Hesperian-" + code + "-" + year + ".pdf", { type: "application/pdf" }), meta: { name: title, shelf: it ? it.id : undefined } };
+    } catch (e) { toast("Couldn't join " + title + "; adding the chapters one by one"); return null; }
   }
   async function addMedia(f, kind, say) {
     say("Saving " + f.name + " (" + sz(f.size) + ")…");
@@ -1248,7 +1277,13 @@
       const groups = new Map(), singles = [];
       for (const f of files) { const m = /^(.*\.zim)a[a-z]$/i.exec(f.name); if (m) { const k = m[1].toLowerCase(); if (!groups.has(k)) groups.set(k, []); groups.get(k).push(f); } else singles.push(f); }
       for (const [, parts] of groups) { parts.sort((a, b) => (a.name < b.name ? -1 : 1)); if (await addZim(new Blob(parts), parts[0].name.replace(/a[a-z]$/i, ""), say)) n++; }
-      for (const f of singles) {
+      const books = new Map(), rest = [];
+      for (const f of singles) { const m = HPRE.exec(f.name); if (m) { const k = m[1].toLowerCase() + "_" + m[2]; if (!books.has(k)) books.set(k, []); books.get(k).push({ f, s: m[3].toLowerCase() }); } else rest.push(f); }
+      for (const [k, parts] of books) {
+        const j = parts.length >= 3 ? await joinChapters(k, parts, say) : null;
+        if (j) { if (await addPdf(j.file, say, j.meta)) n++; } else rest.push(...parts.map((p) => p.f));
+      }
+      for (const f of rest) {
         const kind = await sniff(f);
         if (kind === "zim") { if (await addZim(f, f.name, say)) n++; }
         else if (kind === "pdf") { if (await addPdf(f, say)) n++; }
@@ -1331,6 +1366,7 @@
     for (const t of C.missions.recurring) add("Upkeep", "check", t.t, t.d || "", "#/missions", 1);
     for (const b of C.buy.items) add("Buy list", "cart", b.n, [b.pick, b.why, b.note].join(" "), "#/buy/" + b.id, 0);
     if (C.archive) for (const a of C.archive.items) add("Get more", a.kind === "app" ? "download" : a.kind === "video" ? "film" : "globe", a.t, [a.d, a.tier].join(" "), "#/archive?t=" + a.tier, 0);
+    if (C.shelf) for (const it of C.shelf.items) { const sy = C.shelf.systems.find((x) => x.id === it.sys); add("Shelf · " + (sy ? sy.t : ""), "file", it.t, [it.d, it.by].join(" "), "#/archive?t=shelf&s=" + it.sys, 0); }
     IDX = out; return out;
   }
   function liveIndex() {
@@ -1440,24 +1476,25 @@
     const have = tier === "phone" ? haveOnPhone(it) : null;
     const marked = !!(S.checks.archive && S.checks.archive[it.id]);
     const link = getLink(it);
-    const chips = [sizeTxt(it), it.kind === "app" ? "App Store" : it.kind === "ai" ? "AI" : it.kind === "soft" ? "Software" : it.kind === "video" ? "Video" : it.kind === "pdf" ? "PDF" : it.kind === "zim" ? "Archive" : "",
+    const chips = [sizeTxt(it), it.kind === "app" ? "App Store" : it.kind === "setup" ? "Built in" : it.kind === "ai" ? "AI" : it.kind === "soft" ? "Software" : it.kind === "video" ? "Video" : it.kind === "pdf" ? "PDF" : it.kind === "zim" ? "Archive" : "",
       it.opens === "havyn" ? "Opens in HAVYN" : it.opens === "kiwix" ? "Needs Kiwix" : "", it.core ? "Core" : ""].filter(Boolean);
     let h = '<div class="gi' + (have || marked ? " got" : "") + '" id="gi-' + esc(it.id) + '"><div class="gh"><b>' + esc(it.t) + '</b><span class="gc">' + chips.map((c) => '<span class="chip' + (c === "Core" ? " core" : "") + '">' + esc(c) + "</span>").join("") + "</span></div>" +
       '<div class="gd">' + esc(it.d) + "</div>";
     const btns = [];
     if (have) btns.push('<a class="btn sm" href="#/library/' + esc(have.id) + '">' + ic("check") + "On this phone · open</a>");
-    else if (link && it.kind !== "hub" && it.kind !== "own") btns.push('<a class="btn sm' + (tier === "phone" || tier === "apps" ? "" : " ghost") + '" href="' + esc(link) + '" target="_blank" rel="noopener">' + ic("download") + (it.kind === "app" || (it.kind === "ai" && tier === "apps") ? "App Store" : tier === "drive" ? "Source" : "Download") + "</a>");
-    if (!have && tier !== "phone") btns.push('<label class="mk"><input type="checkbox" data-chk="archive|' + esc(it.id) + '"' + (marked ? " checked" : "") + "><span>" + (tier === "apps" ? "Installed" : tier === "drive" ? "On the drive" : "Set up") + "</span></label>");
+    else if (link && it.kind !== "hub" && it.kind !== "own" && it.kind !== "setup") btns.push('<a class="btn sm' + (tier === "phone" || tier === "apps" ? "" : " ghost") + '" href="' + esc(link) + '" target="_blank" rel="noopener">' + ic("download") + (it.kind === "app" || (it.kind === "ai" && tier === "apps") ? "App Store" : tier === "drive" ? "Source" : "Download") + "</a>");
+    if (!have && tier !== "phone") btns.push('<label class="mk"><input type="checkbox" data-chk="archive|' + esc(it.id) + '"' + (marked ? " checked" : "") + "><span>" + (it.kind === "setup" ? "Done" : tier === "apps" ? "Installed" : tier === "drive" ? "On the drive" : "Set up") + "</span></label>");
     if (!have && tier === "phone" && it.kind !== "own") btns.push('<label class="mk"><input type="checkbox" data-chk="archive|' + esc(it.id) + '"' + (marked ? " checked" : "") + "><span>Downloaded</span></label>");
     if (btns.length) h += '<div class="gb">' + btns.join("") + "</div>";
     return h + "</div>";
   }
   function renderArchive() {
-    const A = C.archive, t = ["phone", "apps", "drive", "hub"].includes(route.q.t) ? route.q.t : Get.tier;
+    const A = C.archive, t = ["shelf", "phone", "apps", "drive", "hub"].includes(route.q.t) ? route.q.t : Get.tier;
     Get.tier = t;
     const items = A.items.filter((i) => i.tier === t), T = A.tiers.find((x) => x.id === t);
     let h = backbar("#/library", "Get more");
-    h += '<div class="seg wide" style="margin:0 0 12px">' + A.tiers.map((x) => '<a href="#/archive?t=' + x.id + '"' + (x.id === t ? ' class="on"' : "") + ">" + esc(x.id === "hub" ? "HOME" : x.id.toUpperCase()) + "</a>").join("") + "</div>";
+    h += '<div class="seg wide" style="margin:0 0 12px">' + [{ id: "shelf" }].concat(A.tiers).map((x) => '<a href="#/archive?t=' + x.id + '"' + (x.id === t ? ' class="on"' : "") + ">" + esc(x.id === "hub" ? "HOME" : x.id.toUpperCase()) + "</a>").join("") + "</div>";
+    if (t === "shelf") return h + renderShelf();
     h += '<section class="glass hero"><div class="lab">' + esc(T.t) + " · checked " + esc(A.checked) + '</div><div class="sub" style="margin-top:6px">' + esc(T.d) + "</div>";
     if (t === "phone") {
       const core = items.filter((i) => i.core), cs = core.reduce((a, i) => a + (i.size || 0), 0), got = core.filter((i) => haveOnPhone(i)).length;
@@ -1504,9 +1541,10 @@
     return h;
   }
   const Get = {
-    tier: "phone",
+    tier: "shelf",
     raw: (f) => "https://raw.githubusercontent.com/hourglazlabs-x/havyn/main/vault/" + f,
     async mount() {
+      if ($("#shelf")) Shelf.mount();
       const el = $("#getq"); if (!el || !navigator.storage || !navigator.storage.estimate) return;
       try {
         const e = await navigator.storage.estimate(), free = Math.max(0, (e.quota || 0) - (e.usage || 0));
@@ -1515,6 +1553,132 @@
       } catch (e) {}
     }
   };
+
+  /* ---------------- SHELF: real manuals and guides, by system, one tap each from HAVYN's own address ---------------- */
+  const LICS = { pd: "Public domain", "cc-by": "CC BY", "cc-by-sa": "CC BY-SA", "cc-by-nc-sa": "CC BY-NC-SA", link: "Publisher's terms" };
+  const SHELF_ZIP = "https://github.com/hourglazlabs-x/havyn/releases/download/shelf/HAVYN-shelf-phone.zip";
+  function shelfHave(it) { return LIB.find((x) => typeOf(x) === "pdf" && (x.shelf === it.id || x.file === it.file)) || null; }
+  const shelfSize = (it) => { const i = Shelf.info(it); return i ? i.size : it.size || 0; };
+  const Shelf = {
+    idx: null, state: "idle", reason: "", built: "", busy: false, stop: false, done: 0, total: 0, cur: "", got: 0, need: 0, base: 0, ok: 0, failed: [],
+    async load() {
+      if (this.state !== "idle") return;
+      this.state = "checking";
+      try {
+        const r = await fetch("./shelf/index.json", { cache: "no-store" });
+        if (!r.ok) throw new Error("HTTP " + r.status);
+        const j = await r.json();
+        this.idx = new Map((j.items || []).filter((x) => x && x.id && x.file).map((x) => [x.id, x]));
+        this.built = j.built || ""; this.state = this.idx.size ? "ready" : "absent";
+        this.reason = this.idx.size ? "" : "missing";
+      } catch (e) { this.idx = null; this.state = "absent"; this.reason = navigator.onLine === false || (e && e.name === "TypeError") ? "offline" : "missing"; }
+      if ($("#shelf")) render();
+    },
+    info(it) { return this.idx ? this.idx.get(it.id) || null : null; },
+    served(it) { return !!this.info(it); },
+    todo(list) { return list.filter((it) => this.served(it) && !shelfHave(it)); },
+    async fetchOne(it, info) {
+      const res = await fetch("./shelf/" + encodeURIComponent(info.file), { cache: "no-store" });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      let blob;
+      if (res.body && res.body.getReader) {
+        const rd = res.body.getReader(), chunks = []; let got = 0;
+        for (;;) {
+          const { done, value } = await rd.read(); if (done) break;
+          chunks.push(value); got += value.length; this.got = got; this.paint();
+          if (this.stop) { try { rd.cancel(); } catch (e) {} throw Object.assign(new Error("Stopped"), { name: "Stop" }); }
+        }
+        blob = new Blob(chunks, { type: "application/pdf" });
+      } else blob = await res.blob();
+      if (info.size && blob.size !== info.size) throw new Error("the download was incomplete");
+      if (info.sha256 && window.crypto && crypto.subtle) {
+        const h = new Uint8Array(await crypto.subtle.digest("SHA-256", await blob.arrayBuffer()));
+        if (Array.from(h, (b) => b.toString(16).padStart(2, "0")).join("") !== info.sha256) throw new Error("its checksum didn't match");
+      }
+      return new File([blob], info.file, { type: "application/pdf" });
+    },
+    async get(list) {
+      if (this.busy) return;
+      list = this.todo(list);
+      if (!list.length) { toast("Already on this phone"); return; }
+      const need = list.reduce((a, it) => a + shelfSize(it), 0);
+      if (!(await roomFor(need))) { toast("Not enough space on this phone for " + sz(need)); return; }
+      Object.assign(this, { busy: true, stop: false, done: 0, total: list.length, need, base: 0, ok: 0, failed: [] });
+      Wake.on(); requestPersist(); this.paint();
+      for (const it of list) {
+        if (this.stop) break;
+        const info = this.info(it); this.cur = it.t; this.got = 0; this.paint();
+        try { const f = await this.fetchOne(it, info); if (await addPdf(f, () => {}, { name: it.t, shelf: it.id })) { this.ok++; await saveLib(); } }
+        catch (e) { if (e && e.name === "Stop") break; this.failed.push(it.t + " (" + (e && e.message ? e.message : "failed") + ")"); }
+        this.done++; this.base += info.size || 0; this.got = 0;
+      }
+      this.busy = false; this.cur = "";
+      if (!document.body.classList.contains("em")) Wake.off();
+      if (this.ok) Snd.chime("save");
+      toast(this.ok ? (this.ok === 1 ? "1 document saved on this phone" : this.ok + " documents saved on this phone") + (this.failed.length ? "; " + this.failed.length + " didn't download" : "") : this.stop ? "Stopped" : "Nothing downloaded");
+      PdfIndex.kick(); render();
+    },
+    paint() {
+      const bar = $("#shbar"), msg = $("#shmsg"), stop = $("#shstop");
+      if (!bar || !msg) return;
+      bar.classList.toggle("hide", !this.busy); if (stop) stop.classList.toggle("hide", !this.busy);
+      if (this.busy) {
+        const pct = this.need ? Math.min(100, Math.round(((this.base + this.got) / this.need) * 100)) : 0;
+        bar.firstElementChild.style.width = pct + "%";
+        msg.textContent = "Downloading " + Math.min(this.done + 1, this.total) + " of " + this.total + ": " + this.cur + " · " + pct + "%. Keep HAVYN open; the screen stays on.";
+      } else msg.textContent = this.failed.length ? "Didn't download: " + this.failed.join("; ") + ". Try again later; if it keeps failing, use the publisher's link." : "";
+      $$("[data-shget]").forEach((b) => { b.disabled = this.busy; });
+    },
+    mount() { if (this.state === "absent" && this.reason === "offline" && navigator.onLine !== false) this.state = "idle"; if (this.state === "idle") this.load(); else this.paint(); }
+  };
+  function shelfRow(it) {
+    const have = shelfHave(it), info = Shelf.info(it), sy = C.shelf.systems.find((x) => x.id === it.sys);
+    const size = info ? info.size : it.size, pages = info && info.pages;
+    const chips = [it.by + (it.yr ? " · " + it.yr : ""), (info || !it.est ? "" : "~") + sz(size) + (pages ? " · " + fmtN(pages) + " pages" : ""), LICS[it.lic] || it.lic, it.ph ? "Phone set" : "Drive"];
+    let h = '<div class="gi' + (have ? " got" : "") + '" id="sh-' + esc(it.id) + '"><div class="gh"><b>' + esc(it.t) + '</b><span class="gc">' +
+      chips.map((c, i) => '<span class="chip' + (i === 3 && it.ph ? " core" : i === 2 ? " lic" : "") + '">' + esc(c) + "</span>").join("") + "</span></div>" +
+      '<div class="gd">' + esc(it.d) + "</div>";
+    const btns = [];
+    if (have) btns.push('<a class="btn sm" href="#/library/' + esc(have.id) + '">' + ic("check") + "On this phone · open</a>");
+    else if (info) btns.push('<button class="btn sm" data-shget data-act="shelf-get" data-id="' + esc(it.id) + '">' + ic("download") + "Get · " + sz(info.size) + "</button>");
+    else if (it.hp) btns.push('<a class="btn sm ghost" href="' + esc(it.u) + '" target="_blank" rel="noopener">' + ic("download") + "Chapters at Hesperian</a>");
+    else if (it.src && it.src[0]) btns.push('<a class="btn sm ghost" href="' + esc(it.src[0]) + '" target="_blank" rel="noopener">' + ic("download") + "From the publisher</a>");
+    if (!have && it.u && !(it.src && it.src[0] === it.u) && !it.hp) btns.push('<a class="btn sm ghost" href="' + esc(it.u) + '" target="_blank" rel="noopener">Source page</a>');
+    if (!have && it.hp) btns.push('<span class="note sm">On the vault drive under 10-shelf › ' + esc(sy ? sy.n : "") + ", in its own folder. Add every chapter at once and HAVYN joins them into one book.</span>");
+    return h + '<div class="gb">' + btns.join("") + "</div></div>";
+  }
+  function renderShelf() {
+    const S = C.shelf, all = S.items, have = all.filter((i) => shelfHave(i)), phone = all.filter((i) => i.ph);
+    const todoPh = Shelf.todo(phone), todoSize = todoPh.reduce((a, i) => a + shelfSize(i), 0);
+    const share = phone.filter((i) => i.lic !== "link"), shareSize = share.reduce((a, i) => a + shelfSize(i), 0);
+    let h = '<div id="shelf"></div><section class="glass hero"><div class="lab">Reference shelf · checked ' + esc(S.checked) + '</div><div class="num" style="margin-top:6px"><span class="big" style="font-size:2.6rem">' + have.length + "/" + all.length +
+      '</span><span class="unit">ON THIS PHONE<br>' + S.systems.length + " SYSTEMS</span></div>" + '<div class="sub">' + esc(S.note) + "</div>";
+    if (Shelf.state === "ready") {
+      h += '<div class="btnrow" style="margin-top:12px">' + (todoPh.length ? '<button class="btn" data-shget data-act="shelf-get-phone">' + ic("download") + "Get the phone set · " + todoPh.length + " · " + sz(todoSize) + "</button>" : '<span class="chip ok">' + ic("check") + "Phone set on this phone</span>") +
+        '<button class="btn ghost hide" id="shstop" data-act="shelf-stop">Stop</button></div>' +
+        '<div class="sub mono" style="font-size:.75rem;margin-top:6px">From HAVYN\'s own address, each file checked against its SHA-256' + (Shelf.built ? " · shelf built " + esc(Shelf.built.slice(0, 10)) : "") + "</div>";
+    } else if (Shelf.state === "absent") {
+      h += '<div class="sub" style="margin-top:10px">' + (Shelf.reason === "offline" ? "No internet right now: shelf downloads need Wi-Fi. Everything already on this phone works." : window.HAVYN_PREVIEW ? "This preview can't hold the shelf files." : "The shelf files aren't on this address yet (GitHub Pages has to be on).") +
+        " Get the phone set (" + share.length + " documents, about " + sz(shareSize) + ") as one zip, unzip it in Files, then Library › Add files and select them all. Or use each document's own link below.</div>" +
+        '<div class="btnrow" style="margin-top:10px"><a class="btn" href="' + SHELF_ZIP + '" target="_blank" rel="noopener">' + ic("download") + "Phone set as one zip</a></div>";
+    } else h += '<div class="sub mono" style="margin-top:10px;font-size:.8rem">Checking for the shelf files…</div>';
+    h += '<div class="bar hide" id="shbar" style="margin-top:12px"><i style="width:0%"></i></div><div id="shmsg" class="empty" style="min-height:1.2em"></div></section>';
+    h += '<div class="shnav">' + S.systems.map((x) => '<button class="chip" data-act="shelf-jump" data-s="' + esc(x.id) + '">' + esc(x.n + " " + x.t) + "</button>").join("") + "</div>";
+    for (const x of S.systems) {
+      const xs = all.filter((i) => i.sys === x.id); if (!xs.length) continue;
+      const got = xs.filter((i) => shelfHave(i)).length, todo = Shelf.todo(xs);
+      h += '<div class="sec shsys" id="shs-' + esc(x.id) + '"><span class="lab">' + ic(x.icon) + esc(x.n + " · " + x.t) + '</span><span class="mono" style="color:var(--mute);font-size:.8rem">' + got + "/" + xs.length + " · ~" + sz(xs.reduce((a, i) => a + shelfSize(i), 0)) + "</span></div>" +
+        '<p class="empty shd">' + esc(x.d) + "</p>" +
+        (todo.length > 1 ? '<div class="btnrow" style="margin:0 0 8px"><button class="btn ghost sm" data-shget data-act="shelf-get-sys" data-s="' + esc(x.id) + '">' + ic("download") + "Get these " + todo.length + " · " + sz(todo.reduce((a, i) => a + shelfSize(i), 0)) + "</button></div>" : "") +
+        '<div class="glist">' + xs.map(shelfRow).join("") + "</div>";
+    }
+    h += '<details class="glass panel shcmp"><summary><b>How this compares with other offline libraries</b></summary>' +
+      S.others.map((o) => '<div class="blk"><b>' + esc(o.t) + "</b><span>" + esc(o.d) + "</span><span class=\"took\">HAVYN: " + esc(o.took) + "</span></div>").join("") + "</details>";
+    h += '<p class="empty" style="font-size:.82rem;margin-top:12px">Public-domain and Creative Commons documents are re-shared from HAVYN\'s own address and its GitHub release, unchanged, with their credits. ' +
+      "Documents under their publisher's terms (Hesperian, MSF, the University of Arizona, NCTSN) come straight from the publisher; HAVYN never re-hosts them. Dictionaries and translation: Get more › Apps. " +
+      "The vault drive script copies the whole shelf into its 10-shelf folder. Sources: " + srcRefs(["hesperiancopy", "applelookup", "appletranslate"]) + ".</p>";
+    return h;
+  }
 
   // PDF reader: pdf.js renders pages to canvas on demand; pages far off screen are released to save memory.
   const PdfV = {
@@ -2008,6 +2172,11 @@
     else if (act === "pdf-zoom") PdfV.setZoom(num(b.dataset.z));
     else if (act === "pdf-dest") PdfV.dest(num(b.dataset.i));
     else if (act === "pdf-go") { const pn = $("#pdfpanel"); if (pn) pn.classList.add("hide"); PdfV.go(num(b.dataset.n)); }
+    else if (act === "shelf-get") { const it = C.shelf.items.find((i) => i.id === b.dataset.id); if (it) Shelf.get([it]); }
+    else if (act === "shelf-get-phone") Shelf.get(C.shelf.items.filter((i) => i.ph));
+    else if (act === "shelf-get-sys") Shelf.get(C.shelf.items.filter((i) => i.sys === b.dataset.s));
+    else if (act === "shelf-stop") { Shelf.stop = true; b.textContent = "Stopping…"; }
+    else if (act === "shelf-jump") { const el = $("#shs-" + b.dataset.s); if (el) el.scrollIntoView({ behavior: "smooth", block: "start" }); }
     else if (act === "lib-del") { if (confirmTap(b, "libdel" + b.dataset.id, "Tap again to delete")) deleteItem(b.dataset.id); }
     else if (act === "zim-random") ZR.random(b.dataset.id);
     else if (act === "zr-back") { if (ZR.back()) ev.preventDefault(); }

@@ -19,6 +19,21 @@ def manifest(content):
         for c in r: assert "\t" not in c and "\n" not in c and c != "", r
     return rows
 
+def shelf_dirs(content):
+    import re
+    return {s["id"]: "10-shelf/%s-%s" % (s["n"], re.sub(r"[^a-z0-9]+", "-", s["t"].lower()).strip("-")) for s in content["shelf"]["systems"]}
+
+def shelf_fallback(content):
+    """Publisher links for single-file shelf documents. The script prefers the checked list the shelf workflow
+    publishes on GitHub (shelf-files.tsv: mirror links, chapter lists and SHA-256s) and uses these only if it can't reach it."""
+    d = shelf_dirs(content); rows = []
+    for it in content["shelf"]["items"]:
+        if not it.get("src"): continue
+        rows.append([it["id"], "core" if it.get("core") else "full", d[it["sys"]], it["file"], it["src"][0], "-", str(it.get("size", 0)), it["t"].replace("\t", " ")])
+    for r in rows:
+        for c in r: assert "\t" not in c and "\n" not in c and c != "", r
+    return rows
+
 def start_here(content, version):
     A = content["archive"]
     groups = [("01-phone-set", "Phone set", "Open these on any iPhone: in HAVYN tap Add files and pick them here (Files › the drive). They also open in Kiwix."),
@@ -29,9 +44,11 @@ def start_here(content, version):
               ("06-books", "Books", "Project Gutenberg collections."),
               ("07-ai", "Offline AI", "A single-file AI assistant for any laptop. Mac/Linux: open Terminal here and run it. Windows: rename it to end in .exe and double-click. It can be wrong: the emergency cards win."),
               ("08-software", "Software", "Installers for Kiwix, VLC, radios, maps and servers, for Windows, Mac, Linux, Android and Raspberry Pi."),
-              ("09-builder", "Builder", "Programming references, if you chose everything.")]
+              ("09-builder", "Builder", "Programming references, if you chose everything."),
+              ("10-shelf", "Reference shelf", "Real manuals and guides by system: medicine, water, sanitation, food, building, power, radio, tools, response, family, science and maps. Open them in HAVYN (Library › Add files) or any PDF reader. Hesperian books come as chapter folders: in HAVYN, select every chapter at once and it joins them into one book.")]
     rows = "".join(f"<tr><td><b>{html.escape(f)}</b></td><td>{html.escape(t)}</td><td>{html.escape(d)}</td></tr>" for f, t, d in groups)
     items = "".join(f"<li><b>{html.escape(i['t'])}</b> — {html.escape(i['d'])}</li>" for i in A["items"] if i["tier"] in ("phone", "drive") and i.get("get"))
+    items += "".join(f"<li><b>{html.escape(i['t'])}</b> ({html.escape(i['by'])}) — {html.escape(i['d'])}</li>" for i in content["shelf"]["items"])
     hub = "".join(f"<li><b>{html.escape(i['t'])}</b> — {html.escape(i['d'])}</li>" for i in A["items"] if i["tier"] == "hub")
     return f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>HAVYN VAULT — start here</title>
@@ -49,8 +66,9 @@ h1{{font-size:1.6rem;margin:0 0 4px}}h2{{margin-top:28px;font-size:1.15rem}}tabl
 </body></html>
 """
 
-def bash_script(rows, start_html, version):
+def bash_script(rows, start_html, version, shelf_rows):
     man = "\n".join("\t".join(r) for r in rows)
+    shelf_man = "\n".join("\t".join(r) for r in shelf_rows)
     return r'''#!/bin/bash
 # HAVYN VAULT — fills a USB drive with the family's offline library.
 # Generated from HAVYN's archive catalog (''' + version + r''').
@@ -70,7 +88,7 @@ LOG="$ROOT/logs/get-vault-$(date +%Y%m%d-%H%M%S).log"; VER="$ROOT/logs/verified.
 KIWIX="${HAVYN_KIWIX_BASE:-https://download.kiwix.org/zim}"
 GHAPI="${HAVYN_GH_API:-https://api.github.com}"
 ONLY=",${HAVYN_ONLY:-},"   # optional: HAVYN_ONLY=p-wikimed,d-ifixit fetches just those
-UA="HAVYN-vault/1.3 (+https://github.com/hourglazlabs-x/havyn)"
+UA="HAVYN-vault/1.4 (+https://github.com/hourglazlabs-x/havyn)"
 if command -v shasum >/dev/null 2>&1; then SHA="shasum -a 256"; elif command -v sha256sum >/dev/null 2>&1; then SHA="sha256sum"; else SHA=""; fi
 ok=0; failed=0; n=0
 say() { printf '%s\n' "$*"; printf '%s\n' "$*" >> "$LOG"; }
@@ -138,6 +156,36 @@ while IFS="$TAB" read -r id set type folder a b all title; do
 done <<'MANIFEST'
 ''' + man + r'''
 MANIFEST
+# ---- reference shelf: manuals and guides, checked by HAVYN's shelf workflow ----
+SHELF_URL="${HAVYN_SHELF_TSV:-https://github.com/hourglazlabs-x/havyn/releases/download/shelf/shelf-files.tsv}"
+STSV="$ROOT/logs/shelf-files.tsv"
+say ""
+if curl -fsSL -A "$UA" --connect-timeout 30 -o "$STSV.new" "$SHELF_URL" 2>/dev/null && [ -s "$STSV.new" ] && grep -q "$TAB" "$STSV.new"; then
+  mv "$STSV.new" "$STSV"; say "Reference shelf (checked list from GitHub)"
+else
+  rm -f "$STSV.new"; cat > "$STSV" <<'SHELF'
+''' + shelf_man + r'''
+SHELF
+  say "Reference shelf (GitHub list unavailable: publisher links)"
+fi
+while IFS="$TAB" read -r id set folder file url sha size title; do
+  [ -z "$id" ] && continue
+  if [ "$ONLY" != ",," ]; then case "$ONLY" in *",$id,"*) ;; *) continue;; esac
+  elif [ "$FULL" -eq 0 ] && [ "$set" != "core" ]; then continue; fi
+  n=$((n+1)); say ""; say "[$n] $title · $file"
+  if [ "$LIST" -eq 1 ]; then say "  shelf $url → $folder"; continue; fi
+  mkdir -p "$ROOT/$folder"; out="$ROOT/$folder/$file"
+  if fetch "$url" "$out"; then
+    if [ -n "$SHA" ] && [ "${#sha}" -eq 64 ] && ! grep -qxF "$folder/$file" "$VER" 2>/dev/null; then
+      got=$($SHA "$out" | awk '{print $1}')
+      if [ "$got" = "$sha" ]; then echo "$folder/$file" >> "$VER"; say "  checksum OK"; ok=$((ok+1))
+      else case "$url" in
+        *"/releases/download/"*) say "  checksum mismatch: deleted, run again to re-download"; rm -f "$out"; failed=$((failed+1));;
+        *) say "  (the publisher has changed this file since HAVYN checked it; kept)"; ok=$((ok+1));;
+      esac; fi
+    else ok=$((ok+1)); fi
+  else failed=$((failed+1)); fi
+done < "$STSV"
 if [ "$LIST" -eq 0 ]; then
 cat > "$ROOT/START-HERE.html" <<'HAVYNHTML'
 ''' + start_html + r'''HAVYNHTML
@@ -147,8 +195,9 @@ say "Log: $LOG"
 [ "$failed" -eq 0 ] || say "Run the same command again to finish the rest."
 '''
 
-def ps_script(rows, start_html, version):
+def ps_script(rows, start_html, version, shelf_rows):
     man = "\n".join("\t".join(r) for r in rows)
+    shelf_man = "\n".join("\t".join(r) for r in shelf_rows)
     return r'''# HAVYN VAULT — fills a USB drive with the family's offline library (Windows).
 # Generated from HAVYN's archive catalog (''' + version + r''').
 #   powershell -ExecutionPolicy Bypass -File .\get-vault.ps1 -Drive E:\          core set (about 165 GB)
@@ -167,7 +216,7 @@ $Ver = Join-Path $Root "logs\verified.txt"; if (-not (Test-Path $Ver)) { New-Ite
 $Kiwix = $(if ($env:HAVYN_KIWIX_BASE) { $env:HAVYN_KIWIX_BASE } else { "https://download.kiwix.org/zim" })
 $GhApi = $(if ($env:HAVYN_GH_API) { $env:HAVYN_GH_API } else { "https://api.github.com" })
 $Only = @(); if ($env:HAVYN_ONLY) { $Only = $env:HAVYN_ONLY.Split(",") }
-$UA = "HAVYN-vault/1.3 (+https://github.com/hourglazlabs-x/havyn)"
+$UA = "HAVYN-vault/1.4 (+https://github.com/hourglazlabs-x/havyn)"
 $ok = 0; $failed = 0; $n = 0
 function Say([string]$m) { Write-Host $m; Add-Content -Path $Log -Value $m }
 function Page([string]$u) { try { (Invoke-WebRequest -UseBasicParsing -UserAgent $UA -Uri $u -TimeoutSec 180).Content } catch { "" } }
@@ -236,6 +285,33 @@ foreach ($line in ($manifest -split "`r?`n")) {
     }
   }
 }
+# ---- reference shelf: manuals and guides, checked by HAVYN's shelf workflow ----
+$shelfFallback = @'
+''' + shelf_man + r'''
+'@
+$ShelfUrl = $(if ($env:HAVYN_SHELF_TSV) { $env:HAVYN_SHELF_TSV } else { "https://github.com/hourglazlabs-x/havyn/releases/download/shelf/shelf-files.tsv" })
+$stsv = Join-Path $Root "logs\shelf-files.tsv"
+& curl.exe -fsSL -A $UA --connect-timeout 30 -o "$stsv.new" $ShelfUrl 2>$null
+Say ""
+if ($LASTEXITCODE -eq 0 -and (Test-Path "$stsv.new") -and ((Get-Content -Raw -Encoding UTF8 "$stsv.new") -match "`t")) { Move-Item -Force "$stsv.new" $stsv; Say "Reference shelf (checked list from GitHub)" }
+else { Remove-Item -Force "$stsv.new" -ErrorAction SilentlyContinue; Set-Content -Path $stsv -Value $shelfFallback -Encoding UTF8; Say "Reference shelf (GitHub list unavailable: publisher links)" }
+foreach ($line in ((Get-Content -Raw -Encoding UTF8 $stsv) -split "`r?`n")) {
+  if (-not $line.Trim()) { continue }
+  $id, $set, $folder, $file, $url, $sha, $size, $title = $line.Split("`t")
+  if ($Only.Count -gt 0) { if ($Only -notcontains $id) { continue } } elseif (-not $Full -and $set -ne "core") { continue }
+  $n++; Say ""; Say "[$n] $title - $file"
+  if ($List) { Say "  shelf $url -> $folder"; continue }
+  $dirPath = Join-Path $Root ($folder -replace '/', '\'); New-Item -ItemType Directory -Force -Path $dirPath | Out-Null
+  $out = Join-Path $dirPath $file; $key = "$folder/$file"
+  if (Fetch $url $out) {
+    if ($sha.Length -eq 64 -and -not ((Get-Content $Ver -ErrorAction SilentlyContinue) -contains $key)) {
+      $got = (Get-FileHash -Algorithm SHA256 -Path $out).Hash
+      if ($got -ieq $sha) { Add-Content -Path $Ver -Value $key; Say "  checksum OK"; $ok++ }
+      elseif ($url -like "*/releases/download/*") { Say "  checksum mismatch: deleted, run again to re-download"; Remove-Item -Force $out; $failed++ }
+      else { Say "  (the publisher has changed this file since HAVYN checked it; kept)"; $ok++ }
+    } else { $ok++ }
+  } else { $failed++ }
+}
 if (-not $List) {
 $html = @'
 ''' + start_html + r'''
@@ -249,11 +325,12 @@ if ($failed -gt 0) { Say "Run the same command again to finish the rest." }
 
 def write(root, content, version):
     rows = manifest(content)
+    srows = shelf_fallback(content)
     sh = start_here(content, version)
     out = root / "vault"; out.mkdir(exist_ok=True)
     (out / "START-HERE.html").write_text(sh, encoding="utf-8")
-    (out / "get-vault.sh").write_text(bash_script(rows, sh, version), encoding="utf-8")
+    (out / "get-vault.sh").write_text(bash_script(rows, sh, version, srows), encoding="utf-8")
     # UTF-8 with BOM so Windows PowerShell 5.1 reads the non-ASCII text correctly.
-    (out / "get-vault.ps1").write_text(ps_script(rows, sh, version).replace("\n", "\r\n"), encoding="utf-8-sig")
+    (out / "get-vault.ps1").write_text(ps_script(rows, sh, version, srows).replace("\n", "\r\n"), encoding="utf-8-sig")
     (out / "get-vault.sh").chmod(0o755)
     return rows

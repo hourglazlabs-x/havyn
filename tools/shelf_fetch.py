@@ -10,84 +10,133 @@ Writes out/release/ (uploaded to the repository's "shelf" release):
   * shelf-files.tsv    the vault drive's shelf manifest (mirror links for shareable files, publisher links for the rest)
   * SHA256SUMS.txt     checksums of the mirrored files
   * HAVYN-shelf-phone.zip   the shareable phone set in one file, for phones without HAVYN's own address
-and out/report.md (job summary) and out/notes.md (release notes).
-Documents under the publisher's own terms (lic "link") are downloaded only to check the links; they are never uploaded."""
-import concurrent.futures as cf, datetime, hashlib, json, logging, os, re, shutil, sys, time, urllib.error, urllib.parse, urllib.request, zipfile
+and out/report.md (job summary), out/notes.md (release notes) and out/changed.txt (release files that differ
+from the last build, so unchanged files aren't uploaded again).
+Documents under the publisher's own terms (lic "link") are downloaded only to check the links; they are never uploaded.
+
+Where each document comes from, in order: the catalog's "src" links; then resolvers ("ia" Internet Archive item,
+"ias" Internet Archive search, "ox" OpenStax book, "dspace" repository handle); then the Internet Archive's Wayback copy of each "src" link,
+byte for byte (for publishers that block cloud servers); then "parts" joined into one PDF. "expect" (a pattern)
+must appear in the first pages, so a mirror can't hand over the wrong document. If a publisher is down on the
+day of a full build, last build's checked copy is kept and the report says so."""
+import concurrent.futures as cf, datetime, hashlib, json, logging, os, re, shutil, sys, threading, time, urllib.error, urllib.parse, urllib.request, zipfile
 logging.getLogger("pypdf").setLevel(logging.ERROR)
 from pathlib import Path
 
 UA = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 HAVYN-shelf/1.4 (+https://github.com/hourglazlabs-x/havyn)"
 MIRROR = {"pd", "cc-by", "cc-by-sa", "cc-by-nc-sa"}
-MAX_BYTES = 450_000_000
+MAX_BYTES = 1_200_000_000    # release files must stay under 2 GiB; OpenStax's Anatomy and Physiology is about half a gigabyte
+MIN_BYTES = 20_000
 FILE_DEADLINE = 600          # seconds for one file, so one slow server can't stall the build
 START = time.time(); BUDGET = 55 * 60   # stop starting new documents after this; the job has 90 minutes
+IA = os.environ.get("SHELF_IA", "https://archive.org")                         # overridable for the local test only
+WAYBACK = os.environ.get("SHELF_WAYBACK", "https://web.archive.org/web/%sid_/%s")
+RELEASES = os.environ.get("SHELF_RELEASES", "https://github.com/%s/releases/download/%s/")
+WB_YEARS = ["2025", "2021"]
 LIC_NAME = {"pd": "Public domain (US government work)", "cc-by": "CC BY", "cc-by-sa": "CC BY-SA", "cc-by-nc-sa": "CC BY-NC-SA", "link": "Publisher's terms (not re-hosted)"}
+
+class Fatal(Exception):
+    """This URL won't work however often it's tried: wrong file, too big, too slow."""
+
+_slots_lock = threading.Lock(); _slots = {}
+def slot(url):
+    """At most two downloads at a time from the Internet Archive (it drops TLS handshakes under load), three elsewhere."""
+    host = urllib.parse.urlparse(url).netloc.lower()
+    with _slots_lock:
+        if host not in _slots: _slots[host] = threading.BoundedSemaphore(2 if host.endswith("archive.org") else 3)
+        return _slots[host]
 
 def req(url, method="GET", headers=None, timeout=60):
     h = {"User-Agent": UA, "Accept": "application/pdf,application/json,text/html;q=0.9,*/*;q=0.8"}
     if headers: h.update(headers)
     return urllib.request.urlopen(urllib.request.Request(url, method=method, headers=h), timeout=timeout)
 
-def get_text(url, timeout=60):
-    with req(url, timeout=timeout) as r:
-        return r.read(8_000_000).decode("utf-8", "replace")
+def get_text(url, timeout=60, headers=None, tries=3):
+    last = None
+    for a in range(tries):
+        try:
+            with slot(url), req(url, headers=headers, timeout=timeout) as r:
+                return r.read(8_000_000).decode("utf-8", "replace")
+        except urllib.error.HTTPError as e:
+            last = e
+            if e.code in (400, 401, 403, 404, 410): break
+        except Exception as e:
+            last = e
+        if a + 1 < tries: time.sleep(4 * (a + 1))
+    raise last
 
 def is_pdf_bytes(b): return b[:1024].find(b"%PDF-") >= 0
 
 def probe_pdf(url):
     """True if url answers with a PDF (first KB), without downloading it all."""
-    try:
-        with req(url, headers={"Range": "bytes=0-1023"}, timeout=40) as r:
-            return r.status in (200, 206) and is_pdf_bytes(r.read(1024))
-    except Exception:
-        return False
+    for a in range(2):
+        try:
+            with req(url, headers={"Range": "bytes=0-1023"}, timeout=40) as r:
+                return r.status in (200, 206) and is_pdf_bytes(r.read(1024))
+        except urllib.error.HTTPError:
+            return False
+        except Exception:
+            time.sleep(3)
+    return False
 
 def download(url, dest, tries=4):
-    """Stream url to dest; returns (size, sha256). Raises if it isn't a PDF or is too big."""
+    """Stream url to dest; returns (size, sha256). Retries timeouts, dropped connections and TLS hiccups."""
     last = None
     for attempt in range(tries):
         part = Path(str(dest) + ".part")
         try:
-            h = hashlib.sha256(); size = 0; t0 = time.time()
-            with req(url, timeout=60) as r, open(part, "wb") as f:
-                first = True
-                while True:
-                    if time.time() - t0 > FILE_DEADLINE: raise TimeoutError("slower than %d s" % FILE_DEADLINE)
-                    chunk = r.read1(1 << 20) if hasattr(r, "read1") else r.read(1 << 16)
-                    if not chunk: break
-                    if first:
-                        if not is_pdf_bytes(chunk): raise ValueError("not a PDF (got %r)" % chunk[:60])
-                        first = False
-                    size += len(chunk)
-                    if size > MAX_BYTES: raise ValueError("bigger than %d MB" % (MAX_BYTES // 1_000_000))
-                    h.update(chunk); f.write(chunk)
-            if size < 20_000: raise ValueError("only %d bytes" % size)
+            with slot(url):
+                h = hashlib.sha256(); size = 0; t0 = time.time()
+                with req(url, timeout=60) as r, open(part, "wb") as f:
+                    first = True
+                    while True:
+                        if time.time() - t0 > FILE_DEADLINE: raise Fatal("slower than %d s" % FILE_DEADLINE)
+                        chunk = r.read1(1 << 20) if hasattr(r, "read1") else r.read(1 << 16)
+                        if not chunk: break
+                        if first:
+                            if not is_pdf_bytes(chunk): raise Fatal("not a PDF (got %r)" % chunk[:60])
+                            first = False
+                        size += len(chunk)
+                        if size > MAX_BYTES: raise Fatal("bigger than %d MB" % (MAX_BYTES // 1_000_000))
+                        h.update(chunk); f.write(chunk)
+            if size < MIN_BYTES:
+                n, text = pdf_info(part)
+                raise ValueError("only %d bytes, %d pages: %s" % (size, n, text[:160]))
             part.replace(dest)
             return size, h.hexdigest()
+        except Fatal as e:
+            last = str(e); break
         except urllib.error.HTTPError as e:
             last = "HTTP %d" % e.code
-            if e.code in (401, 403, 404, 410): break
+            if e.code in (401, 403, 404, 410, 451): break
         except Exception as e:
             last = "%s: %s" % (type(e).__name__, e)
-            if isinstance(e, (ValueError, TimeoutError)): break
         finally:
             try: part.unlink()
             except FileNotFoundError: pass
-        time.sleep(4 * (attempt + 1))
+        if attempt + 1 < tries: time.sleep(5 * (attempt + 1))
     raise RuntimeError(last or "failed")
 
-def pdf_info(path):
+def pdf_info(path, pages=4, chars=600):
     try:
         from pypdf import PdfReader
         r = PdfReader(str(path))
         n = len(r.pages); text = ""
-        for i in range(min(n, 4)):
+        for i in range(min(n, pages)):
             try: text += " " + (r.pages[i].extract_text() or "")
             except Exception: pass
-            if len(text) > 600: break
-        return n, re.sub(r"\s+", " ", text).strip()[:400]
+            if len(text) > chars: break
+        return n, re.sub(r"\s+", " ", text).strip()[:max(chars, 400)]
     except Exception as e:
         return 0, "(text unreadable: %s)" % type(e).__name__
+
+def check_expect(path, pattern):
+    """None if the first pages mention pattern; a note if the PDF has no text to check; raises if it's another document."""
+    if not pattern: return None
+    n, text = pdf_info(path, pages=8, chars=6000)
+    if len(text) < 200: return "identity not checked: no text layer"
+    if re.search(pattern, text, re.I): return None
+    raise Fatal("wrong document: first pages don't match %r (%s)" % (pattern, text[:120]))
 
 def merge(paths, dest):
     from pypdf import PdfWriter
@@ -95,11 +144,27 @@ def merge(paths, dest):
     for p in paths: w.append(str(p))
     with open(dest, "wb") as f: w.write(f)
 
-def resolve_ia(item, match):
-    meta = json.loads(get_text("https://archive.org/metadata/" + urllib.parse.quote(item)))
-    names = sorted(f["name"] for f in meta.get("files", []) if f.get("name", "").lower().endswith(".pdf") and re.search(match, f["name"], re.I))
-    if not names: raise RuntimeError("no file in %s matches %s" % (item, match))
-    return "https://archive.org/download/%s/%s" % (urllib.parse.quote(item), urllib.parse.quote(names[0]))
+def resolve_ia(spec):
+    """Internet Archive items: [{"item", "match"}, ...]; one download link per item that has a matching PDF."""
+    out, notes = [], []
+    for s in (spec if isinstance(spec, list) else [spec]):
+        try:
+            meta = json.loads(get_text(IA + "/metadata/" + urllib.parse.quote(s["item"])))
+        except Exception as e:
+            notes.append("%s: %s" % (s["item"], e)); continue
+        pdfs = sorted(f["name"] for f in meta.get("files", []) if f.get("name", "").lower().endswith(".pdf"))
+        hit = [n for n in pdfs if re.search(s["match"], n, re.I)]
+        if hit: out.append(IA + "/download/%s/%s" % (urllib.parse.quote(s["item"]), urllib.parse.quote(hit[0])))
+        else: notes.append("%s has no PDF matching %s (has: %s)" % (s["item"], s["match"], "; ".join(pdfs[:24])))
+    if not out: raise RuntimeError(" / ".join(notes))
+    return out
+
+def resolve_ias(spec):
+    """Internet Archive search, most-downloaded first: {"q", "match"} -> PDFs from up to four matching items ("expect" checks which is right)."""
+    q = urllib.parse.urlencode([("q", spec["q"]), ("fl[]", "identifier"), ("sort[]", "downloads desc"), ("rows", "8"), ("output", "json")])
+    docs = json.loads(get_text(IA + "/advancedsearch.php?" + q))["response"]["docs"]
+    if not docs: raise RuntimeError("Internet Archive search found nothing for %s" % spec["q"])
+    return resolve_ia([{"item": d["identifier"], "match": spec.get("match", r"\.pdf$")} for d in docs])[:4]
 
 OX_API = "https://openstax.org/apps/cms/api/v2/pages/"
 def resolve_ox(slug):
@@ -119,6 +184,21 @@ def resolve_ox(slug):
                 if b.get(k): return b[k]
     raise RuntimeError("OpenStax book %s: no PDF link in the API" % slug)
 
+def resolve_dspace(spec):
+    """DSpace 7 repositories (WHO IRIS): handle -> item -> ORIGINAL bundle -> the bitstream whose name matches."""
+    base = spec["base"].rstrip("/"); J = {"Accept": "application/json"}
+    item = json.loads(get_text(base + "/server/api/pid/find?id=" + urllib.parse.quote(spec["handle"], safe="/"), headers=J))
+    bundles = json.loads(get_text(item["_links"]["bundles"]["href"], headers=J))["_embedded"]["bundles"]
+    for b in bundles:
+        if b.get("name") != "ORIGINAL": continue
+        for s in json.loads(get_text(b["_links"]["bitstreams"]["href"], headers=J))["_embedded"]["bitstreams"]:
+            if re.search(spec.get("match", r"\.pdf$"), s.get("name", ""), re.I): return s["_links"]["content"]["href"]
+    raise RuntimeError("DSpace %s: no file matching %s" % (spec["handle"], spec.get("match")))
+
+def wayback(urls, years):
+    """The Internet Archive's stored copy of each link (id_ = the original bytes, no toolbar)."""
+    return [WAYBACK % (y, u) for u in urls if not re.search(r"(archive\.org|webarchive\.)", u) for y in years]
+
 HP_SUFFIX = ["fm", "if", "toc", "intro", "how", "wo"] + ["%02d" % i for i in range(0, 46)] + ["gp", "green", "voc", "vocab", "resc", "res", "indx", "index", "bm", "ib", "ob"]
 def resolve_hp(code, years):
     for y in years:
@@ -132,7 +212,7 @@ def resolve_hp(code, years):
 
 def fetch_item(it, work, rel):
     r = fetch_item1(it, work, rel)
-    print("%s %-16s %7.1f MB  %s" % ("✓" if r.get("ok") else "✗", r["id"], (r.get("size") or 0) / 1e6, r.get("url") if r.get("ok") else r.get("error", "")[:200]), flush=True)
+    print("%s %-16s %7.1f MB  %s" % ("✓" if r.get("ok") else "✗", r["id"], (r.get("size") or 0) / 1e6, r.get("url") if r.get("ok") else r.get("error", "")[:300]), flush=True)
     return r
 
 def fetch_item1(it, work, rel):
@@ -154,19 +234,20 @@ def fetch_item1(it, work, rel):
             first = pdf_info(d / parts[0]["name"])[1]
             r.update(ok=True, edition=y, parts=parts, size=sum(p["size"] for p in parts), pages=sum(p["pages"] for p in parts), url=urls[0], probe=first)
             return r
-        cands = list(it.get("src") or [])
-        if it.get("ia"):
-            try: cands.append(resolve_ia(it["ia"]["item"], it["ia"]["match"]))
-            except Exception as e: errors.append("ia: %s" % e)
-        if it.get("ox"):
-            try: cands.append(resolve_ox(it["ox"]))
-            except Exception as e: errors.append("openstax: %s" % e)
-        out = d / it["file"]; used = None
+        src = list(it.get("src") or []); cands = list(src)
+        for key, fn in (("ia", resolve_ia), ("ias", resolve_ias), ("ox", resolve_ox), ("dspace", resolve_dspace)):
+            if it.get(key):
+                try:
+                    got = fn(it[key]); cands += got if isinstance(got, list) else [got]
+                except Exception as e: errors.append("%s: %s" % (key, e))
+        if it.get("wb") is not False: cands += wayback(src, it.get("wb") or WB_YEARS)
+        out = d / it["file"]; used = None; note = None
         for u in cands:
             try:
-                size, sha = download(u, out); used = u; break
+                size, sha = download(u, out)
+                note = check_expect(out, it.get("expect")); used = u; break
             except Exception as e:
-                errors.append("%s → %s" % (u, e))
+                errors.append("%s → %s" % (u, e)); out.unlink(missing_ok=True)
         if not used and it.get("parts"):
             try:
                 ps = []
@@ -179,10 +260,27 @@ def fetch_item1(it, work, rel):
         if not used: raise RuntimeError("; ".join(errors) or "no source")
         n, text = pdf_info(out)
         r.update(ok=True, url=used, size=size, sha256=sha, pages=n, probe=text)
+        if used.startswith(WAYBACK.split("%s")[0]): r["via"] = "wayback"
+        if note: r["note"] = note
+        if errors: r["tried"] = errors[:6]
         if r["mirror"]: shutil.copy(out, rel / it["file"])
     except Exception as e:
-        r.update(ok=False, error=str(e)[:900])
+        r.update(ok=False, error=str(e)[:1500])
     return r
+
+def carry_over(results, prev, prev_built, repo, tag, rel):
+    """A publisher being down on build day shouldn't take a checked document off everyone's shelf: keep last build's copy."""
+    for i, r in enumerate(results):
+        p = prev.get(r["id"])
+        if r.get("ok") or not p or p.get("file") != r.get("file") or bool(p.get("mirror")) != bool(r.get("mirror")): continue
+        if p.get("mirror"):
+            try:
+                size, sha = download(RELEASES % (repo, tag) + urllib.parse.quote(p["file"]), rel / p["file"])
+                if sha != p.get("sha256"): raise RuntimeError("checksum differs from last build")
+            except Exception as e:
+                print("could not keep last build's %s: %s" % (r["id"], e)); continue
+        results[i] = dict(p, carried=r.get("error", "")[:600], carried_from=prev_built)
+        print("↺ %-16s kept last build's copy (today: %s)" % (r["id"], r.get("error", "")[:160]), flush=True)
 
 def main():
     cat = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
@@ -192,8 +290,16 @@ def main():
     items = cat["items"]
     only = set(filter(None, os.environ.get("SHELF_ONLY", "").split(",")))
     if only: items = [i for i in items if i["id"] in only]
+    prev, prev_built = {}, None
+    if not only:
+        try:
+            pj = json.loads(get_text(RELEASES % (repo, tag) + "shelf-index.json"))
+            prev = {p["id"]: p for p in pj.get("items", []) if p.get("ok")}; prev_built = pj.get("built")
+        except Exception as e:
+            print("no earlier shelf build to compare with (%s)" % e)
     with cf.ThreadPoolExecutor(6) as ex:
         results = list(ex.map(lambda it: fetch_item(it, work, rel), items))
+    if prev: carry_over(results, prev, prev_built, repo, tag, rel)
     sysdir = {s["id"]: "10-shelf/%s-%s" % (s["n"], re.sub(r"[^a-z0-9]+", "-", s["t"].lower()).strip("-")) for s in cat["systems"]}
     rows, sums = [], []
     for r in results:
@@ -218,17 +324,25 @@ def main():
         for r in phone: z.write(rel / r["file"], "HAVYN-shelf-phone/" + r["file"])
     index = {"built": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds"), "repo": repo, "release": tag, "items": results}
     (rel / "shelf-index.json").write_text(json.dumps(index, indent=1, ensure_ascii=False), encoding="utf-8")
+    prev_sha = {p["file"]: p.get("sha256") for p in prev.values() if p.get("mirror")}
+    meta = ["shelf-index.json", "shelf-files.tsv", "SHA256SUMS.txt", "HAVYN-shelf-phone.zip"]
+    changed = meta + [r["file"] for r in results if r.get("ok") and r["mirror"] and prev_sha.get(r["file"]) != r["sha256"]]
+    (out / "changed.txt").write_text("\n".join(changed) + "\n", encoding="utf-8")
 
     okn = sum(1 for r in results if r.get("ok")); mb = lambda b: "%.1f MB" % (b / 1e6)
-    lines = ["# HAVYN shelf build", "", "%d of %d documents fetched and checked. Mirrored: %d files, %s. Phone set: %d files, %s." % (
-        okn, len(results), len(sums), mb(sum(r["size"] for r in results if r.get("ok") and r["mirror"])), len(phone), mb(sum(r["size"] for r in phone))), "",
+    kept = sum(1 for r in results if r.get("carried") is not None)
+    lines = ["# HAVYN shelf build", "", "%d of %d documents fetched and checked%s. Mirrored: %d files, %s. Phone set: %d files, %s." % (
+        okn, len(results), (" (%d kept from the last build because the publisher failed today)" % kept) if kept else "",
+        len(sums), mb(sum(r["size"] for r in results if r.get("ok") and r["mirror"])), len(phone), mb(sum(r["size"] for r in phone))), "",
         "| | id | title | size | pages | source | first words |", "|---|---|---|---|---|---|---|"]
     for r in results:
         if r.get("ok"):
-            host = urllib.parse.urlparse(r["url"].replace("parts:", "")).netloc
-            lines.append("| ✓ | %s | %s | %s | %s | %s | %s |" % (r["id"], r["t"], mb(r["size"]), r.get("pages", ""), host, (r.get("probe") or "")[:140].replace("|", "/")))
+            host = urllib.parse.urlparse(r["url"].replace("parts:", "")).netloc + (" (Wayback copy)" if r.get("via") == "wayback" else "")
+            mark = "↺" if r.get("carried") is not None else "✓"
+            extra = (" [%s]" % r["note"]) if r.get("note") else ""
+            lines.append("| %s | %s | %s | %s | %s | %s | %s |" % (mark, r["id"], r["t"], mb(r["size"]), r.get("pages", ""), host, ((r.get("probe") or "")[:140] + extra).replace("|", "/")))
         else:
-            lines.append("| ✗ | %s | %s | | | | %s |" % (r["id"], r["t"], r.get("error", "")[:300].replace("|", "/")))
+            lines.append("| ✗ | %s | %s | | | | %s |" % (r["id"], r["t"], r.get("error", "")[:400].replace("|", "/")))
     try:
         listing = get_text("https://download.kiwix.org/zim/wiktionary/")
         wk = sorted(set(re.findall(r"wiktionary_en_[a-z_]+_\d{4}-\d{2}\.zim", listing)))

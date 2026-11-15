@@ -452,7 +452,7 @@ const HAVYN_CONTENT = {
   missions: {
     phases: [
       { id: "today", label: "Today", when: "Nov 14 · $0", gate: "Airplane-mode test passes", gateD: "Every phone in airplane mode opens HAVYN, an emergency card, WikiMed and a map.", tasks: [
-        { id: "m-downloads", t: "Start the big downloads on Wi-Fi", d: "In HAVYN: Get more › Every phone, download the core set (WikiMed and the survival archives, about 2.8 GB) and Add files. Install the apps on the Apps tab. Apple Maps offline (iOS 17 or later): Maps → your picture → Offline Maps → Download New Map; cover Phoenix and the route to your out-of-area address. Leave the phones plugged in.", go: "#/archive" },
+        { id: "m-downloads", t: "Start the big downloads on Wi-Fi", d: "In HAVYN: Get more › Shelf, tap Get the phone set (about 25 manuals and guides). Then Get more › Phone, download the core archives (WikiMed and the survival archives, about 2.8 GB) and Add files. Install the apps on the Apps tab and download the iPhone's dictionaries and Translate languages. Apple Maps offline (iOS 17 or later): Maps → your picture → Offline Maps → Download New Map; cover Phoenix and the route to your out-of-area address. Leave the phones plugged in.", go: "#/archive" },
         { id: "m-plan", t: "Family plan: out-of-area contact and 3 meeting places", go: "#/family/plan" },
         { id: "m-medid", t: "Medical ID on every phone", d: "Health app → your picture → Medical ID → Edit. Turn on Show When Locked and add emergency contacts." },
         { id: "m-sat", t: "Satellite demo outside (iPhone 14 and newer)", d: "Settings → Emergency SOS → Try Demo, under open sky." },
@@ -627,7 +627,7 @@ const HAVYN_CONTENT = {
   library: {
     note: "Encyclopedias, manuals, video and audio that work with no internet. Files stay on this phone and are not part of Memory Cards.",
     how: [
-      { t: "1 · Download on Wi-Fi", d: "Tap Get more, then a Download button. Safari saves the file to Files › Downloads. Big files go faster on a computer (see the vault drive)." },
+      { t: "1 · Download on Wi-Fi", d: "Manuals and guides: Get more › Shelf, then Get (one tap; they land here). Archives: Get more › Phone, then Download; Safari saves the file to Files › Downloads. Big files go faster on a computer (see the vault drive)." },
       { t: "2 · Add it to HAVYN", d: "Tap Add files and choose the file in Files. HAVYN checks it and keeps its own copy, so you can delete the download afterwards." },
       { t: "3 · Copy to every phone", d: "AirDrop the file to each phone, or plug in the vault drive and pick it in Files, then Add files on that phone." },
       { t: "4 · Keep the master copies on the drive", d: "Library files are too big for Memory Cards. The vault drive holds the originals; re-add from it any time." }
@@ -658,9 +658,6 @@ const HAVYN_CONTENT = {
       { id: "p-vikidia", tier: "phone", kind: "zim", core: true, t: "Vikidia: encyclopedia for kids", d: "A children's encyclopedia written for ages 8 to 13. Keeps kids reading and learning when screens are all they have.", size: 69415731, file: "vikidia_en_all_maxi_2025-12.zim", get: { zim: "vikidia", stem: "vikidia_en_all_maxi" }, opens: "havyn", dir: "01-phone-set", src: "kiwix" },
       { id: "p-wptop", tier: "phone", kind: "zim", t: "Wikipedia: the top articles, with pictures", d: "The most-read English articles in full. Pick this if the phone has about 10 GB free; the text-only edition is 2.8 GB.", size: 6979321856, file: "wikipedia_en_top_maxi_2026-09.zim", get: { zim: "wikipedia", stem: "wikipedia_en_top_maxi" }, opens: "havyn", dir: "01-phone-set", src: "kiwix" },
       { id: "p-wpmini", tier: "phone", kind: "zim", t: "Wikipedia: every article, short form", d: "The opening section of all 7 million English articles. For phones with about 15 GB free.", size: 13958643712, file: "wikipedia_en_all_mini_2026-09.zim", get: { zim: "wikipedia", stem: "wikipedia_en_all_mini" }, opens: "havyn", dir: "01-phone-set", src: "kiwix" },
-      { id: "p-atp", tier: "phone", kind: "pdf", core: true, t: "US Army Survival manual (ATP 3-50.21)", d: "Water, fire, shelter, navigation, signaling and first aid. Approved for public release; distribution unlimited.", size: 15000000, est: true, u: "https://irp.fas.org/doddir/army/atp3-50-21.pdf", get: { url: "https://irp.fas.org/doddir/army/atp3-50-21.pdf", name: "ATP-3-50.21-Survival-2018.pdf" }, opens: "havyn", dir: "01-phone-set", src: "atp" },
-      { id: "p-cert", tier: "phone", kind: "pdf", core: true, t: "FEMA CERT Basic Training manual", d: "Disaster first aid, light search and rescue, fire safety and team organization, from FEMA's community response course.", size: 25000000, est: true, u: "https://www.ready.gov/sites/default/files/2019.CERT_.Basic_.PM_FINAL_508c.pdf", get: { url: "https://www.ready.gov/sites/default/files/2019.CERT_.Basic_.PM_FINAL_508c.pdf", name: "FEMA-CERT-Basic-Training-Participant-Manual-2019.pdf" }, opens: "havyn", dir: "01-phone-set", src: "cert" },
-      { id: "p-wtnd", tier: "phone", kind: "pdf", t: "Where There Is No Doctor (Hesperian)", d: "The classic village health handbook. Free chapter PDFs from Hesperian; the publisher allows free copies for non-profit use.", size: 30000000, est: true, u: "https://en.hesperian.org/hhg/Where_There_Is_No_Doctor", opens: "havyn", src: "hesperian" },
       { id: "p-own", tier: "phone", kind: "own", t: "Record your own house videos", d: "One minute each, filmed on your phone and added here: shutting off the gas meter, the water main and the main breaker; starting the power station and the generator; which radio channel to use. Nobody else can make these for you." },
 
       // ----- apps to install now (App Store) -----
@@ -668,6 +665,7 @@ const HAVYN_CONTENT = {
       { id: "a-maps", tier: "apps", kind: "app", t: "Organic Maps (or CoMaps)", d: "Offline maps and turn-by-turn directions from OpenStreetMap. Download Arizona inside the app. Apple Maps offline (Missions) is the built-in backup.", u: "https://organicmaps.app/", src: "omaps" },
       { id: "a-mesh", tier: "apps", kind: "app", t: "Meshtastic", d: "Texts over LoRa radios with no towers. Needs a radio per person (see the buy list).", u: "https://meshtastic.org/docs/software/apple/installation/", src: "mesh" },
       { id: "a-vlc", tier: "apps", kind: "app", t: "VLC", d: "Plays any video format, including files straight from the vault drive.", u: "https://apps.apple.com/app/vlc-media-player/id650377962", src: "vlc" },
+      { id: "a-dict", tier: "apps", kind: "setup", t: "Dictionary and translation, offline (built in)", d: "The iPhone already has dictionaries and a translator that work with no internet once downloaded. Dictionary: Settings → General → Dictionary, tick English and a thesaurus, plus any bilingual dictionary you need (Spanish–English, for example). Then press and hold any word in any app and tap Look Up. Translator: in Settings → Apps → Translate → Downloaded Languages (or in the Translate app, under Available Offline Languages), download each language you need, and turn on On-Device Mode if it's offered. Test both in Airplane Mode.", src: "applelookup" },
       { id: "a-pocketpal", tier: "apps", kind: "ai", t: "PocketPal AI (optional)", d: "A private AI assistant that runs on the phone with no internet. Needs an iPhone 14 Pro or newer for useful models; download a 1–3 GB model first. It can be wrong: the emergency cards win.", u: "https://apps.apple.com/us/app/pocketpal-ai/id6502579498", src: "pocketpal" },
 
       // ----- vault drive -----
@@ -725,6 +723,261 @@ const HAVYN_CONTENT = {
     ]
   },
 
+  // ---------------- v1.4: the reference shelf (Get more › Shelf) ----------------
+  // Real documents from the agencies and publishers who wrote them, filed by the system each one helps you run or rebuild.
+  // lic: pd = US government work (public domain); cc-by / cc-by-nc-sa = Creative Commons; link = publisher's own terms (HAVYN links, never re-hosts).
+  // Documents under pd and cc-* are mirrored on HAVYN's own address and the "shelf" GitHub release, so phones get them with one tap.
+  // ph = in the phone set. core = in the vault drive's core set.
+  // Fetch (used by .github/workflows/shelf.yml and the vault script): src = direct PDF links in order of preference;
+  // parts = several PDFs joined into one book; ia = {item, match} a file inside an Internet Archive item; ox = OpenStax book slug;
+  // hp = Hesperian book code: chapter PDFs found on hesperian.org (HAVYN joins them into one book on the phone).
+  // size: bytes; est: true until the shelf workflow has measured the real file.
+  shelf: {
+    checked: "2026-11-14",
+    release: "shelf",
+    note: "Real manuals and guides from the agencies and publishers who wrote them, not summaries. Everything opens in HAVYN with no internet, and Search everything reads every page.",
+    systems: [
+      { id: "med", n: "01", icon: "cross", t: "Medicine and first aid", d: "Care for the sick and injured when help can't come." },
+      { id: "water", n: "02", icon: "drop", t: "Water", d: "Find it, make it safe, store it, run a supply." },
+      { id: "sanit", n: "03", icon: "bug", t: "Sanitation and hygiene", d: "Latrines, waste, handwashing and pests: what stops disease spreading after the plumbing fails." },
+      { id: "food", n: "04", icon: "food", t: "Food", d: "Grow it in the desert, preserve it safely, store it." },
+      { id: "shelter", n: "05", icon: "home", t: "Shelter and building", d: "Repair and build with wood, concrete and block." },
+      { id: "power", n: "06", icon: "bolt", t: "Power and electricity", d: "Generators, solar, wind and the electrical knowledge to wire, fix and rebuild." },
+      { id: "comms", n: "07", icon: "radio", t: "Communications", d: "Radio channels, emergency nets and how radio works." },
+      { id: "tools", n: "08", icon: "gear", t: "Tools, machines and trades", d: "Hand tools, machines, metal shop, drawings and wiring: the trade courses the Navy and Army teach." },
+      { id: "resp", n: "09", icon: "flag", t: "Emergency response and survival", d: "Plans, rescue, navigation without GPS, hazardous spills and survival skills." },
+      { id: "family", n: "10", icon: "people", t: "Family, kids and mind", d: "Helping children and adults through fear and loss." },
+      { id: "sci", n: "11", icon: "book", t: "Science and math", d: "Full college textbooks for re-learning, teaching kids and rebuilding know-how." },
+      { id: "ref", n: "12", icon: "globe", t: "Maps and reference", d: "Reading maps and other references. Dictionaries: see Apps (built into the iPhone) and the vault drive." }
+    ],
+    items: [
+      // ----- 01 medicine -----
+      { id: "sh-firstaid", sys: "med", ph: true, core: true, lic: "pd", by: "US Army Medical Center of Excellence", yr: 2026, t: "Army First Aid manual (ATP 4-02.11)",
+        d: "Stopping bleeding, airway and breathing, shock, burns, broken bones and moving the injured, for people who aren't medics. The Army's current first-aid manual, published March 2026.",
+        u: "https://www.army.mil/article/291504/medcoe_publishes_atp_4_02_11_casualty_response_tactical_combat_casualty_care_and_first_aid",
+        src: ["https://armypubs.army.mil/epubs/DR_pubs/DR_a/ARN46159-ATP_4-02.11-000-WEB-1.pdf"], file: "ATP-4-02.11-First-Aid-2026.pdf", size: 12000000, est: true },
+      { id: "sh-shipmed", sys: "med", ph: true, core: true, lic: "pd", by: "US Public Health Service", yr: 2003, t: "The Ship's Medicine Chest and Medical Aid at Sea",
+        d: "Written for a crew with no doctor on board: examining a patient, injuries, illness, medicines, and when to call for evacuation. A close match for a family cut off from care.",
+        u: "https://purl.fdlp.gov/GPO/gpo20582", src: ["https://irp.fas.org/doddir/milmed/ships.pdf", "https://purl.fdlp.gov/GPO/gpo20582"], expect: "Medicine Chest", file: "Ships-Medicine-Chest-and-Medical-Aid-at-Sea-2003.pdf", size: 25000000, est: true },
+      { id: "sh-bec", sys: "med", ph: true, core: true, lic: "cc-by-nc-sa", by: "World Health Organization and ICRC", yr: 2018, t: "Basic Emergency Care: the acutely ill and injured",
+        d: "The ABCDE method for someone suddenly very sick or hurt: trauma, trouble breathing, shock and confusion, with step-by-step skill sheets. WHO's course for first-contact health workers.",
+        u: "https://www.who.int/publications/i/item/9789241513081", src: ["https://iris.who.int/bitstream/handle/10665/275635/9789241513081-eng.pdf", "https://medbox.org/index.php/dl/5e148832db60a2044c2d5292"], file: "WHO-ICRC-Basic-Emergency-Care-2018.pdf", size: 12000000, est: true },
+      { id: "sh-wtnd", sys: "med", ph: true, core: true, lic: "link", by: "Hesperian Health Guides", yr: 2025, t: "Where There Is No Doctor",
+        d: "The world's most-used village health handbook: what's wrong, what to do, which medicine and when to get help. Hesperian lets families download it free but not re-host it, so it comes from Hesperian in chapters and HAVYN joins them into one book when you add them together.",
+        u: "https://en.hesperian.org/hhg/Where_There_Is_No_Doctor", hp: { code: "wtnd", years: [2026, 2025, 2024] }, file: "Where-There-Is-No-Doctor-Hesperian.pdf", size: 35000000, est: true },
+      { id: "sh-dentist", sys: "med", ph: true, lic: "link", by: "Hesperian Health Guides", yr: 2024, t: "Where There Is No Dentist",
+        d: "Toothache, abscesses, broken teeth and safe extraction when no dentist can be reached, and keeping teeth healthy. In chapters from Hesperian, like Where There Is No Doctor.",
+        u: "https://hesperian.org/wp-content/uploads/pdf/en_dent_2024/en_dent_2024_fm.pdf", hp: { code: "dent", years: [2026, 2025, 2024] }, file: "Where-There-Is-No-Dentist-Hesperian.pdf", size: 15000000, est: true },
+      { id: "sh-wwhnd", sys: "med", lic: "link", by: "Hesperian Health Guides", yr: 2024, t: "Where Women Have No Doctor",
+        d: "Women's health from puberty to old age, including pregnancy, birth problems and infections, for when there's no clinic.",
+        u: "https://hesperian.org/wp-content/uploads/pdf/en_wwhnd_2024/en_wwhnd_2024_ob.pdf", hp: { code: "wwhnd", years: [2026, 2025, 2024] }, file: "Where-Women-Have-No-Doctor-Hesperian.pdf", size: 30000000, est: true },
+      { id: "sh-msf", sys: "med", core: true, lic: "link", by: "Médecins Sans Frontières", yr: 2024, t: "MSF Clinical Guidelines: diagnosis and treatment",
+        d: "The manual MSF clinicians use far from hospitals: symptoms, infections, wounds, burns, bites and minor procedures, with drug doses. Written for medical staff; read it with a nurse or medic if you can.",
+        u: "https://medicalguidelines.msf.org/en/viewport/CG/english/clinical-guidelines-16686604.html", src: ["https://medicalguidelines.msf.org/sites/default/files/pdf/guideline-170-en.pdf"], expect: "Clinical guidelines", file: "MSF-Clinical-Guidelines.pdf", size: 9000000, est: true },
+      { id: "sh-ox-nursing", sys: "med", core: true, lic: "cc-by", by: "OpenStax, Rice University", yr: 2024, t: "Clinical Nursing Skills",
+        d: "The hands-on work of nursing, step by step: vital signs, wound and burn care, giving medicines and injections, IV lines, catheters, infection control and moving patients safely.",
+        u: "https://openstax.org/details/books/clinical-nursing-skills", ox: "clinical-nursing-skills", expect: "Attribution 4\\.0 International", file: "OpenStax-Clinical-Nursing-Skills.pdf", size: 100000000, est: true },
+      { id: "sh-ox-pharm", sys: "med", lic: "cc-by", by: "OpenStax, Rice University", yr: 2024, t: "Pharmacology for Nurses",
+        d: "What each common kind of medicine does, its side effects and dangerous combinations, and how to give it safely, body system by body system.",
+        u: "https://openstax.org/details/books/pharmacology", ox: "pharmacology", expect: "Attribution 4\\.0 International", file: "OpenStax-Pharmacology-for-Nurses.pdf", size: 100000000, est: true },
+      { id: "sh-ox-birth", sys: "med", lic: "cc-by", by: "OpenStax, Rice University", yr: 2024, t: "Maternal-Newborn Nursing",
+        d: "Pregnancy, labor and birth, what can go wrong, the weeks after, breastfeeding and newborn care: for when a baby comes and the hospital can't be reached.",
+        u: "https://openstax.org/details/books/maternal-newborn-nursing", ox: "maternal-newborn-nursing", expect: "Attribution 4\\.0 International", file: "OpenStax-Maternal-Newborn-Nursing.pdf", size: 100000000, est: true },
+
+      // ----- 02 water -----
+      { id: "sh-foodwater", sys: "water", ph: true, core: true, lic: "pd", by: "FEMA and American Red Cross", yr: 2004, t: "Food and Water in an Emergency",
+        d: "How much water to store and how, hidden water already in your home, treating water, and safe emergency food and cooking.",
+        u: "https://www.fema.gov/pdf/library/f&web.pdf", src: ["https://www.fema.gov/pdf/library/f&web.pdf", "https://archive.org/download/MManuals/FoodAndWaterInAnEmergency.pdf"], file: "FEMA-Food-and-Water-in-an-Emergency.pdf", size: 800000, est: true },
+      { id: "sh-epawater", sys: "water", ph: true, core: true, lic: "pd", by: "US Environmental Protection Agency", yr: 2017, t: "Emergency Disinfection of Drinking Water",
+        d: "Boiling, and the bleach dose for each amount of water, on two pages.",
+        u: "https://www.epa.gov/ground-water-and-drinking-water/emergency-disinfection-drinking-water",
+        src: ["https://www.epa.gov/sites/default/files/2017-09/documents/emergency_disinfection_of_drinking_water_sept2017.pdf", "https://19january2021snapshot.epa.gov/sites/static/files/2017-09/documents/emergency_disinfection_of_drinking_water_sept2017.pdf"], file: "EPA-Emergency-Disinfection-of-Drinking-Water.pdf", size: 300000, est: true },
+      { id: "sh-tbmed577", sys: "water", core: true, lic: "pd", by: "US Army, Navy and Air Force", yr: 2010, t: "Field Water Supplies (TB MED 577)",
+        d: "Finding, testing, treating and storing water for a group for weeks: chlorination, testing, and cleaning containers and tanks.",
+        u: "https://www.med.navy.mil/Portals/62/Documents/BUMED/Directives/All%20Pubs/5010-10.pdf", src: ["https://www.med.navy.mil/Portals/62/Documents/BUMED/Directives/All%20Pubs/5010-10.pdf", "https://static.e-publishing.af.mil/production/1/af_sg/publication/afman48-138_ip/afman48-138_ip.pdf"], expect: "TB MED 577", file: "TB-MED-577-Field-Water-Supplies-2010.pdf", size: 6000000, est: true },
+      { id: "sh-gdwq", sys: "water", lic: "cc-by-nc-sa", by: "World Health Organization", yr: 2022, t: "Guidelines for Drinking-water Quality",
+        d: "The world reference on safe drinking water: germs, chemicals, treatment methods and water safety plans. For whoever ends up running a neighborhood supply.",
+        u: "https://www.who.int/publications/i/item/9789240045064", src: ["https://iris.who.int/bitstream/handle/10665/352532/9789240045064-eng.pdf", "https://apps.who.int/iris/bitstream/handle/10665/352532/9789240045064-eng.pdf"], dspace: { base: "https://iris.who.int", handle: "10665/352532", match: "eng\\.pdf$" }, wb: ["2023", "2022"], expect: "drinking-water quality", file: "WHO-Guidelines-Drinking-water-Quality-2022.pdf", size: 10000000, est: true },
+
+      // ----- 03 sanitation -----
+      { id: "sh-fieldsan", sys: "sanit", ph: true, core: true, lic: "pd", by: "US Army", yr: 2002, t: "Unit Field Sanitation Team (FM 4-25.12)",
+        d: "Keeping a group from getting sick when the plumbing fails: latrines, handwashing stations, garbage, food safety, flies and mosquitoes, heat and cold injuries.",
+        u: "https://webarchive.library.unt.edu/web/20121027044100/http:/www.irwin.amedd.army.mil/pages/NTCsurgeon/Preventive%20Medicine/fm4_25x12.pdf",
+        src: ["https://webarchive.library.unt.edu/web/20121027044100id_/http://www.irwin.amedd.army.mil/pages/NTCsurgeon/Preventive%20Medicine/fm4_25x12.pdf", "https://web.archive.org/web/2012id_/http://www.irwin.amedd.army.mil/pages/NTCsurgeon/Preventive%20Medicine/fm4_25x12.pdf", "https://irp.fas.org/doddir/army/fm4-25-12.pdf"], expect: "4-25\\.12", file: "FM-4-25.12-Field-Sanitation-2002.pdf", size: 4000000, est: true },
+
+      // ----- 04 food -----
+      { id: "sh-canning", sys: "food", ph: true, core: true, lic: "pd", by: "US Department of Agriculture", yr: 2015, t: "USDA Complete Guide to Home Canning",
+        d: "Tested, safe ways to can fruit, tomatoes, vegetables, meat, pickles and jam, including when only a pressure canner is safe.",
+        u: "https://nchfp.uga.edu/resources/entry/about-the-usda-guide-to-home-canning-2015-revision",
+        src: ["https://www.growables.com/information/documents/CanningUSDA.pdf"],
+        parts: ["https://nchfp.uga.edu/papers/guide/INTRO_HomeCanrev0715.pdf", "https://nchfp.uga.edu/papers/guide/GUIDE01_HomeCan_rev0715.pdf", "https://nchfp.uga.edu/papers/guide/GUIDE02_HomeCan_rev0715.pdf", "https://nchfp.uga.edu/papers/guide/GUIDE03_HomeCan_rev0715.pdf", "https://nchfp.uga.edu/papers/guide/GUIDE04_HomeCan_rev0715.pdf", "https://nchfp.uga.edu/papers/guide/GUIDE05_HomeCan_rev0715.pdf", "https://nchfp.uga.edu/papers/guide/GUIDE06_HomeCan_rev0715.pdf", "https://nchfp.uga.edu/papers/guide/GUIDE07_HomeCan_rev0715.pdf"],
+        file: "USDA-Complete-Guide-to-Home-Canning-2015.pdf", size: 8000000, est: true },
+      { id: "sh-azveg", sys: "food", ph: true, core: true, lic: "link", by: "University of Arizona Cooperative Extension", yr: 2018, t: "Vegetable Planting Calendar for Maricopa County",
+        d: "What to plant each month in the Phoenix low desert, and how long until harvest.",
+        u: "https://extension.arizona.edu/pubs/vegetable-planting-calendar-maricopa-county", src: ["https://extension.arizona.edu/sites/extension.arizona.edu/files/pubs/az1005-2018.pdf", "https://www.extension.arizona.edu/sites/default/files/2024-08/az1005-2018.pdf"], file: "UA-AZ1005-Maricopa-Vegetable-Planting-Calendar.pdf", size: 650000, est: true },
+      { id: "sh-az10", sys: "food", ph: true, lic: "link", by: "University of Arizona Cooperative Extension", yr: 2015, t: "Ten Steps to a Successful Vegetable Garden",
+        d: "Starting a vegetable garden in Arizona: site, soil, water, planting and pests.",
+        u: "https://extension.arizona.edu/sites/extension.arizona.edu/files/pubs/az1435-2015.pdf", src: ["https://extension.arizona.edu/sites/extension.arizona.edu/files/pubs/az1435-2015.pdf"], file: "UA-AZ1435-Ten-Steps-Vegetable-Garden.pdf", size: 1000000, est: true },
+
+      // ----- 05 shelter -----
+      { id: "sh-carpentry", sys: "shelter", core: true, lic: "pd", by: "US Army", yr: 1995, t: "Carpentry (FM 5-426)",
+        d: "Framing, floors, walls, roofs, doors and windows, and concrete forms: a full course in wood-frame building.",
+        u: "https://archive.org/download/MManuals/UsArmyEngineerCarpentry1995.pdf", src: ["https://archive.org/download/MManuals/UsArmyEngineerCarpentry1995.pdf"], file: "FM-5-426-Carpentry-1995.pdf", size: 25000000, est: true },
+      { id: "sh-concrete", sys: "shelter", core: true, lic: "pd", by: "US Army", yr: 1998, t: "Concrete and Masonry (FM 5-428)",
+        d: "Mixing, placing and curing concrete; block, brick and stone walls; footings and repairs.",
+        u: "https://vulcanhammer.net/wp-content/uploads/2017/01/fm5_428.pdf", src: ["https://vulcanhammer.net/wp-content/uploads/2017/01/fm5_428.pdf"], file: "FM-5-428-Concrete-and-Masonry-1998.pdf", size: 20000000, est: true },
+      { id: "sh-builder", sys: "shelter", lic: "pd", by: "US Navy", yr: 1993, t: "Builder 3 & 2, Volume 1 (NAVEDTRA 14043)",
+        d: "The Navy Seabees' builder course: drawings and plans, woodworking, concrete, masonry and rigging.",
+        u: "https://www.constructionknowledge.net/public_domain_documents/Builder_and_2_vol_1_NAVEDTRA_14043_1993.pdf", src: ["https://www.constructionknowledge.net/public_domain_documents/Builder_and_2_vol_1_NAVEDTRA_14043_1993.pdf"], file: "NAVEDTRA-14043-Builder-Vol1-1993.pdf", size: 30000000, est: true },
+      { id: "sh-woodhb", sys: "shelter", lic: "pd", by: "USDA Forest Products Laboratory", yr: 2021, t: "Wood Handbook: wood as an engineering material",
+        d: "How strong each kind of wood is, drying, fasteners, glues, decay and fire: the engineering reference for building with wood.",
+        u: "https://research.fs.usda.gov/treesearch/62200", src: ["https://research.fs.usda.gov/download/treesearch/62200.pdf"], file: "USDA-Wood-Handbook-2021.pdf", size: 103950000, est: true },
+
+      // ----- 06 power -----
+      { id: "sh-cpscgen", sys: "power", ph: true, core: true, lic: "pd", by: "US Consumer Product Safety Commission", yr: 2021, t: "Portable Generator Hazards",
+        d: "Carbon monoxide, shock and fire: where a generator may and may not run, from the safety regulator.",
+        u: "https://www.cpsc.gov/s3fs-public/5123_SafetyAlert_PortableGenerators_102021.pdf", src: ["https://www.cpsc.gov/s3fs-public/5123_SafetyAlert_PortableGenerators_102021.pdf", "https://www.cpsc.gov/s3fs-public/Portable-Generator-Safety-Alert-2017_5123.pdf"], file: "CPSC-Portable-Generator-Hazards.pdf", size: 500000, est: true },
+      { id: "sh-oshagen", sys: "power", ph: true, lic: "pd", by: "US Occupational Safety and Health Administration", yr: 2005, t: "Using Portable Generators Safely",
+        d: "Shock, grounding, cords, refueling, and connecting to a building only through a transfer switch.",
+        u: "https://www.osha.gov/Publications/OSHA3286.pdf", src: ["https://www.osha.gov/sites/default/files/publications/OSHA3286.pdf", "https://www.osha.gov/Publications/OSHA3286.pdf"], file: "OSHA-3286-Portable-Generators.pdf", size: 300000, est: true },
+      { id: "sh-power", sys: "power", core: true, lic: "pd", by: "US Army", yr: 2024, t: "Electric Power Generation and Distribution (ATP 3-34.45)",
+        d: "Running generators for a camp: load planning, grounding, distribution, cables and safety. The closest manual there is to running a small local grid.",
+        u: "https://irp.fas.org/doddir/army/atp3-34-45.pdf", src: ["https://irp.fas.org/doddir/army/atp3-34-45.pdf"], wb: ["2025", "2024"], expect: "3-34\\.45", file: "ATP-3-34.45-Electric-Power-2024.pdf", size: 10000000, est: true },
+      { id: "sh-solar", sys: "power", core: true, lic: "pd", by: "US Department of Energy", t: "Own Your Power! Solar electricity for the home",
+        d: "How home solar works, sizing a system, batteries for off-grid homes, and what to ask an installer.",
+        u: "https://www1.eere.energy.gov/solar/pdfs/43844.pdf", src: ["https://www1.eere.energy.gov/solar/pdfs/43844.pdf", "https://www.nrel.gov/docs/fy09osti/43844.pdf"], file: "DOE-Own-Your-Power-Solar-Guide.pdf", size: 2000000, est: true },
+      { id: "sh-wind", sys: "power", lic: "pd", by: "US Department of Energy", yr: 2007, t: "Small Wind Electric Systems: a U.S. consumer's guide",
+        d: "Whether wind power can work where you live, sizing a turbine, towers, batteries and off-grid hybrids.",
+        u: "https://www.energy.gov/eere/wind/articles/small-wind-electric-systems-us-consumers-guide", src: ["https://www.nlr.gov/docs/fy07osti/42005.pdf", "https://docs.nlr.gov/docs/fy07osti/42005.pdf", "https://www.nrel.gov/docs/fy07osti/42005.pdf"], expect: "Small Wind Electric Systems", file: "DOE-Small-Wind-Electric-Systems-2007.pdf", size: 3000000, est: true },
+      { id: "sh-liec1", sys: "power", core: true, lic: "cc-by", by: "Tony R. Kuphaldt", yr: 2023, t: "Lessons in Electric Circuits, Vol. I: DC",
+        d: "Voltage, current, resistance, Ohm's law, series and parallel circuits, batteries and meters, from scratch.",
+        u: "https://ibiblio.org/kuphaldt/electricCircuits/DC/index.html", src: ["https://ibiblio.org/kuphaldt/electricCircuits/DC/DC.pdf"], file: "Lessons-in-Electric-Circuits-1-DC.pdf", size: 6000000, est: true },
+      { id: "sh-liec2", sys: "power", core: true, lic: "cc-by", by: "Tony R. Kuphaldt", yr: 2021, t: "Lessons in Electric Circuits, Vol. II: AC",
+        d: "Household AC power, transformers, motors, power factor and three-phase systems.",
+        u: "https://ibiblio.org/kuphaldt/electricCircuits/AC/index.html", src: ["https://ibiblio.org/kuphaldt/electricCircuits/AC/AC.pdf"], file: "Lessons-in-Electric-Circuits-2-AC.pdf", size: 6000000, est: true },
+      { id: "sh-liec3", sys: "power", lic: "cc-by", by: "Tony R. Kuphaldt", yr: 2021, t: "Lessons in Electric Circuits, Vol. III: Semiconductors",
+        d: "Diodes, transistors, power supplies and the electronics inside chargers and inverters.",
+        u: "https://ibiblio.org/kuphaldt/electricCircuits/Semi/index.html", src: ["https://ibiblio.org/kuphaldt/electricCircuits/Semi/SEMI.pdf"], file: "Lessons-in-Electric-Circuits-3-Semiconductors.pdf", size: 8000000, est: true },
+      { id: "sh-liec4", sys: "power", lic: "cc-by", by: "Tony R. Kuphaldt", yr: 2021, t: "Lessons in Electric Circuits, Vol. IV: Digital",
+        d: "Logic, relays, counters and the basics of digital circuits.",
+        u: "https://ibiblio.org/kuphaldt/electricCircuits/Digital/index.html", src: ["https://ibiblio.org/kuphaldt/electricCircuits/Digital/DIGI.pdf"], file: "Lessons-in-Electric-Circuits-4-Digital.pdf", size: 5000000, est: true },
+      { id: "sh-liec5", sys: "power", lic: "cc-by", by: "Tony R. Kuphaldt", yr: 2021, t: "Lessons in Electric Circuits, Vol. V: Reference",
+        d: "Formulas, wire tables, color codes and conversions.",
+        u: "https://ibiblio.org/kuphaldt/electricCircuits/Ref/index.html", src: ["https://ibiblio.org/kuphaldt/electricCircuits/Ref/REF.pdf"], file: "Lessons-in-Electric-Circuits-5-Reference.pdf", size: 1500000, est: true },
+      { id: "sh-liec6", sys: "power", lic: "cc-by", by: "Tony R. Kuphaldt", yr: 2021, t: "Lessons in Electric Circuits, Vol. VI: Experiments",
+        d: "Hands-on projects with batteries and parts, to learn by building.",
+        u: "https://ibiblio.org/kuphaldt/electricCircuits/Exper/index.html", src: ["https://ibiblio.org/kuphaldt/electricCircuits/Exper/EXP.pdf"], file: "Lessons-in-Electric-Circuits-6-Experiments.pdf", size: 4000000, est: true },
+      { id: "sh-neets1", sys: "power", core: true, lic: "pd", by: "US Navy", yr: 1998, t: "Navy Electricity course, Module 1: matter, energy and DC",
+        d: "The Navy's electricity and electronics course (NEETS), module 1: electricity from first principles, batteries and DC circuits.",
+        u: "https://archive.org/details/NEETSModules", ia: [{ item: "NEETSModules", match: "Module[ _-]*0?1\\b" }, { item: "neetsmodules_202003", match: "Module[ _-]*0?1\\b" }], file: "NEETS-01-Matter-Energy-Direct-Current.pdf", size: 4000000, est: true },
+      { id: "sh-neets2", sys: "power", core: true, lic: "pd", by: "US Navy", yr: 1998, t: "Navy Electricity course, Module 2: AC and transformers",
+        d: "Alternating current, inductance, capacitance and transformers.",
+        u: "https://archive.org/details/NEETSModules", ia: [{ item: "NEETSModules", match: "Module[ _-]*0?2\\b" }, { item: "neetsmodules_202003", match: "Module[ _-]*0?2\\b" }], file: "NEETS-02-Alternating-Current-Transformers.pdf", size: 4000000, est: true },
+      { id: "sh-neets3", sys: "power", lic: "pd", by: "US Navy", yr: 1998, t: "Navy Electricity course, Module 3: protection, control and measurement",
+        d: "Fuses, breakers, switches, relays and meters.",
+        u: "https://archive.org/details/NEETSModules", ia: [{ item: "NEETSModules", match: "Module[ _-]*0?3\\b" }, { item: "neetsmodules_202003", match: "Module[ _-]*0?3\\b" }], file: "NEETS-03-Circuit-Protection-Control-Measurement.pdf", size: 3000000, est: true },
+      { id: "sh-neets4", sys: "power", core: true, lic: "pd", by: "US Navy", yr: 1998, t: "Navy Electricity course, Module 4: wiring and schematics",
+        d: "Conductors, splices, soldering, wiring techniques and reading schematics.",
+        u: "https://archive.org/details/NEETSModules", ia: [{ item: "NEETSModules", match: "Module[ _-]*0?4\\b" }, { item: "neetsmodules_202003", match: "Module[ _-]*0?4\\b" }], file: "NEETS-04-Conductors-Wiring-Schematics.pdf", size: 3000000, est: true },
+      { id: "sh-neets5", sys: "power", lic: "pd", by: "US Navy", yr: 1998, t: "Navy Electricity course, Module 5: generators and motors",
+        d: "How generators and electric motors work, and how to keep them running.",
+        u: "https://archive.org/details/NEETSModules", ia: [{ item: "NEETSModules", match: "Module[ _-]*0?5\\b" }, { item: "neetsmodules_202003", match: "Module[ _-]*0?5\\b" }], file: "NEETS-05-Generators-Motors.pdf", size: 3000000, est: true },
+
+      // ----- 07 communications -----
+      { id: "sh-nifog", sys: "comms", ph: true, core: true, lic: "pd", by: "US Cybersecurity and Infrastructure Security Agency", yr: 2024, t: "National Interoperability Field Operations Guide (NIFOG 2.02)",
+        d: "The national pocket guide to emergency radio channels and frequencies, with radio reference tables.",
+        u: "https://www.cisa.gov/resources-tools/resources/nifog", src: ["https://www.cisa.gov/sites/default/files/2024-12/NIFOG%202.02_508%20FINAL%20VERSION%2012%2003%202024.pdf", "https://www.cisa.gov/sites/default/files/2023-02/NIFOG%202.01%20508%20FINAL.pdf"], file: "CISA-NIFOG-2.02.pdf", size: 4200000, est: true },
+      { id: "sh-auxfog", sys: "comms", ph: true, core: true, lic: "pd", by: "US Department of Homeland Security", yr: 2016, t: "Auxiliary Communications Field Operations Guide (AUXFOG 1.1)",
+        d: "The volunteer and amateur radio companion to the NIFOG: supporting emergency communications, nets and frequency charts.",
+        u: "https://www.dhs.gov/safecom/eauxfog-mobile-app", src: ["https://www.cisa.gov/sites/default/files/publications/AUXFOG%20June%202016%20-%20508%20Reviewed%20-%20Final%20(2-16-17).pdf"], file: "DHS-AUXFOG-1.1.pdf", size: 3300000, est: true },
+      { id: "sh-neets10", sys: "comms", core: true, lic: "pd", by: "US Navy", yr: 1998, t: "Navy Electricity course, Module 10: radio waves and antennas",
+        d: "How radio waves travel, transmission lines and antennas: what to know to build or fix one.",
+        u: "https://archive.org/details/NEETSModules", ia: [{ item: "NEETSModules", match: "Module[ _-]*10\\b" }, { item: "neetsmodules_202003", match: "Module[ _-]*10\\b" }], file: "NEETS-10-Wave-Propagation-Antennas.pdf", size: 3000000, est: true },
+      { id: "sh-neets17", sys: "comms", lic: "pd", by: "US Navy", yr: 1998, t: "Navy Electricity course, Module 17: radio communications",
+        d: "Transmitters, receivers and radio systems explained.",
+        u: "https://archive.org/details/NEETSModules", ia: [{ item: "NEETSModules", match: "Module[ _-]*17\\b" }, { item: "neetsmodules_202003", match: "Module[ _-]*17\\b" }], file: "NEETS-17-Radio-Frequency-Communications.pdf", size: 3000000, est: true },
+
+      // ----- 08 tools and trades -----
+      { id: "sh-tools", sys: "tools", ph: true, core: true, lic: "pd", by: "US Navy", yr: 1992, t: "Tools and Their Uses (NAVEDTRA 14256)",
+        d: "Every common hand and power tool: what it's for, how to use it safely and how to care for it. Start here.",
+        u: "https://everyspec.com/USN/NAVEDTRA/NAVEDTRA_14256_JUN1992_18379/", src: ["https://www.constructionknowledge.net/public_domain_documents/Div_1_General/Basic_Skills/Tools%20&%20their%20Uses%20NAVEDTRA%2014256.pdf"], file: "NAVEDTRA-14256-Tools-and-Their-Uses-1992.pdf", size: 19670000, est: true },
+      { id: "sh-machines", sys: "tools", core: true, lic: "pd", by: "US Navy, Bureau of Naval Personnel", yr: 1965, t: "Basic Machines and How They Work",
+        d: "Levers, pulleys, gears, hydraulics and engines from first principles: the physics behind every machine you might fix or build.",
+        u: "https://archive.org/details/basicmachineshow00unit", src: ["https://archive.org/download/basicmachineshow00unit/basicmachineshow00unit.pdf"], file: "Navy-Basic-Machines-1965.pdf", size: 10000000, est: true },
+      { id: "sh-blueprint", sys: "tools", lic: "pd", by: "US Navy", yr: 1994, t: "Blueprint Reading and Sketching (NAVEDTRA 14040)",
+        d: "Reading and drawing plans for machines, piping, wiring and buildings.",
+        u: "https://archive.org/download/MManuals/UsNavyBlueprintReadingSketching1994.pdf", src: ["https://archive.org/download/MManuals/UsNavyBlueprintReadingSketching1994.pdf"], file: "NAVEDTRA-14040-Blueprint-Reading-1994.pdf", size: 6000000, est: true },
+      { id: "sh-machinetools", sys: "tools", lic: "pd", by: "US Army", yr: 1996, t: "Fundamentals of Machine Tools (TC 9-524)",
+        d: "Drills, lathes, mills and grinders: how a machine shop makes and repairs metal parts, with charts and formulas.",
+        u: "https://archive.org/download/MManuals/UsArmyMachinistFundamentals-machineTools1996.pdf", src: ["https://archive.org/download/MManuals/UsArmyMachinistFundamentals-machineTools1996.pdf"], file: "TC-9-524-Machine-Tools-1996.pdf", size: 7000000, est: true },
+      { id: "sh-electrician", sys: "tools", core: true, lic: "pd", by: "US Navy", yr: 1998, t: "Construction Electrician Basic (NAVEDTRA 14026)",
+        d: "Power distribution, building wiring, lighting, motors, generators and test equipment, from the Seabees' electrician course.",
+        u: "https://media.defense.gov/2014/Jun/20/2002655885/-1/-1/1/140620-N-ZZ182-6530.pdf", src: ["https://media.defense.gov/2014/Jun/20/2002655885/-1/-1/1/140620-N-ZZ182-6530.pdf"], expect: "Construction Electrician", file: "NAVEDTRA-14026-Construction-Electrician-1998.pdf", size: 20000000, est: true },
+      { id: "sh-autos", sys: "tools", core: true, lic: "pd", by: "US Army", yr: 1985, t: "Principles of Automotive Vehicles (TM 9-8000)",
+        d: "How engines, fuel, ignition, cooling, charging, brakes, steering and drivetrains work and why they fail: the background to keeping any car, truck or generator engine running.",
+        u: "https://everyspec.com/ARMY/TM-Tech-Manual/TM_9-8000_CHG-1_48512/", src: ["https://everyspec.com/ARMY/TM-Tech-Manual/download.php?spec=TM_9-8000_CHG-1.048512.pdf"],
+        ias: { q: 'title:("principles of automotive vehicles") AND mediatype:(texts)', match: "\\.pdf$" }, expect: "Automotive Vehicles", file: "TM-9-8000-Principles-of-Automotive-Vehicles.pdf", size: 40000000, est: true },
+
+      // ----- 09 response and survival -----
+      { id: "sh-ayr", sys: "resp", ph: true, core: true, lic: "pd", by: "FEMA", yr: 2004, t: "Are You Ready? An in-depth guide to citizen preparedness",
+        d: "FEMA's most complete household guide: plans, kits, shutting off utilities, every natural hazard, sheltering and recovery.",
+        u: "https://bready.sd.gov/bReady/areyouready_full.pdf", src: ["https://bready.sd.gov/bReady/areyouready_full.pdf", "https://prepareiowa.training-source.org/sites/default/files/u2/18%20IS22%20Are%20You%20Ready.pdf"], file: "FEMA-Are-You-Ready-IS-22.pdf", size: 22000000, est: true },
+      { id: "sh-cert", sys: "resp", ph: true, core: true, lic: "pd", by: "FEMA", yr: 2019, t: "CERT Basic Training manual",
+        d: "Disaster first aid, light search and rescue, fire safety and team organization, from FEMA's community response course.",
+        u: "https://www.ready.gov/cert", src: ["https://www.ready.gov/sites/default/files/2019.CERT_.Basic_.PM_FINAL_508c.pdf"], file: "FEMA-CERT-Basic-Training-Participant-Manual-2019.pdf", size: 25000000, est: true },
+      { id: "sh-survival", sys: "resp", ph: true, core: true, lic: "pd", by: "US Army", yr: 2018, t: "Survival (ATP 3-50.21)",
+        d: "Water, fire, shelter, food, navigation and signaling when you're on your own, plus field first aid.",
+        u: "https://irp.fas.org/doddir/army/atp3-50-21.pdf", src: ["https://irp.fas.org/doddir/army/atp3-50-21.pdf"], expect: "3-50\\.21", file: "ATP-3-50.21-Survival-2018.pdf", size: 15000000, est: true },
+      { id: "sh-landnav", sys: "resp", ph: true, core: true, lic: "pd", by: "US Army", yr: 2001, t: "Map Reading and Land Navigation (FM 3-25.26)",
+        d: "Finding your way with a paper map and compass when GPS and phones fail: grid references, elevation, bearings and night navigation.",
+        u: "https://archive.org/details/MManuals", src: ["https://archive.org/download/MManuals/Fm3-25.26MapReadingAndLandNavigation.pdf"], expect: "3-25\\.26", file: "FM-3-25.26-Map-Reading-Land-Navigation-2001.pdf", size: 15000000, est: true },
+      { id: "sh-erg", sys: "resp", ph: true, core: true, lic: "pd", by: "US Department of Transportation (PHMSA)", yr: 2024, t: "Emergency Response Guidebook 2024",
+        d: "If a truck or train spills chemicals nearby: look up the number on the placard to see the danger and how far away to stay.",
+        u: "https://www.phmsa.dot.gov/training/hazmat/erg/emergency-response-guidebook-erg", src: ["https://www.phmsa.dot.gov/sites/phmsa.dot.gov/files/2024-04/ERG2024-Eng-Web-a.pdf"], expect: "Emergency Response Guidebook", file: "DOT-Emergency-Response-Guidebook-2024.pdf", size: 10000000, est: true },
+
+      // ----- 10 family, kids and mind -----
+      { id: "sh-pfa", sys: "family", ph: true, core: true, lic: "link", by: "National Child Traumatic Stress Network and National Center for PTSD", yr: 2006, t: "Psychological First Aid: field operations guide",
+        d: "How to calm, comfort and practically help children and adults in the hours and days after a disaster, with handouts. Written for anyone helping, not just counselors.",
+        u: "https://www.samhsa.gov/resource/dbhis/psychological-first-aid-field-operations-guide-2nd-edition",
+        src: ["https://www.nctsn.org/sites/default/files/resources/pfa_field_operations_guide.pdf", "https://psychiatry.uw.edu/wp-content/uploads/2020/04/2.-NCTSN-pfa_field_operations_guide.pdf"], file: "NCTSN-Psychological-First-Aid-Field-Operations-Guide.pdf", size: 3400000, est: true },
+      { id: "sh-wrigleyheat", sys: "family", ph: true, lic: "pd", by: "US Centers for Disease Control and Prevention", yr: 2015, t: "Ready Wrigley Prepares for Extreme Heat",
+        d: "Activity book for young kids: heat safety, the family plan and the emergency kit, with games.",
+        u: "https://stacks.cdc.gov/view/cdc/37673", src: ["https://stacks.cdc.gov/view/cdc/37673/cdc_37673_DS1.pdf"], file: "CDC-Ready-Wrigley-Extreme-Heat.pdf", size: 2000000, est: true },
+      { id: "sh-wrigleycope", sys: "family", ph: true, lic: "pd", by: "US Centers for Disease Control and Prevention", t: "Ready Wrigley: Coping After a Disaster",
+        d: "Helps young children name their feelings and find ways to cope after something scary happens.",
+        u: "https://stacks.cdc.gov/view/cdc/58346", src: ["https://stacks.cdc.gov/view/cdc/58346/cdc_58346_DS1.pdf", "https://hazards.colorado.edu/uploads/freeform/RW_Coping_After_a_Disaster_508.pdf"], file: "CDC-Ready-Wrigley-Coping-After-a-Disaster.pdf", size: 1900000, est: true },
+      { id: "sh-wrigleyfire", sys: "family", ph: true, lic: "pd", by: "US Centers for Disease Control and Prevention", t: "Ready Wrigley Prepares for Wildfires and Smoke",
+        d: "Smoke, a clean room, practicing evacuation and a backpack emergency card, for kids.",
+        u: "https://stacks.cdc.gov/view/cdc/118266", src: ["https://stacks.cdc.gov/view/cdc/118266/cdc_118266_DS1.pdf"], file: "CDC-Ready-Wrigley-Wildfires-Smoke.pdf", size: 2000000, est: true },
+
+      // ----- 11 science and math (OpenStax, CC BY) -----
+      { id: "sh-ox-prealg", sys: "sci", lic: "cc-by", by: "OpenStax, Rice University", yr: 2020, t: "Prealgebra (2nd edition)", d: "Arithmetic, fractions, percents and first algebra, for teaching kids or brushing up.", u: "https://openstax.org/details/books/prealgebra-2e", ox: "prealgebra-2e", file: "OpenStax-Prealgebra-2e.pdf", size: 60000000, est: true },
+      { id: "sh-ox-alg", sys: "sci", lic: "cc-by", by: "OpenStax, Rice University", yr: 2021, t: "College Algebra (2nd edition)", d: "Equations, functions, graphs and the math behind engineering and planning.", u: "https://openstax.org/details/books/college-algebra-2e", ox: "college-algebra-2e", file: "OpenStax-College-Algebra-2e.pdf", size: 60000000, est: true },
+      { id: "sh-ox-stats", sys: "sci", lic: "cc-by", by: "OpenStax, Rice University", yr: 2023, t: "Introductory Statistics (2nd edition)", d: "Making sense of numbers: averages, probability and sampling.", u: "https://openstax.org/details/books/introductory-statistics-2e", ox: "introductory-statistics-2e", file: "OpenStax-Introductory-Statistics-2e.pdf", size: 30000000, est: true },
+      { id: "sh-ox-chem", sys: "sci", core: true, lic: "cc-by", by: "OpenStax, Rice University", yr: 2019, t: "Chemistry (2nd edition)", d: "A full general chemistry course: matter, reactions, solutions, acids and bases.", u: "https://openstax.org/details/books/chemistry-2e", ox: "chemistry-2e", file: "OpenStax-Chemistry-2e.pdf", size: 60000000, est: true },
+      { id: "sh-ox-phys", sys: "sci", core: true, lic: "cc-by", by: "OpenStax, Rice University", yr: 2022, t: "College Physics (2nd edition)", d: "Forces, energy, heat, electricity, light and sound: the physics of how things work.", u: "https://openstax.org/details/books/college-physics-2e", ox: "college-physics-2e", file: "OpenStax-College-Physics-2e.pdf", size: 60000000, est: true },
+      { id: "sh-ox-bio", sys: "sci", lic: "cc-by", by: "OpenStax, Rice University", yr: 2018, t: "Biology (2nd edition)", d: "Cells, genetics, plants, animals and ecology.", u: "https://openstax.org/details/books/biology-2e", ox: "biology-2e", file: "OpenStax-Biology-2e.pdf", size: 60000000, est: true },
+      { id: "sh-ox-ap", sys: "sci", core: true, lic: "cc-by", by: "OpenStax, Rice University", yr: 2022, t: "Anatomy and Physiology (2nd edition)", d: "How the human body is built and works, system by system: the background to every medical guide on this shelf.", u: "https://openstax.org/details/books/anatomy-and-physiology-2e", ox: "anatomy-and-physiology-2e", file: "OpenStax-Anatomy-and-Physiology-2e.pdf", size: 80000000, est: true },
+      { id: "sh-ox-micro", sys: "sci", lic: "cc-by", by: "OpenStax, Rice University", yr: 2016, t: "Microbiology", d: "Bacteria, viruses, infection and immunity: why boiling, bleach and handwashing work.", u: "https://openstax.org/details/books/microbiology", ox: "microbiology", file: "OpenStax-Microbiology.pdf", size: 60000000, est: true },
+
+      // ----- 12 maps and reference -----
+      { id: "sh-topo", sys: "ref", core: true, lic: "pd", by: "US Geological Survey", yr: 2005, t: "Topographic Map Symbols",
+        d: "What every line, color and symbol on a USGS topographic map means. Pair it with the land navigation manual.",
+        u: "https://pubs.usgs.gov/gip/TopographicMapSymbols/", src: ["https://pubs.usgs.gov/gip/TopographicMapSymbols/topomapsymbols.pdf", "https://ftpgeoinfo.msl.mt.gov/Documents/Projects/Topo/topomapsymbols.pdf"], file: "USGS-Topographic-Map-Symbols.pdf", size: 2100000, est: true }
+    ],
+    // What the best-known offline libraries carry, and what HAVYN took from each (checked 2026-11-14).
+    others: [
+      { t: "Project N.O.M.A.D.", d: "A free offline server: Kiwix, Khan Academy courses through Kolibri, offline maps and a local AI.", took: "Its encyclopedia and medical picks; HAVYN's vault drive carries its source for your home server." },
+      { t: "Internet-in-a-Box", d: "Open-source library for a Raspberry Pi: Wikipedia, Khan Academy, OpenStreetMap, medical libraries and books, shared over Wi-Fi.", took: "The idea of one small box serving the whole house (Get more › Home)." },
+      { t: "RACHEL (World Possible)", d: "Offline school and clinic server built from open content: Wikipedia, Khan Academy, CK-12, MedlinePlus and Hesperian health guides.", took: "Hesperian's health books and MedlinePlus." },
+      { t: "PrepperDisk", d: "A commercial Raspberry Pi hotspot preloaded with Wikipedia, street maps, WikiHow, iFixit, government site backups and ebooks.", took: "Most of the same archives are free in the Kiwix library, so they are in Get more." },
+      { t: "Kiwix", d: "The free reader and library behind most of these: Wikipedia, Stack Exchange, Gutenberg, iFixit, TED and the preppers' selection in one format.", took: "Every archive in Get more, and the Hotspot that shares them at home." },
+      { t: "Survivor Library", d: "A large collection of old public-domain books and manuals in over 150 subjects, from farming and trades to medicine.", took: "Project Gutenberg's agriculture and technology collections on the vault drive cover much of the same ground." },
+      { t: "Long Now Foundation: Manual for Civilization", d: "A crowd-chosen list of about 3,500 books most useful for sustaining or rebuilding civilization, held as a physical library.", took: "The test for this shelf: would it help you run or rebuild a working system?" }
+    ]
+  },
+
+
   refs: {
     kiwix: { n: "Kiwix library and download mirror listing (checked 2026-11-14)", u: "https://library.kiwix.org/" },
     kiwixmirror: { n: "Kiwix mirror listing, video and website archives", u: "https://ftp.fau.de/kiwix/zim/videos/" },
@@ -744,6 +997,9 @@ const HAVYN_CONTENT = {
     rpi: { n: "Raspberry Pi Imager", u: "https://www.raspberrypi.com/software/" },
     nomad: { n: "Project N.O.M.A.D.", u: "https://github.com/Crosstalk-Solutions/project-nomad" },
     havyn: { n: "HAVYN on GitHub", u: "https://github.com/hourglazlabs-x/havyn" },
+    applelookup: { n: "Gadget Hacks: add dictionaries to iPhone (Settings › General › Dictionary)", u: "https://ios.gadgethacks.com/how-to/add-foreign-language-dictionaries-your-iphone-look-up-definitions-faster-0167135/" },
+    appletranslate: { n: "iDownloadBlog: download languages for offline translation (iOS 26)", u: "https://www.idownloadblog.com/?p=1044089" },
+    hesperiancopy: { n: "Hesperian: open copyright terms (front matter of Where There Is No Dentist 2024)", u: "https://hesperian.org/wp-content/uploads/pdf/en_dent_2024/en_dent_2024_fm.pdf" },
     webkitstore: { n: "WebKit: storage policy (Home Screen web apps)", u: "https://webkit.org/blog/14403/updates-to-storage-policy/" },
     cdcfood: { n: "CDC: keep food safe after an emergency", u: "https://www.cdc.gov/food-safety/foods/keep-food-safe-after-emergency.html" },
     usda: { n: "USDA FSIS: how temperatures affect food", u: "https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/how-temperatures-affect-food" },

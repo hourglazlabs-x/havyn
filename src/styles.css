@@ -355,3 +355,20 @@ body.night .zhead { background: #000; }
 .gi .mk input { width: 22px; height: 22px; accent-color: var(--cyan); }
 code.cmd { display: block; margin: 6px 0 8px; padding: 10px 12px; border-radius: 10px; background: rgba(0,0,0,.45); border: 1px solid var(--line); font-family: var(--mono); font-size: .76rem; line-height: 1.45; color: var(--aqua); overflow-wrap: anywhere; white-space: pre-wrap; -webkit-user-select: all; user-select: all; }
 .blk code.cmd + span { display: block; }
+
+/* ---------- v1.4: reference shelf ---------- */
+.shnav { display: flex; flex-wrap: nowrap; gap: 6px; margin: 14px -2px 4px; padding: 0 2px 6px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+.shnav::-webkit-scrollbar { display: none; }
+.shnav .chip { flex: none; cursor: pointer; background: rgba(255,255,255,.03); font-size: .76rem; }
+.shsys .lab { display: inline-flex; align-items: center; gap: 8px; }
+.shsys .lab svg { width: 18px; height: 18px; color: var(--cyan); }
+.shd { font-size: .88rem; margin: -2px 2px 8px; text-align: left; }
+.gi .chip.lic { color: var(--ink2); border-style: dashed; }
+.gi .note.sm { font-size: .82rem; color: var(--ink2); line-height: 1.35; flex-basis: 100%; }
+.shcmp { margin-top: 18px; }
+.shcmp summary { cursor: pointer; list-style: none; padding: 2px 0; }
+.shcmp summary::-webkit-details-marker { display: none; }
+.shcmp summary::after { content: " ›"; color: var(--mute); }
+.shcmp[open] summary::after { content: " ⌄"; }
+.shcmp .blk { margin-top: 12px; }
+.shcmp .took { display: block; color: var(--cyan); font-size: .86rem; margin-top: 4px; }

@@ -1,6 +1,7 @@
 /* HAVYN FIELD service worker: cache the app once, then serve it with no network.
    It also serves the offline library: ./z/<archive id>/<path> reads pages straight out of ZIM archives
-   saved on this phone (IndexedDB), with byte ranges so video can seek. Nothing here touches the network. */
+   saved on this phone (IndexedDB), with byte ranges so video can seek. Only shelf downloads (./shelf/) reach the network,
+   and only HAVYN's own address. */
 importScripts("./zimkit.js");
 const VERSION = "__VERSION__";
 const CACHE = "havyn-field-" + VERSION;
@@ -116,6 +117,7 @@ self.addEventListener("fetch", (event) => {
   const base = self.registration.scope, scopePath = new URL(base).pathname;
   const rel = url.pathname.startsWith(scopePath) ? url.pathname.slice(scopePath.length) : "";
   if (rel.startsWith("z/")) { event.respondWith(zimResponse(rel.slice(2), req, base)); return; }
+  if (rel.startsWith("shelf/")) return; // shelf downloads go straight to HAVYN's address; the app stores them itself, never twice
   if (req.mode === "navigate") {
     event.respondWith(caches.match("./index.html").then((r) => r || fetch(req)));
     return;

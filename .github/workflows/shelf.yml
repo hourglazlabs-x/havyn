@@ -1,7 +1,8 @@
 name: Build HAVYN shelf
 # Downloads every document on the reference shelf from its publisher, checks it (PDF, size, SHA-256, pages),
 # attaches the shareable ones (public domain, Creative Commons) to the "shelf" release, then redeploys the app
-# so phones can fetch the phone set from HAVYN's own address. Re-runs monthly to pick up publishers' updates.
+# so phones can fetch the phone set from HAVYN's own address. Re-runs monthly to pick up publishers' updates;
+# a publisher that is down that day doesn't remove its document (last build's checked copy is kept).
 on:
   workflow_dispatch:
     inputs:
@@ -40,16 +41,23 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          set -e
+          set -euo pipefail
           if gh release view shelf >/dev/null 2>&1; then
             gh release edit shelf --notes-file out/notes.md
           else
             gh release create shelf --title "HAVYN reference shelf" --notes-file out/notes.md --latest=false
           fi
-          gh release upload shelf out/release/* --clobber
+          existing="$(gh release view shelf --json assets -q '.assets[].name')"
+          up=()
+          for f in out/release/*; do
+            n="$(basename "$f")"
+            if grep -qxF "$n" out/changed.txt || ! grep -qxF "$n" <<<"$existing"; then up+=("$f"); fi
+          done
+          echo "Uploading ${#up[@]} new or changed files (unchanged ones stay as they are)"
+          if [ "${#up[@]}" -gt 0 ]; then gh release upload shelf "${up[@]}" --clobber; fi
           keep="$(cd out/release && ls)"
-          for a in $(gh release view shelf --json assets -q '.assets[].name'); do
-            printf '%s\n' "$keep" | grep -qxF "$a" || gh release delete-asset shelf "$a" -y
+          for a in $existing; do
+            grep -qxF "$a" <<<"$keep" || gh release delete-asset shelf "$a" -y
           done
       - name: Redeploy HAVYN with the new shelf
         if: ${{ !inputs.only }}

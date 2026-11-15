@@ -247,3 +247,32 @@ test("v1.3 archive catalog: complete, sourced, and consistent", () => {
   assert.ok(core > 2.5e9 && core < 3.1e9, "phone core set about 2.8 GB: " + core);
   assert.ok(A.items.some((i) => i.id === "p-wikimed" && i.core));
 });
+
+test("v1.4 reference shelf: every document licensed, fetchable, filed and consistent", () => {
+  const S = C.shelf, ids = new Set(), files = new Set();
+  assert.ok(/^\d{4}-\d{2}-\d{2}$/.test(S.checked));
+  const sys = new Set(S.systems.map((s) => s.id));
+  assert.equal(sys.size, S.systems.length);
+  for (const it of S.items) {
+    assert.ok(!ids.has(it.id), "duplicate id " + it.id); ids.add(it.id);
+    assert.ok(sys.has(it.sys), it.id + " system");
+    assert.ok(it.t && it.d && it.by, it.id + " title, description and publisher");
+    assert.ok(["pd", "cc-by", "cc-by-sa", "cc-by-nc-sa", "link"].includes(it.lic), it.id + " license");
+    assert.ok(/^[A-Za-z0-9][A-Za-z0-9.-]*\.pdf$/.test(it.file), it.id + " plain file name"); assert.ok(!files.has(it.file), "duplicate file " + it.file); files.add(it.file);
+    assert.ok(["src", "parts", "ia", "ias", "ox", "dspace", "hp"].some((k) => it[k]), it.id + " has a way to fetch");
+    if (it.expect) assert.doesNotThrow(() => new RegExp(it.expect, "i"), it.id + " identity pattern");
+    if (it.wb) assert.ok(Array.isArray(it.wb) && it.wb.every((y) => /^\d{4}$/.test(y)), it.id + " Wayback years");
+    for (const u of (it.src || []).concat(it.parts || [])) assert.ok(/^https:\/\//.test(u), it.id + " https " + u);
+    if (it.u) assert.ok(/^https:\/\//.test(it.u), it.id + " https page");
+    if (it.hp) assert.equal(it.lic, "link", "Hesperian books are never re-hosted");
+    if (/Hesperian|Médecins|University of Arizona|Traumatic Stress/.test(it.by)) assert.equal(it.lic, "link", it.id + " publisher's terms");
+    assert.ok(it.size > 0, it.id + " size");
+  }
+  for (const s of S.systems) assert.ok(S.items.some((i) => i.sys === s.id), s.id + " has documents");
+  const phone = S.items.filter((i) => i.ph && i.lic !== "link").reduce((a, i) => a + i.size, 0);
+  assert.ok(phone > 50e6 && phone < 400e6, "phone set is a sensible size: " + phone);
+  assert.equal(S.items.find((i) => i.id === "sh-cert").file, "FEMA-CERT-Basic-Training-Participant-Manual-2019.pdf", "keeps v1.3 file names so copies already on phones are recognized");
+  assert.ok(!C.archive.items.some((i) => i.kind === "pdf"), "manuals live on the shelf now");
+  assert.ok(S.others.length >= 5 && S.others.every((o) => o.t && o.d && o.took));
+  assert.ok(C.archive.items.some((i) => i.id === "a-dict" && i.kind === "setup"), "offline dictionary and translation setup");
+});

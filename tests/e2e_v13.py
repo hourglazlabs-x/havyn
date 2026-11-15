@@ -160,7 +160,7 @@ with sync_playwright() as p:
     page.fill("#sq", "CPR"); ok("[sw] search updates as you type", until(lambda: page.locator("#sres a.li.hit[href='#/emergency/cpr']").count() == 1, 10))
     page.click("#spdf a.li >> nth=0") if page.locator("#spdf a.li").count() else None
     # get more
-    page.goto(BASE + "#/archive"); page.wait_for_selector(".glist")
+    page.goto(BASE + "#/archive?t=phone"); page.wait_for_selector(".glist")
     ok("[sw] Get more lists the phone set with sizes", page.locator(".gi").count() >= 10 and "WikiMed" in page.inner_text(".glist"))
     page.screenshot(path=str(SHOTS / "v13_get_phone.png"), full_page=True)
     page.check("input[data-chk='archive|p-water']"); time.sleep(0.3); page.reload(); page.wait_for_selector(".glist")

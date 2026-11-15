@@ -6,7 +6,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 SRC, APP, PREV = ROOT / "src", ROOT / "app", ROOT / "preview"
-APP_VERSION = "1.3.0"
+APP_VERSION = "1.4.0"
 
 def read(p): return (SRC / p).read_text(encoding="utf-8")
 
@@ -18,7 +18,7 @@ def build():
     vend = b"".join((vendor / f).read_bytes() for f in ("pdf.min.js", "pdf.worker.min.js")) + (ROOT / "vendor" / "pdflib" / "pdf-lib.esm.min.js").read_bytes()
     # Archive reader: fzstd (vendored, MIT) + HAVYN's ZIM engine, one file for the page and the service worker.
     zimkit = (ROOT / "vendor" / "fzstd" / "fzstd.js").read_text(encoding="utf-8") + "\n" + read("zimkit.js")
-    digest = hashlib.sha256((css + js + tpl + read("sw.js") + zimkit + (ROOT / "tools" / "vault.py").read_text(encoding="utf-8")).encode() + vend).hexdigest()[:10]
+    digest = hashlib.sha256((css + js + tpl + read("sw.js") + zimkit + (ROOT / "tools" / "vault.py").read_text(encoding="utf-8") + (ROOT / "tools" / "shelf.py").read_text(encoding="utf-8")).encode() + vend).hexdigest()[:10]
     version = f"{APP_VERSION}+{digest}"
     js = js.replace("__VERSION__", version)
 
@@ -31,11 +31,11 @@ def build():
         h = h.replace("<script>/*JS*/</script>", "<script>" + script + "</script>")
         return h.replace("<!--CSP-->", csp)
 
-    # Deploy build: CSP pins the one inline script by hash and blocks every network request.
+    # Deploy build: CSP pins the one inline script by hash; the only network requests allowed go to HAVYN's own address (the shelf).
     sha = base64.b64encode(hashlib.sha256(js.encode("utf-8")).digest()).decode()
     csp = ("<meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'self'; "
            f"script-src 'self' 'sha256-{sha}'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; "
-           "connect-src 'none'; font-src 'none'; media-src 'self' blob:; object-src 'none'; frame-src 'self'; "
+           "connect-src 'self'; font-src 'none'; media-src 'self' blob:; object-src 'none'; frame-src 'self'; "
            "worker-src 'self'; manifest-src 'self'; base-uri 'none'; form-action 'none'\">")
     if APP.exists(): shutil.rmtree(APP)
     APP.mkdir(parents=True)
@@ -77,7 +77,8 @@ def build():
     content = json.loads(out)
     # Vault drive kit (scripts + START-HERE page), generated from the same catalog the app shows.
     sys.path.insert(0, str(ROOT / "tools"))
-    import vault
+    import vault, shelf
+    shelf.write(ROOT, content)   # shelf/catalog.json for the GitHub Actions fetcher
     rows = vault.write(ROOT, content, version)
     for d in (APP, PREV):
         (d / "vault").mkdir(exist_ok=True)

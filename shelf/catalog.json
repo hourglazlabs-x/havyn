@@ -113,10 +113,12 @@
    "ph": true,
    "core": true,
    "file": "Ships-Medicine-Chest-and-Medical-Aid-at-Sea-2003.pdf",
-   "u": "https://irp.fas.org/doddir/milmed/ships.pdf",
+   "u": "https://purl.fdlp.gov/GPO/gpo20582",
    "src": [
-    "https://irp.fas.org/doddir/milmed/ships.pdf"
-   ]
+    "https://irp.fas.org/doddir/milmed/ships.pdf",
+    "https://purl.fdlp.gov/GPO/gpo20582"
+   ],
+   "expect": "Medicine Chest"
   },
   {
    "id": "sh-bec",
@@ -203,7 +205,45 @@
    "u": "https://medicalguidelines.msf.org/en/viewport/CG/english/clinical-guidelines-16686604.html",
    "src": [
     "https://medicalguidelines.msf.org/sites/default/files/pdf/guideline-170-en.pdf"
-   ]
+   ],
+   "expect": "Clinical guidelines"
+  },
+  {
+   "id": "sh-ox-nursing",
+   "sys": "med",
+   "t": "Clinical Nursing Skills",
+   "by": "OpenStax, Rice University",
+   "yr": 2024,
+   "lic": "cc-by",
+   "core": true,
+   "file": "OpenStax-Clinical-Nursing-Skills.pdf",
+   "u": "https://openstax.org/details/books/clinical-nursing-skills",
+   "ox": "clinical-nursing-skills",
+   "expect": "Attribution 4\\.0 International"
+  },
+  {
+   "id": "sh-ox-pharm",
+   "sys": "med",
+   "t": "Pharmacology for Nurses",
+   "by": "OpenStax, Rice University",
+   "yr": 2024,
+   "lic": "cc-by",
+   "file": "OpenStax-Pharmacology-for-Nurses.pdf",
+   "u": "https://openstax.org/details/books/pharmacology",
+   "ox": "pharmacology",
+   "expect": "Attribution 4\\.0 International"
+  },
+  {
+   "id": "sh-ox-birth",
+   "sys": "med",
+   "t": "Maternal-Newborn Nursing",
+   "by": "OpenStax, Rice University",
+   "yr": 2024,
+   "lic": "cc-by",
+   "file": "OpenStax-Maternal-Newborn-Nursing.pdf",
+   "u": "https://openstax.org/details/books/maternal-newborn-nursing",
+   "ox": "maternal-newborn-nursing",
+   "expect": "Attribution 4\\.0 International"
   },
   {
    "id": "sh-foodwater",
@@ -248,8 +288,10 @@
    "file": "TB-MED-577-Field-Water-Supplies-2010.pdf",
    "u": "https://www.med.navy.mil/Portals/62/Documents/BUMED/Directives/All%20Pubs/5010-10.pdf",
    "src": [
-    "https://www.med.navy.mil/Portals/62/Documents/BUMED/Directives/All%20Pubs/5010-10.pdf"
-   ]
+    "https://www.med.navy.mil/Portals/62/Documents/BUMED/Directives/All%20Pubs/5010-10.pdf",
+    "https://static.e-publishing.af.mil/production/1/af_sg/publication/afman48-138_ip/afman48-138_ip.pdf"
+   ],
+   "expect": "TB MED 577"
   },
   {
    "id": "sh-gdwq",
@@ -262,8 +304,18 @@
    "u": "https://www.who.int/publications/i/item/9789240045064",
    "src": [
     "https://iris.who.int/bitstream/handle/10665/352532/9789240045064-eng.pdf",
-    "https://www.ncbi.nlm.nih.gov/books/n/who352532/pdf/"
-   ]
+    "https://apps.who.int/iris/bitstream/handle/10665/352532/9789240045064-eng.pdf"
+   ],
+   "dspace": {
+    "base": "https://iris.who.int",
+    "handle": "10665/352532",
+    "match": "eng\\.pdf$"
+   },
+   "wb": [
+    "2023",
+    "2022"
+   ],
+   "expect": "drinking-water quality"
   },
   {
    "id": "sh-fieldsan",
@@ -277,9 +329,11 @@
    "file": "FM-4-25.12-Field-Sanitation-2002.pdf",
    "u": "https://webarchive.library.unt.edu/web/20121027044100/http:/www.irwin.amedd.army.mil/pages/NTCsurgeon/Preventive%20Medicine/fm4_25x12.pdf",
    "src": [
-    "https://webarchive.library.unt.edu/web/20121027044100/http:/www.irwin.amedd.army.mil/pages/NTCsurgeon/Preventive%20Medicine/fm4_25x12.pdf",
+    "https://webarchive.library.unt.edu/web/20121027044100id_/http://www.irwin.amedd.army.mil/pages/NTCsurgeon/Preventive%20Medicine/fm4_25x12.pdf",
+    "https://web.archive.org/web/2012id_/http://www.irwin.amedd.army.mil/pages/NTCsurgeon/Preventive%20Medicine/fm4_25x12.pdf",
     "https://irp.fas.org/doddir/army/fm4-25-12.pdf"
-   ]
+   ],
+   "expect": "4-25\\.12"
   },
   {
    "id": "sh-canning",
@@ -433,7 +487,12 @@
    "u": "https://irp.fas.org/doddir/army/atp3-34-45.pdf",
    "src": [
     "https://irp.fas.org/doddir/army/atp3-34-45.pdf"
-   ]
+   ],
+   "wb": [
+    "2025",
+    "2024"
+   ],
+   "expect": "3-34\\.45"
   },
   {
    "id": "sh-solar",
@@ -459,9 +518,11 @@
    "file": "DOE-Small-Wind-Electric-Systems-2007.pdf",
    "u": "https://www.energy.gov/eere/wind/articles/small-wind-electric-systems-us-consumers-guide",
    "src": [
-    "https://www.nrel.gov/docs/fy07osti/42005.pdf",
-    "https://www.canr.msu.edu/foodsystems/uploads/files/small-wind.pdf"
-   ]
+    "https://www.nlr.gov/docs/fy07osti/42005.pdf",
+    "https://docs.nlr.gov/docs/fy07osti/42005.pdf",
+    "https://www.nrel.gov/docs/fy07osti/42005.pdf"
+   ],
+   "expect": "Small Wind Electric Systems"
   },
   {
    "id": "sh-liec1",
@@ -553,10 +614,16 @@
    "core": true,
    "file": "NEETS-01-Matter-Energy-Direct-Current.pdf",
    "u": "https://archive.org/details/NEETSModules",
-   "ia": {
-    "item": "NEETSModules",
-    "match": "Module 0?1 "
-   }
+   "ia": [
+    {
+     "item": "NEETSModules",
+     "match": "Module[ _-]*0?1\\b"
+    },
+    {
+     "item": "neetsmodules_202003",
+     "match": "Module[ _-]*0?1\\b"
+    }
+   ]
   },
   {
    "id": "sh-neets2",
@@ -568,10 +635,16 @@
    "core": true,
    "file": "NEETS-02-Alternating-Current-Transformers.pdf",
    "u": "https://archive.org/details/NEETSModules",
-   "ia": {
-    "item": "NEETSModules",
-    "match": "Module 0?2 "
-   }
+   "ia": [
+    {
+     "item": "NEETSModules",
+     "match": "Module[ _-]*0?2\\b"
+    },
+    {
+     "item": "neetsmodules_202003",
+     "match": "Module[ _-]*0?2\\b"
+    }
+   ]
   },
   {
    "id": "sh-neets3",
@@ -582,10 +655,16 @@
    "lic": "pd",
    "file": "NEETS-03-Circuit-Protection-Control-Measurement.pdf",
    "u": "https://archive.org/details/NEETSModules",
-   "ia": {
-    "item": "NEETSModules",
-    "match": "Module 0?3 "
-   }
+   "ia": [
+    {
+     "item": "NEETSModules",
+     "match": "Module[ _-]*0?3\\b"
+    },
+    {
+     "item": "neetsmodules_202003",
+     "match": "Module[ _-]*0?3\\b"
+    }
+   ]
   },
   {
    "id": "sh-neets4",
@@ -597,10 +676,16 @@
    "core": true,
    "file": "NEETS-04-Conductors-Wiring-Schematics.pdf",
    "u": "https://archive.org/details/NEETSModules",
-   "ia": {
-    "item": "NEETSModules",
-    "match": "Module 0?4 "
-   }
+   "ia": [
+    {
+     "item": "NEETSModules",
+     "match": "Module[ _-]*0?4\\b"
+    },
+    {
+     "item": "neetsmodules_202003",
+     "match": "Module[ _-]*0?4\\b"
+    }
+   ]
   },
   {
    "id": "sh-neets5",
@@ -611,10 +696,16 @@
    "lic": "pd",
    "file": "NEETS-05-Generators-Motors.pdf",
    "u": "https://archive.org/details/NEETSModules",
-   "ia": {
-    "item": "NEETSModules",
-    "match": "Module 0?5 "
-   }
+   "ia": [
+    {
+     "item": "NEETSModules",
+     "match": "Module[ _-]*0?5\\b"
+    },
+    {
+     "item": "neetsmodules_202003",
+     "match": "Module[ _-]*0?5\\b"
+    }
+   ]
   },
   {
    "id": "sh-nifog",
@@ -657,10 +748,16 @@
    "core": true,
    "file": "NEETS-10-Wave-Propagation-Antennas.pdf",
    "u": "https://archive.org/details/NEETSModules",
-   "ia": {
-    "item": "NEETSModules",
-    "match": "Module 10 "
-   }
+   "ia": [
+    {
+     "item": "NEETSModules",
+     "match": "Module[ _-]*10\\b"
+    },
+    {
+     "item": "neetsmodules_202003",
+     "match": "Module[ _-]*10\\b"
+    }
+   ]
   },
   {
    "id": "sh-neets17",
@@ -671,10 +768,16 @@
    "lic": "pd",
    "file": "NEETS-17-Radio-Frequency-Communications.pdf",
    "u": "https://archive.org/details/NEETSModules",
-   "ia": {
-    "item": "NEETSModules",
-    "match": "Module 17 "
-   }
+   "ia": [
+    {
+     "item": "NEETSModules",
+     "match": "Module[ _-]*17\\b"
+    },
+    {
+     "item": "neetsmodules_202003",
+     "match": "Module[ _-]*17\\b"
+    }
+   ]
   },
   {
    "id": "sh-tools",
@@ -743,7 +846,27 @@
    "u": "https://media.defense.gov/2014/Jun/20/2002655885/-1/-1/1/140620-N-ZZ182-6530.pdf",
    "src": [
     "https://media.defense.gov/2014/Jun/20/2002655885/-1/-1/1/140620-N-ZZ182-6530.pdf"
-   ]
+   ],
+   "expect": "Construction Electrician"
+  },
+  {
+   "id": "sh-autos",
+   "sys": "tools",
+   "t": "Principles of Automotive Vehicles (TM 9-8000)",
+   "by": "US Army",
+   "yr": 1985,
+   "lic": "pd",
+   "core": true,
+   "file": "TM-9-8000-Principles-of-Automotive-Vehicles.pdf",
+   "u": "https://everyspec.com/ARMY/TM-Tech-Manual/TM_9-8000_CHG-1_48512/",
+   "src": [
+    "https://everyspec.com/ARMY/TM-Tech-Manual/download.php?spec=TM_9-8000_CHG-1.048512.pdf"
+   ],
+   "ias": {
+    "q": "title:(\"principles of automotive vehicles\") AND mediatype:(texts)",
+    "match": "\\.pdf$"
+   },
+   "expect": "Automotive Vehicles"
   },
   {
    "id": "sh-ayr",
@@ -789,22 +912,24 @@
    "u": "https://irp.fas.org/doddir/army/atp3-50-21.pdf",
    "src": [
     "https://irp.fas.org/doddir/army/atp3-50-21.pdf"
-   ]
+   ],
+   "expect": "3-50\\.21"
   },
   {
    "id": "sh-landnav",
    "sys": "resp",
    "t": "Map Reading and Land Navigation (FM 3-25.26)",
    "by": "US Army",
-   "yr": 2005,
+   "yr": 2001,
    "lic": "pd",
    "ph": true,
    "core": true,
-   "file": "FM-3-25.26-Map-Reading-Land-Navigation-2005.pdf",
-   "u": "https://irp.fas.org/doddir/army/fm3-25-26.pdf",
+   "file": "FM-3-25.26-Map-Reading-Land-Navigation-2001.pdf",
+   "u": "https://archive.org/details/MManuals",
    "src": [
-    "https://irp.fas.org/doddir/army/fm3-25-26.pdf"
-   ]
+    "https://archive.org/download/MManuals/Fm3-25.26MapReadingAndLandNavigation.pdf"
+   ],
+   "expect": "3-25\\.26"
   },
   {
    "id": "sh-erg",
@@ -819,7 +944,8 @@
    "u": "https://www.phmsa.dot.gov/training/hazmat/erg/emergency-response-guidebook-erg",
    "src": [
     "https://www.phmsa.dot.gov/sites/phmsa.dot.gov/files/2024-04/ERG2024-Eng-Web-a.pdf"
-   ]
+   ],
+   "expect": "Emergency Response Guidebook"
   },
   {
    "id": "sh-pfa",

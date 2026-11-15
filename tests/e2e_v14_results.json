@@ -1,0 +1,157 @@
+[
+ {
+  "name": "service worker controls the page",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "Get more opens on the reference shelf",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "every system is listed with its documents",
+  "pass": true,
+  "detail": "[]"
+ },
+ {
+  "name": "every shelf document has a row",
+  "pass": true,
+  "detail": "62"
+ },
+ {
+  "name": "served files show their real size and pages",
+  "pass": false,
+  "detail": "Emergency Disinfection of Drinking Water\nUS ENVIRONMENTAL PROTECTION AGENCY \u00b7 2017\n1 KB \u00b7 2 PAGES\nPUBLIC DOMAIN\nPHONE SET\nBoiling, and the bleach dose for each amount of water, on two pages.\nGet \u00b7 1 K"
+ },
+ {
+  "name": "phone set button counts the files served here",
+  "pass": true,
+  "detail": "REFERENCE SHELF \u00b7 CHECKED 2026-11-14\n0/62\nON THIS PHONE\n12 SYSTEMS\nReal manuals and guides from the agencies and publishers who wrote them, not summaries. Everything opens in HAVYN with no internet, and Search everything reads every page.\nGet the phone set \u00b7 4 \u00b7 4 KB\nFrom HAVYN's own address, each f"
+ },
+ {
+  "name": "licenses are labeled",
+  "pass": false,
+  "detail": ""
+ },
+ {
+  "name": "publisher-terms documents link to the publisher, never a Get button",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "Hesperian books point to Hesperian and explain joining",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "one tap downloads a document onto the phone",
+  "pass": true,
+  "detail": "[{'id': 'mwhavu38p4wfw8', 'type': 'pdf', 'name': 'Emergency Disinfection of Drinking Water', 'shelf': 'sh-epawater', 'pages': 0, 'indexed': False, 'size': 1056}]"
+ },
+ {
+  "name": "it is saved under its real title",
+  "pass": true,
+  "detail": "Emergency Disinfection of Drinking Water"
+ },
+ {
+  "name": "its row now says On this phone",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "the phone set downloads the rest",
+  "pass": true,
+  "detail": "['sh-epawater', 'sh-cpscgen', 'sh-nifog']"
+ },
+ {
+  "name": "a file with the wrong checksum is refused and reported",
+  "pass": true,
+  "detail": "Didn't download: Emergency Response Guidebook 2024 (its checksum didn't match). Try again on better Wi-Fi."
+ },
+ {
+  "name": "the count updates",
+  "pass": true,
+  "detail": "REFERENCE SHELF \u00b7 CHECKED 2026-11-14\n3/62\nON THIS PHONE\n12 SYSTEMS\nReal manuals and guides from the agencies and publish"
+ },
+ {
+  "name": "no Content-Security-Policy violations",
+  "pass": true,
+  "detail": "[]"
+ },
+ {
+  "name": "search finds words inside shelf documents",
+  "pass": true,
+  "detail": "IN HAVYN\n8\nBoil-water notice\nPLAYBOOK\n\u2026boil 3 minutes. Can't boil? Use unscented bleach. Check the label: 5% to 9%. 8 drops (just under 1/8 teaspoon) per gallon of clear w\u2026\nThis week\nPLAN\n14 days of water at heat-mode rates, a filter and bleach, CO alarms, power banks, a weather radio, genuine tourn"
+ },
+ {
+  "name": "search lists shelf documents that aren't downloaded yet",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "Hesperian chapters added together become one book",
+  "pass": true,
+  "detail": "['Emergency Disinfection of Drinking Water', 'Portable Generator Hazards', 'National Interoperability Field Operations Guide (NIFOG 2.02)', 'Where There Is No Doctor (2025)']"
+ },
+ {
+  "name": "the book is titled and complete",
+  "pass": true,
+  "detail": "{'id': 'mwhavw0dgp8yek', 'type': 'pdf', 'name': 'Where There Is No Doctor (2025)', 'shelf': 'sh-wtnd', 'pages': 0, 'indexed': False, 'size': 1612}"
+ },
+ {
+  "name": "the joined book opens with every page",
+  "pass": true,
+  "detail": "6"
+ },
+ {
+  "name": "its shelf row shows it on this phone",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "adding a shelf document that's already here is refused",
+  "pass": true,
+  "detail": "4"
+ },
+ {
+  "name": "Library links to the reference shelf",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "Apps explains the built-in offline dictionary and translator",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "OFFLINE: the shelf says it needs Wi-Fi",
+  "pass": true,
+  "detail": "REFERENCE SHELF \u00b7 CHECKED 2026-11-14\n4/62\nON THIS PHONE\n12 SYSTEMS\nReal manuals and guides from the agencies and publishers who wrote them, not summaries. Everything opens in HAVYN with no internet, and Search everything reads every page.\nNo internet right now: shelf downloads need Wi-Fi. Everything"
+ },
+ {
+  "name": "OFFLINE: documents already here still open",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "no page errors",
+  "pass": true,
+  "detail": "[]"
+ },
+ {
+  "name": "NO SHELF: offers the phone set as one zip from the release",
+  "pass": true,
+  "detail": "REFERENCE SHELF \u00b7 CHECKED 2026-11-14\n0/62\nON THIS PHONE\n12 SYSTEMS\nReal manuals and guides from the agencies and publishers who wrote them, not summaries. Everything opens in HAVYN with no internet, and Search everything reads every page.\nThe shelf files aren't on this address yet (GitHub Pages has "
+ },
+ {
+  "name": "NO SHELF: each document links to its publisher",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "NO SHELF: no page errors",
+  "pass": true,
+  "detail": "[]"
+ }
+]

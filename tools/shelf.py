@@ -3,7 +3,7 @@ GitHub Actions reads it to fetch and mirror the documents (tools/shelf_fetch.py)
 import json
 from pathlib import Path
 
-FETCH = ("id", "sys", "t", "by", "yr", "lic", "ph", "core", "file", "u", "src", "parts", "ia", "ox", "hp")
+FETCH = ("id", "sys", "t", "by", "yr", "lic", "ph", "core", "file", "u", "src", "parts", "ia", "ias", "ox", "dspace", "hp", "wb", "expect")
 MIRROR = {"pd", "cc-by", "cc-by-sa", "cc-by-nc-sa"}
 
 def catalog(content):
