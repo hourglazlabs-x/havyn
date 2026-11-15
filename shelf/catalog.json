@@ -121,8 +121,12 @@
    "ias": {
     "q": "title:(\"medical aid at sea\") AND mediatype:(texts)"
    },
-   "expect": "(?s)(?=.*Medical Aid at Sea)(?=.*2003)",
+   "expect": "(?=.*Medical Aid at Sea)(?=.*2003)",
    "minpages": 200,
+   "strip": {
+    "marker": "Legally Binding Document",
+    "pages": 1
+   },
    "rev": 1
   },
   {
@@ -214,7 +218,7 @@
    "ias": {
     "q": "title:(\"clinical guidelines\") AND title:(\"diagnosis and treatment\") AND mediatype:(texts)"
    },
-   "expect": "(?s)(?=.*Clinical guidelines)(?=.*M.decins Sans Fronti.res)",
+   "expect": "(?=.*Clinical guidelines)(?=.*M.decins Sans Fronti.res)",
    "minpages": 200
   },
   {
@@ -506,7 +510,8 @@
     "https://irp.fas.org/doddir/army/atp3-34-45.pdf"
    ],
    "ias": {
-    "q": "\"ATP 3-34.45\" AND mediatype:(texts)"
+    "q": "(title:(\"electric power generation and distribution\") OR \"ATP 3-34.45\") AND mediatype:(texts)",
+    "sort": "publicdate desc"
    },
    "wb": [
     "2025",
@@ -899,7 +904,7 @@
     "https://media.defense.gov/2014/Jun/20/2002655885/-1/-1/1/140620-N-ZZ182-6530.pdf"
    ],
    "ias": {
-    "q": "title:(\"construction electrician\") AND mediatype:(texts)"
+    "q": "(title:(\"construction electrician basic\") OR \"NAVEDTRA 14026\") AND mediatype:(texts)"
    },
    "expect": "NAVEDTRA 14026(?![A-Z])",
    "minpages": 150,
@@ -1006,7 +1011,8 @@
     "https://www.phmsa.dot.gov/sites/phmsa.dot.gov/files/2024-04/ERG2024-Eng-Web-a.pdf"
    ],
    "ias": {
-    "q": "title:(\"emergency response guidebook\") AND title:(2024) AND mediatype:(texts)"
+    "q": "(\"emergency response guidebook\" OR ERG2024) AND mediatype:(texts)",
+    "sort": "publicdate desc"
    },
    "expect": "GUIDEBOOK\\s*2024|ERG\\s*2024"
   },

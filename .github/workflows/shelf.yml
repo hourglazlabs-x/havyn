@@ -2,7 +2,8 @@ name: Build HAVYN shelf
 # Downloads every document on the reference shelf from its publisher, checks it (PDF, size, SHA-256, pages),
 # attaches the shareable ones (public domain, Creative Commons) to the "shelf" release, then redeploys the app
 # so phones can fetch the phone set from HAVYN's own address. Re-runs monthly to pick up publishers' updates;
-# a publisher that is down that day doesn't remove its document (last build's checked copy is kept).
+# a publisher that is down that day doesn't remove its document (last build's checked copy is kept), and a daily
+# run retries whatever failed (sites that block cloud servers some days, the Wayback Machine's rate limits).
 on:
   workflow_dispatch:
     inputs:
@@ -19,7 +20,8 @@ on:
     branches: [main]
     paths: ["shelf/catalog.json", "tools/shelf_fetch.py", ".github/workflows/shelf.yml"]
   schedule:
-    - cron: "23 10 1 * *"
+    - cron: "23 10 1 * *"   # monthly: everything, to pick up publishers' updates
+    - cron: "41 9 * * *"    # daily: only documents that failed last time (blocked or down that day)
 permissions:
   contents: write
   actions: write
@@ -38,6 +40,7 @@ jobs:
         env:
           SHELF_ONLY: ${{ inputs.only }}
           SHELF_PUBLISH: ${{ inputs.publish && '1' || '' }}
+          SHELF_RETRY: ${{ github.event.schedule == '41 9 * * *' && '1' || '' }}
         run: python3 tools/shelf_fetch.py shelf/catalog.json out
       - name: Report
         if: always()
@@ -48,6 +51,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
+          if [ -f out/skip ]; then echo "Nothing new to publish."; exit 0; fi
           if gh release view shelf >/dev/null 2>&1; then
             gh release edit shelf --notes-file out/notes.md
           else
@@ -68,4 +72,6 @@ jobs:
         if: ${{ !inputs.only || inputs.publish }}
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh workflow run pages.yml --ref main || echo "Pages deploy not started (is GitHub Pages turned on?)"
+        run: |
+          if [ -f out/skip ]; then exit 0; fi
+          gh workflow run pages.yml --ref main || echo "Pages deploy not started (is GitHub Pages turned on?)"

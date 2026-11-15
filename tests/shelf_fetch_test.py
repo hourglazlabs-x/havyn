@@ -175,6 +175,13 @@ names3 = zipfile.ZipFile(T / "out3/release/HAVYN-shelf-phone.zip").namelist()
 check("HAVYN-shelf-phone/TB-MED.pdf" in names3 and "HAVYN-shelf-phone/Stub-Doc.pdf" in names3, "phone zip still complete after a targeted publish")
 REL.clear()
 
+# Phase 4: daily retry: only what failed (or was kept from an older build) is fetched again, everything else stays
+REL["dir"] = T / "out/release"; os.environ.pop("SHELF_ONLY", None); os.environ["SHELF_RETRY"] = "1"; hits.clear()
+sys.argv = ["shelf_fetch.py", str(T / "catalog.json"), str(T / "out4")]; m.main(); del os.environ["SHELF_RETRY"]
+idx4 = {r["id"]: r for r in json.loads((T / "out4/release/shelf-index.json").read_text())["items"]}
+check(hits.get("/pdf/wrong.pdf", 0) == 0 and hits.get("/403/tbmed.pdf", 0) == 0 and hits.get("/404/x.pdf", 0) >= 1 and hits.get("/stub/s.pdf", 0) >= 1 and okp1 <= set(idx4), "daily retry fetches only failed or kept documents and keeps the rest")
+REL.clear()
+
 # Phase 2: the Wayback Machine starts refusing (429): stop asking after a few refusals instead of waiting out every document
 cat2 = {"release": "shelf", "checked": "2026-11-14", "systems": cat["systems"], "items": [
     {"id": "r%d" % i, "sys": "a", "t": "R%d" % i, "by": "x", "lic": "pd", "file": "R%d.pdf" % i, "src": [BASE + "/403/r%d.pdf" % i]} for i in range(1, 6)]}

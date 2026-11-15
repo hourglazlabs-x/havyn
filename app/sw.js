@@ -3,7 +3,7 @@
    saved on this phone (IndexedDB), with byte ranges so video can seek. Only shelf downloads (./shelf/) reach the network,
    and only HAVYN's own address. */
 importScripts("./zimkit.js");
-const VERSION = "1.4.0+046515e714";
+const VERSION = "1.4.0+5a051108fd";
 const CACHE = "havyn-field-" + VERSION;
 const ASSETS = ["./", "./index.html", "./manifest.webmanifest", "./apple-touch-icon.png", "./icon-192.png", "./icon-512.png", "./icon-maskable-512.png",
   "./pdfjs/pdf.min.js", "./pdfjs/pdf.worker.min.js", "./pdflib/pdf-lib.esm.min.js", "./zimkit.js",

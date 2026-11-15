@@ -238,7 +238,7 @@ def resolve_ia(spec):
 
 def resolve_ias(spec):
     """Internet Archive search, most-downloaded first: {"q", "match"} -> PDFs from up to four matching items ("expect" checks which is right)."""
-    q = urllib.parse.urlencode([("q", spec["q"]), ("fl[]", "identifier"), ("sort[]", "downloads desc"), ("rows", "8"), ("output", "json")])
+    q = urllib.parse.urlencode([("q", spec["q"]), ("fl[]", "identifier"), ("sort[]", spec.get("sort", "downloads desc")), ("rows", "8"), ("output", "json")])
     docs = json.loads(get_text(IA + "/advancedsearch.php?" + q))["response"]["docs"]
     if not docs: raise RuntimeError("Internet Archive search found nothing for %s" % spec["q"])
     return resolve_ia([{"item": d["identifier"], "match": spec.get("match", r"\.pdf$")} for d in docs])[:4]
@@ -412,14 +412,22 @@ def main():
     items = cat["items"]
     only = set(filter(None, os.environ.get("SHELF_ONLY", "").split(",")))
     merge = bool(only) and os.environ.get("SHELF_PUBLISH") == "1"   # re-check a few documents, keep everything else as it is
-    if only: items = [i for i in items if i["id"] in only]
+    retry = os.environ.get("SHELF_RETRY") == "1"                    # daily: only what failed last time (or changed revision)
     prev, prev_built = {}, None
-    if not only or merge:
+    if not only or merge or retry:
         try:
             pj = json.loads(get_text(RELEASES % (repo, tag) + "shelf-index.json"))
             prev = {p["id"]: p for p in pj.get("items", []) if p.get("ok")}; prev_built = pj.get("built")
         except Exception as e:
             print("no earlier shelf build to compare with (%s)" % e)
+    if retry and prev:
+        only = {i["id"] for i in items if i["id"] not in prev or prev[i["id"]].get("rev", 0) != i.get("rev", 0) or prev[i["id"]].get("carried") is not None}
+        merge = True
+        if not only:
+            print("Every document was fetched and checked last time: nothing to retry.")
+            (out / "skip").write_text("nothing to retry\n"); return 0
+        print("Retrying %d documents: %s" % (len(only), ", ".join(sorted(only))))
+    if only: items = [i for i in items if i["id"] in only]
     with cf.ThreadPoolExecutor(6) as ex:
         results = list(ex.map(lambda it: fetch_item(it, work, rel), items))
     if prev: carry_over(results, prev, prev_built, repo, tag, rel)
