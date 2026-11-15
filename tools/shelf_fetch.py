@@ -188,11 +188,16 @@ def pdf_info(path, pages=4, chars=600):
     except Exception as e:
         return 0, "(text unreadable: %s)" % type(e).__name__
 
-def check_expect(path, pattern):
-    """None if the first pages mention pattern; a note if the PDF has no text to check; raises if it's another document."""
-    if not pattern: return None
+def check_expect(path, pattern, strict=False):
+    """None if the first pages mention pattern; a note if the PDF has no text to check (refused when strict: a stranger's
+    upload must prove what it is); raises if it's another document."""
+    if not pattern:
+        if strict: raise Fatal("no identity pattern for a search result")
+        return None
     n, text = pdf_info(path, pages=8, chars=6000)
-    if len(text) < 200: return "identity not checked: no text layer"
+    if len(text) < 200:
+        if strict: raise Fatal("no text to check it is the right document (a scan?)")
+        return "identity not checked: no text layer"
     if re.search(pattern, text, re.I): return None
     raise Fatal("wrong document: first pages don't match %r (%s)" % (pattern, text[:120]))
 
@@ -304,7 +309,7 @@ def fetch_item(it, work, rel):
     return r
 
 def fetch_item1(it, work, rel):
-    r = {k: it.get(k) for k in ("id", "sys", "t", "by", "yr", "lic", "ph", "core", "file", "u")}
+    r = {k: it.get(k) for k in ("id", "sys", "t", "by", "yr", "lic", "ph", "core", "file", "u")}; r["rev"] = it.get("rev", 0)
     if time.time() - START > BUDGET:
         r.update(ok=False, error="skipped: build time budget used up (run again)"); return r
     r["mirror"] = it["lic"] in MIRROR
@@ -330,11 +335,11 @@ def fetch_item1(it, work, rel):
                 except Exception as e: errors.append("%s: %s" % (key, e))
         cands += list(it.get("alt") or [])   # other copies, after the publisher and the archive lookups
         out = d / it["file"]; used = None; note = None
-        def first_good(urls):
+        def first_good(urls, strict=False):
             for u in urls:
                 try:
                     size, sha = download(u, out)
-                    note = check_expect(out, it.get("expect"))
+                    note = check_expect(out, it.get("expect"), strict)
                     if it.get("minpages") and pdf_info(out, pages=1)[0] < it["minpages"]:
                         raise Fatal("only %d pages, expected at least %d (part of the book?)" % (pdf_info(out, pages=1)[0], it["minpages"]))
                     return u, size, sha, note
@@ -345,7 +350,7 @@ def fetch_item1(it, work, rel):
         if not got and src and it.get("wb") is not False:   # only now ask the Wayback Machine (it rate-limits)
             got = first_good(wayback(src, it.get("wb") or WB_YEARS))
         if not got and it.get("ias"):                          # last: other people's uploads to the Internet Archive ("expect" checks them)
-            try: got = first_good(resolve_ias(it["ias"]))
+            try: got = first_good(resolve_ias(it["ias"]), strict=True)
             except Exception as e: errors.append("ias: %s" % e)
         if got: used, size, sha, note = got
         if not used and it.get("parts"):
@@ -394,7 +399,7 @@ def carry_over(results, prev, prev_built, repo, tag, rel):
     """A publisher being down on build day shouldn't take a checked document off everyone's shelf: keep last build's copy."""
     for i, r in enumerate(results):
         p = prev.get(r["id"])
-        if r.get("ok") or not p or p.get("file") != r.get("file") or bool(p.get("mirror")) != bool(r.get("mirror")): continue
+        if r.get("ok") or not p or p.get("file") != r.get("file") or bool(p.get("mirror")) != bool(r.get("mirror")) or p.get("rev", 0) != r.get("rev", 0): continue
         if not keep_prev(p, repo, tag, rel): continue
         results[i] = dict(p, carried=r.get("error", "")[:600], carried_from=prev_built)
         print("↺ %-16s kept last build's copy (today: %s)" % (r["id"], r.get("error", "")[:160]), flush=True)
@@ -422,7 +427,7 @@ def main():
         got = {r["id"]: r for r in results}
         for it in cat["items"]:
             p = prev.get(it["id"])
-            if it["id"] not in got and p and p.get("file") == it["file"] and keep_prev(p, repo, tag, rel): got[it["id"]] = p
+            if it["id"] not in got and p and p.get("file") == it["file"] and p.get("rev", 0) == it.get("rev", 0) and keep_prev(p, repo, tag, rel): got[it["id"]] = p
         results = [got[it["id"]] for it in cat["items"] if it["id"] in got]
     sysdir = {s["id"]: "10-shelf/%s-%s" % (s["n"], re.sub(r"[^a-z0-9]+", "-", s["t"].lower()).strip("-")) for s in cat["systems"]}
     rows, sums = [], []

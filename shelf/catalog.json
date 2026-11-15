@@ -119,10 +119,11 @@
     "https://purl.fdlp.gov/GPO/gpo20582"
    ],
    "ias": {
-    "q": "title:(medicine chest) AND title:(ship) AND mediatype:(texts)"
+    "q": "title:(\"medical aid at sea\") AND mediatype:(texts)"
    },
-   "expect": "Medicine Chest",
-   "minpages": 200
+   "expect": "(?s)(?=.*Medical Aid at Sea)(?=.*2003)",
+   "minpages": 200,
+   "rev": 1
   },
   {
    "id": "sh-bec",
@@ -213,7 +214,7 @@
    "ias": {
     "q": "title:(\"clinical guidelines\") AND title:(\"diagnosis and treatment\") AND mediatype:(texts)"
    },
-   "expect": "Clinical guidelines",
+   "expect": "(?s)(?=.*Clinical guidelines)(?=.*M.decins Sans Fronti.res)",
    "minpages": 200
   },
   {
@@ -854,7 +855,8 @@
     "q": "title:(\"basic machines\") AND mediatype:(texts)"
    },
    "expect": "14037",
-   "minpages": 100
+   "minpages": 100,
+   "rev": 1
   },
   {
    "id": "sh-blueprint",
@@ -900,7 +902,8 @@
     "q": "title:(\"construction electrician\") AND mediatype:(texts)"
    },
    "expect": "NAVEDTRA 14026(?![A-Z])",
-   "minpages": 150
+   "minpages": 150,
+   "rev": 1
   },
   {
    "id": "sh-autos",

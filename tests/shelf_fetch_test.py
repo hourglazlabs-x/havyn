@@ -26,6 +26,13 @@ def covered():
         c.showPage()
     c.save(); return b.getvalue()
 COVERED = covered()
+def scan():
+    b = io.BytesIO(); c = canvas.Canvas(b, pageCompression=0)
+    for i in range(30):
+        for j in range(60): c.rect(40 + j, 40 + j, 500 - 2 * j, 700 - 2 * j - i, fill=0)
+        c.showPage()
+    c.save(); return b.getvalue()
+SCAN = scan()
 hits = {}; REL = {}
 class H(http.server.BaseHTTPRequestHandler):
     def log_message(self, *a): pass
@@ -74,11 +81,13 @@ class H(http.server.BaseHTTPRequestHandler):
         if p == "/metadata/itemA": return J({"files": [{"name": "NEETS Module 13 - Other.pdf"}, {"name": "NEETS Module 03- Introduction.pdf"}, {"name": "x.txt"}]})
         if p == "/metadata/itemB": return J({"files": [{"name": "Module 3.pdf"}]})
         if p == "/metadata/autoX": return J({"files": [{"name": "old.pdf"}]})
+        if p == "/metadata/scanZ": return J({"files": [{"name": "scan.pdf"}]})
+        if p == "/download/scanZ/scan.pdf": return self.send(200, SCAN)
         if p == "/metadata/autoY": return J({"files": [{"name": "TM9-8000.pdf"}, {"name": "TM9-8000_text.pdf"}]})
         if p == "/download/itemA/NEETS Module 03- Introduction.pdf": return self.send(200, DOC["NEETS Module 03"])
         if p == "/download/autoX/old.pdf": return self.send(200, DOC["Automotive old copy"])
         if p == "/download/autoY/TM9-8000.pdf": return self.send(200, DOC["Principles of Automotive Vehicles TM 9-8000"])
-        if p == "/advancedsearch.php": return J({"response": {"docs": [{"identifier": "autoX"}, {"identifier": "autoY"}]}})
+        if p == "/advancedsearch.php": return J({"response": {"docs": [{"identifier": "scanZ"}, {"identifier": "autoX"}, {"identifier": "autoY"}]}})
         if p == "/server/api/pid/find":
             assert q["id"] == ["10665/352532"], q
             return J({"_links": {"bundles": {"href": BASE + "/server/api/core/items/u1/bundles"}}})
@@ -97,6 +106,7 @@ srv = S(("127.0.0.1", 0), H); BASE = "http://127.0.0.1:%d" % srv.server_address[
 threading.Thread(target=srv.serve_forever, daemon=True).start()
 sha = lambda b: hashlib.sha256(b).hexdigest()
 PREV = [
+ {"id": "it-rev", "ok": True, "mirror": True, "file": "Rev-Doc.pdf", "sha256": "0" * 64, "size": 1, "t": "Rev", "sys": "a", "by": "x", "lic": "pd", "rev": 0},
  {"id": "it-stub", "ok": True, "mirror": True, "file": "Stub-Doc.pdf", "sha256": sha(PREV_STUB), "size": len(PREV_STUB), "t": "Stub doc", "sys": "a", "by": "x", "lic": "pd", "ph": True, "url": BASE + "/stub/s.pdf"},
  {"id": "it-flaky", "ok": True, "mirror": True, "file": "Flaky-Doc.pdf", "sha256": sha(DOC["FLAKY doc"]), "size": 1, "t": "Flaky", "sys": "a", "by": "x", "lic": "pd"},
 ]
@@ -113,6 +123,7 @@ cat = {"release": "shelf", "checked": "2026-11-14", "systems": [{"id": "a", "n":
  {"id": "it-link", "sys": "a", "t": "Link", "by": "x", "lic": "link", "file": "Link.pdf", "src": [BASE + "/pdf/link.pdf"]},
  {"id": "it-strip", "sys": "a", "t": "Concrete", "by": "x", "lic": "pd", "file": "Concrete.pdf", "src": [BASE + "/pdf/covered.pdf"], "expect": "5-428", "strip": {"marker": "vulcanhammer", "pages": 1}},
  {"id": "it-min", "sys": "a", "t": "Short", "by": "x", "lic": "pd", "file": "Short.pdf", "src": [BASE + "/pdf/right.pdf"], "minpages": 50, "wb": False},
+ {"id": "it-rev", "sys": "a", "t": "Rev", "by": "x", "lic": "pd", "file": "Rev-Doc.pdf", "src": [BASE + "/404/rev.pdf"], "wb": False, "rev": 1},
  {"id": "it-gone", "sys": "a", "t": "Gone", "by": "x", "lic": "pd", "file": "Gone.pdf", "src": [BASE + "/404/x.pdf"], "wb": False},
 ]}
 (T / "catalog.json").write_text(json.dumps(cat))
@@ -134,11 +145,12 @@ check("license_seen" in idx["it-dspace"], "license statement recorded for Creati
 r = idx["it-flaky"]; check(r["ok"] and hits["/flaky/a.pdf"] == 3 and not r.get("carried"), "dropped connections retried (3 tries) and fetched fresh")
 r = idx["it-expect"]; check(r["ok"] and r["url"].endswith("/pdf/right.pdf") and any("wrong document" in e for e in r.get("tried", [])), "wrong document refused, next source used")
 r = idx["it-ia"]; check(r["ok"] and r["url"].endswith("Module%2003-%20Introduction.pdf"), "IA item: loose match picks Module 03, not 13: %s" % r.get("url"))
-r = idx["it-ias"]; check(r["ok"] and r["url"].endswith("/autoY/TM9-8000.pdf"), "IA search: first hit refused by identity check, second used")
+r = idx["it-ias"]; check(r["ok"] and r["url"].endswith("/autoY/TM9-8000.pdf") and any("no text to check" in e for e in r.get("tried", [])), "IA search: a scan with no text and a wrong copy refused, the right one used")
 r = idx["it-dspace"]; check(r["ok"] and r["url"].endswith("/bitstreams/s1/content"), "DSpace handle resolved to the English PDF")
 r = idx["it-stub"]; check(r["ok"] and "only 1366 bytes" in r.get("carried", "") and (T / "out/release/Stub-Doc.pdf").read_bytes() == PREV_STUB, "publisher stub today -> last build's checked copy kept: %s" % r.get("carried", "")[:60])
 r = idx["it-link"]; check(r["ok"] and not r["mirror"] and not (T / "out/release/Link.pdf").exists(), "link-only document checked, not mirrored")
 r = idx["it-gone"]; check(not r["ok"] and "HTTP 404" in r["error"], "missing document reported")
+r = idx["it-rev"]; check(not r["ok"] and "Rev-Doc.pdf" not in (T / "out/keep.txt").read_text(), "a bumped revision drops last build's copy (and the release file)")
 r = idx["it-strip"]; from pypdf import PdfReader; rd = PdfReader(str(T / "out/release/Concrete.pdf"))
 check(r["ok"] and len(rd.pages) == 10 and "vulcanhammer" not in (rd.pages[0].extract_text() or "") and r["sha256"] == sha((T / "out/release/Concrete.pdf").read_bytes()) and "cover page" in r.get("note", ""), "re-host's cover page taken off, checksum of the result")
 r = idx["it-min"]; check(not r["ok"] and "only 10 pages" in r["error"], "partial book refused by the page minimum")
