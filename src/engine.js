@@ -153,6 +153,85 @@ const HAVYN_ENGINE = (() => {
     return { at: hh + ":" + mm, inMin };
   }
 
+  // ---- Buy list: quantities follow the household (4 people assumed until someone is added).
+  function household(S) {
+    const ppl = live(S.people), pets = live(S.pets);
+    const assumed = ppl.length === 0;
+    const P = assumed ? 4 : ppl.length;
+    const at = assumed ? 4 : ppl.filter((p) => !p.ageBand || p.ageBand === "teen" || p.ageBand === "adult" || p.ageBand === "senior").length;
+    const petGal = pets.reduce((a, p) => a + num(p.weightLb) / 128, 0);
+    return { P, adultsTeens: at, petGal, pets: pets.length, assumed };
+  }
+  function buyQty(item, hh) {
+    const q = item.q;
+    if (q === null || q === undefined) return null;
+    if (typeof q === "number") return q;
+    const up = (x) => Math.ceil(x - 1e-9);
+    if (q === "drum") return up((14 * (2 * hh.P + hh.petGal)) / 55);
+    if (q === "brick") return up((3 * hh.P) / 3.5);
+    if (q === "P") return hh.P;
+    if (q === "P+1") return hh.P + 1;
+    if (q === "P/2") return up(hh.P / 2);
+    if (q === "AT") return hh.adultsTeens;
+    return null;
+  }
+  const STATUSES = ["buy", "ordered", "have"];
+  function buyPlan(S, items) {
+    const hh = household(S);
+    const recs = new Map(live(S.buys).map((b) => [b.id, b]));
+    const rows = (items || []).map((it) => {
+      const rec = recs.get(it.id) || null;
+      const auto = buyQty(it, hh);
+      const ov = rec && rec.qty !== undefined && rec.qty !== null && rec.qty !== "" && Number.isFinite(Number(rec.qty)) ? Math.max(0, Number(rec.qty)) : null;
+      const qty = ov !== null ? ov : auto;
+      const priced = qty !== null && typeof it.price === "number";
+      const status = rec && STATUSES.includes(rec.status) ? rec.status : "buy";
+      return { item: it, rec, auto, qty, override: ov !== null, line: priced ? qty * it.price : null, status };
+    });
+    return { hh, rows };
+  }
+  function buyTotals(rows) {
+    const t = { all: { n: 0, est: 0, buy: 0, ordered: 0, have: 0 } };
+    for (const r of rows) {
+      const k = r.item.tier;
+      if (!t[k]) t[k] = { n: 0, est: 0, buy: 0, ordered: 0, have: 0 };
+      const v = r.line || 0;
+      for (const x of [t[k], t.all]) { x.n++; x.est += v; x[r.status] += v; }
+    }
+    return t;
+  }
+  function floorTotal(items) { return (items || []).reduce((a, it) => a + (it.floor && typeof it.price === "number" ? it.floor * it.price : 0), 0); }
+
+  // ---- Missions: one-off tasks are done or open; upkeep tasks come due again.
+  function recurring(def, rec, now) {
+    const last = (rec && num(rec.lastDone)) || 0;
+    let dueAt = null;
+    if (def.every === "spring") {
+      // Due from March 1 until the heat season ends (Oct 1) if not done since March 1; otherwise next March 1.
+      const y = new Date(now).getFullYear(), start = new Date(y, 2, 1).getTime(), end = new Date(y, 9, 1).getTime(), next = new Date(y + 1, 2, 1).getTime();
+      if (now < start) dueAt = start;
+      else if (now < end) dueAt = last >= start ? next : start;
+      else dueAt = next;
+    } else if (last) dueAt = last + num(def.every) * DAY;
+    const state = dueAt !== null && now >= dueAt ? "due" : last ? "ok" : "new";
+    return { last, dueAt, state };
+  }
+  function missions(M, S, now) {
+    const recs = new Map(live(S.tasks).map((r) => [r.id, r]));
+    const custom = live(S.tasks).filter((r) => r.custom);
+    const phases = (M.phases || []).map((ph) => {
+      const tasks = ph.tasks.map((t) => ({ def: t, done: !!(recs.get(t.id) && recs.get(t.id).done) }))
+        .concat(custom.filter((c) => c.phase === ph.id).map((c) => ({ def: { id: c.id, t: c.t, custom: true }, done: !!c.done })));
+      const d = tasks.filter((x) => x.done).length;
+      return { ph, tasks, n: tasks.length, d, complete: tasks.length > 0 && d === tasks.length };
+    });
+    const n = phases.reduce((a, p) => a + p.n, 0), d = phases.reduce((a, p) => a + p.d, 0);
+    const next = [];
+    for (const p of phases) for (const x of p.tasks) if (!x.done && next.length < 3) next.push({ phase: p.ph, def: x.def });
+    const upkeep = (M.recurring || []).map((def) => Object.assign({ def }, recurring(def, recs.get(def.id), now)));
+    return { phases, n, d, next, upkeep, due: upkeep.filter((u) => u.state === "due") };
+  }
+
   // ---- Memory Card merge: newest edit of each record wins; deletions travel as tombstones.
   function mergeColl(a, b) {
     const map = new Map((Array.isArray(a) ? a : []).filter((r) => r && r.id).map((r) => [r.id, r]));
@@ -170,7 +249,7 @@ const HAVYN_ENGINE = (() => {
     if (!a || num(b.updated) > num(a.updated)) return { rec: b, took: true };
     return { rec: a, took: false };
   }
-  const COLLS = ["people", "pets", "items", "log"];
+  const COLLS = ["people", "pets", "items", "log", "tasks", "buys"];
   const SINGLES = ["settings", "plan", "outage", "checks"];
   function merge(local, incoming) {
     const out = Object.assign({}, local);
@@ -196,9 +275,11 @@ const HAVYN_ENGINE = (() => {
     for (const k of SINGLES) out[k] = data && data[k] && typeof data[k] === "object" ? data[k] : undefined;
     for (const p of out.people) { p.name = str(p.name, 120); }
     for (const i of out.items) { i.name = str(i.name, 160); i.qty = num(i.qty); if (i.per_unit && typeof i.per_unit !== "object") i.per_unit = {}; }
+    for (const t of out.tasks) { if (t.custom) t.t = str(t.t, 200); }
+    for (const b of out.buys) { if (!STATUSES.includes(b.status)) b.status = "buy"; }
     return out;
   }
 
-  return { KCAL, ETA, PV_DERATE, seasonOf, kcalFor, needs, stock, medsDays, consumption, autonomy, status, gaps, expiring, hotStorage, nextCheckin, merge, mergeColl, sanitize, live };
+  return { KCAL, ETA, PV_DERATE, seasonOf, kcalFor, needs, stock, medsDays, consumption, autonomy, status, gaps, expiring, hotStorage, nextCheckin, household, buyQty, buyPlan, buyTotals, floorTotal, recurring, missions, merge, mergeColl, sanitize, live };
 })();
 if (typeof module !== "undefined") module.exports = HAVYN_ENGINE;

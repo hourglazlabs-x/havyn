@@ -6,7 +6,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 SRC, APP, PREV = ROOT / "src", ROOT / "app", ROOT / "preview"
-APP_VERSION = "1.0.0"
+APP_VERSION = "1.1.0"
 
 def read(p): return (SRC / p).read_text(encoding="utf-8")
 
@@ -14,7 +14,9 @@ def build():
     css = read("styles.css")
     js = "\n".join(read(f) for f in ("content.js", "engine.js", "app.js"))
     tpl = read("index.html")
-    digest = hashlib.sha256((css + js + tpl + read("sw.js")).encode()).hexdigest()[:10]
+    vendor = ROOT / "vendor" / "pdfjs"
+    vend = b"".join((vendor / f).read_bytes() for f in ("pdf.min.js", "pdf.worker.min.js"))
+    digest = hashlib.sha256((css + js + tpl + read("sw.js")).encode() + vend).hexdigest()[:10]
     version = f"{APP_VERSION}+{digest}"
     js = js.replace("__VERSION__", version)
 
@@ -50,6 +52,9 @@ def build():
     (APP / "manifest.webmanifest").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
     subprocess.run([sys.executable, str(ROOT / "tools" / "icons.py"), str(APP)], check=True)
     (APP / ".nojekyll").write_text("")
+    for d in (APP,):
+        (d / "pdfjs").mkdir(exist_ok=True)
+        for f in ("pdf.min.js", "pdf.worker.min.js", "LICENSE", "README.txt"): shutil.copy(vendor / f, d / "pdfjs" / f)
 
     # Preview build: same app, flagged so it skips the service worker; no CSP so a host page can frame it.
     if PREV.exists(): shutil.rmtree(PREV)
@@ -57,6 +62,7 @@ def build():
     (PREV / "index.html").write_text(page("window.HAVYN_PREVIEW=true;\n" + js, ""), encoding="utf-8")
     for f in ("manifest.webmanifest", "apple-touch-icon.png", "icon-192.png", "icon-512.png", "icon-maskable-512.png"):
         shutil.copy(APP / f, PREV / f)
+    shutil.copytree(APP / "pdfjs", PREV / "pdfjs")
 
     # Protocol cards as markdown, one file each (generated from src/content.js, the single source).
     out = subprocess.run(["node", "-e", "process.stdout.write(JSON.stringify(require(process.argv[1])))", str(SRC / "content.js")],

@@ -1,7 +1,8 @@
 /* HAVYN FIELD service worker: cache the app once, then serve it with no network. */
 const VERSION = "__VERSION__";
 const CACHE = "havyn-field-" + VERSION;
-const ASSETS = ["./", "./index.html", "./manifest.webmanifest", "./apple-touch-icon.png", "./icon-192.png", "./icon-512.png", "./icon-maskable-512.png"];
+const ASSETS = ["./", "./index.html", "./manifest.webmanifest", "./apple-touch-icon.png", "./icon-192.png", "./icon-512.png", "./icon-maskable-512.png",
+  "./pdfjs/pdf.min.js", "./pdfjs/pdf.worker.min.js"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS)).then(() => self.skipWaiting()));

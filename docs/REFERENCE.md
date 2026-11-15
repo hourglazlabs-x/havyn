@@ -86,3 +86,14 @@ Each card's sources are listed in `src/content.js` and in `content/cards/*.md`. 
 - **Seizure:** [CDC](https://www.cdc.gov/epilepsy/first-aid-for-seizures/index.html) and [Epilepsy Foundation](https://www.epilepsy.com/recognition/first-aid-resources).
 - **Heat and fans:** [CDC: about heat and your health](https://www.cdc.gov/heat-health/about/index.html).
 - **Food after an outage:** [CDC](https://www.cdc.gov/food-safety/foods/keep-food-safe-after-emergency.html) and [USDA FSIS](https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/how-temperatures-affect-food).
+
+## v1.1 additions
+
+- **State collections** (merged per record, newest `updated` wins, deletions as tombstones):
+  - `tasks`: `{id, done, doneAt}` for a built-in mission (id from `content.js`), `{id, custom: true, t, phase, done}` for your own, `{id, lastDone, prevDone}` for upkeep.
+  - `buys`: `{id, status: "buy"|"ordered"|"have", qty?, itemId?}`. `qty` overrides the automatic quantity; `itemId` links a bought item to its Supplies record.
+  - Memory Cards from v1.0 load unchanged (both collections default to empty).
+- **Buy-list quantities** (`engine.buyQty`): `drum` = ceil(14 × (2 × people + pet gal/day) / 55); `brick` = ceil(3 × people / 3.5); `P`, `P+1`, `P/2` (pairs, rounded up); `AT` = teens, adults and seniors. With no one entered, 4 people are assumed.
+- **Upkeep** (`engine.recurring`): due `every` days after it was last done; the spring check is due from March 1 to September 30 unless done since March 1.
+- **PDF library**: per phone, never in Memory Cards. IndexedDB keys `lib` (index: id, name, size, pages, lastPage) and `pdf:<id>` (the file as a Blob).
+- **PDF.js**: `vendor/pdfjs` (legacy build) → `app/pdfjs/`, precached by the service worker, loaded on demand with `import()`. Options: `useWorkerFetch: false`, `useWasm: false`, so it never fetches; the CSP stays `connect-src 'none'`. JPEG 2000 and JBIG2 images (rare outside scans) are skipped.

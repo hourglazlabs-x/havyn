@@ -1,20 +1,21 @@
 # HAVYN: mission state
 
-**Current milestone:** M1, HAVYN FIELD v1. It is built and tested, and is waiting on three things: deployment, the medical review, and founder acceptance.
-**Build:** 1.0.0+a05d59015a · 2026-11-14 · `app/index.html` 126 KB
+**Current milestone:** M2, HAVYN FIELD v1.1. Built and tested. Live deployment waits on one GitHub setting (Settings → Pages → Source: GitHub Actions).
+**Build:** 1.1.0+98bdbf5a5c · 2026-11-14 · `app/index.html` 202 KB + PDF.js (1.8 MB, cached for offline)
 
-## M1 "done when": evidence
+## v1.1 "done when": evidence
 
 | Criterion | Status | Evidence |
 | --- | --- | --- |
-| Works in airplane mode after the first install | PASS (Chrome) | e2e: network off, then reload. The app and the bleeding card load from the service worker. |
-| First screen in under 1 s on the oldest family iPhone | PASS (proxy) | e2e: 195 ms normally and 452 ms with the CPU slowed 6×. Still to confirm on the oldest family iPhone. |
-| Every emergency card is two taps or fewer from launch | PASS | e2e: Emergency tab, then the card. All 10 cards checked. |
-| Every protocol card shows its source and a reviewed-on date | PASS | e2e: all 10 cards. `content/cards/*.md` |
-| Export, import and merge round-trip with zero data loss | PASS | e2e: save, erase, load, then deep-compare. Merge keeps the newest edit. Unit tests cover tombstones, order independence and idempotence. |
-| A content security policy blocks all network requests | PASS | e2e: fetch to an outside site and to the app's own files both blocked, outside image blocked, and no outside requests in the whole session. |
+| Mission map inside the app, ticks persist and sync | PASS | e2e: tick on Status survives reload; custom mission lands in its phase; upkeep "Mark done" shows OK; ticks are in the Memory Card round trip. |
+| Buy list matches the Sheet and sizes itself | PASS | unit: 4 assumed people give $1,844 / $1,469 / $1,550 / $2,030 = $6,893, floor $564. e2e: 5 people + a dog give 3 drums. |
+| A bought item moves into Supplies in one tap | PASS | e2e: drum marked Have, form prefilled (55-gal drum ×3, 55 gal each), saved and linked. |
+| Plan and Comms readable offline | PASS | e2e: live floor and tier figures; one-tap OK text `sms:<contact>&body=…`; call and text 911. |
+| PDFs import and read offline inside the app | PASS (Chrome) | e2e: import, render, contents, find, go to page, resume at last page, and render with the network off (PDF.js from the offline copy). |
+| CSP still blocks all network access | PASS | `connect-src 'none'` unchanged; zero CSP violations in normal use, PDF.js included. |
+| v1.0 checks still pass | PASS | All 36 v1.0 checks, plus a regression check for delete (the v1.0 delete button threw before navigating; fixed). |
 
-Test totals: engine 13/13 (`node --test tests/engine.test.js`) and end-to-end 36/36 (`python3 tests/e2e.py`). Results are in `tests/e2e-results.json`.
+Test totals: engine 20/20 and end-to-end 57/57. First screen: 144 ms normal, 379 ms throttled.
 
 ## Content check, 2026-11-14
 
@@ -44,23 +45,13 @@ An independent pass compared every card step with its sources (AHA 2025 adult an
 
 ## Open items
 
-1. **Medical review gate.** A trained EMT or nurse must review and sign each file in `content/cards/`. Until then the app shows "Awaiting EMT or nurse review" on every card.
-2. **Deploy.** Choose a host (GitHub Pages or another static HTTPS host), then install on every phone. See README.
-3. **On-device checks that headless Chrome can't do:**
-   - The metronome with the ring/silent switch on.
-   - Screen wake lock.
-   - Sending a Memory Card by AirDrop.
-   - Dynamic Type at the largest size.
-   - Time to first screen on the oldest family iPhone.
-4. **Codex audit.** A read-only audit against this table.
-5. **Founder acceptance.**
+1. **Turn on GitHub Pages** (one setting), then install on every phone.
+2. **Medical review gate.** A trained EMT or nurse must review and sign each file in `content/cards/`. Until then the app shows "Awaiting EMT or nurse review" on every card.
+3. **On-device checks that headless Chrome can't do:** the PDF reader on an iPhone (memory on long books, iOS Files import); the metronome with the ring/silent switch on; screen wake lock; AirDrop of a Memory Card; Dynamic Type at the largest size; first-screen time on the oldest family iPhone.
+4. **Codex audit** against these tables, then **founder acceptance**.
 
-## Next milestones
+## Next
 
-- **M2, FIELD v1.1:**
-  - Power calculator, comms ladder, library index, event log.
-  - Paper mode: printing the binder from the app.
-  - Timed drills.
-  - The remaining playbooks: monsoon and dust storm, wildfire smoke or evacuation, and boil-water notice.
-- **M3, CORE hub:** a Pi 5 or laptop serving Kiwix and this app over its own Wi-Fi.
-- **M4, VAULT:** two drives, a sync script, and SHA-256 checks.
+- **v1.2:** printing the binder from the app; the three remaining playbooks (monsoon and dust storm, wildfire smoke or evacuation, boil-water notice), written from sources; offline maps.
+- **v1.3:** the Kiwix encyclopedia inside HAVYN.
+- **CORE hub, VAULT:** a Pi 5 or laptop serving Kiwix and this app over its own Wi-Fi; two drives, a sync script, SHA-256 checks.

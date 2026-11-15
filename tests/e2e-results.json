@@ -2,7 +2,7 @@
  {
   "check": "first screen under 1 s (6x CPU throttle)",
   "pass": true,
-  "detail": "195 ms normal, 452 ms throttled"
+  "detail": "144 ms normal, 379 ms throttled"
  },
  {
   "check": "service worker controls the page",
@@ -130,14 +130,79 @@
   "detail": ""
  },
  {
+  "check": "delete removes the record and returns to the list",
+  "pass": true,
+  "detail": "http://localhost:8765/#/family"
+ },
+ {
   "check": "item from preset + log use",
   "pass": true,
   "detail": "1 -> 0.5"
  },
  {
+  "check": "mission tick on Status persists",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "check": "Status shows mission progress",
+  "pass": true,
+  "detail": "1 of 25 done"
+ },
+ {
+  "check": "custom mission added to its phase",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "check": "upkeep marked done shows OK",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "check": "buy list sizes itself to the household (5 people + dog)",
+  "pass": true,
+  "detail": "[5, 1, 3]"
+ },
+ {
+  "check": "safety floor: 7 items, $564",
+  "pass": true,
+  "detail": "SAFETY FLOOR\n$564\n0 OF 7 ORDERED\nIf money is tight, these bu"
+ },
+ {
+  "check": "Add to Supplies prefills the item form",
+  "pass": true,
+  "detail": "['55-gal drum', '3', '55']"
+ },
+ {
+  "check": "bought item lands in Supplies and stays linked",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "check": "plan shows live floor and tier figures",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "check": "comms: one-tap OK text to the out-of-area contact",
+  "pass": true,
+  "detail": "sms:5550100&body=OK.%20I'm%20at%20"
+ },
+ {
+  "check": "comms: text-911 and call-911",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "check": "Guides tab is highlighted for guides pages",
+  "pass": true,
+  "detail": ""
+ },
+ {
   "check": "memory card file written",
   "pass": true,
-  "detail": "3752 bytes"
+  "detail": "4440 bytes"
  },
  {
   "check": "erase empties the phone",
@@ -155,6 +220,36 @@
   "detail": ""
  },
  {
+  "check": "PDF imported into the library",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "check": "reader renders pages",
+  "pass": true,
+  "detail": "1 / 4"
+ },
+ {
+  "check": "reader: table of contents",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "check": "reader: find text",
+  "pass": true,
+  "detail": "['p. 22. Dehydration and heat Signs of dehydration: dark urine, dizziness, headache. Give']"
+ },
+ {
+  "check": "reader: go to page",
+  "pass": true,
+  "detail": "4 / 4"
+ },
+ {
+  "check": "reader resumes where you left off",
+  "pass": true,
+  "detail": "4 / 4"
+ },
+ {
   "check": "works offline after first install",
   "pass": true,
   "detail": ""
@@ -165,12 +260,22 @@
   "detail": ""
  },
  {
+  "check": "PDF reader works offline (pdf.js from the offline copy)",
+  "pass": true,
+  "detail": ""
+ },
+ {
   "check": "CSP blocks fetch (external + same-origin) and external images",
   "pass": true,
   "detail": "['blocked https://example.com/x', 'blocked /index.html']; violations=['connect-src https://example.com/x', 'connect-src http://localhost:8765/index.html', 'img-src https://example.com/pixel.png']"
  },
  {
   "check": "no external requests during the whole session",
+  "pass": true,
+  "detail": "[]"
+ },
+ {
+  "check": "no CSP violations in normal use (incl. pdf.js)",
   "pass": true,
   "detail": "[]"
  },

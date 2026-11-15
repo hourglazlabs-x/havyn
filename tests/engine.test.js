@@ -135,3 +135,84 @@ test("content: every card has steps, sources, and a reviewed date", () => {
   assert.match(C.reviewed, /^\d{4}-\d{2}-\d{2}$/);
   for (const p of C.playbooks.filter((p) => !p.soon)) for (const k of p.sources) assert.ok(C.refs[k], p.id + " ref " + k);
 });
+
+// ---------------- v1.1 ----------------
+const EMPTY = () => ({ people: [], pets: [], items: [], log: [], tasks: [], buys: [], settings: {}, plan: {}, checks: {}, outage: {} });
+
+test("buy list: 4 assumed people reproduce the Sheet's totals to the dollar", () => {
+  const bp = E.buyPlan(EMPTY(), C.buy.items), t = E.buyTotals(bp.rows);
+  assert.equal(bp.hh.assumed, true);
+  assert.equal(C.buy.items.length, 43);
+  assert.deepEqual([t.week.est, t.bf.est, t.d90.est, t.opt.est, t.all.est], [1844, 1469, 1550, 2030, 6893]);
+  assert.equal(t.all.buy, 6893);
+  assert.equal(E.floorTotal(C.buy.items), 564); // "about $565" in the plan
+  const q = (id) => bp.rows.find((r) => r.item.id === id).qty;
+  assert.deepEqual([q("drum"), q("brick"), q("bank"), q("mesh"), q("gmrs"), q("training"), q("cash")], [3, 4, 4, 5, 2, 4, null]);
+});
+
+test("buy list: quantities follow the household, pets add water", () => {
+  const S = EMPTY();
+  S.people = ["adult", "adult", "child", "child", "teen", "infant"].map((a, i) => ({ id: "p" + i, ageBand: a, updated: 1 }));
+  const q = (S2, id) => E.buyPlan(S2, C.buy.items).rows.find((r) => r.item.id === id).qty;
+  assert.equal(q(S, "drum"), 4);      // 14 × 2 × 6 = 168 gal → 3.05 drums → 4
+  assert.equal(q(S, "brick"), 6);     // 18 gal / 3.5 → 6
+  assert.equal(q(S, "gmrs"), 3);      // 6 people → 3 pairs
+  assert.equal(q(S, "training"), 3);  // 2 adults + 1 teen
+  const S2 = EMPTY(); S2.people = [{ id: "a", ageBand: "adult", updated: 1 }, { id: "b", ageBand: "adult", updated: 1 }];
+  assert.equal(q(S2, "drum"), 2);     // 56 gal → 2
+  S2.pets = [{ id: "d", weightLb: 640, updated: 1 }]; // 5 gal a day of pet water → 126 gal → 3
+  assert.equal(q(S2, "drum"), 3);
+});
+
+test("buy list: overrides and statuses", () => {
+  const S = EMPTY();
+  S.buys = [{ id: "drum", status: "have", qty: 1, updated: 5 }, { id: "station", status: "ordered", updated: 5 }, { id: "x", status: "weird", updated: 5 }];
+  const bp = E.buyPlan(S, C.buy.items), t = E.buyTotals(bp.rows);
+  const drum = bp.rows.find((r) => r.item.id === "drum");
+  assert.equal(drum.qty, 1); assert.equal(drum.override, true); assert.equal(drum.auto, 3);
+  assert.equal(t.week.have, 120); assert.equal(t.bf.ordered, 480);
+  assert.equal(t.all.buy + t.all.ordered + t.all.have, t.all.est);
+  assert.equal(E.sanitize({ buys: [{ id: "x", status: "weird" }] }).buys[0].status, "buy");
+});
+
+test("missions: progress, next steps, custom tasks", () => {
+  const S = EMPTY();
+  let m = E.missions(C.missions, S, NOV);
+  assert.equal(m.n, 25); assert.equal(m.d, 0);
+  assert.deepEqual(m.next.map((x) => x.def.id), ["m-downloads", "m-plan", "m-medid"]);
+  S.tasks = [{ id: "m-downloads", done: true, updated: 2 }, { id: "c1", custom: true, t: "Second can opener", phase: "today", done: false, updated: 2 }];
+  m = E.missions(C.missions, S, NOV);
+  assert.equal(m.n, 26); assert.equal(m.d, 1);
+  assert.equal(m.phases[0].tasks.at(-1).def.id, "c1");
+  assert.deepEqual(m.next.map((x) => x.def.id), ["m-plan", "m-medid", "m-sat"]);
+});
+
+test("upkeep: interval tasks and the spring window", () => {
+  const month = C.missions.recurring.find((r) => r.id === "r-month"), spring = C.missions.recurring.find((r) => r.id === "r-spring");
+  assert.equal(E.recurring(month, null, NOV).state, "new");
+  assert.equal(E.recurring(month, { lastDone: NOV - 10 * 86400000 }, NOV).state, "ok");
+  assert.equal(E.recurring(month, { lastDone: NOV - 31 * 86400000 }, NOV).state, "due");
+  assert.equal(E.recurring(spring, null, NOV).state, "new");                            // November: not due
+  assert.equal(E.recurring(spring, null, Date.parse("2027-03-15T12:00:00")).state, "due");
+  assert.equal(E.recurring(spring, { lastDone: Date.parse("2027-03-20T12:00:00") }, Date.parse("2027-06-01T12:00:00")).state, "ok");
+  assert.equal(E.recurring(spring, { lastDone: Date.parse("2026-04-01T12:00:00") }, Date.parse("2027-03-02T12:00:00")).state, "due");
+});
+
+test("merge carries tasks and buys; old cards without them still load", () => {
+  const a = EMPTY(), b = EMPTY();
+  a.tasks = [{ id: "m-plan", done: false, updated: 1 }];
+  b.tasks = [{ id: "m-plan", done: true, updated: 9 }]; b.buys = [{ id: "drum", status: "ordered", updated: 9 }];
+  const r = E.merge(a, b);
+  assert.equal(r.state.tasks[0].done, true); assert.equal(r.state.buys[0].status, "ordered");
+  const old = E.sanitize({ people: [{ id: "p", name: "X" }] });
+  assert.deepEqual([old.tasks, old.buys], [[], []]);
+});
+
+test("v1.1 content: unique ids and every source key resolves", () => {
+  const ids = C.missions.phases.flatMap((p) => p.tasks.map((t) => t.id)).concat(C.missions.recurring.map((r) => r.id));
+  assert.equal(new Set(ids).size, ids.length);
+  assert.equal(new Set(C.buy.items.map((i) => i.id)).size, C.buy.items.length);
+  for (const i of C.buy.items) assert.ok(C.buy.tiers.some((t) => t.id === i.tier), i.id);
+  for (const r of [...C.plan.heat, ...C.comms.ladder, ...C.comms.rules]) if (r.s) assert.ok(C.refs[r.s], r.s);
+  assert.ok(!C.playbooks.some((p) => /v1\.1/.test(p.sub || "")));
+});

@@ -56,6 +56,14 @@
     chev: '<path d="M9 5l7 7-7 7"/>',
     paw: '<circle cx="7" cy="9" r="1.8"/><circle cx="11" cy="6" r="1.8"/><circle cx="15" cy="6.5" r="1.8"/><circle cx="18" cy="10" r="1.8"/><path d="M12 12c-3 0-6 3.5-5 6 1 2 3.5 1 5 1s4 1 5-1c1-2.5-2-6-5-6z"/>',
     pin: '<path d="M12 21s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/>',
+    check: '<path d="M5 12.5l4.5 4.5L19 7"/>',
+    cart: '<path d="M3 4h2l2.4 11h10.2L20 8H6.2"/><circle cx="9.5" cy="19.5" r="1.4"/><circle cx="16.5" cy="19.5" r="1.4"/>',
+    radio: '<rect x="4" y="9" width="16" height="12" rx="2.5"/><path d="M8 9l9-5"/><circle cx="9" cy="15" r="2.4"/><path d="M14 13.5h3M14 16.5h3"/>',
+    file: '<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 12h6M9 15.5h6"/>',
+    flag: '<path d="M5 21V4M5 4h11l-2 4 2 4H5"/>',
+    search: '<circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5.5 5.5"/>',
+    toc: '<path d="M4 6h2M9 6h11M4 12h2M9 12h11M4 18h2M9 18h11"/>',
+    minus: '<path d="M5 12h14"/>',
     gear: '<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9 7 7M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/>'
   };
   const ic = (n, cls) => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"' + (cls ? ' class="' + cls + '"' : "") + ">" + (P[n] || "") + "</svg>";
@@ -75,7 +83,7 @@
     });
     const tx = (mode, fn) => new Promise((res) => {
       if (!db) return res(fn(null));
-      try { const t = db.transaction("kv", mode); const s = t.objectStore("kv"); const out = fn(s); t.oncomplete = () => res(out && out.result !== undefined ? out.result : out); t.onerror = () => res(undefined); }
+      try { const t = db.transaction("kv", mode); const s = t.objectStore("kv"); const out = fn(s); t.oncomplete = () => res(out && out.result !== undefined ? out.result : out); t.onerror = t.onabort = () => res(undefined); }
       catch (e) { res(undefined); }
     });
     return {
@@ -91,10 +99,10 @@
   /* ---------------- state ---------------- */
   const defaults = () => ({
     settings: { season: "auto", targetDays: 14, loadWhNormal: 300, loadWhHeat: 1080, solarW: 0, sunHours: 6.5, checkins: ["08:00", "12:00", "18:00"], updated: 0 },
-    plan: { contactName: "", contactPhone: "", rally1: "Home", rally2: "", rally3: "", leaveTo: "", leaveNotes: "", gas: "", water: "", power: "", updated: 0 },
+    plan: { contactName: "", contactPhone: "", rally1: "Home", rally2: "", rally3: "", leaveTo: "", leaveNotes: "", gas: "", water: "", power: "", gmrsCh: "", meshCh: "", updated: 0 },
     outage: { active: false, startedAt: 0, endedAt: 0, updated: 0 },
     checks: { updated: 0 },
-    people: [], pets: [], items: [], log: []
+    people: [], pets: [], items: [], log: [], tasks: [], buys: []
   });
   const prefDefaults = () => ({ theme: "void", sound: true, deviceName: "", lastBackup: 0, installHidden: false });
   let S = defaults(), PR = prefDefaults();
@@ -200,20 +208,23 @@
   function go(h) { if (location.hash === h) render(); else location.hash = h; }
 
   const SCREENS = {
-    status: renderStatus, emergency: renderEmergency, playbooks: renderPlaybooks, family: renderFamily, supplies: renderSupplies, system: renderSystem
+    status: renderStatus, emergency: renderEmergency, playbooks: renderPlaybooks, guides: renderGuides, family: renderFamily, supplies: renderSupplies, buy: renderBuy,
+    missions: renderMissions, plan: renderPlan, comms: renderComms, library: renderLibrary, system: renderSystem
   };
+  const TAB_OF = { status: "status", missions: "status", guides: "guides", playbooks: "guides", plan: "guides", comms: "guides", library: "guides", emergency: "emergency", family: "family", supplies: "supplies", buy: "supplies" };
   let lastPath = "";
   function render() {
     route = parseHash();
     const em = route.path === "emergency";
     document.body.classList.toggle("em", em);
     document.body.classList.toggle("night", PR.theme === "night");
+    document.body.classList.toggle("reader", route.path === "library" && !!route.parts[1]);
     if (em) Wake.on(); else { Wake.off(); Metro.stop(); cardView.id = null; cardView.autoBeat = false; }
     if (!(route.path === "supplies" && route.parts[1] === "edit")) draft = null;
     const fn = SCREENS[route.path] || renderStatus;
     const html = fn();
     app().innerHTML = html;
-    $$(".tab").forEach((t) => t.classList.toggle("on", t.dataset.tab === route.path));
+    $$(".tab").forEach((t) => t.classList.toggle("on", t.dataset.tab === TAB_OF[route.path]));
     if (lastPath !== location.hash) { window.scrollTo(0, 0); lastPath = location.hash; }
     afterRender();
   }
@@ -222,6 +233,9 @@
     hydratePhotos();
     if (route.path === "emergency" && cardView.beatStep && Metro.on === false && cardView.autoBeat) { Metro.start(cardView.beatStep); }
     if (!$(".beat")) Metro.stop(); else if (Metro.on) Metro.loop();
+    if (route.path === "library" && route.parts[1]) PdfV.mount(route.parts[1]);
+    else if (PdfV.id) PdfV.close();
+    if (route.path === "library" && !route.parts[1]) libQuota();
   }
 
   /* ---------------- shared chrome ---------------- */
@@ -312,6 +326,8 @@
       (nc ? '<div class="mono" style="font-size:1.6rem;margin:6px 0">' + nc.at + '</div><div style="color:var(--ink2)" data-tick="checkin">in ' + Math.floor(nc.inMin / 60) + "h " + (nc.inMin % 60) + "m</div>" : '<div style="margin-top:8px;color:var(--mute)">Set times in settings</div>') +
       "</section></div>";
 
+    h += missionsPanel(t);
+
     // Alerts
     const alerts = [];
     if (!people.length && !L("items").length) {
@@ -328,6 +344,8 @@
     if (ex.length) { const bad = ex.filter((x) => x.expired).length; alerts.push('<a class="alert' + (bad ? " crit" : "") + '" href="#/supplies"><span class="dot"></span><span><b>' + ex.length + " item" + (ex.length > 1 ? "s" : "") + " expire within 90 days</b><small>" + (bad ? bad + " already expired · " : "") + "Use them in normal life and replace</small></span></a>"); }
     const hot = E.hotStorage(S);
     if (hot.length) alerts.push('<a class="alert" href="#/supplies"><span class="dot"></span><span><b>' + hot.length + " item" + (hot.length > 1 ? "s" : "") + " stored somewhere hot</b><small>Phoenix garages and cars cook food, medicine and batteries</small></span></a>");
+    const bf = bfAlert(t); if (bf) alerts.push(bf);
+    for (const u of E.missions(C.missions, S, t).due) alerts.push('<a class="alert" href="#/missions"><span class="dot"></span><span><b>' + esc(u.def.t) + " is due</b><small>" + esc(u.def.time) + " · " + esc(u.def.d.split(". ")[0]) + "</small></span></a>");
     const g = E.gaps(S, t);
     if (people.length && g.list.length) alerts.push('<a class="alert" href="#/supplies"><span class="dot"></span><span><b>To reach ' + g.target + " days</b><small>" + g.list.slice(0, 3).map((x) => "+" + fmtN(x.gap, x.unit === "gal" ? 1 : 0) + " " + x.unit + " " + (x.name ? esc(x.name) : x.res)).join(" · ") + "</small></span></a>");
     if (alerts.length) h += '<div class="sec"><span class="lab">Attention</span></div>' + alerts.join("");
@@ -387,18 +405,7 @@
   function renderPlaybooks() {
     const id = route.parts[1];
     if (id) return renderPlaybook(id);
-    let h = topbar("Playbooks");
-    h += '<div class="list">';
-    for (const p of C.playbooks) {
-      if (p.soon) h += '<div class="li soon"><span class="ic">' + ic(p.icon) + '</span><span class="tx"><b>' + esc(p.title) + "</b><small>" + esc(p.sub) + "</small></span></div>";
-      else {
-        const done = countChecks(p);
-        h += '<a class="li" href="#/playbooks/' + p.id + '"><span class="ic">' + ic(p.icon) + '</span><span class="tx"><b>' + esc(p.title) + "</b><small>" + esc(p.sub) + '</small></span><span class="rt">' + done.d + "/" + done.n + "</span>" + ic("chev") + "</a>";
-      }
-    }
-    h += "</div>";
-    h += '<p class="empty" style="margin-top:14px">Each playbook: what to do in the first 10 minutes, hour, day, and the hard rule for leaving. Tick items as you go; reset after the event.</p>';
-    return h;
+    return renderGuides();
   }
   function countChecks(p) {
     const ch = (S.checks && S.checks[p.id]) || {};
@@ -409,7 +416,7 @@
     const p = C.playbooks.find((x) => x.id === id && !x.soon);
     if (!p) return renderPlaybooks();
     const ch = (S.checks && S.checks[p.id]) || {};
-    let h = backbar("#/playbooks", "Playbook");
+    let h = backbar("#/guides", "Playbook");
     h += '<section class="glass hero"><div class="lab">Playbook</div><h2 style="margin:6px 0 4px;font-size:1.6rem">' + esc(p.title) + '</h2><div class="sub">' + esc(p.trigger) + "</div></section>";
     h += '<section class="panel" style="border:2px solid var(--crit);border-radius:var(--r);background:rgba(255,77,94,.06)"><h3 style="color:var(--crit)">Hard rule: leave now if</h3>' +
       p.leave.map((l) => '<div class="kv"><span style="color:var(--ink)">' + esc(l) + "</span></div>").join("") +
@@ -449,7 +456,7 @@
       '<div class="kv"><span>Meet 3 · out of area</span><span>' + (esc(pl.rally3) || "—") + "</span></div>" +
       '<div class="kv"><span>If heat forces us out</span><span>' + (esc(pl.leaveTo) || "—") + "</span></div>" +
       '<div class="kv"><span>Check-ins</span><span class="mono">' + esc((S.settings.checkins || []).join(" · ")) + "</span></div>" +
-      '<div class="btnrow" style="margin-top:10px"><a class="btn ghost" href="#/family/plan">Edit plan and shutoffs</a></div></section>';
+      '<div class="btnrow" style="margin-top:10px"><a class="btn ghost" href="#/family/plan">Edit plan and shutoffs</a><a class="btn ghost" href="#/comms">Comms</a></div></section>';
     h += '<div class="sec"><span class="lab">People</span><a class="btn sm" href="#/family/person/new">' + ic("plus") + "Add</a></div><div class=\"list\">";
     const ppl = L("people");
     if (!ppl.length) h += '<div class="empty">No one yet. Add everyone who lives in the house.</div>';
@@ -511,6 +518,7 @@
       "<h3>Meeting places</h3>" + fld("rally1", "1 · Near home", pl.rally1, { ph: "Front of the house" }) + fld("rally2", "2 · Neighborhood", pl.rally2, { ph: "Park, school, church" }) + fld("rally3", "3 · Out of area", pl.rally3, { ph: "Relative's address" }) +
       "<h3>If heat forces us out</h3>" + fld("leaveTo", "Destination", pl.leaveTo, { ph: "Family on another grid, a hotel, a cooler town" }) + fld("leaveNotes", "Route and contact", pl.leaveNotes, { type: "area" }) +
       "<h3>Check-in times</h3>" + '<div class="two">' + fld("c1", "First", (S.settings.checkins || [])[0], { type: "time" }) + fld("c2", "Second", (S.settings.checkins || [])[1], { type: "time" }) + "</div>" + fld("c3", "Third", (S.settings.checkins || [])[2], { type: "time" }) +
+      "<h3>Radio channels</h3>" + '<div class="two">' + fld("gmrsCh", "GMRS channel", pl.gmrsCh, { ph: "e.g. 16" }) + fld("meshCh", "Meshtastic channel", pl.meshCh, { ph: "Family channel name" }) + "</div>" +
       "<h3>Utility shutoffs</h3>" + ["gas", "water", "power"].map((k) =>
         fld(k, k[0].toUpperCase() + k.slice(1) + " shutoff: where and how", pl[k], { ph: k === "gas" ? "Meter, east wall. Wrench in hall closet." : "" }) +
         '<div class="btnrow" style="margin:-4px 0 14px"><label class="btn ghost sm">' + (pl[k + "Photo"] ? "Replace photo" : "Add photo") + '<input class="sr" type="file" accept="image/*" data-photo-for="' + k + '"></label></div>' +
@@ -536,7 +544,7 @@
     if (sub === "item") return renderItem(route.parts[2]);
     if (sub === "edit") return renderItemForm(route.parts[2]);
     const t = now(), a = E.autonomy(S, t), g = E.gaps(S, t), cat = route.q.cat || "all";
-    let h = topbar("Supplies");
+    let h = topbar("Supplies") + segNav("inv");
     h += '<div class="grid2">' + ["water", "food", "meds", "power"].map((k) => {
       const v = a[k], st = v === Infinity ? "ok" : E.status(v);
       return '<a class="glass panel" href="#/supplies?cat=' + k + '" style="text-decoration:none;color:var(--ink)"><div class="lab">' + RES[k].label + '</div><div class="mono" style="font-size:1.7rem;margin-top:4px">' + fmtDays(v) + ' <span style="font-size:.8rem;color:var(--mute)">days</span></div><span class="chip ' + st + '" style="margin-top:6px">' + (v === Infinity ? "SOLAR" : STATUS_WORD[st]) + (a.measured[k] ? " · measured" : "") + "</span></a>";
@@ -606,6 +614,426 @@
     Snd.chime("nav");
   }
 
+  /* ---------------- v1.1 helpers ---------------- */
+  const money = (v) => "$" + Number(v).toLocaleString("en-US", { minimumFractionDigits: v % 1 ? 2 : 0, maximumFractionDigits: 2 });
+  const mb = (b) => (b < 1048576 ? Math.max(1, Math.round(b / 1024)) + " KB" : (b / 1048576).toFixed(b < 10485760 ? 1 : 0) + " MB");
+  const shortDate = (t) => new Date(t).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  const kv = (k, v, raw) => '<div class="kv"><span>' + esc(k) + "</span><span>" + (raw ? v : esc(v)) + "</span></div>";
+  const NOTSET = '<span style="color:var(--mute)">not set</span>';
+  const li = (href, icon, title, sub, rt) => '<a class="li" href="' + href + '"><span class="ic">' + ic(icon) + '</span><span class="tx"><b>' + esc(title) + "</b><small>" + esc(sub) + "</small></span>" + (rt ? '<span class="rt">' + rt + "</span>" : "") + ic("chev") + "</a>";
+  const srcRefs = (keys) => srcLine(keys.filter((k) => C.refs[k]).map((k) => C.refs[k]));
+  const segNav = (on) => '<div class="seg wide" style="margin:0 0 12px"><a href="#/supplies"' + (on === "inv" ? ' class="on"' : "") + '>INVENTORY</a><a href="#/buy"' + (on === "buy" ? ' class="on"' : "") + ">BUY LIST</a></div>";
+  const recOf = (coll, id) => S[coll].find((r) => r.id === id && !r.deleted);
+
+  /* ---------------- GUIDES ---------------- */
+  function renderGuides() {
+    let h = topbar("Guides");
+    h += '<div class="sec" style="margin-top:4px"><span class="lab">Playbooks</span></div><div class="list">';
+    for (const p of C.playbooks) {
+      if (p.soon) h += '<div class="li soon"><span class="ic">' + ic(p.icon) + '</span><span class="tx"><b>' + esc(p.title) + "</b><small>" + esc(p.sub) + "</small></span></div>";
+      else { const done = countChecks(p); h += li("#/playbooks/" + p.id, p.icon, p.title, p.sub, done.d + "/" + done.n); }
+    }
+    h += '</div><div class="sec"><span class="lab">Plan</span></div><div class="list">' +
+      li("#/plan", "flag", "The plan", "Phases, power, Phoenix heat rules, upkeep") +
+      li("#/comms", "radio", "Comms", "Who to text, rally points, check-ins, radios") +
+      li("#/missions", "check", "Missions", "Step by step, today through May") +
+      '</div><div class="sec"><span class="lab">Library</span></div><div class="list">' +
+      li("#/library", "file", "PDF library", LIB.length ? LIB.length + " on this phone" : "Manuals and guides, readable offline") + "</div>";
+    h += '<p class="empty" style="margin-top:14px">Each playbook: what to do in the first 10 minutes, hour, day, and the hard rule for leaving. Tick items as you go; reset after the event.</p>';
+    return h;
+  }
+
+  /* ---------------- MISSIONS ---------------- */
+  function taskRow(def, done, phase) {
+    return '<label class="chk' + (done ? " done" : "") + '"><input type="checkbox" data-task="' + esc(def.id) + '"' + (done ? " checked" : "") + '><span class="tx"><b>' + esc(def.t) + "</b>" +
+      (phase ? "<small>" + esc(phase.label) + (phase.when ? " · " + esc(phase.when) : "") + "</small>" : def.d ? "<small>" + esc(def.d) + "</small>" : "") +
+      (def.go && !done ? '<span style="display:block;margin-top:8px"><a class="btn ghost sm" href="' + esc(def.go) + '">Open</a></span>' : "") +
+      (def.custom ? '<span style="display:block;margin-top:8px"><button type="button" class="btn ghost sm danger" data-act="task-del" data-id="' + esc(def.id) + '">Remove</button></span>' : "") +
+      "</span></label>";
+  }
+  function missionsPanel(t) {
+    const ms = E.missions(C.missions, S, t);
+    return '<section class="glass panel"><div class="ph"><h3>Missions</h3><a class="rt" href="#/missions">' + ms.d + " of " + ms.n + " done" + ic("chev") + "</a></div>" +
+      '<div class="bar" style="margin:0 0 6px"><i style="width:' + (ms.n ? Math.round((ms.d / ms.n) * 100) : 0) + '%"></i></div>' +
+      (ms.next.length ? ms.next.map((x) => taskRow(x.def, false, x.phase)).join("") : '<div class="empty">Every mission is done. Keep up the upkeep.</div>') +
+      '<div class="btnrow" style="margin-top:8px"><a class="btn ghost sm" href="#/missions">All missions</a></div></section>';
+  }
+  function renderMissions() {
+    const t = now(), ms = E.missions(C.missions, S, t);
+    let h = backbar("#/status", "Missions");
+    h += '<section class="glass hero"><div class="lab">Missions</div><div class="num"><span class="big">' + ms.d + '</span><span class="unit">OF ' + ms.n + " DONE</span></div>" +
+      '<div class="bar" style="margin:10px 0 8px"><i style="width:' + (ms.n ? Math.round((ms.d / ms.n) * 100) : 0) + '%"></i></div><div class="sub">' + esc(C.plan.line) + "</div></section>";
+    for (const p of ms.phases) {
+      h += '<section class="glass panel"><div class="ph"><h3>' + esc(p.ph.label) + (p.ph.when ? ' <span class="when">· ' + esc(p.ph.when) + "</span>" : "") + '</h3><span class="rt">' + p.d + "/" + p.n + "</span></div>" +
+        p.tasks.map((x) => taskRow(x.def, x.done)).join("") +
+        '<div class="gate' + (p.complete ? " done" : "") + '">' + ic(p.complete ? "check" : "flag") + "<span><b>Done when:</b> " + esc(p.ph.gate) + (p.ph.gateD ? "<small>" + esc(p.ph.gateD) + "</small>" : "") + "</span></div></section>";
+    }
+    h += '<form class="glass panel" data-form="task"><h3>Add a mission</h3>' + fld("t", "What needs doing", "", { ph: "Buy a second can opener" }) +
+      fld("phase", "When", "week", { type: "select", opts: C.missions.phases.map((p) => [p.id, p.label + (p.when ? " · " + p.when : "")]) }) +
+      '<div class="btnrow"><button class="btn" type="submit">Add</button></div></form>';
+    h += '<div class="sec"><span class="lab">Upkeep</span><span class="lab">' + (ms.due.length ? ms.due.length + " due" : "") + "</span></div>";
+    for (const u of ms.upkeep) {
+      const chip = u.state === "due" ? '<span class="chip warn">DUE</span>' : u.state === "ok" ? '<span class="chip ok">OK</span>' : '<span class="chip">NOT STARTED</span>';
+      const when = u.state === "ok" ? "Done " + shortDate(u.last) + " · next " + shortDate(u.dueAt) : u.state === "due" ? (u.last ? "Last done " + shortDate(u.last) : "Due now") : u.dueAt ? "Starts " + shortDate(u.dueAt) : "Start once your gear arrives";
+      const today = u.last && ymd(u.last) === ymd(t);
+      h += '<section class="glass panel up"><div class="ph"><h3>' + esc(u.def.t) + ' <span class="when">· ' + esc(u.def.time) + "</span></h3>" + chip + "</div><p>" + esc(u.def.d) + '</p><div class="upk"><small>' + esc(when) + "</small>" +
+        (today ? '<button class="btn ghost sm" data-act="up-undo" data-id="' + esc(u.def.id) + '">Undo</button>' : '<button class="btn sm" data-act="up-done" data-id="' + esc(u.def.id) + '">Mark done</button>') + "</div></section>";
+    }
+    h += '<p class="empty" style="font-size:.85rem">Ticks travel in Memory Cards, so every phone sees the same progress.</p>';
+    return h;
+  }
+  function setTask(id, patch) { upsert("tasks", Object.assign({ id }, recOf("tasks", id) || {}, patch)); }
+
+  /* ---------------- BUY LIST ---------------- */
+  const BUYST = { buy: ["TO BUY", ""], ordered: ["ORDERED", "cyan"], have: ["HAVE", "ok"] };
+  const BUYF = [["all", "All"], ["floor", "Safety floor"], ["week", "This week"], ["bf", "Black Friday"], ["d90", "90 days"], ["opt", "Optional"]];
+  function hhLine(hh) {
+    return hh.assumed ? "Sized for 4 people (assumed). Add your household on Family." : "Sized for " + hh.P + (hh.P === 1 ? " person" : " people") + (hh.pets ? " and " + hh.pets + (hh.pets === 1 ? " pet" : " pets") : "") + ".";
+  }
+  function dateChips(t) {
+    return '<div class="dates">' + C.buy.dates.map((d) => {
+      const at = Date.parse(d.d + "T00:00:00"), days = Math.ceil((at - t) / DAY);
+      const rel = days > 1 ? "in " + days + " days" : days === 1 ? "tomorrow" : days === 0 ? "today" : "passed";
+      return '<span class="chip' + (days >= 0 && days <= 14 ? " warn" : "") + '">' + esc(d.n) + " · " + shortDate(at) + " · " + rel + "</span>";
+    }).join("") + "</div>";
+  }
+  function buyLine(r, floor) {
+    const it = r.item, st = BUYST[r.status];
+    const q = floor ? it.floor : r.qty;
+    const line = q !== null && q !== undefined && typeof it.price === "number" ? q * it.price : null;
+    const sub = (q !== null && q !== undefined ? "×" + fmtN(q, 2) + (floor && r.qty !== null && r.qty !== it.floor ? " of " + fmtN(r.qty, 2) : "") + " · " : "") + it.pick;
+    return '<a class="li' + (r.status === "have" ? " got" : "") + '" href="#/buy/' + esc(it.id) + '"><span class="ic">' + ic(r.status === "have" ? "check" : r.status === "ordered" ? "cart" : "box") + '</span><span class="tx"><b>' + esc(it.n) + "</b><small>" + esc(sub) + '</small></span><span class="rt">' + (line !== null ? money(line) : "—") + '<br><span class="chip ' + st[1] + '">' + st[0] + "</span></span></a>";
+  }
+  function renderBuy() {
+    if (route.parts[1]) return renderBuyItem(route.parts[1]);
+    const t = now(), bp = E.buyPlan(S, C.buy.items), tot = E.buyTotals(bp.rows), f = BUYF.some((x) => x[0] === route.q.f) ? route.q.f : "all", floor = f === "floor";
+    let h = topbar("Supplies") + segNav("buy");
+    if (floor) {
+      const rows = bp.rows.filter((r) => r.item.floor), got = rows.filter((r) => r.status !== "buy").length;
+      h += '<section class="glass hero"><div class="lab">Safety floor</div><div class="num"><span class="big" style="font-size:2.8rem">' + money(E.floorTotal(C.buy.items)) + '</span><span class="unit">' + got + " OF " + rows.length + " ORDERED</span></div>" +
+        '<div class="sub">If money is tight, these buy the most protection first. Quantities here are the floor, not the full tier.</div></section>';
+    } else {
+      const a = tot.all;
+      h += '<section class="glass hero"><div class="lab">Still to buy</div><div class="num"><span class="big" style="font-size:2.8rem">' + money(a.buy) + "</span></div>" +
+        '<div class="sub">Ordered ' + money(a.ordered) + " · have " + money(a.have) + " · plan " + money(a.est) + "<br>" + esc(hhLine(bp.hh)) + "</div></section>";
+    }
+    h += dateChips(t);
+    h += '<div class="filters">' + BUYF.map(([k, l]) => '<a href="#/buy' + (k === "all" ? "" : "?f=" + k) + '"><span class="chip' + (f === k ? " on" : "") + '">' + esc(l) + "</span></a>").join("") + "</div>";
+    for (const tier of C.buy.tiers) {
+      const rows = bp.rows.filter((r) => r.item.tier === tier.id && (f === "all" || f === tier.id || (floor && r.item.floor)));
+      if (!rows.length) continue;
+      const x = tot[tier.id] || { est: 0, buy: 0 };
+      h += '<div class="sec"><span class="lab">' + esc(tier.label) + '</span><span class="lab">' + (floor ? "" : money(x.est) + (x.buy !== x.est ? " · " + money(x.buy) + " to buy" : "")) + '</span></div><div class="list">' + rows.map((r) => buyLine(r, floor)).join("") + "</div>";
+    }
+    h += '<section class="glass panel" style="margin-top:14px"><h3>Deal rules</h3>' + C.buy.rules.map((r, i) => '<div class="step"><span class="n">' + (i + 1) + "</span><span><small style=\"margin:0\">" + esc(r) + "</small></span></div>").join("") + "</section>";
+    h += '<p class="empty" style="font-size:.85rem">Prices checked ' + esc(C.buy.checked) + "; most are estimates. Store links need internet.</p>";
+    return h;
+  }
+  function qtyBasis(it, r, hh) {
+    if (r.override) return "Set by you. Automatic: " + (r.auto === null ? "none" : "×" + fmtN(r.auto, 2)) + ".";
+    const who = hh.assumed ? "4 people (assumed)" : hh.P + (hh.P === 1 ? " person" : " people");
+    const gal = 14 * (2 * hh.P + hh.petGal);
+    const m = { drum: "14 days at 2 gal per person a day for " + who + (hh.petGal ? " plus pets" : "") + ": " + fmtN(gal, 0) + " gal", brick: "3 days on the move at 1 gal per person a day for " + who, P: "One per person, " + who, "P+1": "One per person plus a base, " + who, "P/2": "Pairs, one radio per person, " + who, AT: "Each teen and adult" + (hh.assumed ? ", 4 assumed" : "") };
+    return typeof it.q === "string" && m[it.q] ? esc(m[it.q]) + "." : it.q === null ? "Amount is your call." : "";
+  }
+  function renderBuyItem(id) {
+    const bp = E.buyPlan(S, C.buy.items), r = bp.rows.find((x) => x.item.id === id);
+    if (!r) return renderBuy();
+    const it = r.item, tier = C.buy.tiers.find((x) => x.id === it.tier);
+    let h = backbar("#/buy?f=" + it.tier, tier ? tier.label : "Buy list");
+    h += '<section class="glass hero"><div class="lab">' + esc(it.n) + '</div><h2 style="margin:6px 0 4px;font-size:1.25rem;font-weight:650">' + esc(it.pick) + "</h2>" +
+      '<div class="num"><span class="big" style="font-size:2.6rem">' + (r.qty !== null ? "×" + fmtN(r.qty, 2) : "—") + '</span><span class="unit">' + (r.line !== null ? money(r.line) : "") + "</span></div>" +
+      '<div class="sub">' + qtyBasis(it, r, bp.hh) + "</div></section>";
+    let add = "";
+    if (r.status === "have" && it.add) {
+      if (it.add.solarW) {
+        const w = it.add.solarW * (r.qty || 1);
+        add = num(S.settings.solarW) >= w ? '<p class="note">Counted on Status: solar is set to ' + esc(S.settings.solarW) + " W.</p>" : '<div class="btnrow" style="margin-top:12px"><button class="btn" data-act="buy-solar" data-id="' + esc(it.id) + '">Count ' + w + " W of solar on Status</button></div>";
+      } else {
+        const linked = r.rec && r.rec.itemId && byId("items", r.rec.itemId);
+        add = linked ? '<div class="btnrow" style="margin-top:12px"><a class="btn ghost" href="#/supplies/item/' + esc(linked.id) + '">In Supplies · open</a></div>' : '<div class="btnrow" style="margin-top:12px"><button class="btn" data-act="buy-add" data-id="' + esc(it.id) + '">Add to Supplies</button></div><p class="note">Adds it to your inventory so Status counts it.</p>';
+      }
+    }
+    h += '<section class="glass panel"><h3>Status</h3><div class="seg wide">' + ["buy", "ordered", "have"].map((s) => '<button data-act="buy-status" data-id="' + esc(it.id) + '" data-v="' + s + '"' + (r.status === s ? ' class="on"' : "") + ">" + BUYST[s][0] + "</button>").join("") + "</div>" + add + "</section>";
+    h += '<section class="glass panel"><h3>Details</h3>' + kv("Price each", typeof it.price === "number" ? money(it.price) + (it.note === "Estimate" ? " (estimate)" : "") : "—") + kv("Deal target", it.target ? money(it.target) : "—") +
+      (it.note && it.note !== "Estimate" ? kv("Price seen", it.note) : "") + kv("Safety floor", it.floor ? "×" + it.floor : "—") +
+      '<p class="note">' + esc(it.why) + "</p>" + (it.u ? '<div class="btnrow" style="margin-top:12px"><a class="btn ghost" href="' + esc(it.u) + '" target="_blank" rel="noopener">' + esc(it.uName || "Search Amazon") + "</a></div>" : "") + "</section>";
+    if (r.auto !== null || r.override) h += '<form class="glass panel" data-form="buyqty" data-id="' + esc(it.id) + '"><h3>Quantity</h3><div class="two">' + fld("qty", "How many", r.override ? r.qty : "", { type: "num", ph: r.auto !== null ? String(r.auto) : "" }) +
+      '<div style="display:flex;align-items:flex-end;margin-bottom:12px"><button class="btn wide" type="submit">Set</button></div></div>' +
+      (r.override ? '<button class="btn ghost sm" type="button" data-act="buy-auto" data-id="' + esc(it.id) + '">Back to automatic' + (r.auto !== null ? " (×" + fmtN(r.auto, 2) + ")" : "") + "</button>" : '<p class="empty" style="font-size:.85rem;margin:0">Leave it to follow the household.</p>') + "</form>";
+    return h;
+  }
+  function setBuy(id, patch) { upsert("buys", Object.assign({ id }, recOf("buys", id) || {}, patch)); }
+  function bfAlert(t) {
+    const start = Date.parse(C.buy.dates[0].d + "T00:00:00"), end = Date.parse(C.buy.dates[1].d + "T23:59:59");
+    if (!(t < end && start - t < 14 * DAY)) return "";
+    const rows = E.buyPlan(S, C.buy.items).rows.filter((r) => r.item.tier === "bf" && r.status === "buy");
+    if (!rows.length) return "";
+    const days = Math.ceil((start - t) / DAY), sum = rows.reduce((a, r) => a + (r.line || 0), 0);
+    return '<a class="alert" href="#/buy?f=bf"><span class="dot"></span><span><b>' + (t >= start ? "Black Friday is on" : "Black Friday in " + days + (days === 1 ? " day" : " days")) + "</b><small>" + rows.length + " items still to buy · " + money(sum) + "</small></span></a>";
+  }
+
+  /* ---------------- PLAN ---------------- */
+  function renderPlan() {
+    const t = now(), tot = E.buyTotals(E.buyPlan(S, C.buy.items).rows), ms = E.missions(C.missions, S, t), pl = S.plan || {};
+    let h = backbar("#/guides", "The plan");
+    h += '<section class="glass hero"><div class="lab">The plan</div><h2 style="margin:6px 0 4px;font-size:1.45rem;line-height:1.2">' + esc(C.plan.line) + '</h2><div class="sub">Missions ' + ms.d + " of " + ms.n + ' done · <a href="#/missions">open</a></div></section>';
+    h += '<section class="glass panel"><h3>Phases</h3>' + C.plan.stages.map((s, i) => {
+      const title = s.id === "week" ? "This week, " + money(E.floorTotal(C.buy.items)) + " minimum (" + money(tot.week ? tot.week.est : 0) + " for the full tier)" : s.t;
+      return '<div class="step"><span class="n">' + (i + 1) + "</span><span><b>" + esc(title) + "</b><small>" + esc(s.d) + "</small></span></div>";
+    }).join("") + '<div class="btnrow" style="margin-top:10px"><a class="btn ghost sm" href="#/missions">Missions</a><a class="btn ghost sm" href="#/buy">Buy list</a></div></section>';
+    h += '<section class="glass panel"><h3>Our plan</h3>' +
+      kv("Out-of-area contact", pl.contactName ? esc(pl.contactName) + (pl.contactPhone ? " · " + esc(pl.contactPhone) : "") : NOTSET, true) +
+      kv("Meeting places", [pl.rally1, pl.rally2, pl.rally3].filter(Boolean).map(esc).join(" · ") || NOTSET, true) +
+      kv("If heat forces us out", pl.leaveTo ? esc(pl.leaveTo) : NOTSET, true) + kv("Check-ins", (S.settings.checkins || []).join(" · ") || "—") +
+      '<div class="btnrow" style="margin-top:10px"><a class="btn ghost sm" href="#/family/plan">Edit</a><a class="btn ghost sm" href="#/comms">Comms</a></div></section>';
+    h += '<section class="glass panel"><h3>Power</h3>' + C.plan.power.map((p) => '<div class="blk"><b>' + esc(p.n) + "</b><small>" + esc(p.cap) + "</small><span>" + esc(p.runs) + "</span></div>").join("") + '<p class="note">' + esc(C.plan.powerRule) + "</p></section>";
+    h += '<section class="glass panel"><h3>Phoenix heat rules</h3>' + C.plan.heat.map((r, i) => '<div class="step"><span class="n">' + (i + 1) + "</span><span><b>" + esc(r.t) + "</b><small>" + esc(r.d) + "</small></span></div>").join("") +
+      '<div class="btnrow" style="margin-top:10px"><a class="btn ghost sm" href="#/playbooks/heat">Heat playbook</a></div></section>';
+    h += '<section class="glass panel"><h3>Upkeep</h3>' + ms.upkeep.map((u) => kv(u.def.t + " · " + u.def.time, u.state === "due" ? '<span class="chip warn">DUE</span>' : u.state === "ok" ? "next " + shortDate(u.dueAt) : '<span style="color:var(--mute)">not started</span>', true)).join("") +
+      '<div class="btnrow" style="margin-top:10px"><a class="btn ghost sm" href="#/missions">Open upkeep</a></div></section>';
+    h += '<p class="empty" style="font-size:.85rem">Sources: ' + srcRefs(["cdcoa", "cdcab", "cdcpo"]) + ". Power figures are estimates from the plan.</p>";
+    return h;
+  }
+
+  /* ---------------- COMMS ---------------- */
+  function renderComms() {
+    const t = now(), pl = S.plan || {}, nc = E.nextCheckin(S.settings.checkins, t);
+    const ph = (pl.contactPhone || "").replace(/[^0-9+]/g, "");
+    let h = backbar("#/guides", "Comms");
+    h += '<section class="glass hero"><div class="lab">Out-of-area contact</div>' +
+      (pl.contactName ? '<h2 style="margin:6px 0 2px;font-size:1.4rem">' + esc(pl.contactName) + "</h2>" + (pl.contactPhone ? '<div class="sub mono">' + esc(pl.contactPhone) + "</div>" : "") : '<div class="sub" style="margin-top:6px">Not set yet. <a href="#/family/plan">Add one</a>: everyone texts them "OK + location".</div>') +
+      (ph ? '<div class="btnrow" style="margin-top:12px"><a class="btn" href="sms:' + esc(ph) + "&body=" + encodeURIComponent("OK. I'm at ") + '">Text "OK"</a><a class="btn ghost" href="tel:' + esc(ph) + '">Call</a></div>' : "") + "</section>";
+    h += '<div class="btnrow" style="margin:12px 0"><a class="btn red" href="tel:911">' + ic("phone") + 'Call 911</a><a class="btn ghost" href="sms:911">Text 911</a></div>';
+    h += '<section class="glass panel"><h3>Check-ins</h3>' + (nc ? '<div class="mono" style="font-size:1.6rem;margin:2px 0">' + nc.at + '</div><div style="color:var(--ink2);margin-bottom:6px" data-tick="checkin">in ' + Math.floor(nc.inMin / 60) + "h " + (nc.inMin % 60) + "m</div>" : '<div class="empty">Set times in the family plan.</div>') +
+      kv("Windows", (S.settings.checkins || []).join(" · ") || "—") + kv("GMRS channel", pl.gmrsCh ? esc(pl.gmrsCh) : NOTSET, true) + kv("Meshtastic channel", pl.meshCh ? esc(pl.meshCh) : NOTSET, true) +
+      '<p class="note">' + esc(C.comms.rules[1].d) + "</p></section>";
+    h += '<section class="glass panel"><h3>Rally points</h3>' + [["1 · Near home", pl.rally1], ["2 · Neighborhood", pl.rally2], ["3 · Out of area", pl.rally3], ["Heat destination", pl.leaveTo]].map(([k, v]) => kv(k, v ? esc(v) : NOTSET, true)).join("") +
+      '<div class="btnrow" style="margin-top:10px"><a class="btn ghost sm" href="#/family/plan">Edit plan and channels</a></div></section>';
+    h += '<div class="sec"><span class="lab">The ladder · try in this order</span></div>';
+    C.comms.ladder.forEach((r, i) => {
+      h += '<section class="glass panel"><h3>' + (i + 1) + " · " + esc(r.rung) + '</h3><b class="big2">' + esc(r.t) + "</b>" + kv("Works when", r.when) + kv("Range", r.range) + '<p class="note">' + esc(r.d) + "</p></section>";
+    });
+    h += '<section class="glass panel"><h3>Rules</h3>' + C.comms.rules.filter((r, i) => i !== 1).map((r) => '<div class="blk"><b>' + esc(r.t) + "</b><span>" + esc(r.d) + "</span></div>").join("") + "</section>";
+    h += '<p class="empty" style="font-size:.85rem">Sources: ' + srcRefs(["fcc", "text911", "gmrs"]) + ". Ranges are estimates.</p>";
+    return h;
+  }
+
+  /* ---------------- LIBRARY (PDFs stay on this phone) ---------------- */
+  let LIB = [];
+  async function saveLib() { await Store.set("lib", LIB); }
+  function renderLibrary() {
+    if (route.parts[1]) return renderReader(route.parts[1]);
+    const total = LIB.reduce((a, x) => a + (x.size || 0), 0);
+    let h = backbar("#/guides", "Library");
+    h += '<section class="glass hero"><div class="lab">PDF library · this phone</div><div class="num"><span class="big" style="font-size:2.8rem">' + LIB.length + '</span><span class="unit">' + (LIB.length === 1 ? "PDF" : "PDFS") + (LIB.length ? " · " + mb(total) : "") + "</span></div>" +
+      '<div class="sub">' + esc(C.library.note) + '</div><div class="sub mono" id="libq" style="font-size:.75rem;margin-top:6px"></div>' +
+      '<div class="btnrow" style="margin-top:12px"><label class="btn">' + ic("plus") + 'Import PDFs<input class="sr" type="file" accept="application/pdf,.pdf" multiple id="pdffile"></label></div><div id="libmsg" class="empty" style="min-height:1.3em"></div></section>';
+    h += LIB.length ? '<div class="list">' + LIB.slice().sort((a, b) => (b.opened || b.added) - (a.opened || a.added)).map((x) => li("#/library/" + x.id, "file", x.name, [mb(x.size || 0), x.pages ? x.pages + " pages" : "", x.lastPage > 1 ? "at p. " + x.lastPage : ""].filter(Boolean).join(" · "))).join("") + "</div>" : '<div class="empty">No PDFs yet. Import from Files, or from Safari after a download.</div>';
+    h += '<section class="glass panel" style="margin-top:14px"><h3>Worth importing</h3>' + C.library.suggest.map((s) => '<div class="blk"><b>' + esc(s.t) + "</b><span>" + esc(s.d) + (s.u ? ' <a href="' + esc(s.u) + '" target="_blank" rel="noopener">Open site</a>' : "") + "</span></div>").join("") + "</section>";
+    return h;
+  }
+  function renderReader(id) {
+    const x = LIB.find((d) => d.id === id);
+    if (!x) { route.parts = ["library"]; return renderLibrary(); }
+    let h = '<div class="rhead"><header class="top"><a class="ibtn" href="#/library" aria-label="Back to library">' + ic("back") + '</a><span class="rtitle">' + esc(x.name) + '</span><span class="mono rpg" id="pgnum">' + (x.lastPage || 1) + " / " + (x.pages || "…") + "</span></header>" +
+      '<div class="rbar"><button class="ibtn" data-act="pdf-toc" aria-label="Contents">' + ic("toc") + '</button><button class="ibtn" data-act="pdf-find" aria-label="Find text">' + ic("search") + "</button>" +
+      '<form data-form="pdfgo" class="rgo"><input name="p" inputmode="numeric" placeholder="Page" aria-label="Go to page" autocomplete="off"><button class="btn sm" type="submit">Go</button></form>' +
+      '<button class="ibtn" data-act="pdf-zoom" data-z="-1" aria-label="Zoom out">' + ic("minus") + '</button><button class="ibtn" data-act="pdf-zoom" data-z="1" aria-label="Zoom in">' + ic("plus") + "</button></div></div>";
+    h += '<div id="pdfpanel" class="glass panel hide"></div><div id="pdfmsg" class="empty">Opening…</div><div class="pgwrap"><div id="pdfpages" class="pdfv"></div></div>';
+    h += '<div class="btnrow" style="margin-top:16px"><button class="btn ghost danger" data-act="pdf-del" data-id="' + esc(id) + '">Delete from this phone</button></div>';
+    return h;
+  }
+  async function importPdfs(files) {
+    const msg = $("#libmsg"); let n = 0;
+    for (const f of Array.from(files || [])) {
+      if (msg) msg.textContent = "Saving " + f.name + "…";
+      let head = "";
+      try { head = await f.slice(0, 1024).text(); } catch (e) {}
+      if (!head.includes("%PDF-")) { toast(f.name + " isn't a PDF"); continue; }
+      const id = uid();
+      if (!(await Store.set("pdf:" + id, f))) { toast("Not enough space for " + f.name); continue; }
+      LIB.push({ id, name: f.name.replace(/\.pdf$/i, "").slice(0, 140) || "Untitled", size: f.size, added: now(), pages: 0, lastPage: 1 });
+      n++;
+    }
+    await saveLib(); requestPersist();
+    if (n) { Snd.chime("save"); toast(n === 1 ? "PDF saved on this phone" : n + " PDFs saved on this phone"); }
+    render();
+  }
+  async function deletePdf(id) {
+    await PdfV.close(); await Store.del("pdf:" + id);
+    LIB = LIB.filter((d) => d.id !== id); await saveLib(); toast("Deleted from this phone"); go("#/library");
+  }
+  async function libQuota() {
+    const el = $("#libq"); if (!el || !navigator.storage || !navigator.storage.estimate) return;
+    try {
+      const e = await navigator.storage.estimate(), kept = navigator.storage.persisted ? await navigator.storage.persisted() : false;
+      el.textContent = "Storage: " + mb(e.usage || 0) + " used of " + mb(e.quota || 0) + (kept ? " · kept safe from cleanup" : "");
+    } catch (e) {}
+  }
+
+  // PDF reader: pdf.js renders pages to canvas on demand; pages far off screen are released to save memory.
+  const PdfV = {
+    lib: null, task: null, loadP: null, doc: null, id: null, n: 0, ratio: 1.294, zoom: 1, cur: 1, io: null, io2: null,
+    vis: new Set(), rendered: new Map(), queue: [], busy: false, token: 0, ftoken: 0, text: null, outline: null, saveT: 0,
+    async engine() {
+      if (this.lib) return this.lib;
+      const lib = await import("./pdfjs/pdf.min.js");
+      lib.GlobalWorkerOptions.workerSrc = new URL("./pdfjs/pdf.worker.min.js", location.href).href;
+      this.lib = lib; return lib;
+    },
+    msg(m) { const e = $("#pdfmsg"); if (e) { e.textContent = m || ""; e.classList.toggle("hide", !m); } },
+    async load(id) {
+      const tk = this.token;
+      const blob = await Store.get("pdf:" + id);
+      if (!blob) throw Object.assign(new Error("This PDF is missing on this phone. Import it again."), { name: "Missing" });
+      const lib = await this.engine();
+      const data = new Uint8Array(await blob.arrayBuffer());
+      if (tk !== this.token) return;
+      this.task = lib.getDocument({ data, useWorkerFetch: false, useWasm: false, isEvalSupported: false, verbosity: 0 });
+      const doc = await this.task.promise;
+      if (tk !== this.token) { doc.destroy(); return; }
+      const v = (await doc.getPage(1)).getViewport({ scale: 1 });
+      this.doc = doc; this.n = doc.numPages; this.text = new Map(); this.outline = null; this.ratio = v.height / v.width;
+      const meta = LIB.find((d) => d.id === id);
+      if (meta) { meta.pages = this.n; meta.opened = now(); saveLib(); }
+    },
+    async mount(id) {
+      if (!$("#pdfpages")) return;
+      try {
+        if (this.id !== id) { await this.close(); this.id = id; this.loadP = this.load(id); }
+        await this.loadP;
+        if (!this.doc || this.id !== id || !$("#pdfpages")) return;
+        this.msg("");
+        this.layout($("#pdfpages"));
+        const meta = LIB.find((d) => d.id === id);
+        const start = Math.min(this.n, Math.max(1, (meta && meta.lastPage) || 1));
+        this.setNum(start); if (start > 1) this.go(start);
+      } catch (e) {
+        if (this.id !== id) return;
+        this.msg(e && e.name === "PasswordException" ? "This PDF is password-protected, so HAVYN can't open it." : e && e.name === "Missing" ? e.message : "Couldn't open this PDF" + (e && e.message ? ": " + e.message : "."));
+      }
+    },
+    layout(box) {
+      this.unobserve();
+      for (const [, c] of this.rendered) if (c && c !== "busy") { c.width = 0; c.height = 0; }
+      this.rendered = new Map(); this.vis = new Set(); this.queue = [];
+      box.style.setProperty("--z", this.zoom);
+      let html = ""; for (let i = 1; i <= this.n; i++) html += '<div class="pg" data-n="' + i + '" style="aspect-ratio:1 / ' + this.ratio.toFixed(4) + '"></div>';
+      box.innerHTML = html;
+      this.io = new IntersectionObserver((ents) => {
+        for (const e of ents) { const n = +e.target.dataset.n; if (e.isIntersecting) { this.vis.add(n); this.want(n); } else { this.vis.delete(n); this.free(n); } }
+        this.pump();
+      }, { rootMargin: "120% 0px" });
+      this.io2 = new IntersectionObserver((ents) => { for (const e of ents) if (e.isIntersecting) this.setNum(+e.target.dataset.n); }, { rootMargin: "-45% 0px -54% 0px" });
+      $$(".pg", box).forEach((el) => { this.io.observe(el); this.io2.observe(el); });
+    },
+    want(n) { if (!this.rendered.has(n) && !this.queue.includes(n)) this.queue.push(n); },
+    free(n) {
+      const c = this.rendered.get(n);
+      if (c && c !== "busy") { c.width = 0; c.height = 0; c.remove(); this.rendered.delete(n); }
+      const i = this.queue.indexOf(n); if (i >= 0) this.queue.splice(i, 1);
+    },
+    async pump() {
+      if (this.busy || !this.doc) return;
+      this.busy = true;
+      try {
+        while (this.queue.length && this.doc) {
+          this.queue.sort((a, b) => Math.abs(a - this.cur) - Math.abs(b - this.cur));
+          const n = this.queue.shift();
+          if (this.vis.has(n) && !this.rendered.has(n)) await this.draw(n);
+        }
+      } catch (e) {} finally { this.busy = false; }
+    },
+    async draw(n) {
+      const el = $('.pg[data-n="' + n + '"]'); if (!el || !this.doc) return;
+      const doc = this.doc; this.rendered.set(n, "busy");
+      try {
+        const page = await doc.getPage(n);
+        const v1 = page.getViewport({ scale: 1 });
+        el.style.aspectRatio = v1.width + " / " + v1.height;
+        let s = ((el.clientWidth || 360) / v1.width) * Math.min(window.devicePixelRatio || 1, 3);
+        const px = v1.width * v1.height * s * s, MAX = 5e6; if (px > MAX) s *= Math.sqrt(MAX / px);
+        const vp = page.getViewport({ scale: s });
+        const cv = document.createElement("canvas"); cv.width = Math.floor(vp.width); cv.height = Math.floor(vp.height);
+        await page.render({ canvas: cv, viewport: vp }).promise;
+        page.cleanup();
+        if (doc !== this.doc || !el.isConnected || !this.vis.has(n)) { cv.width = 0; cv.height = 0; if (this.rendered.get(n) === "busy") this.rendered.delete(n); return; }
+        el.replaceChildren(cv); this.rendered.set(n, cv);
+      } catch (e) { if (this.rendered.get(n) === "busy") this.rendered.delete(n); }
+    },
+    setNum(n) {
+      this.cur = n; const e = $("#pgnum"); if (e) e.textContent = n + " / " + this.n;
+      clearTimeout(this.saveT); const id = this.id;
+      this.saveT = setTimeout(() => { const m = LIB.find((d) => d.id === id); if (m && m.lastPage !== n) { m.lastPage = n; saveLib(); } }, 700);
+    },
+    go(n) { const el = $('.pg[data-n="' + n + '"]'); if (el) { el.scrollIntoView({ block: "start" }); window.scrollBy(0, -(($(".rhead") || {}).offsetHeight || 0) - 6); this.setNum(n); } },
+    setZoom(dz) {
+      const Z = [1, 1.5, 2, 3]; const i = Math.max(0, Math.min(Z.length - 1, Z.indexOf(this.zoom) + dz));
+      if (Z[i] === this.zoom || !this.doc) return;
+      const keep = this.cur; this.zoom = Z[i];
+      const box = $("#pdfpages"); if (!box) return;
+      this.layout(box); this.go(keep); toast("Zoom " + Math.round(this.zoom * 100) + "%");
+    },
+    panel(kind) {
+      const pn = $("#pdfpanel"); if (!pn) return null;
+      if (!pn.classList.contains("hide") && pn.dataset.kind === kind) { pn.classList.add("hide"); return null; }
+      pn.dataset.kind = kind; pn.classList.remove("hide"); return pn;
+    },
+    async toc() {
+      if (!this.doc) return; const pn = this.panel("toc"); if (!pn) return;
+      pn.innerHTML = '<h3>Contents</h3><div class="empty">Reading contents…</div>';
+      if (!this.outline) {
+        const flat = [], walk = (items, d) => { for (const it of items || []) { flat.push({ title: it.title, dest: it.dest, d }); if (d < 2 && it.items && it.items.length) walk(it.items, d + 1); } };
+        try { walk(await this.doc.getOutline(), 0); } catch (e) {}
+        this.outline = flat;
+      }
+      pn.innerHTML = "<h3>Contents</h3>" + (this.outline.length ? '<div class="toc">' + this.outline.map((o, i) => '<button data-act="pdf-dest" data-i="' + i + '" style="padding-left:' + (10 + o.d * 16) + 'px">' + esc(o.title) + "</button>").join("") + "</div>" : '<div class="empty">This PDF has no table of contents. Use Find or Go.</div>');
+    },
+    async dest(i) {
+      const o = this.outline && this.outline[i]; if (!o || !this.doc) return;
+      try {
+        let d = o.dest; if (typeof d === "string") d = await this.doc.getDestination(d);
+        if (!Array.isArray(d)) return;
+        const n = typeof d[0] === "number" ? d[0] + 1 : (await this.doc.getPageIndex(d[0])) + 1;
+        $("#pdfpanel").classList.add("hide"); this.go(n);
+      } catch (e) { toast("Couldn't follow that link"); }
+    },
+    findPanel() {
+      if (!this.doc) return; const pn = this.panel("find"); if (!pn) return;
+      pn.innerHTML = '<h3>Find</h3><form data-form="pdffind" class="rgo"><input name="q" placeholder="Word or phrase" aria-label="Find text" autocomplete="off"><button class="btn sm" type="submit">Find</button></form><div id="findres" style="margin-top:10px"></div>';
+      const q = $("[name=q]", pn); if (q) q.focus();
+    },
+    async search(q) {
+      const res = $("#findres"); if (!res || !this.doc) return;
+      const ql = String(q || "").trim().toLowerCase();
+      if (ql.length < 2) { res.innerHTML = '<div class="empty">Type at least 2 letters.</div>'; return; }
+      const tk = ++this.ftoken, doc = this.doc, hits = [];
+      res.innerHTML = '<div class="empty" id="findprog">Searching…</div>';
+      for (let n = 1; n <= this.n; n++) {
+        if (tk !== this.ftoken || doc !== this.doc) return;
+        let txt = this.text.get(n);
+        if (txt === undefined) {
+          try { const page = await doc.getPage(n); const tc = await page.getTextContent(); txt = tc.items.map((it) => (it.str || "") + (it.hasEOL ? " " : "")).join("").replace(/\s+/g, " "); page.cleanup(); } catch (e) { txt = ""; }
+          if (doc !== this.doc) return; this.text.set(n, txt);
+        }
+        const at = txt.toLowerCase().indexOf(ql);
+        if (at >= 0) { hits.push({ n, s: txt.slice(Math.max(0, at - 50), at + ql.length + 70) }); if (hits.length >= 80) break; }
+        if (n % 20 === 0) { const p = $("#findprog"); if (p) p.textContent = "Searching… page " + n + " of " + this.n; }
+      }
+      if (!$("#findres")) return;
+      $("#findres").innerHTML = hits.length ? '<div class="toc">' + hits.map((x) => '<button data-act="pdf-go" data-n="' + x.n + '"><b>p. ' + x.n + "</b>" + esc(x.s) + "</button>").join("") + "</div>" + (hits.length >= 80 ? '<div class="empty">Showing the first 80 pages with a match.</div>' : "") : '<div class="empty">No match. Scanned pages without a text layer can\'t be searched.</div>';
+    },
+    unobserve() { if (this.io) this.io.disconnect(); if (this.io2) this.io2.disconnect(); this.io = this.io2 = null; },
+    async close() {
+      this.token++; this.ftoken++; this.unobserve(); clearTimeout(this.saveT);
+      for (const [, c] of this.rendered) if (c && c !== "busy") { c.width = 0; c.height = 0; }
+      this.rendered = new Map(); this.queue = []; this.vis = new Set();
+      const d = this.doc, t = this.task; this.doc = null; this.task = null; this.id = null; this.loadP = null; this.text = null; this.outline = null; this.zoom = 1;
+      try { if (d) await d.destroy(); else if (t) await t.destroy(); } catch (e) {}
+    }
+  };
+
   /* ---------------- SYSTEM: memory card + settings ---------------- */
   let pendingCard = null, preparedFile = null;
   function isStandalone() { return window.navigator.standalone === true || (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches); }
@@ -632,6 +1060,7 @@
       '<div class="kv"><span>Installed to Home Screen</span><span>' + (isStandalone() ? "Yes" : "No") + "</span></div>" +
       '<div class="kv"><span>Offline copy</span><span id="swst">' + (PREVIEW ? "Preview: none" : navigator.serviceWorker && navigator.serviceWorker.controller ? "Saved for offline" : "Not yet: open once online") + "</span></div>" +
       '<div class="kv"><span>Storage</span><span id="stst">' + (Store.ok ? "On this phone" : "Temporary") + "</span></div>" +
+      '<div class="kv"><span>PDF library</span><span>' + LIB.length + (LIB.length === 1 ? " file" : " files") + " · " + mb(LIB.reduce((a, x) => a + (x.size || 0), 0)) + "</span></div>" +
       '<div class="kv"><span>Network use</span><span>None (blocked by policy)</span></div>' +
       '<div class="kv"><span>Version</span><span class="mono">' + esc(VERSION) + "</span></div>" +
       '<p class="empty" style="font-size:.85rem">Deleting the app icon deletes its data. Keep Memory Cards on another phone and the vault drive.</p></section>';
@@ -641,7 +1070,7 @@
   async function sha256(text) {
     try { const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text)); return Array.from(new Uint8Array(b)).map((x) => x.toString(16).padStart(2, "0")).join(""); } catch (e) { return ""; }
   }
-  function snapshot() { return JSON.parse(JSON.stringify({ settings: S.settings, plan: S.plan, outage: S.outage, checks: S.checks, people: S.people, pets: S.pets, items: S.items, log: S.log })); }
+  function snapshot() { return JSON.parse(JSON.stringify({ settings: S.settings, plan: S.plan, outage: S.outage, checks: S.checks, people: S.people, pets: S.pets, items: S.items, log: S.log, tasks: S.tasks, buys: S.buys })); }
   async function allPhotos() {
     const out = {}; const keys = (await Store.keys()) || [];
     for (const k of keys) if (String(k).startsWith("photo:")) out[String(k).slice(6)] = await Store.get(k);
@@ -753,7 +1182,7 @@
     return false;
   }
   document.addEventListener("click", (ev) => {
-    const go = ev.target.closest("[data-go]"); if (go) { location.hash = go.dataset.go; return; }
+    const dg = ev.target.closest("[data-go]"); if (dg) { location.hash = dg.dataset.go; return; }
     const pre = ev.target.closest("[data-preset]");
     if (pre) { const [n, v] = pre.dataset.preset.split("|"); const f = pre.closest("form"); const nm = f.querySelector("[name=name]"), pv = f.querySelector("[name=per]"); if (nm) nm.value = n; if (pv) pv.value = v; return; }
     const b = ev.target.closest("[data-act]"); if (!b) return;
@@ -772,6 +1201,25 @@
     else if (act === "reset-checks") { const c = Object.assign({}, S.checks); delete c[b.dataset.id]; S.checks = touch(c); save(); render(); }
     else if (act === "use") logUse(b.dataset.id, num(b.dataset.n)), render();
     else if (act === "del") { if (confirmTap(b, "del" + b.dataset.id, "Tap again to delete")) { remove(b.dataset.coll, b.dataset.id); toast("Deleted"); go(b.dataset.coll === "items" ? "#/supplies" : "#/family"); } }
+    else if (act === "up-done") { const r = recOf("tasks", b.dataset.id) || {}; setTask(b.dataset.id, { prevDone: r.lastDone || 0, lastDone: now() }); Snd.chime("ok"); toast("Marked done"); render(); }
+    else if (act === "up-undo") { const r = recOf("tasks", b.dataset.id) || {}; setTask(b.dataset.id, { lastDone: r.prevDone || 0, prevDone: 0 }); render(); }
+    else if (act === "task-del") { if (confirmTap(b, "task" + b.dataset.id, "Tap again to remove")) { remove("tasks", b.dataset.id); toast("Removed"); render(); } }
+    else if (act === "buy-status") { setBuy(b.dataset.id, { status: b.dataset.v }); Snd.chime(b.dataset.v === "have" ? "ok" : "nav"); render(); }
+    else if (act === "buy-auto") { setBuy(b.dataset.id, { qty: null }); render(); }
+    else if (act === "buy-add") {
+      const r = E.buyPlan(S, C.buy.items).rows.find((x) => x.item.id === b.dataset.id); if (!r || !r.item.add) return;
+      const a = r.item.add, cat = RES[a.cat] ? a.cat : "gear", key = RES[cat].key;
+      const vals = { category: cat, name: a.name || r.item.n, qty: r.qty !== null ? r.qty : 1, notes: r.item.pick };
+      if (key && a.per) { vals.per_unit = {}; vals.per_unit[key] = a.per; }
+      draft = { id: "", vals, fromBuy: r.item.id }; go("#/supplies/edit/new?cat=" + cat);
+    }
+    else if (act === "buy-solar") { const r = E.buyPlan(S, C.buy.items).rows.find((x) => x.item.id === b.dataset.id); const w = 200 * ((r && r.qty) || 1); setOne("settings", { solarW: Math.max(num(S.settings.solarW), w) }); toast("Solar set to " + w + " W"); Snd.chime("ok"); render(); }
+    else if (act === "pdf-toc") PdfV.toc();
+    else if (act === "pdf-find") PdfV.findPanel();
+    else if (act === "pdf-zoom") PdfV.setZoom(num(b.dataset.z));
+    else if (act === "pdf-dest") PdfV.dest(num(b.dataset.i));
+    else if (act === "pdf-go") { const pn = $("#pdfpanel"); if (pn) pn.classList.add("hide"); PdfV.go(num(b.dataset.n)); }
+    else if (act === "pdf-del") { if (confirmTap(b, "pdfdel", "Tap again to delete")) deletePdf(b.dataset.id); }
     else if (act === "mc-save") prepareCard();
     else if (act === "mc-share") shareCard();
     else if (act === "mc-download") downloadCard();
@@ -787,14 +1235,19 @@
       const [pid, k] = t.dataset.chk.split("|"); const c = Object.assign({}, S.checks); c[pid] = Object.assign({}, c[pid]); if (t.checked) c[pid][k] = now(); else delete c[pid][k];
       S.checks = touch(c); save(); t.closest(".chk").classList.toggle("done", t.checked); if (t.checked) Snd.chime("nav"); return;
     }
+    if (t.dataset && t.dataset.task) {
+      setTask(t.dataset.task, { done: t.checked, doneAt: t.checked ? now() : 0 });
+      if (t.checked) Snd.chime("ok"); render(); return;
+    }
     if (t.id === "mcfile") { await readCardFile(t.files && t.files[0]); t.value = ""; return; }
+    if (t.id === "pdffile") { const fs = Array.from(t.files || []); t.value = ""; await importPdfs(fs); return; }
     if (t.dataset && t.dataset.photoFor) {
       const f = t.files && t.files[0]; if (!f) return;
       try { const url = await shrinkPhoto(f); const id = uid(); await Store.set("photo:" + id, url); const old = S.plan[t.dataset.photoFor + "Photo"]; if (old) Store.del("photo:" + old); const p = {}; p[t.dataset.photoFor + "Photo"] = id; setOne("plan", p); toast("Photo saved"); render(); } catch (e) { toast("Could not read that photo"); }
       return;
     }
     const form = t.closest && t.closest("form[data-form=item]");
-    if (form && t.name === "category") { draft = { id: form.dataset.id || "", vals: formVals(form) }; render(); }
+    if (form && t.name === "category") { draft = { id: form.dataset.id || "", vals: formVals(form), fromBuy: draft && draft.fromBuy }; render(); }
   });
   function formVals(f) { const o = {}; new FormData(f).forEach((v, k) => { o[k] = typeof v === "string" ? v.trim() : v; }); return o; }
   document.addEventListener("submit", (ev) => {
@@ -809,7 +1262,7 @@
       delete p.example; upsert("pets", p); toast("Saved"); Snd.chime("ok"); go("#/family");
     } else if (kind === "plan") {
       const checkins = [v.c1, v.c2, v.c3].filter(Boolean);
-      setOne("plan", { contactName: v.contactName, contactPhone: v.contactPhone, rally1: v.rally1, rally2: v.rally2, rally3: v.rally3, leaveTo: v.leaveTo, leaveNotes: v.leaveNotes, gas: v.gas, water: v.water, power: v.power });
+      setOne("plan", { contactName: v.contactName, contactPhone: v.contactPhone, rally1: v.rally1, rally2: v.rally2, rally3: v.rally3, leaveTo: v.leaveTo, leaveNotes: v.leaveNotes, gas: v.gas, water: v.water, power: v.power, gmrsCh: v.gmrsCh, meshCh: v.meshCh });
       setOne("settings", { checkins }); toast("Plan saved"); Snd.chime("ok"); go("#/family");
     } else if (kind === "item") {
       const cat = RES[v.category] ? v.category : "gear", r = RES[cat];
@@ -817,7 +1270,19 @@
       const it = Object.assign({}, base, { category: cat, name: v.name || r.label, qty: num(v.qty), location: v.location, expires: v.expires, min_qty: optNum(v.min_qty), notes: v.notes });
       it.per_unit = r.key ? (() => { const o = {}; o[r.key] = num(v.per); return o; })() : {};
       if (cat === "meds") { it.per_day = num(v.per_day); it.critical = v.critical === "yes"; it.owner = v.owner; } else { delete it.per_day; delete it.critical; delete it.owner; }
-      delete it.example; draft = null; upsert("items", it); toast("Saved"); Snd.chime("ok"); go("#/supplies/item/" + it.id);
+      const fromBuy = draft && draft.fromBuy;
+      delete it.example; draft = null; upsert("items", it); if (fromBuy) setBuy(fromBuy, { itemId: it.id, status: "have" }); toast("Saved"); Snd.chime("ok"); go("#/supplies/item/" + it.id);
+    } else if (kind === "task") {
+      if (!v.t) { toast("Type what needs doing"); return; }
+      upsert("tasks", { id: uid(), custom: true, t: String(v.t).slice(0, 200), phase: C.missions.phases.some((x) => x.id === v.phase) ? v.phase : "week", done: false });
+      toast("Mission added"); Snd.chime("ok"); render();
+    } else if (kind === "buyqty") {
+      setBuy(id, { qty: String(v.qty || "").trim() === "" ? null : Math.max(0, num(v.qty)) }); toast("Quantity saved"); render();
+    } else if (kind === "pdfgo") {
+      const n = Math.round(num(v.p)); const inp = f.querySelector("input"); if (inp) { inp.value = ""; inp.blur(); }
+      if (n >= 1 && n <= PdfV.n) PdfV.go(n); else toast("Pages 1 to " + PdfV.n);
+    } else if (kind === "pdffind") {
+      const inp = f.querySelector("input"); if (inp) inp.blur(); PdfV.search(v.q);
     } else if (kind === "use") {
       logUse(id, num(v.n)); render();
     } else if (kind === "settings") {
@@ -838,6 +1303,7 @@
   document.addEventListener("visibilitychange", () => { if (document.hidden) flush(); else if (document.body.classList.contains("em")) Wake.on(); });
 
   async function eraseAll() {
+    await PdfV.close(); LIB = [];
     const keys = (await Store.keys()) || [];
     for (const k of keys) await Store.del(k);
     S = defaults(); PR = prefDefaults(); preparedFile = null; pendingCard = null; flush(); toast("Erased"); go("#/status");
@@ -856,6 +1322,7 @@
     const st = await Store.get("state"), pr = await Store.get("prefs");
     if (st && typeof st === "object") { const d = defaults(); S = Object.assign(d, st); S.settings = Object.assign(d.settings, st.settings || {}); S.plan = Object.assign(d.plan, st.plan || {}); }
     if (pr && typeof pr === "object") PR = Object.assign(prefDefaults(), pr);
+    const lib = await Store.get("lib"); LIB = Array.isArray(lib) ? lib.filter((x) => x && typeof x.id === "string") : [];
     const v = $(".void"); if (v && !v.children.length) for (let i = 0; i < 14; i++) { const m = document.createElement("i"); m.style.left = (5 + Math.random() * 90) + "%"; m.style.top = (40 + Math.random() * 55) + "%"; m.style.animationDelay = (-Math.random() * 22).toFixed(1) + "s"; v.appendChild(m); }
     render();
     document.body.dataset.ready = "1";

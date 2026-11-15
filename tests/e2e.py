@@ -1,4 +1,4 @@
-"""End-to-end checks against the M1 'done when' list, in headless Chrome at iPhone size.
+"""End-to-end checks (v1.0 M1 list + v1.1 missions, buy list, plan, comms, PDF library), headless Chrome at iPhone size.
 Usage: python3 tests/e2e.py  (serves ./app on localhost:8765, writes screenshots to tests/shots/)"""
 import json, os, sys, threading, time, functools
 from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
@@ -24,7 +24,12 @@ IPHONE_UA = "Mozilla/5.0 (iPhone; CPU iPhone OS 18_6 like Mac OS X) AppleWebKit/
 with sync_playwright() as p:
     br = p.chromium.launch(executable_path="/usr/bin/google-chrome", headless=True, args=["--no-sandbox"])
     ctx = br.new_context(viewport={"width": 390, "height": 844}, device_scale_factor=2, is_mobile=True, has_touch=True, user_agent=IPHONE_UA, accept_downloads=True)
+    ctx.add_init_script("window.__vall = []; document.addEventListener('securitypolicyviolation', e => window.__vall.push(e.violatedDirective + ' ' + e.blockedURI));")
     page = ctx.new_page()
+    vio_all = []
+    def keep_violations():
+        try: vio_all.extend(page.evaluate('window.__vall || []'))
+        except Exception: pass
     errors, reqs = [], []
     page.on("pageerror", lambda e: errors.append(str(e)))
     page.on("console", lambda m: errors.append(m.text) if m.type == "error" else None)
@@ -87,6 +92,11 @@ with sync_playwright() as p:
     page.wait_for_selector("text=Test Person")
     page.screenshot(path=str(SHOTS / "06_family.png"), full_page=True)
     ok("person saved", page.is_visible("text=Test Person"))
+    page.goto(BASE + "#/family/pet/new"); page.wait_for_selector("form[data-form=pet]")
+    page.fill("[name=name]", "Temp Pet"); page.click("button[type=submit]"); page.wait_for_selector("text=Temp Pet")
+    page.click("text=Temp Pet"); page.wait_for_selector("[data-act=del]")
+    page.click("[data-act=del]"); page.click("[data-act=del]"); page.wait_for_timeout(300)
+    ok("delete removes the record and returns to the list", page.url.endswith("#/family") and not page.is_visible("text=Temp Pet"), page.url)
 
     # 7. supplies: add from preset, log use
     page.goto(BASE + "#/supplies/edit/new?cat=water"); page.wait_for_selector("form[data-form=item]")
@@ -105,10 +115,51 @@ with sync_playwright() as p:
     page.screenshot(path=str(SHOTS / "08_night.png"))
     page.click("[data-act=night]")
 
+
+    # 8b. v1.1: missions, buy list, plan, comms (with the example household loaded)
+    page.goto(BASE + "#/status"); page.wait_for_selector("[data-task]")
+    first = page.get_attribute("[data-task] >> nth=0", "data-task")
+    page.click(f"[data-task='{first}']"); page.wait_for_timeout(250)
+    page.reload(); page.wait_for_selector("body[data-ready]")
+    ok("mission tick on Status persists", page.evaluate(f"__HAVYN.state.tasks.some(t => t.id === '{first}' && t.done)"))
+    ok("Status shows mission progress", "1 of 25 done" in page.inner_text(".ph .rt"), page.inner_text(".ph .rt"))
+    page.goto(BASE + "#/missions"); page.wait_for_selector("form[data-form=task]")
+    page.fill("form[data-form=task] [name=t]", "Test mission"); page.select_option("form[data-form=task] [name=phase]", "bf"); page.click("form[data-form=task] button[type=submit]")
+    page.wait_for_timeout(250)
+    ok("custom mission added to its phase", page.evaluate("__HAVYN.state.tasks.some(t => t.custom && t.t === 'Test mission' && t.phase === 'bf')"))
+    page.click("[data-act=up-done][data-id=r-month]"); page.wait_for_timeout(200)
+    ok("upkeep marked done shows OK", page.locator(".up").nth(0).locator(".chip.ok").count() == 1)
+    page.screenshot(path=str(SHOTS / "11_missions.png"), full_page=True)
+    tot = page.evaluate("(() => { const b = __HAVYN.E.buyPlan(__HAVYN.state, __HAVYN.C.buy.items); return [b.hh.P, b.hh.pets, b.rows.find(r => r.item.id === 'drum').qty]; })()")
+    ok("buy list sizes itself to the household (5 people + dog)", tot == [5, 1, 3], tot)
+    page.goto(BASE + "#/buy?f=floor"); page.wait_for_selector(".li")
+    ok("safety floor: 7 items, $564", page.locator(".list .li").count() == 7 and "$564" in page.inner_text(".hero"), page.inner_text(".hero")[:60])
+    page.goto(BASE + "#/buy/drum"); page.wait_for_selector("[data-act=buy-status]")
+    page.click("[data-act=buy-status][data-v=have]"); page.wait_for_selector("[data-act=buy-add]")
+    page.click("[data-act=buy-add]"); page.wait_for_selector("form[data-form=item]")
+    pre = [page.input_value("[name=name]"), page.input_value("[name=qty]"), page.input_value("[name=per]")]
+    ok("Add to Supplies prefills the item form", pre == ["55-gal drum", "3", "55"], pre)
+    page.click("button[type=submit]"); page.wait_for_selector("[data-act=use]")
+    linked = page.evaluate("(() => { const b = __HAVYN.state.buys.find(x => x.id === 'drum'); const i = b && __HAVYN.state.items.find(x => x.id === b.itemId); return !!(i && i.per_unit.gal === 55 && i.qty === 3 && b.status === 'have'); })()")
+    ok("bought item lands in Supplies and stays linked", linked)
+    page.goto(BASE + "#/buy"); page.wait_for_selector(".hero")
+    page.screenshot(path=str(SHOTS / "12_buylist.png"))
+    page.goto(BASE + "#/plan"); page.wait_for_selector(".step")
+    ok("plan shows live floor and tier figures", "$564 minimum" in page.inner_text("body"))
+    page.screenshot(path=str(SHOTS / "13_plan.png"), full_page=True)
+    page.goto(BASE + "#/comms"); page.wait_for_selector("a[href^='sms:']")
+    sms = page.get_attribute("a.btn[href^='sms:5']", "href")
+    ok("comms: one-tap OK text to the out-of-area contact", sms.startswith("sms:5550100&body=OK"), sms)
+    ok("comms: text-911 and call-911", page.locator("a[href='sms:911']").count() == 1 and page.locator("a[href='tel:911']").count() >= 1)
+    page.screenshot(path=str(SHOTS / "14_comms.png"), full_page=True)
+    page.goto(BASE + "#/guides"); page.wait_for_selector(".li")
+    ok("Guides tab is highlighted for guides pages", page.get_attribute("a.tab[data-tab=guides]", "class").endswith("on"))
+    keep_violations()
+
     # 9. Memory Card round trip: save -> erase -> load -> identical
     page.goto(BASE + "#/system"); page.wait_for_selector("[data-act=mc-save]")
     page.screenshot(path=str(SHOTS / "09_system.png"), full_page=True)
-    original = page.evaluate("JSON.stringify({people: __HAVYN.state.people, pets: __HAVYN.state.pets, items: __HAVYN.state.items, log: __HAVYN.state.log, plan: __HAVYN.state.plan, settings: __HAVYN.state.settings, checks: __HAVYN.state.checks})")
+    original = page.evaluate("JSON.stringify({people: __HAVYN.state.people, pets: __HAVYN.state.pets, items: __HAVYN.state.items, log: __HAVYN.state.log, plan: __HAVYN.state.plan, settings: __HAVYN.state.settings, checks: __HAVYN.state.checks, tasks: __HAVYN.state.tasks, buys: __HAVYN.state.buys})")
     page.click("[data-act=mc-save]"); page.wait_for_selector("#mcsend:not(.hide)")
     with page.expect_download() as dl: page.click("[data-act=mc-download]")
     card_path = SHOTS / "memorycard.json"; dl.value.save_as(str(card_path))
@@ -119,13 +170,39 @@ with sync_playwright() as p:
     page.goto(BASE + "#/system"); page.wait_for_selector("#mcfile", state="attached")
     page.set_input_files("#mcfile", str(card_path)); page.wait_for_selector("[data-act=mc-merge]")
     page.click("[data-act=mc-merge]"); page.wait_for_timeout(300)
-    restored = page.evaluate("JSON.stringify({people: __HAVYN.state.people, pets: __HAVYN.state.pets, items: __HAVYN.state.items, log: __HAVYN.state.log, plan: __HAVYN.state.plan, settings: __HAVYN.state.settings, checks: __HAVYN.state.checks})")
+    restored = page.evaluate("JSON.stringify({people: __HAVYN.state.people, pets: __HAVYN.state.pets, items: __HAVYN.state.items, log: __HAVYN.state.log, plan: __HAVYN.state.plan, settings: __HAVYN.state.settings, checks: __HAVYN.state.checks, tasks: __HAVYN.state.tasks, buys: __HAVYN.state.buys})")
     norm = lambda s: {k: (sorted(v, key=lambda r: r["id"]) if isinstance(v, list) else v) for k, v in json.loads(s).items()}
     ok("memory card round trip has zero data loss", norm(original) == norm(restored))
     # merge keeps the newer local edit
     page.evaluate("""(() => { const i = __HAVYN.state.items.find(x => !x.deleted); i.qty = 999; i.updated = Date.now() + 60000; })()""")
     page.set_input_files("#mcfile", str(card_path)); page.wait_for_selector("[data-act=mc-merge]"); page.click("[data-act=mc-merge]"); page.wait_for_timeout(300)
     ok("merge keeps the newest edit", page.evaluate("__HAVYN.state.items.some(x => x.qty === 999)"))
+
+
+    # 9b. v1.1: PDF library (after the erase, which also clears PDFs)
+    page.goto(BASE + "#/library"); page.wait_for_selector("#pdffile", state="attached")
+    page.set_input_files("#pdffile", str(ROOT / "tests" / "fixtures" / "havyn-test.pdf"))
+    page.wait_for_selector("a.li[href^='#/library/']")
+    ok("PDF imported into the library", page.locator("a.li[href^='#/library/']").count() == 1)
+    page.click("a.li[href^='#/library/']"); page.wait_for_selector(".pg canvas", timeout=15000)
+    ok("reader renders pages", page.inner_text("#pgnum").strip() == "1 / 4" and page.locator(".pg canvas").count() >= 2, page.inner_text("#pgnum"))
+    page.screenshot(path=str(SHOTS / "15_reader.png"))
+    page.click("[data-act=pdf-toc]"); page.wait_for_selector(".toc button")
+    ok("reader: table of contents", page.locator(".toc button").all_inner_texts() == ["Water storage", "Dehydration and heat", "Power station care", "Radio channels"])
+    page.click("[data-act=pdf-find]"); page.fill("#pdfpanel [name=q]", "dehydration"); page.click("#pdfpanel button[type=submit]")
+    page.wait_for_selector("#findres .toc button")
+    hits = page.locator("#findres .toc button").all_inner_texts()
+    ok("reader: find text", len(hits) == 1 and hits[0].startswith("p. 2"), hits)
+    page.fill("form[data-form=pdfgo] [name=p]", "4"); page.click("form[data-form=pdfgo] button[type=submit]"); page.wait_for_timeout(1200)
+    ok("reader: go to page", page.inner_text("#pgnum").strip() == "4 / 4", page.inner_text("#pgnum"))
+    page.goto(BASE + "#/library"); page.wait_for_selector("a.li[href^='#/library/']")
+    page.click("a.li[href^='#/library/']"); page.wait_for_selector(".pg canvas", timeout=15000); page.wait_for_timeout(600)
+    ok("reader resumes where you left off", page.inner_text("#pgnum").strip() == "4 / 4", page.inner_text("#pgnum"))
+    page.click("[data-act=night]") if page.locator("[data-act=night]").count() else None
+    page.evaluate("__HAVYN.prefs.theme = 'night'"); page.goto(BASE + "#/status"); page.go_back(); page.wait_for_selector(".pg canvas", timeout=15000); page.wait_for_timeout(500)
+    page.screenshot(path=str(SHOTS / "16_reader_night.png"))
+    page.evaluate("__HAVYN.prefs.theme = 'void'")
+    keep_violations()
 
     # 10. offline: reload with the network off
     ctx.set_offline(True)
@@ -134,6 +211,10 @@ with sync_playwright() as p:
     page.click("a.tab.sos"); page.click('a.emtile[href="#/emergency/bleeding"]')
     page.wait_for_selector(".emstep", timeout=5000)
     ok("emergency card offline", page.is_visible(".emstep"))
+    page.goto(BASE + "#/library"); page.wait_for_selector("a.li[href^='#/library/']", timeout=8000)
+    page.click("a.li[href^='#/library/']"); page.wait_for_selector(".pg canvas", timeout=15000)
+    ok("PDF reader works offline (pdf.js from the offline copy)", page.locator(".pg canvas").count() >= 1)
+    keep_violations()
     page.screenshot(path=str(SHOTS / "10_offline_bleeding.png"))
     ctx.set_offline(False)
 
@@ -150,6 +231,7 @@ with sync_playwright() as p:
     ok("CSP blocks fetch (external + same-origin) and external images", all(b.startswith("blocked") for b in blocked) and not external and any("img-src" in v for v in viol), f"{blocked}; violations={viol}")
     ext_all = sorted({u for u in reqs if not (u.startswith(BASE) or u.startswith("data:") or u.startswith("blob:"))})
     ok("no external requests during the whole session", not ext_all, ext_all)
+    ok("no CSP violations in normal use (incl. pdf.js)", not vio_all, vio_all[:5])
     ok("no script errors", not [e for e in errors if "Content Security Policy" not in e and "net::ERR" not in e and "Failed to fetch" not in e], errors[:5])
     br.close()
 srv.shutdown()

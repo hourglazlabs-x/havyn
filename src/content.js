@@ -258,10 +258,183 @@ const HAVYN_CONTENT = {
       ],
       sources: ["cdcillness", "cdcoa", "cdckc", "cdcab", "cpsc"]
     },
-    { id: "storm", title: "Monsoon and dust storm", sub: "Coming in v1.1", icon: "wind", soon: true },
-    { id: "smoke", title: "Wildfire smoke or evacuation", sub: "Coming in v1.1", icon: "flame", soon: true },
-    { id: "boil", title: "Boil-water notice", sub: "Coming in v1.1", icon: "drop", soon: true }
+    { id: "storm", title: "Monsoon and dust storm", sub: "Coming next", icon: "wind", soon: true },
+    { id: "smoke", title: "Wildfire smoke or evacuation", sub: "Coming next", icon: "flame", soon: true },
+    { id: "boil", title: "Boil-water notice", sub: "Coming next", icon: "drop", soon: true }
   ],
+
+  // ---------------- v1.1: missions (from the mission map) ----------------
+  missions: {
+    phases: [
+      { id: "today", label: "Today", when: "Nov 14 · $0", gate: "Airplane-mode test passes", gateD: "Every phone in airplane mode opens HAVYN, an emergency card, WikiMed and a map.", tasks: [
+        { id: "m-downloads", t: "Start the big downloads on Wi-Fi", d: "Kiwix with WikiMed, plus offline maps. Leave the phones plugged in; it takes hours." },
+        { id: "m-plan", t: "Family plan: out-of-area contact and 3 meeting places", go: "#/family/plan" },
+        { id: "m-medid", t: "Medical ID on every phone", d: "Health app → your picture → Medical ID → Edit. Turn on Show When Locked and add emergency contacts." },
+        { id: "m-sat", t: "Satellite demo outside (iPhone 14 and newer)", d: "Settings → Emergency SOS → Try Demo, under open sky." },
+        { id: "m-planpdf", t: "Plan PDF on every phone; print 2 copies", d: "Import it into the Library so it opens inside HAVYN.", go: "#/library" }
+      ] },
+      { id: "week", label: "This week", when: "by Nov 21", gate: "HAVYN on every phone, safety floor ordered", tasks: [
+        { id: "m-install", t: "Install HAVYN on every phone", d: "Safari → Share → Add to Home Screen, then open it once while online." },
+        { id: "m-enter", t: "Enter family and supplies; save a Memory Card", go: "#/family" },
+        { id: "m-household", t: "Add every person and pet so the buy list sizes itself", d: "Note any powered medical device or refrigerated medicine on that person's page.", go: "#/buy" },
+        { id: "m-floor", t: "Order the safety floor (about $565)", d: "Two water drums, a filter and bleach, three CO alarms, two power banks, the weather radio, one genuine tourniquet.", go: "#/buy?f=floor" },
+        { id: "m-review", t: "EMT or nurse reviews the 10 cards", d: "Their sign-off replaces \"Awaiting EMT or nurse review\".", go: "#/emergency" }
+      ] },
+      { id: "bf", label: "Black Friday", when: "Nov 27–30", gate: "Power, radios and drives ordered", tasks: [
+        { id: "m-power", t: "1 kWh LiFePO4 power station + 200 W solar", go: "#/buy?f=bf" },
+        { id: "m-mesh", t: "Meshtastic radios (T1000-E)", go: "#/buy?f=bf" },
+        { id: "m-gmrs", t: "GMRS radios + $35 license", d: "Apply online with the FCC. No exam; the holder must be 18 or older.", go: "#/buy?f=bf" },
+        { id: "m-vault", t: "Vault drives: 1 TB SSD + 2 TB HDD", go: "#/buy?f=bf" }
+      ] },
+      { id: "dec", label: "December", when: "", gate: "Anyone finds any card in under 10 seconds", tasks: [
+        { id: "m-library", t: "Load manuals and guides into the Library", d: "Power station and radio manuals, the plan PDF, a first-aid book.", go: "#/library" },
+        { id: "m-binder", t: "Print the binder", d: "The plan, contacts, medical list and cards, in sheet protectors." },
+        { id: "m-class", t: "CPR + Stop the Bleed class" },
+        { id: "m-drill", t: "First lights-out drill", d: "Two hours with phones in airplane mode: everyone finds three cards, the radios and the rally point." }
+      ] },
+      { id: "jan", label: "January–February", when: "hub + vault", gate: "Every phone browses the hub offline", tasks: [
+        { id: "m-hub", t: "Hub: Raspberry Pi 5 or an old laptop running Kiwix" },
+        { id: "m-vaultsync", t: "Vault: two drives, synced, with checksums" },
+        { id: "m-tier3", t: "Tier 3: 2 kWh station, extinguishers, camp stove", go: "#/buy?f=d90" }
+      ] },
+      { id: "may", label: "Before May", when: "heat season", gate: "Drill run, destination confirmed", tasks: [
+        { id: "m-dest", t: "Confirm where you'd go if heat forces you out", go: "#/family/plan" },
+        { id: "m-cool", t: "Window covers, battery fans, car AC service" },
+        { id: "m-heatdrill", t: "Heat drill: run the leave-now rule", go: "#/playbooks/heat" },
+        { id: "m-ai", t: "Optional: AI librarian on the hub" }
+      ] }
+    ],
+    // Upkeep from the plan's maintenance schedule. every = days, or "spring" (due from March 1 each year).
+    recurring: [
+      { id: "r-month", t: "Monthly check", time: "15 min", every: 30, d: "Top up and test the power station and power banks. Press-test the CO alarms. Open HAVYN on every phone and clear the expiry list." },
+      { id: "r-quarter", t: "Quarterly drill", time: "1–2 h", every: 91, d: "Two hours of lights out: airplane mode, everyone finds three cards, the radios and the rally point. Sync both vault drives and verify checksums. Check for newer archive versions." },
+      { id: "r-spring", t: "Spring, before the heat", time: "2 h", every: "spring", d: "Confirm the evacuation destination. Service the car's AC. Switch to heat mode (2 gal per person a day) and close the gap. Check window covers and battery fans." },
+      { id: "r-year", t: "Yearly review", time: "Half a day", every: 365, d: "Update the plan, contacts and medical details. Replace stored bleach and alarm batteries. Reprint the binder. Book CPR and bleeding-control refreshers." }
+    ]
+  },
+
+  // ---------------- v1.1: buy list (from the Blackout Prep Buy List, Nov 14 2026) ----------------
+  // q: a number, null (no fixed quantity), or a rule sized from the household:
+  //   drum = 14 days at 2 gal per person a day (+ pets) in 55-gal drums · brick = 3 days at 1 gal per person in 3.5-gal bricks
+  //   P = one per person · P+1 = one per person plus a base · P/2 = pairs · AT = each teen and adult
+  // floor = quantity in the "first $565" safety floor. add = how a bought item enters Supplies.
+  buy: {
+    checked: "2026-11-14",
+    dates: [{ n: "Black Friday", d: "2026-11-27" }, { n: "Cyber Monday", d: "2026-11-30" }],
+    tiers: [
+      { id: "week", label: "This week" }, { id: "bf", label: "Black Friday" },
+      { id: "d90", label: "Next 90 days" }, { id: "opt", label: "Optional" }
+    ],
+    rules: [
+      "Check price history (Keepa or camelcamelcamel) and buy at or near the 90-day low. Ignore inflated \"was\" prices.",
+      "Never buy safety gear on price. Tourniquets and trauma supplies only from the maker or an authorized dealer.",
+      "Power stations: LiFePO4, a major brand, solar and car charging, and a warranty you can actually use.",
+      "Storage is expensive in 2026. Buy the capacity this plan needs: hard drive at home, SSD in the go-bag.",
+      "Rows are in buying order. Quantities follow the people and pets on the Family screen."
+    ],
+    items: [
+      { id: "drum", tier: "week", n: "Water storage, home", pick: "55-gal BPA-free drum kit with pump (Augason Farms or WaterPrepared)", q: "drum", price: 120, target: 100, floor: 2, why: "14 days at heat-mode 2 gal per person per day. Keep indoors, out of the sun.", u: "https://www.amazon.com/s?k=55+gallon+water+storage+barrel+kit+pump", note: "Estimate", add: { cat: "water", per: 55, name: "55-gal drum" } },
+      { id: "brick", tier: "week", n: "Water storage, portable", pick: "WaterBrick 3.5 gal stackable (or Reliance Aqua-Tainer 7 gal)", q: "brick", price: 21, target: 19, why: "3 days on the move at 1 gal per person per day; fits in a car.", u: "https://www.amazon.com/s?k=WaterBrick+3.5+gallon", note: "Walmart: about $19–21 each in 6–10 packs, Nov 2026", add: { cat: "water", per: 3.5, name: "WaterBrick 3.5 gal" } },
+      { id: "filter", tier: "week", n: "Water filter", pick: "Sawyer Squeeze SP129", q: 2, price: 31, target: 30, floor: 1, why: "Removes bacteria and protozoa, not viruses, chemicals or salt. Pair with bleach or tablets; pool water is for flushing only.", u: "https://www.amazon.com/s?k=Sawyer+Squeeze+SP129", note: "Amazon deal $31 (Oct 2026); list $45.99", add: { cat: "gear", name: "Sawyer Squeeze filter" } },
+      { id: "bleach", tier: "week", n: "Water disinfection", pick: "Unscented household bleach + Katadyn Micropur MP1 tablets", q: 1, price: 20, target: 15, floor: 1, why: "Kills viruses. Check the bleach strength on the label; replace yearly.", u: "https://www.amazon.com/s?k=Katadyn+Micropur+MP1", note: "Estimate", add: { cat: "gear", name: "Bleach + Micropur tablets" } },
+      { id: "waterbob", tier: "week", n: "Bathtub water bladder", pick: "waterBOB 100 gal", q: 1, price: 35, target: 30, why: "Fill it when an outage is forecast; for flushing and washing.", u: "https://www.amazon.com/s?k=waterBOB+bathtub", note: "Estimate", add: { cat: "gear", name: "waterBOB (fill before an outage)" } },
+      { id: "co", tier: "week", n: "CO alarms, battery", pick: "First Alert CO250B or Kidde 9CO5-LP3", q: 3, price: 25, target: 23, floor: 3, why: "One near each sleeping area. Generators and grills kill quietly.", u: "https://www.amazon.com/s?k=battery+carbon+monoxide+alarm", note: "Walmart $23–29, Nov 2026", add: { cat: "gear", name: "CO alarm (battery)" } },
+      { id: "bank", tier: "week", n: "Power banks", pick: "20,000 mAh USB-C PD (Anker or similar)", q: "P", price: 45, target: 35, floor: 2, why: "About 3–4 phone charges each.", u: "https://www.amazon.com/s?k=20000mAh+power+bank+USB-C+PD", note: "Estimate", add: { cat: "power", per: 74, name: "Power bank 20,000 mAh" } },
+      { id: "headlamp", tier: "week", n: "Headlamps", pick: "Rechargeable, with AAA backup", q: "P", price: 30, target: 25, why: "Hands-free light; no candles.", u: "https://www.amazon.com/s?k=rechargeable+headlamp", note: "Estimate", add: { cat: "gear", name: "Headlamp" } },
+      { id: "lantern", tier: "week", n: "Lanterns", pick: "Rechargeable or solar LED", q: 2, price: 30, target: 25, why: "Room light without fire risk.", u: "https://www.amazon.com/s?k=rechargeable+LED+lantern", note: "Estimate", add: { cat: "gear", name: "LED lantern" } },
+      { id: "batt", tier: "week", n: "Batteries (packs)", pick: "AA and AAA lithium, long shelf life", q: 2, price: 20, target: 16, why: "Radios, lights, alarms.", u: "https://www.amazon.com/s?k=Energizer+Ultimate+Lithium+AA", note: "Estimate", add: { cat: "gear", name: "Lithium AA/AAA packs" } },
+      { id: "radio", tier: "week", n: "Weather radio", pick: "Midland ER310 (crank, solar, AA; NOAA alerts)", q: 1, price: 75, target: 45, floor: 1, why: "News and alerts with no network.", u: "https://www.amazon.com/s?k=Midland+ER310", note: "REI $80, Sportsman's $69.99; Amazon hit $25.63 in Sep 2026", add: { cat: "gear", name: "Weather radio (Midland ER310)" } },
+      { id: "tq", tier: "week", n: "Tourniquets", pick: "CAT Gen 7, genuine only", q: 3, price: 33, target: 30, floor: 1, why: "Severe bleeding. Under $20 is a red flag for a fake: buy from the maker or an authorized dealer.", u: "https://www.narescue.com/", uName: "North American Rescue", note: "Genuine $25–39 (Tactical Medical Solutions)", add: { cat: "gear", name: "Tourniquet (CAT Gen 7)" } },
+      { id: "bleedkit", tier: "week", n: "Bleeding-control kit", pick: "Hemostatic gauze, compression bandage, chest seal, shears, gloves", q: 1, price: 70, target: 60, why: "Pairs with the tourniquets. Same counterfeit rule applies.", u: "https://www.narescue.com/", uName: "North American Rescue", note: "Estimate", add: { cat: "gear", name: "Bleeding-control kit" } },
+      { id: "firstaid", tier: "week", n: "First aid kit", pick: "Family-size kit + digital thermometer + pulse oximeter", q: 1, price: 60, target: 50, why: "Everyday injuries and fevers.", u: "https://www.amazon.com/s?k=family+first+aid+kit", note: "Estimate", add: { cat: "gear", name: "First aid kit" } },
+      { id: "ors", tier: "week", n: "Oral rehydration salts", pick: "WHO-formula ORS packets", q: 30, price: 1, target: 0.8, why: "Heat illness and diarrhea.", u: "https://www.amazon.com/s?k=oral+rehydration+salts+WHO+formula", note: "Estimate", add: { cat: "gear", name: "ORS packets" } },
+      { id: "opener", tier: "week", n: "Manual can openers", pick: "Heavy-duty", q: 2, price: 12, target: 10, why: "The classic failure point.", u: "https://www.amazon.com/s?k=manual+can+opener+heavy+duty", note: "Estimate", add: { cat: "gear", name: "Manual can opener" } },
+      { id: "food", tier: "week", n: "Food, 2 weeks (per person)", pick: "Shelf-stable food you already eat, about 28,000 kcal per person", q: "P", price: 70, target: 70, why: "Rotate into normal meals and replace as you use it.", note: "Estimate", add: { cat: "food", per: 28000, name: "Shelf-stable food, 2 weeks per person" } },
+      { id: "sanit", tier: "week", n: "Sanitation kit", pick: "5-gal bucket + toilet seat lid + heavy bags + cat litter", q: 1, price: 45, target: 40, why: "A toilet when water or sewer fails.", u: "https://www.amazon.com/s?k=5+gallon+bucket+toilet+seat+lid", note: "Estimate", add: { cat: "gear", name: "Sanitation kit" } },
+      { id: "n95", tier: "week", n: "N95 masks", pick: "NIOSH-approved, box of 20", q: 1, price: 20, target: 15, why: "Dust storms and wildfire smoke.", u: "https://www.amazon.com/s?k=NIOSH+N95+mask+20+pack", note: "Estimate", add: { cat: "gear", name: "N95 masks (box of 20)" } },
+      { id: "cool", tier: "week", n: "Cooling kit", pick: "Battery fans + cooling towels + spray bottles + reflective window covers + instant cold packs", q: 1, price: 80, target: 60, why: "Heat without AC. Above 90°F indoors a dry fan can raise body temperature; wet skin plus moving air helps.", u: "https://www.amazon.com/s?k=battery+operated+fan", note: "Estimate", add: { cat: "gear", name: "Cooling kit" } },
+      { id: "binder", tier: "week", n: "Printed binder", pick: "Binder, sheet protectors, waterproof pouches", q: 1, price: 25, target: 20, why: "The paper layer.", note: "Estimate", add: { cat: "gear", name: "Printed binder" } },
+      { id: "cash", tier: "week", n: "Cash", pick: "Small bills; amount is your call", q: null, price: null, why: "Card readers and ATMs fail with the grid." },
+      { id: "station", tier: "bf", n: "Power station, about 1 kWh", pick: "LiFePO4: EcoFlow DELTA 3 Classic or Anker SOLIX C1000", q: 1, price: 480, target: 450, why: "Phones, lights, radios, a fan, the hub.", u: "https://www.amazon.com/s?k=EcoFlow+DELTA+3+Classic", note: "EcoFlow $462 (early Black Friday); Anker $499.99 (Oct 27, 2026)", add: { cat: "power", per: 1024, name: "1 kWh power station" } },
+      { id: "solar", tier: "bf", n: "Solar panel, 200 W", pick: "Renogy 200W, Anker SOLIX PS200 or EcoFlow 220W", q: 1, price: 220, target: 200, why: "Refills the station most days in Phoenix.", u: "https://www.amazon.com/s?k=200W+portable+solar+panel", note: "Renogy about $200, Anker about $299 (2026 guides)", add: { solarW: 200 } },
+      { id: "mesh", tier: "bf", n: "Meshtastic radios", pick: "SenseCAP T1000-E, one per person + one base", q: "P+1", price: 45, target: 40, why: "Family texting with no cell towers.", u: "https://www.amazon.com/s?k=SenseCAP+T1000-E+Meshtastic", note: "About $40–50 at US retailers (Maker Shed $42.99)", add: { cat: "gear", name: "Meshtastic radio (T1000-E)" } },
+      { id: "gmrs", tier: "bf", n: "GMRS radios (pairs)", pick: "Midland GXT1000VP4", q: "P/2", price: 95, target: 85, why: "Voice backup when phones are dead or lost.", u: "https://www.amazon.com/s?k=Midland+GXT1000VP4", note: "REI $90; Ace $99.99 (2026)", add: { cat: "gear", name: "GMRS radio pair" } },
+      { id: "gmrslic", tier: "bf", n: "GMRS license", pick: "FCC, 10 years, covers immediate family", q: 1, price: 35, target: 35, why: "Required to transmit on GMRS. No exam; the holder must be 18 or older. Apply online with the FCC.", note: "FCC fee $35" },
+      { id: "ssd", tier: "bf", n: "Vault drive, go-bag", pick: "1 TB rugged USB-C SSD (Samsung T7 Shield or similar)", q: 1, price: 150, target: 130, why: "Shock-proof copy that travels.", u: "https://www.amazon.com/s?k=Samsung+T7+Shield+1TB", note: "2026 prices volatile: $130–288 seen", add: { cat: "gear", name: "Vault SSD 1 TB" } },
+      { id: "hdd", tier: "bf", n: "Vault drive, home", pick: "2 TB portable hard drive (WD or Toshiba)", q: 1, price: 90, target: 75, why: "Cheap home copy of the full library.", u: "https://www.amazon.com/s?k=2TB+portable+hard+drive", note: "Walmart: Toshiba $74, WD $105 (Nov 2026)", add: { cat: "gear", name: "Vault HDD 2 TB" } },
+      { id: "adapter", tier: "bf", n: "Lightning to USB 3 adapter", pick: "Apple camera adapter, only for iPhones before 15", q: 1, price: 39, target: 29, why: "Opens the vault drive on older iPhones.", u: "https://www.amazon.com/s?k=Apple+Lightning+to+USB+3+Camera+Adapter", note: "Estimate", add: { cat: "gear", name: "Lightning to USB 3 adapter" } },
+      { id: "carchg", tier: "bf", n: "Car chargers", pick: "USB-C PD, 12 V", q: 2, price: 20, target: 15, why: "The car as a phone charger.", u: "https://www.amazon.com/s?k=USB-C+PD+car+charger", note: "Estimate", add: { cat: "gear", name: "USB-C car charger" } },
+      { id: "hub", tier: "d90", n: "Hub computer", pick: "Raspberry Pi 5 4GB + power supply + case + SSD (or an old laptop for $0)", q: 1, price: 260, target: 200, why: "Serves the full library over its own Wi-Fi.", u: "https://www.amazon.com/s?k=Raspberry+Pi+5+4GB", note: "Pi 5 4GB $110 (Oct 2026); rest estimate", add: { cat: "gear", name: "Library hub" } },
+      { id: "station2", tier: "d90", n: "Power station, about 2 kWh", pick: "Anker SOLIX S2000 or similar", q: 1, price: 700, target: 650, why: "Longer runtime; powers medical devices.", u: "https://www.amazon.com/s?k=Anker+SOLIX+S2000", note: "$699.99 on sale, Oct 2026", add: { cat: "power", per: 2010, name: "2 kWh power station" } },
+      { id: "ext", tier: "d90", n: "Fire extinguishers", pick: "ABC, 5 lb", q: 2, price: 50, target: 40, why: "Kitchen and garage.", u: "https://www.amazon.com/s?k=ABC+fire+extinguisher+5+lb", note: "Estimate", add: { cat: "gear", name: "Fire extinguisher (ABC, 5 lb)" } },
+      { id: "stove", tier: "d90", n: "Camp stove + fuel", pick: "Butane single burner + 8 canisters", q: 1, price: 60, target: 50, why: "Cooking without power. Outdoors only.", u: "https://www.amazon.com/s?k=butane+camp+stove", note: "Estimate", add: { cat: "gear", name: "Camp stove + butane" } },
+      { id: "training", tier: "d90", n: "Training (per person)", pick: "CPR/AED/First Aid course for each adult and teen (Red Cross or AHA)", q: "AT", price: 100, target: 80, why: "Skills live in people, not apps.", note: "Estimate; varies by provider" },
+      { id: "rx", tier: "d90", n: "Prescription buffer", pick: "30 extra days of daily meds (ask your doctor and insurer)", q: null, price: null, why: "Pharmacies close or run short.", add: { cat: "meds", name: "Prescription buffer" } },
+      { id: "pouch", tier: "d90", n: "Document pouch", pick: "Fireproof, waterproof", q: 1, price: 30, target: 25, why: "Originals of IDs, deeds and insurance.", u: "https://www.amazon.com/s?k=fireproof+document+bag", note: "Estimate", add: { cat: "gear", name: "Document pouch" } },
+      { id: "ereader", tier: "opt", n: "E-ink reader", pick: "Kindle Paperwhite or Kobo", q: 1, price: 150, target: 120, why: "Weeks of reading on one charge.", u: "https://www.amazon.com/s?k=Kindle+Paperwhite", note: "Estimate", add: { cat: "gear", name: "E-ink reader" } },
+      { id: "faraday", tier: "opt", n: "Faraday bag", pick: "For a spare phone and the go-bag SSD", q: 1, price: 30, target: 25, why: "Cheap insurance against rare events.", u: "https://www.amazon.com/s?k=faraday+bag+phone", note: "Estimate", add: { cat: "gear", name: "Faraday bag" } },
+      { id: "gen", tier: "opt", n: "Inverter generator", pick: "2–3 kW with automatic CO shutoff", q: 1, price: 900, target: 750, why: "Fridge, freezer, window AC. Outdoors, 20 ft from openings.", u: "https://www.amazon.com/s?k=inverter+generator+CO+shutoff", note: "Estimate", add: { cat: "gear", name: "Inverter generator" } },
+      { id: "minipc", tier: "opt", n: "Mini PC for local AI", pick: "Ryzen 7, 32 GB RAM, 1 TB SSD", q: 1, price: 800, target: 650, why: "Runs the AI librarian on the hub.", note: "Estimate; memory prices up in 2026", add: { cat: "gear", name: "Mini PC" } },
+      { id: "spare", tier: "opt", n: "Spare library phone", pick: "Older iPhone loaded with the full offline pack", q: 1, price: 150, target: 100, why: "Backup device, kept charged.", note: "Estimate", add: { cat: "gear", name: "Spare library phone" } }
+    ]
+  },
+
+  // ---------------- v1.1: the plan (family-facing parts of the Offline Survival Plan) ----------------
+  plan: {
+    line: "Free setup today, gear this month, drilled by May.",
+    stages: [
+      { id: "today", t: "Today, $0, 2–3 hours", d: "Set up every iPhone (Medical ID, satellite demo), install the offline apps and archives, save the free manuals, print the family plan. Every phone is useful offline tonight." },
+      { id: "week", t: "This week", d: "14 days of water at heat-mode rates, a filter and bleach, CO alarms, power banks, a weather radio, genuine tourniquets." },
+      { id: "bf", t: "Black Friday, Nov 27–30", d: "A 1 kWh LiFePO4 power station, a 200 W solar panel, Meshtastic mesh radios, GMRS radios, vault drives." },
+      { id: "then", t: "Then", d: "A home hub serving the whole library over its own Wi-Fi, two vault drives, an AI librarian, the family mesh." }
+    ],
+    power: [
+      { n: "Power bank, one per person", cap: "20,000 mAh, about 74 Wh: roughly 3–4 iPhone charges (estimate)", runs: "A phone for several days on Low Power Mode" },
+      { n: "Power station, about 1 kWh, LiFePO4", cap: "About 870 Wh usable", runs: "Phones, lights and radio for about 9 days (about 3 with the hub on), or one 40 W fan for about 20 hours" },
+      { n: "Power station, about 2 kWh", cap: "About 1,700 Wh usable", runs: "Double the above" },
+      { n: "Folding solar, 200–400 W", cap: "About 0.9–1.8 kWh a day at Phoenix's average sun (calculation)", runs: "Refills a 1 kWh station most days" },
+      { n: "The car", cap: "12 V and USB; limited by fuel", runs: "Phone charging; its AC as a cooling refuge, parked outdoors only. Keep the tank at least half full." },
+      { n: "Inverter generator (optional)", cap: "2–3 kW with automatic CO shutoff; limited by fuel", runs: "Fridge, freezer, a window AC. Only with CO alarms and the 20-ft rule." }
+    ],
+    powerRule: "Buy LiFePO4 from a major brand, with solar and car charging and a warranty you can actually use.",
+    heat: [
+      { t: "Decide by trigger, not by feel.", d: "Leave for a powered place (family on another grid, a hotel, a cooler town) when any of these is true: an excessive-heat warning plus an outage expected past 24 hours; anyone in the house who is an infant, over 65 or chronically ill; or any sign of heat exhaustion. Public cooling centers hold only a small share of the city, so arrange your destination ahead.", s: "cdcoa" },
+      { t: "Fans are not protection in serious heat.", d: "CDC: above 90°F indoors, a fan can raise body temperature. A cool shower or bath, or getting to air conditioning, works better. In dry air, wet skin plus moving air helps more than a dry fan.", s: "cdcab" },
+      { t: "Don't expect batteries to run AC.", d: "Estimate: a small window unit draws several hundred watts, so a 1 kWh station runs it for only a couple of hours." },
+      { t: "Cut heat gain.", d: "Reflective covers on east-, west- and south-facing windows; live in the lowest interior room; no oven and no exertion at midday." },
+      { t: "Medical devices first.", d: "If anyone uses a CPAP, oxygen or refrigerated medication, size a dedicated battery for that device and talk to the supplier before summer." }
+    ]
+  },
+
+  // ---------------- v1.1: comms ----------------
+  comms: {
+    ladder: [
+      { rung: "Primary", t: "Cell texts, not calls", when: "Towers up but jammed", range: "Anywhere with signal", d: "Texts need far less network capacity and can wait in line until it frees up.", s: "fcc" },
+      { rung: "Alternate", t: "Messages and Find My via satellite", when: "Towers down, open sky", range: "Outdoors, anywhere", d: "iPhone 14 and newer. Practise the demo before you need it." },
+      { rung: "Contingency", t: "Meshtastic family mesh", when: "No towers and no sky view: indoors, at night", range: "About 2–5 km per hop (estimate); less in town, more from height", d: "A radio per person paired to their phone, plus a base node placed high at home." },
+      { rung: "Emergency", t: "GMRS radios, then the rally point", when: "Phones dead or lost", range: "About 1–3 km handheld (estimate)", d: "Agreed channel; meet at the rally point at the next check-in time." }
+    ],
+    rules: [
+      { t: "One out-of-area contact", d: "Everyone texts them \"OK + location\". Long-distance calls can connect when calls across town won't." },
+      { t: "Check-in windows", d: "Five minutes each, radios off in between to save battery." },
+      { t: "Three rally points", d: "Home, a neighborhood spot and an out-of-area address. Keep them in HAVYN, on paper and in every go-bag." },
+      { t: "Text 911 if you can't call", d: "Maricopa County has taken texts to 911 since 2018: call if you can, text if you can't. Put your address in the first text; no group texts. A bounce-back message means call instead.", s: "text911" },
+      { t: "GMRS license", d: "$35 for 10 years, no exam. The holder must be 18 or older; it covers immediate family of any age. FRS radios need no license but have lower power.", s: "gmrs" },
+      { t: "News in", d: "A hand-crank or battery AM/FM radio with NOAA Weather Radio gets emergency broadcasts with no network at all." },
+      { t: "Bitchat", d: "Free. Install it, but count on it only if neighbors run it too." }
+    ]
+  },
+
+  // ---------------- v1.1: library ----------------
+  library: {
+    note: "PDFs stay on this phone and are not part of Memory Cards. AirDrop the files to each phone and import them there.",
+    suggest: [
+      { t: "The HAVYN plan PDF", d: "The Offline Survival Plan you were sent." },
+      { t: "Manuals for your power station, radios and filter", d: "Download them from each maker's site while you have internet." },
+      { t: "Where There Is No Doctor (Hesperian)", d: "A free download from hesperian.org.", u: "https://hesperian.org/" },
+      { t: "Your own papers", d: "Insurance, prescriptions, copies of IDs. They never leave this phone." }
+    ]
+  },
 
   refs: {
     cdcfood: { n: "CDC: keep food safe after an emergency", u: "https://www.cdc.gov/food-safety/foods/keep-food-safe-after-emergency.html" },
@@ -275,7 +448,9 @@ const HAVYN_CONTENT = {
     cdcoa: { n: "CDC: heat and older adults", u: "https://www.cdc.gov/heat-health/risk-factors/heat-and-older-adults-aged-65.html" },
     cdckc: { n: "CDC: keeping cool in a heat wave", u: "https://www.cdc.gov/natural-disasters/psa-toolkit/keeping-cool-in-a-heat-wave.html" },
     cdcab: { n: "CDC: about heat and your health (fans)", u: "https://www.cdc.gov/heat-health/about/index.html" },
-    cdcillness: { n: "CDC: heat-related illness", u: "https://www.cdc.gov/disasters/extremeheat/pdf/Heat_Related_Illness.pdf" }
+    cdcillness: { n: "CDC: heat-related illness", u: "https://www.cdc.gov/disasters/extremeheat/pdf/Heat_Related_Illness.pdf" },
+    text911: { n: "KTAR: text 911 anywhere in Maricopa County", u: "https://ktar.com/arizona-news/people-in-maricopa-county-can-now-text-911-in-case-of-an-emergency" },
+    gmrs: { n: "Midland: GMRS licensing", u: "https://midlandusa.com/pages/licensing" }
   }
 };
 if (typeof module !== "undefined") module.exports = HAVYN_CONTENT;
