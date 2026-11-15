@@ -64,18 +64,18 @@ def main():
     out = {"voice": a.voice, "speed": a.speed, "model": "hexgrad/Kokoro-82M (Apache-2.0)", "lines": {}}
     made = kept = 0
     for ln in lines:
-        rel = ("c/" if ln["kind"] == "card" else "") + ln["id"] + ".mp3"; mp3 = VDIR / rel
+        rel = {"card": "c/", "sim": "s/"}.get(ln["kind"], "") + ln["id"] + ".mp3"; mp3 = VDIR / rel
         o = old.get(ln["id"])
         if o and o.get("text") == ln["text"] and o.get("file") == rel and mp3.exists() and hashlib.sha256(mp3.read_bytes()).hexdigest() == o.get("sha256"):
             out["lines"][ln["id"]] = o; kept += 1; continue
-        ms = encode(render(pipe, a.voice, a.speed, ln["text"]), tmp / (ln["id"] + ".wav"), mp3, 64 if ln["kind"] == "card" else 96)
+        ms = encode(render(pipe, a.voice, a.speed, ln["text"]), tmp / (ln["id"] + ".wav"), mp3, 96 if ln["kind"] == "ui" else 64)
         b = mp3.read_bytes()
         if len(b) < 2000 or ms < 400: raise SystemExit("%s came out empty (%d bytes, %d ms)" % (ln["id"], len(b), ms))
         out["lines"][ln["id"]] = {"text": ln["text"], "file": rel, "bytes": len(b), "sha256": hashlib.sha256(b).hexdigest(), "ms": ms}
         made += 1
         print("%-18s %6d ms %7d bytes  %s" % (ln["id"], ms, len(b), ln["text"][:80]))
     keep = {v["file"] for v in out["lines"].values()}
-    for f in list(VDIR.glob("*.mp3")) + list((VDIR / "c").glob("*.mp3")):
+    for f in list(VDIR.glob("*.mp3")) + list((VDIR / "c").glob("*.mp3")) + list((VDIR / "s").glob("*.mp3")):
         if str(f.relative_to(VDIR)) not in keep: f.unlink()
     print("made %d, kept %d, total %.1f MB" % (made, kept, sum(v["bytes"] for v in out["lines"].values()) / 1e6))
     (VDIR / "manifest.json").write_text(json.dumps(out, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")

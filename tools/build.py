@@ -6,13 +6,13 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 SRC, APP, PREV = ROOT / "src", ROOT / "app", ROOT / "preview"
-APP_VERSION = "1.7.0"
+APP_VERSION = "1.8.0"
 
 def read(p): return (SRC / p).read_text(encoding="utf-8")
 
 def build():
     css = read("styles.css")
-    js = "\n".join(read(f) for f in ("content.js", "engine.js", "app.js"))
+    js = "\n".join(read(f) for f in ("content.js", "sims.js", "engine.js", "app.js"))
     # HAVYN's voice: lines pre-rendered in an elegant British woman's voice (tools/voice_render.py via the Voice workflow).
     # The page gets text -> file (and each file's hash, so a new voice changes the version); the MP3s ship in ./voice/.
     # Only recordings whose words still match the script (and the cards, as voice_lines rewrites them) ship.

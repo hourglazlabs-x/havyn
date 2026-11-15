@@ -13,7 +13,7 @@ ROOT = Path(__file__).resolve().parent.parent
 RULES = [
     (r"\s*\(\d+(?:\.\d+)? cm\)", ""),                       # "2 in (5 cm)": the ear needs one unit
     (r"1-800-222-1222", "one eight hundred, two two two, one two two two"),
-    (r"\b911\b", "nine one one"),
+    (r"\b911\b", "nine one one"), (r"\b(\d+) ft\b", r"\1 feet"),
     (r"\b24/7\b", "twenty-four seven"),
     (r"(\d+)\s?°F\b", r"\1 degrees Fahrenheit"),
     (r"\b1/2 cup\b", "half a cup"),
@@ -50,9 +50,24 @@ def cards():
     return out
 
 
+def sims():
+    """Sim Lab narration: each sim's intro (s-<sim>), each question or scan (s-<sim>-<frame>; not the sound questions,
+    where the alarm itself plays) and each explanation (s-<sim>-<frame>-ok)."""
+    js = "process.stdout.write(JSON.stringify(require(process.argv[1]).list))"
+    data = json.loads(subprocess.run(["node", "-e", js, str(ROOT / "src" / "sims.js")], check=True, capture_output=True, text=True).stdout)
+    out = []
+    for s in data:
+        if s.get("say"): out.append({"id": "s-%s" % s["id"], "text": speak(s["say"]), "kind": "sim"})
+        for i, f in enumerate(s.get("frames", [])):
+            q = f.get("say") or (None if f.get("sound") else f.get("q"))
+            if q: out.append({"id": "s-%s-%d" % (s["id"], i), "text": speak(q), "kind": "sim"})
+            if f.get("ok"): out.append({"id": "s-%s-%d-ok" % (s["id"], i), "text": speak(f["ok"]), "kind": "sim"})
+    return out
+
+
 def all_lines():
     base = json.loads((ROOT / "src" / "voice" / "lines.json").read_text(encoding="utf-8"))
-    return [dict(l, kind="ui") for l in base] + cards()
+    return [dict(l, kind="ui") for l in base] + cards() + sims()
 
 
 if __name__ == "__main__":

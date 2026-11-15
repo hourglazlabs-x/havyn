@@ -16,6 +16,10 @@
   "text": "When something happens, tap it here. Everything you need is in one place."
  },
  {
+  "id": "sim",
+  "text": "Sim Lab trains you in about a minute. Tap, listen and decide."
+ },
+ {
   "id": "sos",
   "text": "In an emergency, tap the red button. Each card talks you through it, step by step, and keeps the times for the paramedics."
  },

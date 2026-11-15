@@ -237,9 +237,9 @@
   const SCREENS = {
     status: renderStatus, emergency: renderEmergency, playbooks: renderPlaybooks, guides: renderGuides, family: renderFamily, supplies: renderSupplies, buy: renderBuy,
     missions: renderMissions, plan: renderPlan, comms: renderComms, library: renderLibrary, binder: renderBinder, system: renderSystem, field: renderField, now: renderNow, quick: renderQuick, quests: renderQuests,
-    search: renderSearch, archive: renderArchive
+    search: renderSearch, archive: renderArchive, sim: renderSim
   };
-  const TAB_OF = { status: "status", missions: "status", now: "status", quick: "status", quests: "status", guides: "guides", playbooks: "guides", plan: "guides", comms: "guides", library: "guides", binder: "guides", search: "guides", field: "guides", archive: "guides", emergency: "emergency", family: "family", supplies: "supplies", buy: "supplies" };
+  const TAB_OF = { status: "status", sim: "status", missions: "status", now: "status", quick: "status", quests: "status", guides: "guides", playbooks: "guides", plan: "guides", comms: "guides", library: "guides", binder: "guides", search: "guides", field: "guides", archive: "guides", emergency: "emergency", family: "family", supplies: "supplies", buy: "supplies" };
   let lastPath = "";
   function render() {
     route = parseHash();
@@ -276,6 +276,22 @@
     if (route.path === "search") SearchUI.mount();
     if (route.path === "archive") Get.mount();
     if (route.path === "status" || route.path === "" || route.path === "quests") Ready.mount();
+    const simLive = route.path === "sim" && !!route.parts[1];
+    if (!simLive && SimVoice.live) {
+      SimVoice.live = false; Clips.stop(); AlarmSnd.stop(); Beat.stop(); Drill.stopT();
+      if (SR && SR.beat && SR.beat.phase !== "done") SR.beat.phase = "ready";
+      if (SR && SR.drill && SR.drill.phase === "run") SR.drill.phase = "ready";
+      if (!Welcome.on) AudioMode.set("auto");
+    }
+    if (simLive && SR) {
+      SimVoice.live = true; if (!Welcome.on) AudioMode.set("playback");
+      const sm = SR.s;
+      if (sm.type === "quiz" && !SR.done) {
+        const f = SR.frames[SR.i], key = "s-" + sm.id + "-" + SR.order[SR.i];
+        if (SR.said !== key && SR.pick < 0) { SR.said = key; if (f.sound) setTimeout(() => { if (route.path === "sim" && SR && SR.frames[SR.i] === f) simSound(); }, 450); else SimVoice.say(key); }
+      } else if ((sm.type === "beat" || sm.type === "drill") && SR.said !== "intro" && ((SR.beat || SR.drill || {}).phase || "ready") === "ready") { SR.said = "intro"; SimVoice.say("s-" + sm.id); }
+      if (SR.drill && SR.drill.phase === "run") Wake.on();
+    }
     CardVoice.sync();
     if (route.path === "status" || route.path === "") Strip.fill();
   }
@@ -360,7 +376,10 @@
       const pb = x.pb && C.playbooks.find((p) => p.id === x.pb && !p.soon), pr = pb ? countChecks(pb) : null;
       return '<a class="gt" href="#/now/' + x.id + '">' + ic(x.icon) + "<b>" + esc(x.t) + "</b>" + (pr && pr.d ? '<small class="on">' + pr.d + " of " + pr.n + " done</small>" : "<small>" + esc(x.sub) + "</small>") + "</a>";
     }).join("") + "</div>";
-    h += '<div class="sec"><span class="lab"><b>03</b> Know-how</span></div><div class="menugrid">' +
+    const sd = simDone(), sst = simStars(), smax = SIMS.list.length * 3;
+    h += '<div class="sec"><span class="lab"><b>03</b> Train</span></div><a class="simbanner" href="#/sim"><span class="sbgrid" aria-hidden="true"></span><span class="sbx"><small>HAVYN</small><b>SIM LAB</b><span>' +
+      (sd ? sd + " of " + SIMS.list.length + " run · " + sst + " ★" : "Practice in about a minute. Tap, listen, decide.") + '</span><span class="sbbar"><i style="width:' + Math.round(sst / Math.max(1, smax) * 100) + '%"></i></span></span><span class="sbic" aria-hidden="true">' + ["heart", "speaker", "bug", "flame"].map((i) => "<i>" + ic(i) + "</i>").join("") + "</span></a>";
+    h += '<div class="sec"><span class="lab"><b>04</b> Know-how</span></div><div class="menugrid">' +
       [["#/field", "book", "How do I…", FIELD().length + " answers"], ["#/library", "globe", "Library", libSummary() || "Books and manuals"], ["#/plan", "pin", "Plan", "Where to meet"], ["#/comms", "radio", "Comms", "Radios, check-ins"]]
         .map(([href, icn, b, sm]) => '<a class="mt" href="' + href + '">' + ic(icn) + "<span><b>" + esc(b) + "</b><small>" + esc(sm) + "</small></span></a>").join("") + "</div>";
     return h;
@@ -377,7 +396,7 @@
     if (PR.level && lv.n > PR.level && !Welcome.on) setTimeout(() => { toast("LEVEL UP · " + lv.rank.toUpperCase() + " · LV " + lv.n); Snd.chime("save"); }, 400);
     if (PR.level !== lv.n) { PR.level = lv.n; flush(); }
     h += Strip.html() + '<div class="sec first"><span class="lab"><b>01</b> Readiness</span></div>' + Ready.panel() + deck();
-    h += '<div class="sec"><span class="lab"><b>04</b> Family status</span></div>';
+    h += '<div class="sec"><span class="lab"><b>05</b> Family status</span></div>';
     h += '<section class="glass hero"><div class="lab">Family autonomy</div>';
     if (!people.length) {
       h += '<div class="num"><span class="big">—</span><span class="unit">DAYS</span></div><div class="sub">Add your household and supplies to see how long you can last.</div></section>';
@@ -498,6 +517,267 @@
     }).join("") + "</ol>";
     if (Inc.on()) h += '<div class="loglive">Since the first entry <b data-since="' + t0 + '">' + mss(now() - t0) + "</b></div>";
     h += '<div class="emnav"><button data-act="inc-clear">' + (Inc.arm && now() - Inc.arm < 5000 ? "TAP AGAIN" : "CLEAR LOG") + '</button><a class="next" href="#/emergency">ALL CARDS</a></div>';
+    return h;
+  }
+
+  /* ---------------- SIM LAB: train by doing (tap, listen, decide), about a minute each ----------------
+     Content in src/sims.js. Three engines: quiz (scans, missions, Alarm ID), beat (CPR rhythm) and drill (family escape
+     timer). Stars per sim live in prefs.sim; three runs count as a readiness quest. Narration plays HAVYN's recordings
+     (s-<sim>-<frame> and s-<sim>-<frame>-ok) when they exist. */
+  const SIMS = typeof HAVYN_SIMS !== "undefined" ? HAVYN_SIMS : { list: [], art: {}, checked: "" };
+  const simById = (id) => SIMS.list.find((x) => x.id === id);
+  const simRec = (id) => (PR.sim || {})[id] || null;
+  const simDone = () => SIMS.list.filter((x) => (simRec(x.id) || {}).stars > 0).length;
+  const simStars = () => SIMS.list.reduce((a, x) => a + ((simRec(x.id) || {}).stars || 0), 0);
+  const art = (k, cls) => (SIMS.art[k] ? '<svg class="art' + (cls ? " " + cls : "") + '" viewBox="0 0 240 160" aria-hidden="true">' + SIMS.art[k] + "</svg>" : "");
+  const starRow = (n) => '<span class="stars" aria-label="' + n + ' of 3 stars">' + [0, 1, 2].map((i) => "<i" + (i < n ? ' class="on"' : "") + ">★</i>").join("") + "</span>";
+  const SIMKIND = { train: "Train", scan: "Scan", mission: "Mission" };
+  // Alarm sounds, as the standards describe them: smoke T3 (three half-second beeps, 1.5 s pause), CO T4 (four short
+  // beeps, about 5 s pause), low battery (one chirp, repeating every 30 to 60 seconds).
+  const ALARM = {
+    t3: { f: 3100, dur: 7, pulses: [[0, 0.5], [1, 0.5], [2, 0.5], [4, 0.5], [5, 0.5], [6, 0.5]] },
+    t4: { f: 3100, dur: 7, pulses: [[0, 0.1], [0.2, 0.1], [0.4, 0.1], [0.6, 0.1], [5.7, 0.1], [5.9, 0.1], [6.1, 0.1], [6.3, 0.1]] },
+    chirp: { f: 3500, dur: 7, pulses: [[0, 0.05]] }
+  };
+  const AlarmSnd = {
+    nodes: [], loopT: 0, last: null,
+    once(kind, gain) {
+      const a = Snd.ctx(), P = ALARM[kind]; if (!a || !P) return false;
+      const t0 = a.currentTime + 0.06, g = gain || 0.09;
+      for (const [s, d] of P.pulses) {
+        const o = a.createOscillator(), v = a.createGain();
+        o.type = "square"; o.frequency.value = P.f;
+        v.gain.setValueAtTime(0, t0 + s); v.gain.linearRampToValueAtTime(g, t0 + s + 0.008); v.gain.setValueAtTime(g, t0 + s + d - 0.01); v.gain.linearRampToValueAtTime(0, t0 + s + d);
+        o.connect(v).connect(a.destination); o.start(t0 + s); o.stop(t0 + s + d + 0.02); this.nodes.push(o);
+      }
+      this.last = { kind, at: now() }; return true;
+    },
+    play(kind, gain) { this.stop(); return this.once(kind, gain); },
+    loop(kind, gain) { this.stop(); this.once(kind, gain); this.loopT = setInterval(() => { this.nodes = this.nodes.slice(-12); this.once(kind, gain); }, ALARM[kind].dur * 1000); },
+    stop() { this.nodes.forEach((o) => { try { o.stop(); } catch (e) {} }); this.nodes = []; clearInterval(this.loopT); this.loopT = 0; }
+  };
+  const SimVoice = {
+    live: false,
+    say(key) { if (PR.simVoice === false || !Clips.hasId(key)) return false; Clips.playId(key); return true; }
+  };
+
+  let SR = null; // the run on screen: {id, s, i, frames, order, ch, pick, miss, score, bonus, t0, uv, done, stars, gain, said}
+  function simStart(id) {
+    const s = simById(id); if (!s) return null;
+    const idx = (s.frames || []).map((_, k) => k);
+    const order = s.shuffle ? idx.map((k) => [Math.random(), k]).sort((a, b) => a[0] - b[0]).map((x) => x[1]) : idx;
+    const frames = order.map((k) => s.frames[k]);
+    const ch = frames.map((f) => (f.choices || []).map((_, k) => [Math.random(), k]).sort((a, b) => a[0] - b[0]).map((x) => x[1]));
+    return { id, s, i: 0, frames, order, ch, pick: -1, miss: 0, score: 0, bonus: 0, t0: now(), uv: false, done: false, stars: 0, gain: 0, said: "" };
+  }
+  function simSave(id, stars, score, time) {
+    PR.sim = PR.sim || {}; const r = PR.sim[id] || { stars: 0, best: 0, n: 0 }, before = simStars();
+    PR.sim[id] = { stars: Math.max(r.stars || 0, stars), best: Math.max(r.best || 0, score || 0), n: (r.n || 0) + 1, at: now() };
+    if (time) PR.sim[id].time = r.time ? Math.min(r.time, time) : time; else if (r.time) PR.sim[id].time = r.time;
+    if (SR) SR.gain = simStars() - before;
+    flush();
+  }
+  function renderSim() {
+    const id = route.parts[1];
+    if (!id) { SR = null; return renderSimHub(); }
+    if (!SR || SR.id !== id) SR = simStart(id);
+    if (!SR) return renderSimHub();
+    const s = SR.s;
+    if (s.type === "beat") return renderBeat(s);
+    if (s.type === "drill") return renderDrill(s);
+    return SR.done ? renderSimEnd(s) : renderSimFrame(s);
+  }
+  function renderSimHub() {
+    const st = simStars(), max = SIMS.list.length * 3;
+    let h = backbar("#/status", "Sim Lab");
+    h += '<div class="simhero"><div class="simgrid" aria-hidden="true"></div><div class="simhx"><small>HAVYN</small><b>SIM LAB</b><span>Train in about a minute. Tap, listen, decide.</span></div>' +
+      '<div class="simscore"><b>' + st + "</b><small>of " + max + ' ★</small></div><div class="simbarp"><i style="width:' + Math.round(st / max * 100) + '%"></i></div></div>';
+    [["train", "01", "Train", "Hands and ears"], ["scan", "02", "Scan", "Know it when you see it"], ["mission", "03", "Missions", "Five calls, one minute"]].forEach(([k, n, t, sub]) => {
+      h += '<div class="sec"><span class="lab"><b>' + n + "</b> " + t + '</span><span class="sec2">' + sub + '</span></div><div class="simtiles">';
+      for (const x of SIMS.list.filter((y) => y.kind === k)) {
+        const r = simRec(x.id) || {};
+        h += '<a class="simtile k-' + k + (r.stars ? " done" : "") + '" href="#/sim/' + x.id + '"><div class="sta">' + art(x.art) + "</div><b>" + esc(x.title) + "</b><small>" + esc(r.time ? "Best " + mss(r.time * 1000) : x.sub) + "</small>" + starRow(r.stars || 0) + "</a>";
+      }
+      h += "</div>";
+    });
+    return h + '<p class="simsrc">Every answer comes from HAVYN\'s cards and playbooks or the source named with it. Practice helps; a class helps more.</p>';
+  }
+  function simHud(s, i, n) {
+    return '<div class="simhud"><a class="ibtn" href="#/sim" aria-label="Back to Sim Lab">' + ic("back") + '</a><div class="shx"><small>' + esc(SIMKIND[s.kind] || "Sim") + "</small><b>" + esc(s.title) + "</b></div>" +
+      (n ? '<div class="sdots">' + Array.from({ length: n }, (_, k) => "<i" + (k < i ? ' class="on"' : k === i ? ' class="cur"' : "") + "></i>").join("") + "</div>" : '<div class="sdots"></div>') +
+      '<button class="ibtn" data-act="sim-voice" aria-pressed="' + (PR.simVoice !== false) + '" aria-label="Narration">' + ic(PR.simVoice === false ? "speakeroff" : "speaker") + "</button></div>";
+  }
+  function soundPanel(kind, a) {
+    const P = ALARM[kind];
+    return '<div class="simsound"><div class="ssart">' + art(a) + '</div><button class="ssplay" data-act="sim-play">' + ic("play") + "<span>Play the sound</span></button>" +
+      '<svg class="wave" viewBox="0 0 300 40" preserveAspectRatio="none" aria-hidden="true">' + P.pulses.map(([s, d]) => '<rect x="' + (s / P.dur * 300).toFixed(1) + '" y="6" width="' + Math.max(3, d / P.dur * 300).toFixed(1) + '" height="28" rx="2"/>').join("") + '<line class="head" x1="1" y1="0" x2="1" y2="40"/></svg>' +
+      '<div class="ssnote">' + (kind === "chirp" ? "…then quiet for 30 to 60 seconds" : "Count the beeps") + "</div></div>";
+  }
+  function renderSimFrame(s) {
+    const f = SR.frames[SR.i], n = SR.frames.length;
+    let h = simHud(s, SR.i, n) + (s.scene ? '<div class="simscene"><i></i>' + esc(s.scene) + "</div>" : "");
+    if (f.scan) {
+      const mk = (m, k) => '<span class="mark' + (m[1] < 20 ? " lft" : m[1] > 80 ? " rgt" : "") + '" style="left:' + m[1] + "%;top:" + m[2] + "%;animation-delay:" + (0.45 + k * 0.4).toFixed(2) + 's"><i></i>' + esc(m[0]) + "</span>";
+      h += '<div class="scanbox' + (SR.uv ? " uv" : "") + '"><div class="scanart' + (f.art2 ? " two" : "") + '">' + art(f.art) + (f.art2 ? art(f.art2) : "") + (f.marks || []).map(mk).join("") + '</div><div class="scanline" aria-hidden="true"></div><div class="scantag">' + (SR.uv ? "UV SCAN" : "SCAN COMPLETE") + "</div></div>";
+      h += '<div class="simq"><b>' + esc(f.title) + "</b>" + (f.sub ? "<small>" + esc(f.sub) + "</small>" : "") + "</div>";
+      return h + '<div class="simbar">' + (f.uv ? '<button class="simbtn ghost' + (SR.uv ? " on" : "") + '" data-act="sim-uv">' + ic("sun") + "UV light</button>" : "") + '<button class="simbtn" data-act="sim-next">Got it ›</button></div>';
+    }
+    const arty = f.choices.some((c) => c.art);
+    if (f.sound) h += soundPanel(f.sound, f.art);
+    else if (f.art && !arty) h += '<div class="simart">' + art(f.art) + "</div>";
+    h += '<div class="simq"><b>' + esc(f.q) + "</b></div>";
+    h += '<div class="simch' + (arty ? " arty" : "") + '">' + SR.ch[SR.i].map((k) => {
+      const c = f.choices[k], st = SR.pick < 0 ? "" : c.ok ? " right" : k === SR.pick ? " wrong" : " dim";
+      return '<button class="sch' + st + '" data-act="sim-pick" data-i="' + k + '"' + (SR.pick >= 0 ? " disabled" : "") + ">" + (c.art ? art(c.art) : "") + "<span>" + esc(c.t) + "</span>" + (st === " right" ? ic("check") : "") + "</button>";
+    }).join("") + "</div>";
+    if (SR.pick >= 0) {
+      const good = !!f.choices[SR.pick].ok;
+      h += '<div class="simwhy ' + (good ? "good" : "bad") + '"><b>' + (good ? "Correct" : "Not quite") + (good && SR.bonus ? " <em>+" + SR.bonus + " speed</em>" : "") + "</b><span>" + esc(f.ok) + "</span></div>";
+      h += '<div class="simbar"><button class="simbtn" data-act="sim-next">' + (SR.i < n - 1 ? "Next ›" : "Finish ›") + "</button></div>";
+    }
+    return h;
+  }
+  function simSrc(s) {
+    const card = s.card && C.cards.find((c) => c.id === s.card), src = (s.src || []).concat(card ? card.sources : []);
+    return '<p class="simsrc">' + (s.from ? "From " + esc(s.from) + ". " : "") + (src.length ? "Sources: " + srcLine(src) + ". " : "") + "Checked " + esc(SIMS.checked) + ". Training beats any app: take a CPR class.</p>";
+  }
+  function simEndHtml(s, stars, title, stats) {
+    const nx = s.next && simById(s.next);
+    return '<div class="simend"><div class="bigstars">' + [0, 1, 2].map((i) => '<i class="' + (i < stars ? "on" : "") + '" style="animation-delay:' + (0.15 + i * 0.28).toFixed(2) + 's">★</i>').join("") + "</div>" +
+      "<b>" + esc(title) + '</b><div class="endstats">' + stats.map(([k, v]) => "<span><small>" + k + "</small><b>" + v + "</b></span>").join("") + "</div>" +
+      (SR.gain > 0 ? '<div class="xpgain">+' + SR.gain + " ★ to your Sim Lab</div>" : "") + "</div>" +
+      '<div class="simbar"><button class="simbtn ghost" data-act="sim-again">Again</button>' + (nx ? '<a class="simbtn" href="#/sim/' + nx.id + '">Next: ' + esc(nx.title) + " ›</a>" : '<a class="simbtn" href="#/sim">Sim Lab ›</a>') + "</div>" + simSrc(s);
+  }
+  function renderSimEnd(s) {
+    const r = simRec(s.id) || {}, n = SR.frames.length;
+    return simHud(s, n, n) + simEndHtml(s, SR.stars, SR.stars === 3 ? "Perfect run" : SR.stars === 2 ? "Nicely done" : "Run complete", [["Score", SR.score], ["Best", Math.max(r.best || 0, SR.score)], ["Missed", SR.miss]]);
+  }
+  function simPick(k) {
+    if (!SR || SR.pick >= 0) return;
+    const f = SR.frames[SR.i], c = f.choices[k]; if (!c) return;
+    SR.pick = k; AlarmSnd.stop(); Clips.stop();
+    if (c.ok) { const dt = (now() - SR.t0) / 1000; SR.bonus = Math.max(0, Math.round(50 * (1 - Math.max(0, dt - 3) / 9))); SR.score += 100 + SR.bonus; Snd.chime("ok"); }
+    else { SR.miss++; SR.bonus = 0; Snd.chime("warn"); }
+    render();
+    SimVoice.say("s-" + SR.id + "-" + SR.order[SR.i] + "-ok");
+  }
+  function simNext() {
+    if (!SR) return;
+    SR.i++; SR.pick = -1; SR.t0 = now(); SR.uv = false; SR.bonus = 0; AlarmSnd.stop(); Clips.stop();
+    if (SR.i >= SR.frames.length) { SR.done = true; SR.stars = SR.miss === 0 ? 3 : SR.miss === 1 ? 2 : 1; simSave(SR.id, SR.stars, SR.score); Snd.chime("save"); }
+    render();
+  }
+  function simSound() {
+    const f = SR && !SR.done && SR.frames[SR.i]; if (!f || !f.sound) return;
+    Clips.stop(); AlarmSnd.play(f.sound);
+    const w = $(".wave"); if (w) { w.style.setProperty("--d", ALARM[f.sound].dur + "s"); w.classList.remove("go"); void w.getBoundingClientRect(); w.classList.add("go"); }
+  }
+
+  // CPR Beat: tap the chest; the first 6 seconds have a 110-a-minute guide beat, then you keep the rhythm yourself.
+  const Beat = {
+    raf: 0, t: 0,
+    st() { return SR && SR.beat; },
+    start() {
+      const B = this.st(); if (!B) return; this.stop(); Snd.ctx(); Clips.stop();
+      Object.assign(B, { phase: "count", taps: [], start: 0 }); render();
+      let n = 3;
+      const step = () => { const el = $("#beatcall"); if (!this.st() || this.st().phase !== "count") return; if (n > 0) { if (el) el.textContent = String(n); const a = Snd.ctx(); if (a) Snd.click(a.currentTime + 0.01); n--; this.t = setTimeout(step, 650); } else this.go(); };
+      step();
+    },
+    go() {
+      const B = this.st(); if (!B) return;
+      B.phase = "run"; B.start = performance.now();
+      const a = Snd.ctx(); if (a) { const t0 = a.currentTime + 0.05; for (let k = 0; k * 0.545 < 6; k++) Snd.click(t0 + k * 0.545); }
+      const box = $(".beatart"); if (box) box.classList.add("guide");
+      const call = $("#beatcall"); if (call) call.textContent = "Push";
+      this.loop();
+    },
+    tap() {
+      const B = this.st(); if (!B || B.phase !== "run") return;
+      const t = performance.now(); B.taps.push(t);
+      const box = $(".beatart"); if (box) { box.classList.remove("hit"); void box.getBoundingClientRect(); box.classList.add("hit"); }
+      const r = this.rate(B.taps); const c = $("#bcount"); if (c) c.textContent = String(B.taps.length);
+      if (r) {
+        const nd = $("#needle"), bp = $("#bpm"), call = $("#beatcall");
+        if (nd) nd.style.transform = "rotate(" + Math.max(-90, Math.min(90, -90 + (r - 60) / 100 * 180)).toFixed(1) + "deg)";
+        if (bp) bp.textContent = String(Math.round(r));
+        if (call) { call.textContent = r < 100 ? "Faster" : r > 120 ? "Slower" : "Good"; call.className = r < 100 || r > 120 ? "warn" : "ok"; }
+      }
+    },
+    rate(taps, upto) { // the pace over the last four pushes (a minute's worth of pushes at that pace)
+      const n = upto === undefined ? taps.length : upto + 1; if (n < 3) return 0;
+      const a = taps.slice(Math.max(0, n - 5), n), dt = (a[a.length - 1] - a[0]) / (a.length - 1);
+      return dt > 0 && dt < 1500 ? 60000 / dt : 0;
+    },
+    loop() {
+      const B = this.st(); if (!B || B.phase !== "run") return;
+      const el = performance.now() - B.start, secs = (SR.s.secs || 20) * (window.__HAVYN_SIM_FAST ? 0.25 : 1), left = Math.max(0, secs - el / 1000);
+      const tm = $("#btime"); if (tm) tm.textContent = Math.ceil(left) + "s";
+      if (el > 6000) { const box = $(".beatart"); if (box) box.classList.remove("guide"); }
+      if (left <= 0) return this.finish();
+      this.raf = requestAnimationFrame(() => this.loop());
+    },
+    finish() {
+      const B = this.st(); if (!B) return; this.stop();
+      const rates = B.taps.map((_, k) => this.rate(B.taps, k)).filter(Boolean), zone = rates.filter((r) => r >= 100 && r <= 120).length;
+      B.pct = rates.length ? Math.round(zone / rates.length * 100) : 0;
+      B.avg = B.taps.length > 2 ? Math.round(60000 / ((B.taps[B.taps.length - 1] - B.taps[0]) / (B.taps.length - 1))) : 0;
+      B.stars = B.taps.length < 12 ? 1 : B.pct >= 75 ? 3 : B.pct >= 50 ? 2 : 1;
+      B.phase = "done"; SR.stars = B.stars; simSave(SR.id, B.stars, B.pct); Snd.chime("save"); render();
+    },
+    stop() { cancelAnimationFrame(this.raf); clearTimeout(this.t); }
+  };
+  function renderBeat(s) {
+    const B = SR.beat || (SR.beat = { phase: "ready", taps: [] });
+    let h = simHud(s, 0, 0);
+    if (B.phase === "done") return h + simEndHtml(s, B.stars, B.pct >= 75 ? "Steady hands" : B.pct >= 50 ? "Getting there" : "Keep practicing", [["Average", (B.avg || "—") + "/min"], ["In the zone", B.pct + "%"], ["Pushes", B.taps.length]]) .replace('<div class="simbar">', '<p class="simtip">' + esc(s.tip) + '</p><div class="simbar">');
+    const zx = (b) => { const th = (180 - (b - 60) / 100 * 180) * Math.PI / 180; return (100 + 80 * Math.cos(th)).toFixed(1) + " " + (100 - 80 * Math.sin(th)).toFixed(1); };
+    h += '<div class="beatbox"><div class="beatart' + (B.phase === "run" ? " live" : "") + '" role="button" aria-label="Tap here to push">' + art("chest") + '<div class="ring" aria-hidden="true"></div><div id="beatcall">' + (B.phase === "ready" ? "Tap here" : B.phase === "count" ? "3" : "Push") + "</div></div>" +
+      '<div class="gauge"><svg viewBox="0 0 200 112" aria-hidden="true"><path class="gtrack" d="M20 100A80 80 0 0 1 180 100"/><path class="gzone" d="M' + zx(100) + "A80 80 0 0 1 " + zx(120) + '"/><g id="needle" style="transform:rotate(-90deg)"><path d="M100 100V30"/></g><circle cx="100" cy="100" r="6"/>' +
+      '<text x="14" y="110">60</text><text x="70" y="14">100</text><text x="118" y="14">120</text><text x="168" y="110">160</text></svg><div class="gnum"><b id="bpm">—</b><small>per minute</small></div></div>' +
+      '<div class="beatstats"><span><small>Time</small><b id="btime">' + (s.secs || 20) + 's</b></span><span><small>Pushes</small><b id="bcount">0</b></span><span><small>Target</small><b>100–120</b></span></div></div>';
+    if (B.phase === "ready") h += '<div class="simq"><b>Tap the chest to the beat</b><small>100 to 120 a minute. The beat stops after 6 seconds: keep going.</small></div><div class="simbar"><button class="simbtn" data-act="beat-go">' + ic("play") + "Start</button></div>";
+    return h;
+  }
+
+  // The 2-Minute Drill: a real escape practice for the whole family, with a stopwatch and (if you like) the smoke alarm.
+  const Drill = {
+    t: 0,
+    st() { return SR && SR.drill; },
+    go() {
+      const D = this.st(); if (!D) return; Clips.stop();
+      D.phase = "run"; D.start = performance.now(); if (D.alarm) AlarmSnd.loop("t3", 0.05);
+      render(); this.t = setInterval(() => this.tick(), 200);
+    },
+    tick() {
+      const D = this.st(); if (!D || D.phase !== "run") return this.stopT();
+      const s = (performance.now() - D.start) / 1000, el = $("#dtime"), pr = $("#dprog");
+      if (el) el.textContent = mss(s * 1000);
+      if (pr) { pr.setAttribute("stroke-dasharray", Math.min(120, s).toFixed(2) + " 120"); pr.classList.toggle("over", s > 120); }
+    },
+    stop() {
+      const D = this.st(); if (!D || D.phase !== "run") return;
+      this.stopT(); AlarmSnd.stop();
+      D.secs = Math.max(1, Math.round((performance.now() - D.start) / 1000)); D.phase = "done";
+      D.stars = D.secs <= 120 ? 3 : D.secs <= 180 ? 2 : 1; SR.stars = D.stars; simSave(SR.id, D.stars, Math.max(0, 300 - D.secs), D.secs); Snd.chime("save"); render();
+    },
+    stopT() { clearInterval(this.t); this.t = 0; }
+  };
+  function renderDrill(s) {
+    const D = SR.drill || (SR.drill = { phase: "ready", alarm: true }), P = S.plan || {}, meet = P.rally1 && P.rally1 !== "Home" ? P.rally1 : "";
+    let h = simHud(s, 0, 0);
+    if (D.phase === "done") {
+      const r = simRec(s.id) || {};
+      return h + simEndHtml(s, D.stars, D.secs <= 120 ? "Out in time" : "Practice again", [["Your time", mss(D.secs * 1000)], ["Best", r.time ? mss(r.time * 1000) : mss(D.secs * 1000)], ["Goal", "2:00"]])
+        .replace('<div class="simbar">', '<ul class="simtips">' + s.tips.map((t) => "<li>" + esc(t) + "</li>").join("") + '</ul><div class="simbar">');
+    }
+    h += '<div class="drillbox"><svg class="dring" viewBox="0 0 200 200" aria-hidden="true"><circle class="trk" cx="100" cy="100" r="86"/><circle id="dprog" class="prog" cx="100" cy="100" r="86" pathLength="120" stroke-dasharray="0 120" transform="rotate(-90 100 100)"/></svg>' +
+      '<div class="dtime"><b id="dtime">0:00</b><small>goal 2:00</small></div></div>';
+    if (D.phase === "ready") {
+      h += '<div class="drsteps">' + [["alarm", "Alarm"], ["people", "Everyone up"], ["evac", "Out"], ["pin", meet ? esc(meet) : "Meeting place"]].map(([i, t], k) => (k ? '<span class="dra">›</span>' : "") + "<span>" + (i === "alarm" ? ic("speaker") : ic(i)) + "<small>" + t + "</small></span>").join("") + "</div>";
+      if (!meet) h += '<a class="simhint" href="#/plan">' + ic("pin") + "Pick a meeting place outside (a tree, a mailbox) in Plan ›</a>";
+      h += '<div class="simbar"><button class="simbtn ghost' + (D.alarm ? " on" : "") + '" data-act="drill-alarm" aria-pressed="' + !!D.alarm + '">' + ic(D.alarm ? "speaker" : "speakeroff") + "Alarm sound</button><button class=\"simbtn\" data-act=\"drill-go\">" + ic("play") + "Start the drill</button></div>";
+    } else h += '<div class="simbar"><button class="simbtn stop" data-act="drill-stop">Everyone\'s out: STOP</button></div>';
     return h;
   }
 
@@ -2227,11 +2507,12 @@
       return [
         { k: "app", w: 10, f: isStandalone() ? 1 : 0, t: "On the Home Screen", d: isStandalone() ? "Opens like an app, with its own storage." : "In Safari: Share › Add to Home Screen, then open HAVYN from its icon. Downloads made in a Safari tab stay in that tab.", go: "#/system" },
         { k: "offline", w: 10, f: sw || PREVIEW ? 1 : 0, t: "Works with no internet", d: sw ? "The app itself is saved on this phone." : "Open HAVYN once while online; it saves itself for offline use.", go: "#/system" },
-        { k: "shelf", w: 20, f: share.length ? shHave / share.length : 1, t: "Manuals and guides: " + shHave + " of " + share.length, d: (shHave === share.length ? "Every phone-set document on HAVYN's shelf is here and searchable." : "First aid, water, food, power, radio, repair and survival manuals (" + sz(share.filter((i) => !shelfHave(i)).reduce((a, i) => a + shelfSize(i), 0)) + " to go)."), n: later ? later + (later === 1 ? " more isn't" : " more aren't") + " on HAVYN's shelf yet (the publisher was unreachable); HAVYN's shelf retries every day." : "", go: "#/archive?t=shelf" },
-        { k: "arc", w: 20, f: core.length ? arHave / core.length : 1, t: "Encyclopedias: " + arHave + " of " + core.length, d: arHave === core.length ? "WikiMed and the survival libraries are here." : "WikiMed, post-disaster, water, food, medicine, knots and a kids' encyclopedia (" + sz(core.filter((i) => !haveOnPhone(i)).reduce((a, i) => a + Arc.size(i), 0)) + " to go).", go: "#/archive?t=phone" },
+        { k: "shelf", w: 15, f: share.length ? shHave / share.length : 1, t: "Manuals and guides: " + shHave + " of " + share.length, d: (shHave === share.length ? "Every phone-set document on HAVYN's shelf is here and searchable." : "First aid, water, food, power, radio, repair and survival manuals (" + sz(share.filter((i) => !shelfHave(i)).reduce((a, i) => a + shelfSize(i), 0)) + " to go)."), n: later ? later + (later === 1 ? " more isn't" : " more aren't") + " on HAVYN's shelf yet (the publisher was unreachable); HAVYN's shelf retries every day." : "", go: "#/archive?t=shelf" },
+        { k: "arc", w: 15, f: core.length ? arHave / core.length : 1, t: "Encyclopedias: " + arHave + " of " + core.length, d: arHave === core.length ? "WikiMed and the survival libraries are here." : "WikiMed, post-disaster, water, food, medicine, knots and a kids' encyclopedia (" + sz(core.filter((i) => !haveOnPhone(i)).reduce((a, i) => a + Arc.size(i), 0)) + " to go).", go: "#/archive?t=phone" },
         { k: "books", w: 5, f: link.length ? lkHave / link.length : 1, t: "Health books from their publishers: " + lkHave + " of " + link.length, d: "Where There Is No Doctor and the others aren't re-hosted; get them from Get more › Shelf (Hesperian chapters are joined into one book).", go: "#/archive?t=shelf" },
         { k: "family", w: 15, f: plan / 4, t: "Family plan: " + plan + " of 4", d: people ? "An out-of-area contact, meeting places and where to go if you must leave." : "Start with who lives with you: a few taps.", go: people ? "#/family" : "#/quick/household" },
         { k: "supplies", w: 10, f: (hasW ? 0.5 : 0) + (hasF ? 0.5 : 0), t: hasW && hasF ? "Supplies counted" : "Count your supplies", d: "A few taps for water, food, power and gear; Home turns them into days you can last.", go: "#/quick/supplies" },
+        { k: "sim", w: 10, f: Math.min(1, simDone() / 3), t: "Sim Lab: " + Math.min(3, simDone()) + " of 3 run", d: "About a minute each: CPR to the beat, alarm sounds, scorpions, snakes, quick missions.", go: "#/sim" },
         { k: "card", w: 10, f: now() - (PR.lastBackup || 0) < 30 * DAY ? 1 : 0, t: "Memory Card saved this month", d: "Copies your plan to every family phone and keeps a backup.", go: "#/system" }
       ];
     },
@@ -2835,6 +3116,16 @@
       Snd.chime("nav");
     }
     else if (act === "q-save") quickSave();
+    else if (act === "sim-pick") simPick(Number(b.dataset.i));
+    else if (act === "sim-next") simNext();
+    else if (act === "sim-uv") { if (SR) { SR.uv = !SR.uv; render(); } }
+    else if (act === "sim-play") simSound();
+    else if (act === "sim-again") { if (SR) { Beat.stop(); Drill.stopT(); AlarmSnd.stop(); Clips.stop(); SR = simStart(SR.id); render(); } }
+    else if (act === "sim-voice") { PR.simVoice = PR.simVoice === false; flush(); if (PR.simVoice === false) Clips.stop(); render(); }
+    else if (act === "beat-go") Beat.start();
+    else if (act === "drill-go") Drill.go();
+    else if (act === "drill-stop") Drill.stop();
+    else if (act === "drill-alarm") { if (SR && SR.drill) { SR.drill.alarm = !SR.drill.alarm; if (SR.drill.alarm) AlarmSnd.play("t3", 0.05); else AlarmSnd.stop(); render(); } }
     else if (act === "inc-mark") { Inc.add(b.dataset.w, b.dataset.card); render(); }
     else if (act === "inc-clear") { if (Inc.arm && now() - Inc.arm < 5000) { Inc.clear(); go("#/emergency"); } else { Inc.arm = now(); render(); } }
     else if (act === "card-voice") { PR.cardVoice = PR.cardVoice === false; flush(); if (PR.cardVoice === false) CardVoice.off(); else { Snd.ctx(); CardVoice.said = ""; } render(); }
@@ -2971,6 +3262,7 @@
     const n = decodeURIComponent(a.getAttribute("href").slice(4)), w = n === "911" ? "Called 911" : "Called " + (a.textContent.trim().replace(/^call\s+/i, "") || n);
     Inc.add(w, cardView.id || ""); if (route.path === "emergency") setTimeout(render, 50);
   }, true);
+  document.addEventListener("pointerdown", (e) => { if (e.target.closest(".beatart") && SR && SR.beat && SR.beat.phase === "run") { e.preventDefault(); Beat.tap(); } }, true);
   // An iPhone lets a page make sound only after a touch: unlock it on the first touch of every session (silently),
   // so the voice guide can speak the moment a card opens.
   ["pointerdown", "touchend", "keydown"].forEach((ev) => document.addEventListener(ev, function once() { Snd.ctx(); document.removeEventListener(ev, once, true); }, true));
@@ -3181,6 +3473,7 @@
       return [
         { go: "#/status", at: "#ready .rdyhead", t: "Your level", d: "Your phone levels up as you finish quests: the downloads, your household, your supplies, a Memory Card. Most of it happens by itself, and every quest is a few taps.", say: "This is your command deck. Your level rises as you finish quests, and most of them finish themselves." },
         { go: "#/status", at: ".nowgrid", t: "What's happening?", d: "Tap what's going on: power out, extreme heat, a storm, smoke, unsafe water, an earthquake. You get everything for it in one place: the steps, the cards, the manual pages and the numbers to call.", say: "When something happens, tap it here. Everything you need is in one place." },
+        { go: "#/status", at: ".simbanner", t: "Sim Lab", d: "Practice in about a minute: CPR to the beat, the sounds alarms make, scorpions and snakes, and quick missions. Stars as you go.", say: "Sim Lab trains you in about a minute. Tap, listen and decide." },
         { go: "#/status", at: ".tab.sos", t: "Someone hurt? The red button", d: "This red button, on every screen (and the red tile on Home), opens twenty step-by-step cards: CPR with a beat to follow, bleeding, choking, heart attack, heat stroke and more. Each card reads its steps aloud, keeps the times for the paramedics, and calls 911 in one tap.", say: "In an emergency, tap the red button. Each card talks you through it, step by step, and keeps the times for the paramedics." },
         { go: "#/guides", at: ".tab[data-tab=guides]", t: "Guides: know what to do", d: "How do I… opens the exact page in the manuals on this phone. Playbooks walk you through blackouts, extreme heat, storms and smoke.", say: "Guides tells you what to do, step by step." },
         { go: "#/family", at: ".tab[data-tab=family]", t: "Family: your people", d: "Everyone's medicines, allergies and needs. Fill it in once, then copy it to every phone with the Memory Card.", say: "Family keeps everyone's medicines, allergies and needs in one place." },
@@ -3275,6 +3568,6 @@
       navigator.serviceWorker.register("./sw.js").then(() => navigator.serviceWorker.ready).then(() => { const s = $("#swst"); if (s) s.textContent = "Saved for offline"; }).catch(() => { const s = $("#swst"); if (s) s.textContent = "Not available"; });
     }
   }
-  window.__HAVYN = { get incident() { return INC; }, get state() { return S; }, get prefs() { return PR; }, get lib() { return LIB; }, E, C, version: VERSION, arc: Arc, shelf: Shelf, ready: Ready, store: Store, welcome: Welcome, voice: Voice, clips: Clips };
+  window.__HAVYN = { get sim() { return SR; }, sims: SIMS, beat: Beat, drill: Drill, alarm: AlarmSnd, get incident() { return INC; }, get state() { return S; }, get prefs() { return PR; }, get lib() { return LIB; }, E, C, version: VERSION, arc: Arc, shelf: Shelf, ready: Ready, store: Store, welcome: Welcome, voice: Voice, clips: Clips };
   boot();
 })();
