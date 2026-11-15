@@ -1,7 +1,18 @@
 # HAVYN: mission state
 
-**Current milestone:** M5, HAVYN FIELD v1.5: everything on the phone with one tap (Download everything: 50 phone-set manuals and 7 core encyclopedias, resumable, checked), "How do I…" (a field index that opens the exact page in the manuals), and four new emergency cards. Live deployment still waits on one GitHub setting (Settings → Pages → Source: GitHub Actions).
+**Current milestone:** M6, HAVYN FIELD v1.6: a game-style command deck (levels, quests, What's happening?, quick setup) and an elegant British voice, on top of v1.5: everything on the phone with one tap (Download everything: 50 phone-set manuals and 7 core encyclopedias, resumable, checked), "How do I…" (a field index that opens the exact page in the manuals), and four new emergency cards. Live deployment still waits on one GitHub setting (Settings → Pages → Source: GitHub Actions).
 **Build:** 1.5.0 · 2026-11-15 · `app/index.html` 442 KB + `zimkit.js` 54 KB + PDF.js and pdf-lib (cached for offline) · shelf release `shelf` (rebuilding with the wider phone set after the v1.5 push)
+
+## v1.6 "done when": evidence
+
+| Criterion | Status | Evidence |
+| --- | --- | --- |
+| Opening the app makes the next move obvious | PASS (Chrome) | e2e_v15: Home leads with the level (ring, rank), the next three quests with XP, the red Someone's hurt tile, What's happening? (8 situations) and know-how tiles; the welcome tour spotlights the level and What's happening? before the tabs. |
+| One tap from a situation to everything for it | PASS (Chrome) | e2e_v15: all 8 situation screens show their title, playbook link, cards, field answers and 911; Power out starts the outage clock. |
+| Less typing | PASS (Chrome) | e2e_v15: the household is made from counts (2 adults, 1 kid, 1 pet → "Adult 1", "Adult 2", "Kid 1", a pet), supplies from counts with what each holds (cases of water, canned meals, power banks), Home shows days at once, counting again starts from what's saved, zero removes an item, and the quests move. |
+| An elegant British woman's voice | PASS (logic) / not yet heard on an iPhone | e2e_v15: with Serena (Enhanced), Martha, Daniel, Samantha and Fred available, HAVYN picks Serena (Enhanced); with only Daniel, Samantha and Moira, Moira; with only men's voices and Samantha, Samantha. Depends on the voices installed on the phone (System says which is in use and how to get Serena or Martha). |
+
+Test totals for 1.6.0: engine 27/27, archive reader 208/208, end-to-end 91/91 + 76/76 + 31/31 + 71/71, shelf fetcher 27/27.
 
 ## v1.5 "done when": evidence
 

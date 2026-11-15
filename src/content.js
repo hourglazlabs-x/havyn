@@ -703,6 +703,56 @@ const HAVYN_CONTENT = {
     ]
   },
 
+  // ---------------- v1.6: "What's happening?" ----------------
+  // One tap from the situation to everything for it: the playbook, the cards, the manual pages, the numbers.
+  // nums: indexes into numbers. Nothing new is claimed here: each piece points to content that carries its own sources.
+  situations: [
+    { id: "power", t: "Power out", sub: "Outage at home", icon: "bolt", pb: "blackout", clock: true, cards: ["co", "heatstroke"], field: ["f-gen", "f-fridge", "f-cook", "f-hidden", "f-heatwave"], nums: [2, 3, 4] },
+    { id: "heat", t: "Extreme heat", sub: "Heat warning, AC out", icon: "sun", pb: "heat", cards: ["heatstroke"], field: ["f-heat", "f-ors", "f-heatwave"], nums: [2, 3] },
+    { id: "storm", t: "Storm or flood", sub: "Monsoon, dust storm, flash flood", icon: "wind", pb: "storm", cards: ["drowning", "bleeding"], field: ["f-flood", "f-storm", "f-tornado"], nums: [4] },
+    { id: "smoke", t: "Smoke or fire", sub: "Wildfire smoke, fire, evacuation", icon: "flame", pb: "smoke", cards: ["asthma", "burns"], field: ["f-smoke", "f-wildfire", "f-housefire", "f-extinguish"], nums: [] },
+    { id: "water", t: "Water unsafe", sub: "Boil-water notice, water off", icon: "drop", pb: "boil", cards: [], field: ["f-boil", "f-bleach", "f-waterstore", "f-hidden"], nums: [6] },
+    { id: "quake", t: "Earthquake", sub: "Shaking, damage, someone trapped", icon: "quake", cards: ["bleeding", "fracture", "unresponsive"], field: ["f-quake", "f-utilities", "f-lift", "f-extinguish", "f-check"], nums: [5] },
+    { id: "evac", t: "Leaving home", sub: "Evacuation, meeting places", icon: "evac", plan: true, cards: [], field: ["f-kit", "f-plan", "f-wildfire"], nums: [] },
+    { id: "sick", t: "Sick at home", sub: "Vomiting, fever, poisoning", icon: "thermo", cards: ["poison", "lowsugar", "asthma", "seizure"], field: ["f-diarrhea", "f-ors", "f-vitals", "f-dose"], nums: [1] }
+  ],
+
+  // ---------------- v1.6: quick setup (tap counts instead of forms) ----------------
+  // Amounts per unit are typical label values, rounded; anyone can edit an item afterwards in Supplies.
+  quick: {
+    household: [
+      { k: "adult", t: "Adults", sub: "18 to 64" }, { k: "senior", t: "Seniors", sub: "65 or older" }, { k: "teen", t: "Teens", sub: "13 to 17" },
+      { k: "child", t: "Kids", sub: "1 to 12" }, { k: "infant", t: "Babies", sub: "Under 1" }, { k: "pet", t: "Pets", sub: "Dogs, cats and others" }
+    ],
+    supplies: [
+      { g: "Water", icon: "drop", items: [
+        { k: "w-case", category: "water", name: "Case of water bottles (24 × 16.9 oz)", t: "Cases of bottled water", sub: "24 bottles, about 3.2 gallons", per_unit: { gal: 3.17 } },
+        { k: "w-1gal", category: "water", name: "1-gallon water jug", t: "1-gallon jugs", sub: "Store-bought, sealed", per_unit: { gal: 1 } },
+        { k: "w-5gal", category: "water", name: "5-gallon water jug", t: "5-gallon jugs", sub: "Water-cooler size", per_unit: { gal: 5 } },
+        { k: "w-brick", category: "water", name: "WaterBrick (3.5 gal)", t: "3.5-gallon bricks", sub: "Stackable containers", per_unit: { gal: 3.5 } },
+        { k: "w-drum", category: "water", name: "55-gallon water drum", t: "55-gallon drums", sub: "Blue barrels", per_unit: { gal: 55 } }
+      ] },
+      { g: "Food", icon: "food", items: [
+        { k: "f-can", category: "food", name: "Canned meal", t: "Canned meals", sub: "About 450 calories each", per_unit: { kcal: 450 } },
+        { k: "f-rice", category: "food", name: "Rice or beans, 20 lb bag", t: "20 lb bags of rice or beans", sub: "About 32,000 calories each", per_unit: { kcal: 32000 } },
+        { k: "f-bars", category: "food", name: "Box of granola or protein bars", t: "Boxes of bars", sub: "About 1,200 calories a box", per_unit: { kcal: 1200 } },
+        { k: "f-pb", category: "food", name: "Peanut butter, 40 oz jar", t: "Big jars of peanut butter", sub: "40 oz, about 6,700 calories", per_unit: { kcal: 6700 } }
+      ] },
+      { g: "Power", icon: "bolt", items: [
+        { k: "p-bank", category: "power", name: "Power bank (20,000 mAh)", t: "Power banks", sub: "20,000 mAh, about 74 Wh", per_unit: { wh: 74 } },
+        { k: "p-1k", category: "power", name: "Power station (about 1 kWh)", t: "Power stations, about 1 kWh", sub: "Jackery, EcoFlow and similar", per_unit: { wh: 1024 } },
+        { k: "p-2k", category: "power", name: "Power station (about 2 kWh)", t: "Power stations, about 2 kWh", sub: "The bigger ones", per_unit: { wh: 2048 } }
+      ] },
+      { g: "Gear", icon: "box", items: [
+        { k: "g-light", category: "gear", name: "Flashlight or headlamp", t: "Flashlights or headlamps", sub: "With batteries" },
+        { k: "g-co", category: "gear", name: "CO alarm (battery)", t: "Battery CO alarms", sub: "One on every sleeping floor" },
+        { k: "g-aid", category: "gear", name: "First-aid kit", t: "First-aid kits", sub: "Home or car" },
+        { k: "g-radio", category: "gear", name: "Battery or crank radio", t: "Battery or crank radios", sub: "For news when the cell network is down" },
+        { k: "g-ext", category: "gear", name: "Fire extinguisher", t: "Fire extinguishers", sub: "Kitchen and garage" }
+      ] }
+    ]
+  },
+
   // ---------------- v1.5: field index ("How do I…") ----------------
   // Each answer points to the exact page in the shelf documents on this phone. r: [shelf id, page, what's there].
   // Pages are the PDF's own page numbers in HAVYN's copies (the same files on every phone, checked by SHA-256), which is

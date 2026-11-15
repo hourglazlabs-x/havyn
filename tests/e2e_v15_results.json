@@ -7,22 +7,27 @@
  {
   "name": "Status shows how ready this phone is",
   "pass": true,
-  "detail": "THIS PHONE\n10% READY NOT YET\nDownload everything \u00b7 21 MB\n11 items. Use Wi-Fi and keep HAVYN open (the screen stays on); it picks up where it stopped if you close it.\nOn the Home Screen\nIn Safari: Shar"
+  "detail": "LV\n1\nTHIS PHONE \u00b7 READINESS\nRecruit\n10\n% READY\n10 XP TO SCOUT\nDownload everything \u00b7 21 MB\n11 items \u00b7 on Wi-Fi, keep HAVYN open; it picks up where it stopped.\nNEXT QUESTS\n1 OF 8 COMPLETE \u203a\nOn the Home "
  },
  {
   "name": "one button offers to download everything",
   "pass": true,
-  "detail": "THIS PHONE\n10% READY NOT YET\nDownload everything \u00b7 21 MB\n11 items. Use Wi-Fi and keep HAVYN open (the screen stays on); it picks up where it stopped if you close it.\nOn the Home Screen\nIn Safari: Share \u203a Add to Home Screen, then open HAVYN from its icon. Downloads made in a Safari tab stay in that t"
+  "detail": "LV\n1\nTHIS PHONE \u00b7 READINESS\nRecruit\n10\n% READY\n10 XP TO SCOUT\nDownload everything \u00b7 21 MB\n11 items \u00b7 on Wi-Fi, keep HAVYN open; it picks up where it stopped.\nNEXT QUESTS\n1 OF 8 COMPLETE \u203a\nOn the Home Screen\n+10 XP\nManuals and guides: 0 of 4\n+20 XP\nEncyclopedias: 0 of 7\n+20 XP"
  },
  {
-  "name": "the checklist covers manuals, encyclopedias, plan and backup",
+  "name": "Home shows the next quests with their XP",
   "pass": true,
-  "detail": "THIS PHONE\n10% READY NOT YET\nDownload everything \u00b7 21 MB\n11 items. Use Wi-Fi and keep HAVYN open (the screen stays on); it picks up where it stopped if you close it.\nOn the Home Screen\nIn Safari: Share \u203a Add to Home Screen, then open HAVYN from its icon. Downloads made in a Safari tab stay in that tab.\nWorks with no internet\nManuals and guides: 0 of 4\nFirst aid, water, food, power, radio, repair a"
+  "detail": "LV\n1\nTHIS PHONE \u00b7 READINESS\nRecruit\n10\n% READY\n10 XP TO SCOUT\nDownload everything \u00b7 21 MB\n11 items \u00b7 on Wi-Fi, keep HAVYN open; it picks up where it stopped.\nNEXT QUESTS\n1 OF 8 COMPLETE \u203a\nOn the Home Screen\n+10 XP\nManuals and guides: 0 of 4\n+20 XP\nEncyclopedias: 0 of 7\n+20 XP"
+ },
+ {
+  "name": "the Quests screen covers manuals, encyclopedias, plan, supplies and backup",
+  "pass": true,
+  "detail": "LV\n1\nTHIS PHONE \u00b7 READINESS\nRecruit\n10\n% READY\n10 XP TO SCOUT\nDownload everything \u00b7 21 MB\n11 items \u00b7 on Wi-Fi, keep HAVYN open; it picks up where it stopped.\nQUESTS\n1 OF 8 COMPLETE\nOn the Home Screen\nIn Safari: Share \u203a Add to Home Screen, then open HAVYN from its icon. Downloads made in a Safari tab stay in that tab.\n+10 XP\nManuals and guides: 0 of 4\nFirst aid, water, food, power, radio, repair an"
  },
  {
   "name": "progress shows while downloading",
   "pass": true,
-  "detail": "THIS PHONE\n10% READY NOT YET\nDownload everything \u00b7 21 MB\nStop\n11 items. Use Wi-Fi and keep HAVYN open (the screen stays on); it picks up where it stopped if you close it.\nDownloading 1 of 4: Emergency Disinfection of Drinking Water \u00b7 1%. Keep HAVYN open; the screen stays on.\nOn the Home Screen\nIn Sa"
+  "detail": "LV\n1\nTHIS PHONE \u00b7 READINESS\nRecruit\n10\n% READY\n10 XP TO SCOUT\nDownload everything \u00b7 21 MB\nStop\n11 items \u00b7 on Wi-Fi, keep HAVYN open; it picks up where it stopped.\nDownloading 1 of 4: Emergency Disinfection of Drinking Water \u00b7 1%. Keep HAVYN open; the screen stays on.\nNEXT QUESTS\n1 OF 8 COMPLETE \u203a\nOn"
  },
  {
   "name": "the shelf documents arrive first",
@@ -52,7 +57,7 @@
  {
   "name": "every downloaded archive was checked",
   "pass": true,
-  "detail": "[{'id': 'mwi99iiqidyjol', 'type': 'zim', 'name': 'Test WikiMed: medical encyclopedia', 'shelf': '', 'catalog': 'p-wikimed', 'verified': True, 'check': 'sha256', 'size': 44276, 'file': 'wikipedia_en_medicine_maxi_2026-10.zim'}, {'id': 'mwi99l4lv0ngm6', 'type': 'zim', 'name': 'Test Water treatment', 'shelf': '', 'catalog': 'p-water', 'verified': True, 'check': 'md5', 'size': 44248, 'file': 'zimgit-water_en_2026-10.zim'}, {'id': 'mwi99lbnnw10wn', 'type': 'zim', 'name': 'Test Food for preppers', 'shelf': '', 'catalog': 'p-food', 'verified': True, 'check': 'sha256', 'size': 44261, 'file': 'zimgit-food-preparation_en_2026-10.zim'}, {'id': 'mwi99lj2fikl0b', 'type': 'zim', 'name': 'Test Medical library', 'shelf': '', 'catalog': 'p-medlib', 'verified': True, 'check': 'sha256', 'size': 44251, 'file': 'zimgit-medicine_en_2026-10.zim'}, {'id': 'mwi99lqoqblly2', 'type': 'zim', 'name': 'Test A library of knots', 'shelf': '', 'catalog': 'p-knots', 'verified': True, 'check': 'sha256', 'size': 44251, 'file': 'zimgit-knots_en_2026-10.zim'}, {'id': 'mwi99ly1y1f9fu', 'type': 'zim', 'name': 'Test Vikidia: encyclopedia for kids', 'shelf': '', 'catalog': 'p-vikidia', 'verified': True, 'check': 'sha256', 'size': 44270, 'file': 'vikidia_en_all_maxi_2026-10.zim'}]"
+  "detail": "[{'id': 'mwiabw9k2btedj', 'type': 'zim', 'name': 'Test WikiMed: medical encyclopedia', 'shelf': '', 'catalog': 'p-wikimed', 'verified': True, 'check': 'sha256', 'size': 44276, 'file': 'wikipedia_en_medicine_maxi_2026-10.zim'}, {'id': 'mwiabyvxrs9y1q', 'type': 'zim', 'name': 'Test Water treatment', 'shelf': '', 'catalog': 'p-water', 'verified': True, 'check': 'md5', 'size': 44248, 'file': 'zimgit-water_en_2026-10.zim'}, {'id': 'mwiabz3kvf29p1', 'type': 'zim', 'name': 'Test Food for preppers', 'shelf': '', 'catalog': 'p-food', 'verified': True, 'check': 'sha256', 'size': 44261, 'file': 'zimgit-food-preparation_en_2026-10.zim'}, {'id': 'mwiabzc5rvgdn1', 'type': 'zim', 'name': 'Test Medical library', 'shelf': '', 'catalog': 'p-medlib', 'verified': True, 'check': 'sha256', 'size': 44251, 'file': 'zimgit-medicine_en_2026-10.zim'}, {'id': 'mwiabzjkyjjyhv', 'type': 'zim', 'name': 'Test A library of knots', 'shelf': '', 'catalog': 'p-knots', 'verified': True, 'check': 'sha256', 'size': 44251, 'file': 'zimgit-knots_en_2026-10.zim'}, {'id': 'mwiabzqwzj42w7', 'type': 'zim', 'name': 'Test Vikidia: encyclopedia for kids', 'shelf': '', 'catalog': 'p-vikidia', 'verified': True, 'check': 'sha256', 'size': 44270, 'file': 'vikidia_en_all_maxi_2026-10.zim'}]"
  },
  {
   "name": "against Kiwix's SHA-256, or the ZIM's own MD5 when Kiwix has none",
@@ -110,14 +115,14 @@
   "detail": "[('p-food', 'bytes=8192-')]"
  },
  {
-  "name": "Status says the downloads are done",
+  "name": "Quests say the downloads are done",
   "pass": true,
-  "detail": "HAVYN\nFIELD\nFAMILY AUTONOMY\n\u2014\nDAYS\nAdd your household and supplies to see how long you can last.\nTHIS PHONE\n60% READY ALMOST\nOn the Home Screen\nIn Safari: Share \u203a Add to Home Screen, then open HAVYN from its icon. Downloads made in a Safari tab stay in that tab.\nWorks with no internet\nManuals and guides: 4 of 4\n46 more aren't on HAVYN's shelf yet (the publisher was unreachable); HAVYN's shelf retr"
+  "detail": "QUESTS\nLV\n3\nTHIS PHONE \u00b7 READINESS\nRanger\n50\n% READY\n10 XP TO GUARDIAN\nQUESTS\n3 OF 8 COMPLETE\nOn the Home Screen\nIn Safari: Share \u203a Add to Home Screen, then open HAVYN from its icon. Downloads made in a Safari tab stay in that tab.\n+10 XP\nHealth books from their publishers: 0 of 7\nWhere There Is No Doctor and the others aren't re-hosted; get them from Get more \u203a Shelf (Hesperian chapters are joine"
  },
  {
   "name": "readiness counts only manuals HAVYN's shelf holds, and says what's missing",
   "pass": true,
-  "detail": "THIS PHONE\n60% READY ALMOST\nOn the Home Screen\nIn Safari: Share \u203a Add to Home Screen, then open HAVYN from its icon. Downloads made in a Safari tab stay in that tab.\nWorks with no internet\nManuals and guides: 4 of 4\n46 more aren't on HAVYN's shelf yet (the publisher was unreachable); HAVYN's shelf retries every day.\nEncyclopedias: 7 of 7\nHealth books from their publishers: 0 of 7\nWhere There Is No Doctor and the others aren't re-hosted; get them from Get more \u203a Shelf (Hesperian chapters are joined into one book).\nFamily plan: 0 of 4\nYour household, an out-of-area contact, meeting places and wh"
+  "detail": "LV\n3\nTHIS PHONE \u00b7 READINESS\nRanger\n50\n% READY\n10 XP TO GUARDIAN\nQUESTS\n3 OF 8 COMPLETE\nOn the Home Screen\nIn Safari: Share \u203a Add to Home Screen, then open HAVYN from its icon. Downloads made in a Safari tab stay in that tab.\n+10 XP\nHealth books from their publishers: 0 of 7\nWhere There Is No Doctor and the others aren't re-hosted; get them from Get more \u203a Shelf (Hesperian chapters are joined into one book).\n+5 XP\nFamily plan: 0 of 4\nStart with who lives with you: a few taps.\n+15 XP\nCount your supplies\nA few taps for water, food, power and gear; Home turns them into days you can last.\n+10 XP\nMe"
  },
  {
   "name": "the field index lists answers and how many manuals are here",
@@ -132,7 +137,7 @@
  {
   "name": "a page link opens the manual at that page",
   "pass": true,
-  "detail": "#/library/mwi99igvgytc64?page=102&from=%23%2Ffield 102 / 268"
+  "detail": "#/library/mwiabw7j9qqc1r?page=102&from=%23%2Ffield 102 / 268"
  },
  {
   "name": "Back returns to the field index",
@@ -167,7 +172,7 @@
  {
   "name": "a playbook lists the pages that go with it",
   "pass": true,
-  "detail": "Run a generator safely\nCARD\nCPSC generator alert \u00b7 p. 1\nCarbon monoxide and backfeeding\nOSHA generator sheet \u00b7 p. 1\nGenerator safety fact sheet \u00b7 not on this phone yet | [{\"id\": \"mwi99ies1ll5jx\", \"type\": \"pdf\", \"name\": \"Emergency Disinfection of Drinking Water\", \"shelf\": \"sh-epawater\", \"catalog\": \"\", \"verified\": false, \"check\": \"\", \"size\": 976, \"file\": \"EPA-Emergency-Disinfection-of-Drinking-Water.pdf\"}, {\"id\": \"mwi99ifber6qiq\", \"type\": \"pdf\", \"name\": \"Portable Generator Hazards\", \"shelf\": \"sh-cpscgen\", \"catalog\": \"\", \"verified\": false, \"check\": \"\", \"size\": 637, \"file\": \"CPSC-Portable-Generator-Hazards.pdf\"}, {\"id\": \"mwi99igaq676oi\", \"type\": \"pdf\", \"name\": \"National Interoperability Field Operations Guide (NIFOG 2.02)\", \"shelf\": \"sh-nifog\", \"catalog\": \"\", \"verified\": false, \"check\": \"\", \"size\": 67800, \"file\": \"CISA-NIFOG-2.02.pdf\"}, {\"id\": \"mwi99igvgytc64\", \"type\": \"pdf\", \"name\": \"CERT Basic Training manual\", \"shelf\": \"sh-cert\", \"catalog\": \"\", \"verified\": false, \"check\": \"\", \"size\": 85516, \"file\": \"FEMA-CERT-Basic-Training-Participant-Manual-2019.pdf\"}]"
+  "detail": "Run a generator safely\nCARD\nCPSC generator alert \u00b7 p. 1\nCarbon monoxide and backfeeding\nOSHA generator sheet \u00b7 p. 1\nGenerator safety fact sheet \u00b7 not on this phone yet | [{\"id\": \"mwiabw6hhd6wqh\", \"type\": \"pdf\", \"name\": \"Emergency Disinfection of Drinking Water\", \"shelf\": \"sh-epawater\", \"catalog\": \"\", \"verified\": false, \"check\": \"\", \"size\": 976, \"file\": \"EPA-Emergency-Disinfection-of-Drinking-Water.pdf\"}, {\"id\": \"mwiabw6ssj3t6a\", \"type\": \"pdf\", \"name\": \"Portable Generator Hazards\", \"shelf\": \"sh-cpscgen\", \"catalog\": \"\", \"verified\": false, \"check\": \"\", \"size\": 637, \"file\": \"CPSC-Portable-Generator-Hazards.pdf\"}, {\"id\": \"mwiabw6zopbuur\", \"type\": \"pdf\", \"name\": \"National Interoperability Field Operations Guide (NIFOG 2.02)\", \"shelf\": \"sh-nifog\", \"catalog\": \"\", \"verified\": false, \"check\": \"\", \"size\": 67800, \"file\": \"CISA-NIFOG-2.02.pdf\"}, {\"id\": \"mwiabw7j9qqc1r\", \"type\": \"pdf\", \"name\": \"CERT Basic Training manual\", \"shelf\": \"sh-cert\", \"catalog\": \"\", \"verified\": false, \"check\": \"\", \"size\": 85516, \"file\": \"FEMA-CERT-Basic-Training-Participant-Manual-2019.pdf\"}]"
  },
  {
   "name": "Search everything finds field answers",
@@ -187,7 +192,72 @@
  {
   "name": "parts are separate storage entries that delete cleanly",
   "pass": true,
-  "detail": "(46, 40)"
+  "detail": "(52, 46)"
+ },
+ {
+  "name": "deck: Home leads with the level, the red tile, What's happening and know-how",
+  "pass": true,
+  "detail": "[1, 1, 8, 4]"
+ },
+ {
+  "name": "deck: the rank is one of the levels",
+  "pass": true,
+  "detail": "Ranger"
+ },
+ {
+  "name": "deck: each situation brings its plan, cards, manual pages and numbers together",
+  "pass": true,
+  "detail": "[]"
+ },
+ {
+  "name": "deck: Power out starts the outage clock",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "quick: + and \u2212 count on the spot",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "quick: the household is made from counts (names can come later)",
+  "pass": true,
+  "detail": "['Adult 1/adult', 'Adult 2/adult', 'Kid 1/child']"
+ },
+ {
+  "name": "quick: supplies are made from counts, with what each holds",
+  "pass": true,
+  "detail": "[['water', 3, '{\"gal\":3.17}'], ['food', 12, '{\"kcal\":450}'], ['power', 2, '{\"wh\":74}']]"
+ },
+ {
+  "name": "quick: Home turns them into days you can last",
+  "pass": true,
+  "detail": "FAMILY AUTONOMY\n1.0\nDAYS\nCRITICAL\nLimited by food \u00b7 target 14 days \u00b7 NORMAL MODE"
+ },
+ {
+  "name": "quick: counting again starts from what's saved",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "quick: counting down to zero removes it",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "quick: the household and supplies quests move",
+  "pass": true,
+  "detail": "LV\n3\nTHIS PHONE \u00b7 READINESS\nRanger\n59\n% READY\n1 XP TO GUARDIAN\nQUESTS\n3 OF 8 COMPLETE\nOn the Home Screen\nIn Safari: Share \u203a Add to Home Screen, then open HAVYN from its icon. Downloads made in a Safari tab stay in that tab.\n+10 XP\nHealth books from their publishers: 0 of 7\nWhere There Is No Doctor and the others aren't re-hosted; get them from Get more \u203a Shelf (Hesperian chapters are joined into one book).\n+5 XP\nFamily plan: 1 of 4\nAn out-of-area contact, meeting places and where to go if you mu"
+ },
+ {
+  "name": "voice: an elegant British woman first (Serena, Enhanced), then the nearest woman's voice, never a man's while a woman's is there",
+  "pass": true,
+  "detail": "('Serena (Enhanced)', 'Moira', 'Samantha')"
+ },
+ {
+  "name": "voice: System says which voice speaks and how to get the British one",
+  "pass": true,
+  "detail": ""
  },
  {
   "name": "no page errors",
@@ -220,19 +290,19 @@
   "detail": ""
  },
  {
-  "name": "welcome: the spotlight lands on each tab and on Search",
+  "name": "welcome: the spotlight lands on the level, What's happening, each tab and Search",
   "pass": true,
-  "detail": "[True, True, True, True, True, True]"
+  "detail": "[True, True, True, True, True, True, True]"
  },
  {
   "name": "welcome: every step is spoken",
   "pass": true,
-  "detail": "[' ', 'Welcome to Haven.', 'This is Status, your home base. It shows how ready your family is.', 'In an emergency, tap the red button. Every card is two taps away.', 'Guides tells you what to do, step by step.', \"Family keeps everyone's medicines, allergies and needs in one place.\", 'Supplies turns what you have into days you can last.', 'Search finds anything, even inside every manual, with no internet.', \"Now I'm downloading everything this phone needs. Stay on Wi-Fi, and keep me open.\"]"
+  "detail": "[' ', 'Welcome to Haven.', 'This is your command deck. Your level rises as you finish quests, and most of them finish themselves.', 'When something happens, tap it here. Everything you need is in one place.', 'In an emergency, tap the red button. Every card is two taps away.', 'Guides tells you what to do, step by step.', \"Family keeps everyone's medicines, allergies and needs in one place.\", 'Supplies turns what you have into days you can last.', 'Search finds anything, even inside every manual, with no internet.', \"Now I'm downloading everything this phone needs. Stay on Wi-Fi, and keep me open.\"]"
  },
  {
   "name": "welcome: the last step starts Download everything by itself",
   "pass": true,
-  "detail": "7 OF 7\nGetting this phone ready\n\nHAVYN is downloading everything now: 11 manuals and encyclopedias, 21 MB. Stay on Wi-Fi and keep HAVYN open; if it closes, it picks up where it stopped.\n\nNot on Wi-Fi?"
+  "detail": "8 OF 8\nGetting this phone ready\n\nHAVYN is downloading everything now: 11 manuals and encyclopedias, 21 MB. Stay on Wi-Fi and keep HAVYN open; if it closes, it picks up where it stopped. Your first que"
  },
  {
   "name": "welcome: it ends with You're equipped",

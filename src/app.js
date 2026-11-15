@@ -61,6 +61,9 @@
     wave: '<circle cx="12" cy="5.5" r="2"/><path d="M3 12c2 0 2-2 4.5-2s2.5 2 4.5 2 2-2 4.5-2 2.5 2 4.5 2"/><path d="M3 17c2 0 2-2 4.5-2s2.5 2 4.5 2 2-2 4.5-2 2.5 2 4.5 2"/>',
     bug: '<ellipse cx="12" cy="15" rx="3.5" ry="4.5"/><path d="M12 10.5V7a3 3 0 0 1 3-3h2l1.5 1.5"/><path d="M8.7 13 5 11.5M8.5 16.5 5 17.5M15.3 13l3.7-1.5M15.5 16.5l3.5 1"/>',
     snake: '<path d="M4 19c3 0 4-3 7-3s3 3 6 3 3-2.5 3-5.5S17.5 8 14.5 8H12"/><circle cx="10" cy="8" r="2.2"/><path d="M7.8 8H5.5l-1 1M5.5 8l-1-1"/>',
+    quake: '<path d="M3 20.5h18"/><path d="M5 20.5V9.5l7-5.5 7 5.5v11"/><path d="M12.5 8.5l-2 3.5 3 2-2.5 6.5"/>',
+    evac: '<path d="M13 3.5h5a1 1 0 0 1 1 1v15a1 1 0 0 1-1 1h-5"/><path d="M3 12h11M10.5 8l4 4-4 4"/>',
+    thermo: '<path d="M14 14.6V5.5a2 2 0 0 0-4 0v9.1a4 4 0 1 0 4 0z"/><path d="M12 10.5v6"/>',
     play: '<circle cx="12" cy="12" r="9"/><path d="M10 8.5v7l5.5-3.5z"/>',
     speaker: '<path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/>',
     speakeroff: '<path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M16 9.5l5 5M21 9.5l-5 5"/>',
@@ -233,10 +236,10 @@
 
   const SCREENS = {
     status: renderStatus, emergency: renderEmergency, playbooks: renderPlaybooks, guides: renderGuides, family: renderFamily, supplies: renderSupplies, buy: renderBuy,
-    missions: renderMissions, plan: renderPlan, comms: renderComms, library: renderLibrary, binder: renderBinder, system: renderSystem, field: renderField,
+    missions: renderMissions, plan: renderPlan, comms: renderComms, library: renderLibrary, binder: renderBinder, system: renderSystem, field: renderField, now: renderNow, quick: renderQuick, quests: renderQuests,
     search: renderSearch, archive: renderArchive
   };
-  const TAB_OF = { status: "status", missions: "status", guides: "guides", playbooks: "guides", plan: "guides", comms: "guides", library: "guides", binder: "guides", search: "guides", field: "guides", archive: "guides", emergency: "emergency", family: "family", supplies: "supplies", buy: "supplies" };
+  const TAB_OF = { status: "status", missions: "status", now: "status", quick: "status", quests: "status", guides: "guides", playbooks: "guides", plan: "guides", comms: "guides", library: "guides", binder: "guides", search: "guides", field: "guides", archive: "guides", emergency: "emergency", family: "family", supplies: "supplies", buy: "supplies" };
   let lastPath = "";
   function render() {
     route = parseHash();
@@ -272,7 +275,7 @@
     if (route.path === "library" && !route.parts[1]) { libQuota(); PdfIndex.kick(); }
     if (route.path === "search") SearchUI.mount();
     if (route.path === "archive") Get.mount();
-    if (route.path === "status" || route.path === "") Ready.mount();
+    if (route.path === "status" || route.path === "" || route.path === "quests") Ready.mount();
   }
 
   /* ---------------- shared chrome ---------------- */
@@ -335,6 +338,18 @@
     return out + "</svg>";
   }
 
+  function deck() {
+    // The command deck: the one red button, then "What's happening?", then the rest of HAVYN as tiles.
+    let h = '<a class="sostile" href="#/emergency"><span class="sd">' + ic("cross") + '</span><span class="tx"><b>Someone\'s hurt</b><small>Not breathing, bleeding, choking, chest pain: the cards, with one-tap 911</small></span>' + ic("chev") + "</a>";
+    h += '<div class="sec"><span class="lab">What\'s happening?</span></div><div class="nowgrid">' + (C.situations || []).map((x) => {
+      const pb = x.pb && C.playbooks.find((p) => p.id === x.pb && !p.soon), pr = pb ? countChecks(pb) : null;
+      return '<a class="gt" href="#/now/' + x.id + '">' + ic(x.icon) + "<b>" + esc(x.t) + "</b>" + (pr && pr.d ? '<small class="on">' + pr.d + " of " + pr.n + " done</small>" : "<small>" + esc(x.sub) + "</small>") + "</a>";
+    }).join("") + "</div>";
+    h += '<div class="sec"><span class="lab">Know-how</span></div><div class="menugrid">' +
+      [["#/field", "book", "How do I…", FIELD().length + " answers"], ["#/library", "globe", "Library", libSummary() || "Encyclopedias, manuals"], ["#/plan", "pin", "Plan", "Meeting places, contacts"], ["#/comms", "radio", "Comms", "Radios, check-ins"]]
+        .map(([href, icn, b, sm]) => '<a class="mt" href="' + href + '">' + ic(icn) + "<span><b>" + esc(b) + "</b><small>" + esc(sm) + "</small></span></a>").join("") + "</div>";
+    return h;
+  }
   function renderStatus() {
     const t = now();
     const a = E.autonomy(S, t);
@@ -342,6 +357,12 @@
     let h = topbar();
     const fam = a.family;
     const st = E.status(fam);
+    // Readiness is the game: level up as quests are done (a toast and a chime when it happens).
+    const rs = Ready.score(), lv = level(rs);
+    if (PR.level && lv.n > PR.level && !Welcome.on) setTimeout(() => { toast("LEVEL UP · " + lv.rank.toUpperCase() + " · LV " + lv.n); Snd.chime("save"); }, 400);
+    if (PR.level !== lv.n) { PR.level = lv.n; flush(); }
+    h += Ready.panel() + deck();
+    h += '<div class="sec"><span class="lab">Family status</span></div>';
     h += '<section class="glass hero"><div class="lab">Family autonomy</div>';
     if (!people.length) {
       h += '<div class="num"><span class="big">—</span><span class="unit">DAYS</span></div><div class="sub">Add your household and supplies to see how long you can last.</div></section>';
@@ -351,9 +372,6 @@
         '<span class="chip ' + (a.season === "heat" ? "heat" : "") + '">' + (a.season === "heat" ? "Heat mode" : "Normal mode") + "</span>" +
         (a.measured.water || a.measured.food || a.measured.power ? ' <span class="chip cyan">Measured use</span>' : "") + "</div></section>";
     }
-    // Until everything is on this phone, getting it there is the most important thing on this screen.
-    const rs = Ready.score();
-    if (rs < 100) h += Ready.panel();
     h += '<div class="scene">' + towersSVG(a) + "</div>";
 
     // Outage + check-in
@@ -372,8 +390,8 @@
     const alerts = [];
     if (!people.length && !L("items").length) {
       alerts.push('<div class="glass panel"><h3>Start here</h3><div class="list">' +
-        '<a class="li" href="#/family">' + '<span class="ic">' + ic("people") + '</span><span class="tx"><b>1. Add your household</b><small>People, pets, contacts, meeting places</small></span>' + ic("chev") + "</a>" +
-        '<a class="li" href="#/supplies">' + '<span class="ic">' + ic("box") + '</span><span class="tx"><b>2. Add supplies</b><small>Water, food, critical meds, batteries</small></span>' + ic("chev") + "</a>" +
+        '<a class="li" href="#/quick/household">' + '<span class="ic">' + ic("people") + '</span><span class="tx"><b>1. Add your household</b><small>People, pets, contacts, meeting places</small></span>' + ic("chev") + "</a>" +
+        '<a class="li" href="#/quick/supplies">' + '<span class="ic">' + ic("box") + '</span><span class="tx"><b>2. Add supplies</b><small>Water, food, critical meds, batteries</small></span>' + ic("chev") + "</a>" +
         '<a class="li" href="#/system">' + '<span class="ic">' + ic("card") + '</span><span class="tx"><b>3. Save a Memory Card</b><small>Back up and share to every phone</small></span>' + ic("chev") + "</a>" +
         '</div><div class="btnrow" style="margin-top:12px"><button class="btn ghost" data-act="example">Try with an example household</button></div></div>');
     }
@@ -389,9 +407,83 @@
     const g = E.gaps(S, t);
     if (people.length && g.list.length) alerts.push('<a class="alert" href="#/supplies"><span class="dot"></span><span><b>To reach ' + g.target + " days</b><small>" + g.list.slice(0, 3).map((x) => "+" + fmtN(x.gap, x.unit === "gal" ? 1 : 0) + " " + x.unit + " " + (x.name ? esc(x.name) : x.res)).join(" · ") + "</small></span></a>");
     if (alerts.length) h += '<div class="sec"><span class="lab">Attention</span></div>' + alerts.join("");
-    if (rs >= 100) h += '<a class="alert info" href="#/archive?t=shelf" id="ready"><span class="dot" style="background:var(--ok)"></span><span><b>This phone is ready</b><small>Manuals, encyclopedias, plan and backup are all on it. Open Get more for updates.</small></span></a>';
+    if (false) h += '<a class="alert info" href="#/archive?t=shelf" id="ready"><span class="dot" style="background:var(--ok)"></span><span><b>This phone is ready</b><small>Manuals, encyclopedias, plan and backup are all on it. Open Get more for updates.</small></span></a>';
     if (PREVIEW) h += '<div class="alert info"><span class="dot"></span><span><b>Preview build</b><small>Data stays in this browser only. Install from your own link for offline use on iPhone.</small></span></div>';
     return h;
+  }
+
+  function renderQuests() { return backbar("#/status", "Quests") + Ready.panel(true); }
+
+  /* ---------------- WHAT'S HAPPENING: one situation, everything for it ---------------- */
+  function renderNow() {
+    const x = (C.situations || []).find((y) => y.id === route.parts[1]);
+    if (!x) { location.replace("#/status"); return ""; }
+    const pb = x.pb && C.playbooks.find((p) => p.id === x.pb && !p.soon), from = "#/now/" + x.id, P = S.plan || {};
+    let h = backbar("#/status", "Home");
+    h += '<section class="glass hero nowhero"><div class="lab">What\'s happening</div><div class="nowh"><span class="nic">' + ic(x.icon) + "</span><div><h2>" + esc(x.t) + "</h2><div class=\"sub\">" + esc(pb ? pb.trigger : x.sub) + "</div></div></div>";
+    if (pb) {
+      const pr = countChecks(pb), ph = pb.phases[0];
+      h += '<div class="nowfirst"><div class="lab">' + esc(ph.label) + "</div>" + ph.items.slice(0, 3).map((it) => '<div class="nowi">' + ic("chev") + "<span>" + esc(it.t) + "</span></div>").join("") + "</div>" +
+        '<div class="btnrow"><a class="btn" href="#/playbooks/' + pb.id + '">' + ic("play") + (pr.d ? "Carry on: " + pr.d + " of " + pr.n + " done" : "Start the step-by-step plan") + "</a></div>";
+    }
+    if (x.clock) { const o = S.outage || {}; h += '<div class="btnrow" style="margin-top:8px">' + (o.active ? '<span class="chip warn">Outage clock running</span>' : '<button class="btn ghost" data-act="outage-start">' + ic("clock") + "Start the outage clock</button>") + "</div>"; }
+    h += "</section>";
+    if (pb) h += '<section class="panel leaveif"><h3>' + esc(pb.ruleTitle || "Hard rule: leave now if") + "</h3>" + pb.leave.map((l) => '<div class="kv"><span>' + esc(l) + "</span></div>").join("") + "</section>";
+    if (x.plan) h += '<section class="glass panel"><h3>Your plan</h3>' +
+      [["Meet 1 · near home", P.rally1], ["Meet 2 · neighborhood", P.rally2], ["Meet 3 · out of area", P.rally3], ["If you must leave", P.leaveTo], ["Out-of-area contact", P.contactName ? P.contactName + (P.contactPhone ? " · " + P.contactPhone : "") : ""]]
+        .map(([k, v]) => '<div class="kv"><span>' + esc(k) + "</span><span>" + (v ? esc(v) : '<span style="color:var(--mute)">not set</span>') + "</span></div>").join("") +
+      '<div class="btnrow" style="margin-top:10px"><a class="btn ghost" href="#/family/plan">Edit the plan</a>' + (P.contactPhone ? '<a class="btn" href="tel:' + esc(P.contactPhone.replace(/[^0-9+]/g, "")) + '">' + ic("phone") + "Call contact</a>" : "") + "</div></section>";
+    const cards = x.cards.map((id) => C.cards.find((c) => c.id === id)).filter(Boolean);
+    if (cards.length) h += '<div class="sec"><span class="lab">If someone is hurt</span></div><div class="nowcards">' + cards.map((c) => '<a class="nc" href="#/emergency/' + c.id + '">' + ic(c.icon) + "<span><b>" + esc(c.title) + "</b><small>" + esc(c.sub) + "</small></span></a>").join("") + "</div>";
+    const fs = x.field.map((id) => FIELD().find((f) => f.id === id)).filter(Boolean);
+    if (fs.length) h += '<div class="sec"><span class="lab">How to, from the manuals on this phone</span></div><div class="list fl">' + fs.map((f) => fieldRow(f, from)).join("") + "</div>";
+    const nums = [0].concat(x.nums || []).map((i) => C.numbers[i]).filter(Boolean);
+    h += '<div class="sec"><span class="lab">Numbers</span></div><div class="list">' + nums.map((n) => '<a class="li" href="tel:' + esc(String(n.num).replace(/[^0-9+]/g, "")) + '"><span class="ic">' + ic("phone") + '</span><span class="tx"><b>' + esc(n.n) + " · " + esc(n.num) + "</b><small>" + esc(n.d) + "</small></span>" + ic("chev") + "</a>").join("") + "</div>";
+    return h;
+  }
+
+  /* ---------------- QUICK SETUP: tap counts instead of forms ---------------- */
+  let quick = null;
+  function renderQuick() {
+    const kind = route.parts[1] === "supplies" ? "supplies" : "household", Q = C.quick;
+    if (!quick || quick.kind !== kind) {
+      quick = { kind, n: {} };
+      if (kind === "household") { for (const r of Q.household) quick.n[r.k] = r.k === "pet" ? L("pets").length : L("people").filter((x) => (x.ageBand || "adult") === r.k).length; }
+      else for (const g of Q.supplies) for (const it of g.items) { const ex = L("items").find((i) => i.name === it.name && !i.example); quick.n[it.k] = ex ? Number(ex.qty) || 0 : 0; }
+    }
+    const row = (k, t, sub, icn) => '<div class="qrow">' + (icn ? '<span class="qic">' + ic(icn) + "</span>" : "") + '<span class="qtx"><b>' + esc(t) + "</b><small>" + esc(sub) + '</small></span><span class="qstep"><button data-act="q-" data-k="' + k + '" aria-label="Fewer ' + esc(t) + '">' + ic("minus") + '</button><output id="q-' + k + '">' + (quick.n[k] || 0) + '</output><button data-act="q+" data-k="' + k + '" aria-label="More ' + esc(t) + '">' + ic("plus") + "</button></span></div>";
+    let h = backbar("#/status", kind === "household" ? "Your household" : "Your supplies");
+    if (kind === "household") {
+      h += '<section class="glass hero qhero"><div class="lab">Quest · +15 XP</div><h2>Who lives with you?</h2><div class="sub">Tap + for each person and pet. Names can wait: HAVYN works out water, food and medicine from the count.</div></section>';
+      h += '<section class="glass panel qpanel">' + Q.household.map((r) => row(r.k, r.t, r.sub, r.k === "pet" ? "paw" : "people")).join("") + "</section>";
+    } else {
+      h += '<section class="glass hero qhero"><div class="lab">Quest · +10 XP</div><h2>What do you have?</h2><div class="sub">Count what\'s in the house. Home turns it into days you can last; fine-tune anything later in Supplies.</div></section>';
+      for (const g of Q.supplies) h += '<div class="sec"><span class="lab">' + esc(g.g) + '</span></div><section class="glass panel qpanel">' + g.items.map((it) => row(it.k, it.t, it.sub, g.icon)).join("") + "</section>";
+    }
+    h += '<div class="btnrow qsave"><button class="btn" data-act="q-save">' + ic("check") + "Save</button></div>";
+    return h;
+  }
+  function quickSave() {
+    if (!quick) return;
+    const t = now(), Q = C.quick;
+    if (quick.kind === "household") {
+      let added = 0;
+      for (const r of Q.household) {
+        if (r.k === "pet") { const have = L("pets").length; for (let i = have; i < (quick.n.pet || 0); i++) { S.pets.push({ id: uid(), name: "Pet " + (i + 1), species: "Pet", updated: t }); added++; } continue; }
+        const have = L("people").filter((x) => (x.ageBand || "adult") === r.k).length;
+        for (let i = have; i < (quick.n[r.k] || 0); i++) { S.people.push({ id: uid(), name: r.t.replace(/s$/, "").replace(/^Babie$/, "Baby") + " " + (i + 1), ageBand: r.k, updated: t }); added++; }
+      }
+      save(); quick = null; Snd.chime("save");
+      toast(added ? "Household saved. Add names, medicines and allergies any time in Family" : "Nothing new to add");
+    } else {
+      for (const g of Q.supplies) for (const it of g.items) {
+        const n = quick.n[it.k] || 0, ex = S.items.find((i) => !i.deleted && i.name === it.name && !i.example);
+        if (ex) { if (n) { ex.qty = n; ex.updated = t; } else { Object.keys(ex).forEach((k) => { if (k !== "id") delete ex[k]; }); ex.deleted = true; ex.updated = t; } }
+        else if (n) S.items.push(Object.assign({ id: uid(), category: it.category, name: it.name, qty: n, updated: t }, it.per_unit ? { per_unit: Object.assign({}, it.per_unit) } : {}));
+      }
+      save(); quick = null; Snd.chime("save"); toast("Supplies saved. Home shows how many days they last");
+    }
+    location.hash = "#/status";
   }
 
   /* ---------------- EMERGENCY ---------------- */
@@ -466,7 +558,8 @@
     return out;
   }
   function fieldRow(f, from) {
-    const pb = f.pb && !String(from || "").endsWith("/" + f.pb) && C.playbooks.find((x) => x.id === f.pb && !x.soon);   // no link to the playbook you're in
+    const sit = /^#\/now\/([\w-]+)/.exec(from || ""), inSit = sit && (C.situations || []).find((x) => x.id === sit[1]);
+    const pb = f.pb && !String(from || "").endsWith("/" + f.pb) && !(inSit && inSit.pb === f.pb) && C.playbooks.find((x) => x.id === f.pb && !x.soon);   // no link to the playbook you're in (or whose situation you're in)
     return '<div class="fi" id="' + esc(f.id) + '" data-k="' + esc(fold(f.q + " " + (f.k || "") + " " + f.r.map((r) => r[2] + " " + fieldDoc(r[0])).join(" "))) + '"><div class="fq"><b>' + esc(f.q) + "</b>" +
       (f.card ? '<a class="chip crit" href="#/emergency/' + esc(f.card) + '">Card</a>' : "") + (pb ? '<a class="chip" href="#/playbooks/' + esc(pb.id) + '">' + esc(pb.title) + "</a>" : "") + "</div>" +
       f.r.map((r) => refRow(r, from)).join("") + "</div>";
@@ -547,6 +640,7 @@
     if (sub === "pet") return renderPetForm(route.parts[2]);
     if (sub === "plan") return renderPlanForm();
     let h = topbar("Family");
+    h += '<a class="quickbtn" href="#/quick/household">' + ic("people") + "<span><b>" + (L("people").length ? "Add people fast" : "Set up your household in a few taps") + "</b><small>Counts first, names later</small></span>" + ic("chev") + "</a>";
     const pl = S.plan || {};
     h += '<section class="glass panel"><h3>Plan</h3>' +
       '<div class="kv"><span>Out-of-area contact</span><span>' + (pl.contactName ? esc(pl.contactName) + (pl.contactPhone ? ' · <a href="tel:' + esc(pl.contactPhone.replace(/[^0-9+]/g, "")) + '">' + esc(pl.contactPhone) + "</a>" : "") : '<span style="color:var(--mute)">not set</span>') + "</span></div>" +
@@ -644,6 +738,7 @@
     if (sub === "edit") return renderItemForm(route.parts[2]);
     const t = now(), a = E.autonomy(S, t), g = E.gaps(S, t), cat = route.q.cat || "all";
     let h = topbar("Supplies") + segNav("inv");
+    h += '<a class="quickbtn" href="#/quick/supplies">' + ic("box") + "<span><b>Quick count</b><small>Tap how many cases, jugs, cans and batteries you have</small></span>" + ic("chev") + "</a>";
     h += '<div class="grid2">' + ["water", "food", "meds", "power"].map((k) => {
       const v = a[k], st = v === Infinity ? "ok" : E.status(v);
       return '<a class="glass panel" href="#/supplies?cat=' + k + '" style="text-decoration:none;color:var(--ink)"><div class="lab">' + RES[k].label + '</div><div class="mono" style="font-size:1.7rem;margin-top:4px">' + fmtDays(v) + ' <span style="font-size:.8rem;color:var(--mute)">days</span></div><span class="chip ' + st + '" style="margin-top:6px">' + (v === Infinity ? "SOLAR" : STATUS_WORD[st]) + (a.measured[k] ? " · measured" : "") + "</span></a>";
@@ -2019,22 +2114,29 @@
       clearTimeout(this.t); this.t = setTimeout(() => { if (PR.autoGet && !document.hidden && idle() && !document.body.classList.contains("em")) this.run(true); }, 2000);
     }
   };
+  // Levels: readiness as a game. Each quest is worth its share of the 100 points.
+  const LEVELS = [[0, "Recruit"], [20, "Scout"], [40, "Ranger"], [60, "Guardian"], [80, "Sentinel"], [100, "Fortress"]];
+  function level(sc) {
+    let n = 1; LEVELS.forEach(([at], i) => { if (sc >= at) n = i + 1; });
+    const nx = LEVELS[n]; return { n, rank: LEVELS[n - 1][1], next: nx ? { at: nx[0], rank: nx[1] } : null };
+  }
   const Ready = {
     rows() {
       // Count only what HAVYN's shelf actually holds today (a document whose publisher was down on build day can't be fetched yet).
       const ph = C.shelf.items.filter((i) => i.ph), hosted = ph.filter((i) => i.lic !== "link"), share = hosted.filter((i) => Shelf.state !== "ready" || Shelf.info(i) || shelfHave(i)), shHave = share.filter((i) => shelfHave(i)).length, later = hosted.length - share.length;
       const link = ph.filter((i) => i.lic === "link"), lkHave = link.filter((i) => shelfHave(i)).length;
       const core = coreArchives(), arHave = core.filter((i) => haveOnPhone(i)).length;
-      const people = L("people").length, P = S.plan || {};
+      const people = L("people").length, P = S.plan || {}, its = L("items"), hasW = its.some((i) => i.category === "water" && i.qty > 0), hasF = its.some((i) => i.category === "food" && i.qty > 0);
       const plan = [people > 0, !!P.contactPhone, !!(P.rally2 || P.rally3), !!P.leaveTo].filter(Boolean).length;
       const sw = !!(navigator.serviceWorker && navigator.serviceWorker.controller);
       return [
         { k: "app", w: 10, f: isStandalone() ? 1 : 0, t: "On the Home Screen", d: isStandalone() ? "Opens like an app, with its own storage." : "In Safari: Share › Add to Home Screen, then open HAVYN from its icon. Downloads made in a Safari tab stay in that tab.", go: "#/system" },
         { k: "offline", w: 10, f: sw || PREVIEW ? 1 : 0, t: "Works with no internet", d: sw ? "The app itself is saved on this phone." : "Open HAVYN once while online; it saves itself for offline use.", go: "#/system" },
-        { k: "shelf", w: 25, f: share.length ? shHave / share.length : 1, t: "Manuals and guides: " + shHave + " of " + share.length, d: (shHave === share.length ? "Every phone-set document on HAVYN's shelf is here and searchable." : "First aid, water, food, power, radio, repair and survival manuals (" + sz(share.filter((i) => !shelfHave(i)).reduce((a, i) => a + shelfSize(i), 0)) + " to go)."), n: later ? later + (later === 1 ? " more isn't" : " more aren't") + " on HAVYN's shelf yet (the publisher was unreachable); HAVYN's shelf retries every day." : "", go: "#/archive?t=shelf" },
-        { k: "arc", w: 25, f: core.length ? arHave / core.length : 1, t: "Encyclopedias: " + arHave + " of " + core.length, d: arHave === core.length ? "WikiMed and the survival libraries are here." : "WikiMed, post-disaster, water, food, medicine, knots and a kids' encyclopedia (" + sz(core.filter((i) => !haveOnPhone(i)).reduce((a, i) => a + Arc.size(i), 0)) + " to go).", go: "#/archive?t=phone" },
+        { k: "shelf", w: 20, f: share.length ? shHave / share.length : 1, t: "Manuals and guides: " + shHave + " of " + share.length, d: (shHave === share.length ? "Every phone-set document on HAVYN's shelf is here and searchable." : "First aid, water, food, power, radio, repair and survival manuals (" + sz(share.filter((i) => !shelfHave(i)).reduce((a, i) => a + shelfSize(i), 0)) + " to go)."), n: later ? later + (later === 1 ? " more isn't" : " more aren't") + " on HAVYN's shelf yet (the publisher was unreachable); HAVYN's shelf retries every day." : "", go: "#/archive?t=shelf" },
+        { k: "arc", w: 20, f: core.length ? arHave / core.length : 1, t: "Encyclopedias: " + arHave + " of " + core.length, d: arHave === core.length ? "WikiMed and the survival libraries are here." : "WikiMed, post-disaster, water, food, medicine, knots and a kids' encyclopedia (" + sz(core.filter((i) => !haveOnPhone(i)).reduce((a, i) => a + Arc.size(i), 0)) + " to go).", go: "#/archive?t=phone" },
         { k: "books", w: 5, f: link.length ? lkHave / link.length : 1, t: "Health books from their publishers: " + lkHave + " of " + link.length, d: "Where There Is No Doctor and the others aren't re-hosted; get them from Get more › Shelf (Hesperian chapters are joined into one book).", go: "#/archive?t=shelf" },
-        { k: "family", w: 15, f: plan / 4, t: "Family plan: " + plan + " of 4", d: "Your household, an out-of-area contact, meeting places and where to go if you must leave.", go: "#/family" },
+        { k: "family", w: 15, f: plan / 4, t: "Family plan: " + plan + " of 4", d: people ? "An out-of-area contact, meeting places and where to go if you must leave." : "Start with who lives with you: a few taps.", go: people ? "#/family" : "#/quick/household" },
+        { k: "supplies", w: 10, f: (hasW ? 0.5 : 0) + (hasF ? 0.5 : 0), t: hasW && hasF ? "Supplies counted" : "Count your supplies", d: "A few taps for water, food, power and gear; Home turns them into days you can last.", go: "#/quick/supplies" },
         { k: "card", w: 10, f: now() - (PR.lastBackup || 0) < 30 * DAY ? 1 : 0, t: "Memory Card saved this month", d: "Copies your plan to every family phone and keeps a backup.", go: "#/system" }
       ];
     },
@@ -2044,21 +2146,34 @@
       const ar = coreArchives().filter((i) => Arc.can(i) && !haveOnPhone(i));
       return { n: sh.length + ar.length, bytes: sh.reduce((a, i) => a + shelfSize(i), 0) + ar.reduce((a, i) => a + Arc.size(i), 0) };
     },
-    panel() {
+    panel(full) {
       const rows = this.rows(), sc = this.score(), lf = this.left(), busy = Shelf.busy || Arc.busy || Everything.busy, done = lf.n === 0;
-      const st = sc >= 90 ? "ok" : sc >= 50 ? "warn" : "crit";
-      let h = '<section class="glass panel ready" id="ready"><div class="rdyhead"><div><div class="lab">This phone</div><div class="num"><span class="big" style="font-size:2.4rem">' + sc + '</span><span class="unit">% READY</span> <span class="chip ' + st + '">' + (sc >= 90 ? "READY" : sc >= 50 ? "ALMOST" : "NOT YET") + "</span></div></div></div>" +
-        '<div class="bar" style="margin:8px 0 10px"><i style="width:' + sc + '%"></i></div>';
+      const st = sc >= 90 ? "ok" : sc >= 50 ? "warn" : "crit", lv = level(sc), circ = 2 * Math.PI * 34;
+      let h = '<section class="glass panel ready hud" id="ready"><div class="rdyhead">' +
+        '<div class="ring" aria-hidden="true"><svg viewBox="0 0 80 80"><circle cx="40" cy="40" r="34" class="rt"/><circle cx="40" cy="40" r="34" class="rp" style="stroke-dasharray:' + circ.toFixed(1) + ";stroke-dashoffset:" + (circ * (1 - sc / 100)).toFixed(1) + '"/></svg><div class="lv"><small>LV</small><b>' + lv.n + "</b></div></div>" +
+        '<div class="hudtx"><div class="lab">This phone · readiness</div><div class="rank">' + esc(lv.rank) + "</div>" +
+        '<div class="num"><span class="big">' + sc + '</span><span class="unit">% READY</span>' + (lv.next ? '<span class="xpn">' + (lv.next.at - sc) + " XP to " + esc(lv.next.rank) + "</span>" : '<span class="xpn">Max level</span>') + "</div></div></div>" +
+        '<div class="bar xp"><i style="width:' + sc + '%"></i></div>';
       if (!PREVIEW && !done) {
-        h += '<div class="btnrow">' + '<button class="btn" data-act="get-everything" data-arcget data-shget' + (busy ? " disabled" : "") + ">" + ic("download") + (PR.autoGet && !PR.firstGet ? "Carry on downloading · " : "Download everything · ") + sz(lf.bytes) + "</button>" +
+        h += '<div class="btnrow">' + '<button class="btn" data-act="get-everything" data-arcget data-shget' + (busy ? " disabled" : "") + ">" + ic("download") + (busy ? "Downloading · " + sz(lf.bytes) + " to go" : (PR.autoGet && !PR.firstGet ? "Carry on downloading · " : "Download everything · ") + sz(lf.bytes)) + "</button>" +
           '<button class="btn ghost' + (busy ? "" : " hide") + '" id="rdystop" data-act="get-stop">Stop</button></div>' +
-          '<div class="sub" style="font-size:.8rem;margin-top:6px">' + lf.n + " items. Use Wi-Fi and keep HAVYN open (the screen stays on); it picks up where it stopped if you close it.</div>";
+          '<div class="sub" style="font-size:.8rem;margin-top:6px">' + lf.n + " items · on Wi-Fi, keep HAVYN open; it picks up where it stopped.</div>";
       }
       h += '<div class="bar' + (busy ? "" : " hide") + '" id="rdybar" style="margin-top:10px"><i style="width:0%"></i></div><div id="rdymsg" class="empty" style="min-height:1.1em;font-size:.82rem"></div>';
-      h += '<div class="list rdy">' + rows.map((r) => {
+      const open = rows.filter((r) => r.f < 1), doneQ = rows.length - open.length;
+      // On Home: the next three quests, one line each. Every quest, with what it means: the Quests screen.
+      if (!full) {
+        h += '<div class="qhead"><span class="lab">' + (open.length ? "Next quests" : "Quests") + '</span><a class="lab qall" href="#/quests">' + doneQ + " of " + rows.length + " complete ›</a></div>";
+        h += '<div class="list rdy quests mini">' + (open.length ? open.slice(0, 3).map((r) => '<a class="li" href="' + r.go + '"><span class="ic">' + ic(r.f > 0 ? "clock" : "plus") + '</span><span class="tx"><b>' + esc(r.t) + '</b></span><span class="xpc">+' + Math.round(r.w * (1 - Math.max(0, r.f))) + " XP</span>" + ic("chev") + "</a>").join("")
+          : '<a class="li ok" href="#/quests"><span class="ic">' + ic("check") + '</span><span class="tx"><b>Every quest complete</b></span>' + ic("chev") + "</a>") + "</div></section>";
+        return h;
+      }
+      h += '<div class="qhead"><span class="lab">Quests</span><span class="lab">' + doneQ + " of " + rows.length + " complete</span></div>";
+      h += '<div class="list rdy quests">' + open.concat(rows.filter((r) => r.f >= 1)).map((r) => {
         const ok = r.f >= 1, part = !ok && r.f > 0;
         const note = ok ? r.n || "" : [r.d, r.n].filter(Boolean).join(" ");
-        return '<a class="li' + (ok ? " ok" : "") + '" href="' + r.go + '"><span class="ic">' + ic(ok ? "check" : part ? "clock" : "plus") + '</span><span class="tx"><b>' + esc(r.t) + "</b>" + (note ? "<small" + (ok ? ' class="keep"' : "") + ">" + esc(note) + "</small>" : "") + "</span>" + ic("chev") + "</a>";
+        return '<a class="li' + (ok ? " ok" : "") + '" href="' + r.go + '"><span class="ic">' + ic(ok ? "check" : part ? "clock" : "plus") + '</span><span class="tx"><b>' + esc(r.t) + "</b>" + (note ? "<small" + (ok ? ' class="keep"' : "") + ">" + esc(note) + "</small>" : "") + "</span>" +
+          '<span class="xpc' + (ok ? " got" : "") + '">' + (ok ? "" : "+") + Math.round(r.w * (ok ? 1 : 1 - Math.max(0, r.f))) + " XP</span>" + ic("chev") + "</a>";
       }).join("") + "</div></section>";
       return h;
     },
@@ -2458,6 +2573,10 @@
       '<div class="kv"><span>Version</span><span class="mono">' + esc(VERSION) + "</span></div>" +
       '<p class="empty" style="font-size:.85rem">Deleting the app icon deletes its data. Keep Memory Cards on another phone and the vault drive.</p>' +
       '<div class="btnrow"><button class="btn ghost" data-act="wel-replay">' + ic("play") + "Replay the welcome tour</button></div></section>";
+    const vi = Voice.ok() ? Voice.info() : null;
+    h += '<section class="glass panel"><h3>Voice</h3><div class="kv"><span>In use</span><span>' + (vi ? esc(vi.name) + " · " + esc(vi.lang) : Voice.ok() ? "Loading…" : "This browser can't speak") + "</span></div>" +
+      (vi && vi.gb ? "" : '<p class="empty" style="font-size:.85rem">HAVYN speaks with an elegant British woman\'s voice when the iPhone has one: Settings › Accessibility › Spoken Content › Voices › English › English (UK) › Serena or Martha, then download the Enhanced or Premium version. HAVYN picks it up by itself.</p>') +
+      '<div class="btnrow"><button class="btn ghost" data-act="voice-test">' + ic("speaker") + "Hear it</button></div></section>";
     h += '<section class="glass panel"><h3>Danger zone</h3><button class="btn ghost danger wide" data-act="erase">Erase everything on this phone</button></section>';
     return h;
   }
@@ -2615,6 +2734,13 @@
     else if (act === "pdf-dest") PdfV.dest(num(b.dataset.i));
     else if (act === "pdf-go") { const pn = $("#pdfpanel"); if (pn) pn.classList.add("hide"); PdfV.go(num(b.dataset.n)); }
     else if (act === "get-everything") Everything.run(false);
+    else if (act === "q+" || act === "q-") {
+      if (!quick) return; const k = b.dataset.k, v = Math.max(0, Math.min(999, (quick.n[k] || 0) + (act === "q+" ? 1 : -1)));
+      quick.n[k] = v; const o = $("#q-" + k); if (o) { o.textContent = v; o.classList.remove("bump"); void o.offsetWidth; o.classList.add("bump"); }
+      Snd.chime("nav");
+    }
+    else if (act === "q-save") quickSave();
+    else if (act === "voice-test") { Welcome.muted = false; Voice.say("Welcome to Haven. This is the voice I'll use."); setTimeout(render, 600); }
     else if (act === "wel-begin") Welcome.begin();
     else if (act === "wel-skip") Welcome.close("skip");
     else if (act === "wel-sos") Welcome.close("sos");
@@ -2740,7 +2866,7 @@
     const dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy;
     if (Math.abs(dx) > 70 && Math.abs(dy) < 50) stepTo(dx < 0 ? 1 : -1);
   }, { passive: true });
-  document.addEventListener("click", (e) => { const t = e.target.closest(".tab, a.li"); if (t && !document.body.classList.contains("em")) Snd.chime("nav"); }, true);
+  document.addEventListener("click", (e) => { const t = e.target.closest(".tab, a.li, a.gt, a.mt, a.nc, a.sostile"); if (t && !document.body.classList.contains("em")) Snd.chime("nav"); }, true);
   window.addEventListener("hashchange", render);
   document.addEventListener("visibilitychange", () => { if (document.hidden) flush(); else { if (document.body.classList.contains("em")) Wake.on(); Everything.carryOn(); } });
   window.addEventListener("online", () => Everything.carryOn());
@@ -2772,9 +2898,13 @@
     pick() {
       if (!this.ok()) return null;
       const novelty = /(Albert|Bad News|Bahh|Bells|Boing|Bubbles|Cellos|Deranged|Good News|Hysterical|Jester|Junior|Organ|Pipe|Superstar|Trinoids|Whisper|Wobble|Zarvox|Fred|Ralph|Kathy|Grandma|Grandpa|Eddy|Flo|Reed|Rocko|Sandy|Shelley)/i;
+      // An elegant British woman first: Serena or Martha (or Kate, Stephanie; Libby, Sonia, Maisie or "UK English Female" on other
+      // systems), then any other woman's voice, never a man's while a woman's is there. Premium and Enhanced voices sound best.
+      const gbF = /(Serena|Martha|Kate|Stephanie|Fiona|Libby|Sonia|Maisie|Hazel|Bella|UK English Female)/i, otherF = /(Moira|Karen|Tessa|Samantha|Ava|Zoe|Allison|Susan|Victoria|Nicky|Noelle|Catherine|Joelle|Kathy)/i,
+        male = /(Daniel|Arthur|Oliver|Malcolm|Jamie|Gordon|George|Ryan|Thomas|Alfie|Elliot|Ethan|Noah|Rishi|Lee|Tom|Evan|Nathan|Aaron|Alex|UK English Male|Fred)/i;
       const score = (x) => { const l = String(x.lang || "").replace("_", "-");
-        return (/premium/i.test(x.name) ? 50 : /enhanced/i.test(x.name) ? 35 : 0) + (/^en-GB/i.test(l) ? 14 : /^en-(AU|IE|NZ|ZA)/i.test(l) ? 6 : 0) +
-          (/(Serena|Daniel|Arthur|Martha|Kate|Oliver|Stephanie|Jamie|Malcolm)/.test(x.name) ? 10 : /(Ava|Zoe|Evan|Nathan|Allison|Susan|Samantha|Tom|Noelle)/.test(x.name) ? 5 : 0) + (x.localService ? 3 : 0); };
+        return (/premium/i.test(x.name) ? 30 : /enhanced/i.test(x.name) ? 20 : 0) + (gbF.test(x.name) ? 100 : otherF.test(x.name) ? 45 : 0) - (male.test(x.name) ? 120 : 0) +
+          (/^en-GB/i.test(l) ? 12 : /^en-(IE|AU|NZ|ZA)/i.test(l) ? 5 : 0) + (x.localService ? 3 : 0); };
       let vs = []; try { vs = speechSynthesis.getVoices().filter((x) => /^en/i.test(x.lang || "") && !novelty.test(x.name)); } catch (e) {}
       vs.sort((a, b) => score(b) - score(a));
       return (this.v = vs[0] || null);
@@ -2786,9 +2916,11 @@
     },
     say(t) {
       if (!this.ok() || Welcome.muted || !t) return;
-      try { speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(t), v = this.v || this.pick(); if (v) { u.voice = v; u.lang = v.lang; } else u.lang = "en-GB"; u.rate = 0.9; u.pitch = 0.94; speechSynthesis.speak(u); } catch (e) {}
+      try { speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(t), v = this.v || this.pick(); if (v) { u.voice = v; u.lang = v.lang; } else u.lang = "en-GB"; u.rate = 0.92; u.pitch = 1.02; speechSynthesis.speak(u); } catch (e) {}
     },
-    stop() { try { if (this.ok()) speechSynthesis.cancel(); } catch (e) {} }
+    stop() { try { if (this.ok()) speechSynthesis.cancel(); } catch (e) {} },
+    // what System shows: the voice in use, and whether it's the British woman's voice HAVYN was made for
+    info() { const v = this.v || this.pick(); return v ? { name: v.name, lang: v.lang, gb: /(Serena|Martha|Kate|Stephanie|Fiona|Libby|Sonia|Maisie|Hazel|Bella|UK English Female)/i.test(v.name) } : null; }
   };
   // The open's sound, made on the phone: a low swell that opens into an unresolved A major chord, a bell as the mark lands,
   // and soft ticks as the letters resolve. No audio files.
@@ -2900,16 +3032,17 @@
       const L = Ready.left(), size = L.n ? sz(L.bytes) : "", home = isStandalone();
       const ready = PREVIEW ? { t: "Everything, on every phone", d: "In HAVYN on your Home Screen, this is where the manuals and encyclopedias download by themselves, then work with no internet.", say: "In the app on your Home Screen, everything downloads right here, by itself." }
         : !L.n ? { t: "This phone is stocked", d: "The manuals and encyclopedias are already here and work with no internet. HAVYN tops them up when you open it on Wi-Fi.", say: "This phone already has everything. It works with no internet." }
-        : home ? { t: "Getting this phone ready", d: "HAVYN is downloading everything now: " + L.n + " manuals and encyclopedias, " + size + ". Stay on Wi-Fi and keep HAVYN open; if it closes, it picks up where it stopped.", say: "Now I'm downloading everything this phone needs. Stay on Wi-Fi, and keep me open.", get: true }
+        : home ? { t: "Getting this phone ready", d: "HAVYN is downloading everything now: " + L.n + " manuals and encyclopedias, " + size + ". Stay on Wi-Fi and keep HAVYN open; if it closes, it picks up where it stopped. Your first quest completes itself.", say: "Now I'm downloading everything this phone needs. Stay on Wi-Fi, and keep me open.", get: true }
         : { t: "One step left: the Home Screen", d: "Tap Share (in Safari's ••• menu if you don't see it), then Add to Home Screen. Open HAVYN from the new icon and it downloads everything by itself (" + size + " on Wi-Fi).", say: "One last step. Add HAVYN to your Home Screen, and open it from the icon." };
       return [
-        { go: "#/status", at: ".tab[data-tab=status]", t: "Status, your home base", d: "How ready your family is: days of water, food, medicine and power, what's missing, and what to do next.", say: "This is Status, your home base. It shows how ready your family is." },
-        { go: "#/status", at: ".tab.sos", t: "In an emergency, the red button", d: "Twenty step-by-step cards: CPR with a beat to follow, bleeding, choking, heart attack, heat stroke and more. Two taps from anywhere, with one-tap 911.", say: "In an emergency, tap the red button. Every card is two taps away." },
+        { go: "#/status", at: "#ready .rdyhead", t: "Your level", d: "Your phone levels up as you finish quests: the downloads, your household, your supplies, a Memory Card. Most of it happens by itself, and every quest is a few taps.", say: "This is your command deck. Your level rises as you finish quests, and most of them finish themselves." },
+        { go: "#/status", at: ".nowgrid", t: "What's happening?", d: "Tap what's going on: power out, extreme heat, a storm, smoke, unsafe water, an earthquake. You get everything for it in one place: the steps, the cards, the manual pages and the numbers to call.", say: "When something happens, tap it here. Everything you need is in one place." },
+        { go: "#/status", at: ".tab.sos", t: "Someone hurt? The red button", d: "This red button, on every screen (and the red tile on Home), opens twenty step-by-step cards: CPR with a beat to follow, bleeding, choking, heart attack, heat stroke and more, with one-tap 911.", say: "In an emergency, tap the red button. Every card is two taps away." },
         { go: "#/guides", at: ".tab[data-tab=guides]", t: "Guides: know what to do", d: "How do I… opens the exact page in the manuals on this phone. Playbooks walk you through blackouts, extreme heat, storms and smoke.", say: "Guides tells you what to do, step by step." },
         { go: "#/family", at: ".tab[data-tab=family]", t: "Family: your people", d: "Everyone's medicines, allergies and needs. Fill it in once, then copy it to every phone with the Memory Card.", say: "Family keeps everyone's medicines, allergies and needs in one place." },
         { go: "#/supplies", at: ".tab[data-tab=supplies]", t: "Supplies: what you have", d: "Water, food, medicine and power on hand become days of autonomy, and HAVYN warns you before anything expires.", say: "Supplies turns what you have into days you can last." },
         { go: "#/status", at: ".tools a[href='#/search']", t: "Find anything", d: "Search looks through the cards, playbooks, your plan, and every page of every manual and encyclopedia on this phone. No internet needed.", say: "Search finds anything, even inside every manual, with no internet." },
-        Object.assign({ go: "#/status", at: "#ready .rdyhead|#rdybar|#rdymsg" }, ready),
+        Object.assign({ go: "#/status", at: "#ready .rdyhead|#ready .bar.xp|#rdybar|#rdymsg" }, ready),
         { fin: true }
       ];
     },
@@ -2997,6 +3130,6 @@
       navigator.serviceWorker.register("./sw.js").then(() => navigator.serviceWorker.ready).then(() => { const s = $("#swst"); if (s) s.textContent = "Saved for offline"; }).catch(() => { const s = $("#swst"); if (s) s.textContent = "Not available"; });
     }
   }
-  window.__HAVYN = { get state() { return S; }, get prefs() { return PR; }, get lib() { return LIB; }, E, C, version: VERSION, arc: Arc, shelf: Shelf, ready: Ready, store: Store, welcome: Welcome };
+  window.__HAVYN = { get state() { return S; }, get prefs() { return PR; }, get lib() { return LIB; }, E, C, version: VERSION, arc: Arc, shelf: Shelf, ready: Ready, store: Store, welcome: Welcome, voice: Voice };
   boot();
 })();

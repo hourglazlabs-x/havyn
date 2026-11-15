@@ -120,8 +120,11 @@ with sync_playwright() as p:
     page.wait_for_selector("#ready")
     ok("Status shows how ready this phone is", until(lambda: "% READY" in page.inner_text("#ready").upper()), page.inner_text("#ready")[:200])
     ok("one button offers to download everything", until(lambda: "DOWNLOAD EVERYTHING ·" in page.inner_text("#ready").upper()), page.inner_text("#ready")[:300])
+    ok("Home shows the next quests with their XP", page.locator("#ready .quests.mini .li").count() == 3 and "XP" in page.inner_text("#ready"), page.inner_text("#ready")[:300])
+    page.goto(BASE + "#/quests"); page.wait_for_selector("#ready .quests")
     rows = page.inner_text("#ready")
-    ok("the checklist covers manuals, encyclopedias, plan and backup", all(k in rows for k in ("Manuals and guides", "Encyclopedias", "Family plan", "Memory Card")), rows[:400])
+    ok("the Quests screen covers manuals, encyclopedias, plan, supplies and backup", all(k in rows for k in ("Manuals and guides", "Encyclopedias", "Family plan", "Count your supplies", "Memory Card")), rows[:400])
+    page.goto(BASE + "#/status"); page.wait_for_selector("#ready")
     page.screenshot(path=str(SHOTS / "v15_ready.png"), full_page=False)
     page.evaluate("__HAVYN.arc.PART = 8192")   # small parts, so each test archive is stored in several
     page.click("button[data-act='get-everything']")
@@ -165,8 +168,8 @@ with sync_playwright() as p:
     state["slow"] = None
     page.reload(); page.wait_for_selector("body[data-ready]"); page.evaluate("__HAVYN.arc.PART = 8192")
     ok("after closing and reopening, it finishes from where it stopped", until(lambda: any(x["catalog"] == core[3]["id"] for x in zims_on(page)), 40) and any(i == core[3]["id"] for i, _ in state["ranges"][n_before:]), state["ranges"][n_before:])
-    page.goto(BASE + "#/status")
-    ok("Status says the downloads are done", until(lambda: "Encyclopedias: %d of %d" % (len(core), len(core)) in page.inner_text("#app"), 15), page.inner_text("#app")[:400])
+    page.goto(BASE + "#/quests")
+    ok("Quests say the downloads are done", until(lambda: "Encyclopedias: %d of %d" % (len(core), len(core)) in page.inner_text("#app"), 15), page.inner_text("#app")[:400])
     ok("readiness counts only manuals HAVYN's shelf holds, and says what's missing", "Manuals and guides: 4 of 4" in page.inner_text("#app") and "on HAVYN's shelf yet" in page.inner_text("#app"), page.inner_text("#ready")[:600] if page.locator("#ready").count() else "")
     # the field index: "How do I…" opens the exact page in a manual on this phone, and comes back
     page.goto(BASE + "#/field"); page.wait_for_selector("#fq")
@@ -211,6 +214,52 @@ with sync_playwright() as p:
     page.evaluate("(async () => { const v = await __HAVYN.store.get('zim:' + %r); for (const k of v.parts) await __HAVYN.store.del(k); await __HAVYN.store.del('zim:' + %r); })()" % (zid, zid))
     keys1 = page.evaluate("__HAVYN.store.keys().then(k => k.filter(x => String(x).startsWith('zpart:')).length)")
     ok("parts are separate storage entries that delete cleanly", keys1 < keys0, (keys0, keys1))
+    # ---------------- v1.6 the command deck ----------------
+    SIT = json.loads(__import__("subprocess").run(["node", "-e", "const C=require(process.argv[1]); process.stdout.write(JSON.stringify(C.situations))", str(ROOT / "src" / "content.js")], check=True, capture_output=True, text=True).stdout)
+    page.goto(BASE + "#/status"); page.wait_for_selector("#ready")
+    ok("deck: Home leads with the level, the red tile, What's happening and know-how", page.locator("#ready .ring .lv b").count() == 1 and page.locator(".sostile").count() == 1 and page.locator(".nowgrid .gt").count() == len(SIT) and page.locator(".menugrid .mt").count() == 4,
+       [page.locator(x).count() for x in ("#ready .ring", ".sostile", ".nowgrid .gt", ".menugrid .mt")])
+    ok("deck: the rank is one of the levels", page.inner_text("#ready .rank").strip() in ("Recruit", "Scout", "Ranger", "Guardian", "Sentinel", "Fortress"), page.inner_text("#ready .rank"))
+    bad = []
+    for x in SIT:
+        page.goto(BASE + "#/now/" + x["id"]); page.wait_for_selector(".nowhero h2")
+        got = (page.inner_text(".nowhero h2").strip() == x["t"], page.locator(".nowcards .nc").count() == len(x["cards"]), page.locator(".fl .fi").count() == len(x["field"]),
+               (not x.get("pb")) or page.locator("a[href='#/playbooks/%s']" % x["pb"]).count() == 1, "911" in page.inner_text("#app"))
+        if not all(got): bad.append((x["id"], got))
+    ok("deck: each situation brings its plan, cards, manual pages and numbers together", not bad, bad)
+    page.goto(BASE + "#/now/power"); page.wait_for_selector(".nowhero"); page.click("button[data-act=outage-start]")
+    ok("deck: Power out starts the outage clock", until(lambda: page.evaluate("__HAVYN.state.outage.active === true"), 5))
+    page.evaluate("(() => { __HAVYN.state.outage.active = false; })()")
+    page.goto(BASE + "#/quick/household"); page.wait_for_selector("#q-adult")
+    for k, n in (("adult", 2), ("child", 1), ("pet", 1)):
+        for _ in range(n): page.click("button[data-act='q+'][data-k=%s]" % k)
+    ok("quick: + and − count on the spot", page.inner_text("#q-adult") == "2" and page.inner_text("#q-child") == "1")
+    page.click("button[data-act=q-save]")
+    ppl = until(lambda: page.evaluate("__HAVYN.state.people.filter(p => !p.deleted).map(p => p.name + '/' + p.ageBand)"), 5)
+    ok("quick: the household is made from counts (names can come later)", sorted(ppl or []) == ["Adult 1/adult", "Adult 2/adult", "Kid 1/child"] and page.evaluate("__HAVYN.state.pets.filter(p => !p.deleted).length") == 1 and page.evaluate("location.hash") == "#/status", ppl)
+    page.goto(BASE + "#/quick/supplies"); page.wait_for_selector("#q-w-case")
+    for k, n in (("w-case", 3), ("f-can", 12), ("p-bank", 2)):
+        for _ in range(n): page.click("button[data-act='q+'][data-k=%s]" % k)
+    page.click("button[data-act=q-save]")
+    its = until(lambda: page.evaluate("__HAVYN.state.items.filter(i => !i.deleted).map(i => [i.category, i.qty, JSON.stringify(i.per_unit || {})])"), 5)
+    ok("quick: supplies are made from counts, with what each holds", sorted(map(tuple, its or [])) == sorted([("water", 3, '{"gal":3.17}'), ("food", 12, '{"kcal":450}'), ("power", 2, '{"wh":74}')]), its)
+    page.goto(BASE + "#/status"); page.wait_for_selector(".hero .big")
+    ok("quick: Home turns them into days you can last", page.inner_text(".hero .big").strip() not in ("—", ""), page.inner_text(".hero")[:120])
+    page.goto(BASE + "#/quick/supplies"); page.wait_for_selector("#q-w-case")
+    ok("quick: counting again starts from what's saved", page.inner_text("#q-w-case") == "3" and page.inner_text("#q-f-can") == "12")
+    for _ in range(3): page.click("button[data-act='q-'][data-k=w-case]")
+    page.click("button[data-act=q-save]")
+    ok("quick: counting down to zero removes it", until(lambda: page.evaluate("!__HAVYN.state.items.some(i => !i.deleted && i.category === 'water')"), 5))
+    page.goto(BASE + "#/quests"); page.wait_for_selector("#ready .quests")
+    ok("quick: the household and supplies quests move", "Family plan: 1 of 4" in page.inner_text("#ready") and "Count your supplies" in page.inner_text("#ready"), page.inner_text("#ready")[:500])
+    pick = lambda vs: page.evaluate("(vs) => { speechSynthesis.getVoices = () => vs; const v = __HAVYN.voice.pick(); return v && v.name; }", vs)
+    v1 = pick([{"name": "Daniel", "lang": "en-GB"}, {"name": "Samantha", "lang": "en-US"}, {"name": "Serena (Enhanced)", "lang": "en-GB"}, {"name": "Fred", "lang": "en-US"}, {"name": "Martha", "lang": "en-GB"}])
+    v2 = pick([{"name": "Daniel", "lang": "en-GB"}, {"name": "Samantha", "lang": "en-US"}, {"name": "Moira", "lang": "en-IE"}])
+    v3 = pick([{"name": "Daniel", "lang": "en-GB"}, {"name": "Arthur", "lang": "en-GB"}, {"name": "Samantha", "lang": "en-US"}])
+    ok("voice: an elegant British woman first (Serena, Enhanced), then the nearest woman's voice, never a man's while a woman's is there", (v1, v2, v3) == ("Serena (Enhanced)", "Moira", "Samantha"), (v1, v2, v3))
+    page.goto(BASE + "#/system"); 
+    ok("voice: System says which voice speaks and how to get the British one", "Voice" in page.inner_text("#app") and "Hear it" in page.inner_text("#app"))
+    page.screenshot(path=str(SHOTS / "v16_home.png"), full_page=False)
     ok("no page errors", not errors, errors)
 
     # ---------------- the welcome: first open from the Home Screen ----------------
@@ -231,12 +280,12 @@ with sync_playwright() as p:
     ok("welcome: then the HAVYN mark and the voice says Welcome to Haven", until(lambda: "Welcome to Haven." in w.evaluate("window.__said"), 8), w.evaluate("window.__said"))
     w.screenshot(path=str(SHOTS / "v15_welcome_mark.png"))
     ok("welcome: then a tour of the real screens", until(lambda: w.locator("#tour .tcard h3").count() == 1, 10))
-    targets = [".tab[data-tab=status]", ".tab.sos", ".tab[data-tab=guides]", ".tab[data-tab=family]", ".tab[data-tab=supplies]", ".tools a[href='#/search']"]
+    targets = ["#ready .rdyhead", ".nowgrid", ".tab.sos", ".tab[data-tab=guides]", ".tab[data-tab=family]", ".tab[data-tab=supplies]", ".tools a[href='#/search']"]
     lit = []
     for k, sel in enumerate(targets):
         until(lambda: w.inner_text("#tour .tmeta .lab").startswith("%d of" % (k + 1)), 5); time.sleep(0.8)   # the spotlight glides into place
         lit.append(contains(rect(w, "#tour .thole"), rect(w, sel))); w.click("#tour [data-act=wel-next]")
-    ok("welcome: the spotlight lands on each tab and on Search", all(lit), lit)
+    ok("welcome: the spotlight lands on the level, What's happening, each tab and Search", all(lit), lit)
     ok("welcome: every step is spoken", len([x for x in w.evaluate("window.__said") if x.strip()]) >= 8, w.evaluate("window.__said"))
     ok("welcome: the last step starts Download everything by itself", until(lambda: "Getting this phone ready" in w.inner_text("#tour") and w.evaluate("__HAVYN.shelf.busy || __HAVYN.arc.busy || __HAVYN.lib.length > 0"), 10), w.inner_text("#tour")[:200])
     w.click("#tour [data-act=wel-next]")
