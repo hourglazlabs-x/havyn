@@ -57,6 +57,11 @@
     paw: '<circle cx="7" cy="9" r="1.8"/><circle cx="11" cy="6" r="1.8"/><circle cx="15" cy="6.5" r="1.8"/><circle cx="18" cy="10" r="1.8"/><path d="M12 12c-3 0-6 3.5-5 6 1 2 3.5 1 5 1s4 1 5-1c1-2.5-2-6-5-6z"/>',
     pin: '<path d="M12 21s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/>',
     check: '<path d="M5 12.5l4.5 4.5L19 7"/>',
+    wave: '<circle cx="12" cy="5.5" r="2"/><path d="M3 12c2 0 2-2 4.5-2s2.5 2 4.5 2 2-2 4.5-2 2.5 2 4.5 2"/><path d="M3 17c2 0 2-2 4.5-2s2.5 2 4.5 2 2-2 4.5-2 2.5 2 4.5 2"/>',
+    bug: '<ellipse cx="12" cy="15" rx="3.5" ry="4.5"/><path d="M12 10.5V7a3 3 0 0 1 3-3h2l1.5 1.5"/><path d="M8.7 13 5 11.5M8.5 16.5 5 17.5M15.3 13l3.7-1.5M15.5 16.5l3.5 1"/>',
+    snake: '<path d="M4 19c3 0 4-3 7-3s3 3 6 3 3-2.5 3-5.5S17.5 8 14.5 8H12"/><circle cx="10" cy="8" r="2.2"/><path d="M7.8 8H5.5l-1 1M5.5 8l-1-1"/>',
+    candy: '<circle cx="12" cy="12" r="4.5"/><path d="M7.6 11 3 8v8l4.6-3M16.4 11 21 8v8l-4.6-3"/>',
+    lungs: '<path d="M12 4v8"/><path d="M12 11c-1.2-.8-2.2-1-3.4-1C6 10 4 13 4 16.5 4 19 5 20 6.5 20 9 20 10 18.5 10 16v-3.5"/><path d="M12 11c1.2-.8 2.2-1 3.4-1 2.6 0 4.6 3 4.6 6.5 0 2.5-1 3.5-2.5 3.5-2.5 0-3.5-1.5-3.5-4v-3.5"/>',
     cart: '<path d="M3 4h2l2.4 11h10.2L20 8H6.2"/><circle cx="9.5" cy="19.5" r="1.4"/><circle cx="16.5" cy="19.5" r="1.4"/>',
     radio: '<rect x="4" y="9" width="16" height="12" rx="2.5"/><path d="M8 9l9-5"/><circle cx="9" cy="15" r="2.4"/><path d="M14 13.5h3M14 16.5h3"/>',
     file: '<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 12h6M9 15.5h6"/>',
@@ -385,6 +390,7 @@
         '<button data-act="beat-toggle">' + (Metro.on || cardView.autoBeat ? "Stop beat" : "Start beat") + "</button>" +
         '<button data-act="beat-sound">' + (Metro.sound ? "Sound on" : "Sound off") + "</button></div>";
     }
+    if (s.call) h += '<a class="emlink" href="' + telHref(s.call.num) + '">' + ic("phone") + "Call " + esc(s.call.n) + "</a> ";
     if (s.link) h += '<a class="emlink" href="#/emergency/' + s.link + '" data-act="card-jump" data-card="' + s.link + '">Open ' + esc(C.cards.find((x) => x.id === s.link).title) + " card</a>";
     h += '<div class="emnav"><button data-act="step-prev"' + (i === 0 ? " disabled" : "") + ">BACK</button>" +
       (i < n - 1 ? '<button class="next" data-act="step-next">NEXT</button>' : '<a class="next" href="#/emergency">ALL CARDS</a>') + "</div>";
@@ -418,9 +424,9 @@
     const ch = (S.checks && S.checks[p.id]) || {};
     let h = backbar("#/guides", "Playbook");
     h += '<section class="glass hero"><div class="lab">Playbook</div><h2 style="margin:6px 0 4px;font-size:1.6rem">' + esc(p.title) + '</h2><div class="sub">' + esc(p.trigger) + "</div></section>";
-    h += '<section class="panel" style="border:2px solid var(--crit);border-radius:var(--r);background:rgba(255,77,94,.06)"><h3 style="color:var(--crit)">Hard rule: leave now if</h3>' +
+    h += '<section class="panel" style="border:2px solid var(--crit);border-radius:var(--r);background:rgba(255,77,94,.06)"><h3 style="color:var(--crit)">' + esc(p.ruleTitle || "Hard rule: leave now if") + "</h3>" +
       p.leave.map((l) => '<div class="kv"><span style="color:var(--ink)">' + esc(l) + "</span></div>").join("") +
-      (S.plan.leaveTo ? '<div class="kv"><span>Destination</span><span>' + esc(S.plan.leaveTo) + "</span></div>" : '<div class="kv"><span>Destination</span><a href="#/family/plan">Set it now</a></div>') + "</section>";
+      (p.ruleTitle ? "" : S.plan.leaveTo ? '<div class="kv"><span>Destination</span><span>' + esc(S.plan.leaveTo) + "</span></div>" : '<div class="kv"><span>Destination</span><a href="#/family/plan">Set it now</a></div>') + "</section>";
     p.phases.forEach((ph, a) => {
       h += '<section class="glass panel"><h3>' + esc(ph.label) + "</h3>";
       ph.items.forEach((it, b) => {
@@ -431,6 +437,7 @@
           (it.act === "outage-start" && !(S.outage && S.outage.active) ? '<span style="display:block;margin-top:8px"><button class="btn sm" data-act="outage-start">Start outage clock</button></span>' : "") +
           (it.go ? '<span style="display:block;margin-top:8px"><a class="btn ghost sm" href="#/playbooks/' + it.go + '">Open</a></span>' : "") +
           (it.card ? '<span style="display:block;margin-top:8px"><a class="btn red sm" href="#/emergency/' + it.card + '">Open card</a></span>' : "") +
+          (it.href ? '<span style="display:block;margin-top:8px"><a class="btn ghost sm" href="' + esc(it.href) + '">Open</a></span>' : "") +
           "</span></label>";
       });
       h += "</section>";
@@ -1061,10 +1068,10 @@
     sec.push({ h: "Comms ladder", steps: C.comms.ladder.map((r) => [r.rung + ": " + r.t, "Works when: " + r.when + ". Range: " + r.range + ". " + r.d]) });
     sec.push({ h: "Comms rules", steps: C.comms.rules.map((r) => [r.t, r.d]) });
     for (const p of C.playbooks.filter((x) => !x.soon)) {
-      sec.push({ h: "Playbook: " + p.title, sub: p.trigger, page: true, leave: p.leave, phases: p.phases.map((ph) => [ph.label, ph.items.map((it) => it.t + (it.d ? ": " + it.d : ""))]) });
+      sec.push({ h: "Playbook: " + p.title, sub: p.trigger, page: true, leave: p.leave, rule: p.ruleTitle || "Leave now if", phases: p.phases.map((ph) => [ph.label, ph.items.map((it) => it.t + (it.d ? ": " + it.d : ""))]) });
     }
     sec.push({ h: "Phoenix heat rules", steps: C.plan.heat.map((r) => [r.t, r.d]) });
-    for (const c of C.cards) sec.push({ h: "Card: " + c.title, sub: c.sub, page: true, steps: c.steps.map((s) => [s.t, s.d + (s.beat ? " (push to a beat of " + s.beat + " a minute)" : "")]), note: c.note, src: "Source: " + c.sources.map((x) => x.n).join("; ") });
+    for (const c of C.cards) sec.push({ h: "Card: " + c.title, sub: c.sub, page: true, steps: c.steps.map((s) => [s.t, (s.d || "") + (s.beat ? " (push to a beat of " + s.beat + " a minute)" : "")]), note: c.note, src: "Source: " + c.sources.map((x) => x.n).join("; ") });
     return { title: "HAVYN binder", date: ymd(now()), gate: "Cards: " + C.gate + ". Checked against sources " + C.reviewed + ". Training beats any app.", sections: sec };
   }
   function binderHTML(d) {
@@ -1073,9 +1080,9 @@
       h += '<section class="' + (s.page ? "pb" : "") + '"><h2>' + esc(s.h) + "</h2>" + (s.sub ? '<p class="sub2">' + esc(s.sub) + "</p>" : "");
       if (s.kv) h += "<table>" + s.kv.map(([k, v]) => "<tr><th>" + esc(k) + "</th><td>" + esc(v) + "</td></tr>").join("") + "</table>";
       if (s.items) h += s.items.length ? s.items.map((it) => "<h3>" + esc(it.t) + "</h3>" + (it.kv.length ? "<table>" + it.kv.map(([k, v]) => "<tr><th>" + esc(k) + "</th><td>" + esc(v) + "</td></tr>").join("") + "</table>" : "")).join("") : "<p>" + esc(s.empty || "") + "</p>";
-      if (s.leave) h += '<p class="leave"><b>Leave now if:</b> ' + s.leave.map(esc).join(" · ") + "</p>";
+      if (s.leave) h += '<p class="leave"><b>' + esc(s.rule || "Leave now if") + ":</b> " + s.leave.map(esc).join(" · ") + "</p>";
       if (s.phases) h += s.phases.map(([lab, items]) => "<h3>" + esc(lab) + "</h3><ul>" + items.map((x) => "<li>" + esc(x) + "</li>").join("") + "</ul>").join("");
-      if (s.steps) h += "<ol>" + s.steps.map(([t, x]) => "<li><b>" + esc(t) + ".</b> " + esc(x) + "</li>").join("") + "</ol>";
+      if (s.steps) h += "<ol>" + s.steps.map(([t, x]) => "<li><b>" + esc(t) + ".</b>" + (x ? " " + esc(x) : "") + "</li>").join("") + "</ol>";
       if (s.note) h += '<p class="sub2">' + esc(s.note) + "</p>";
       if (s.src) h += '<p class="src2">' + esc(s.src) + "</p>";
       h += "</section>";
@@ -1144,9 +1151,9 @@
       y -= 2;
       if (s.kv) kvRows(s.kv);
       if (s.items) { if (!s.items.length) text(s.empty || ""); for (const it of s.items) { room(40); y -= 2; text(it.t, { font: FB, size: 11.5, gap: 4 }); kvRows(it.kv, M + 10); } }
-      if (s.leave) { y -= 2; text("Leave now if: " + s.leave.join(" · "), { font: FB, size: 10.5 }); }
+      if (s.leave) { y -= 2; text((s.rule || "Leave now if") + ": " + s.leave.join(" · "), { font: FB, size: 10.5 }); }
       if (s.phases) for (const [lab, items] of s.phases) { room(40); y -= 4; text(lab, { font: FB, size: 11.5, gap: 4 }); for (const it of items) text("•  " + it, { size: 10, x: M + 8 }); }
-      if (s.steps) s.steps.forEach(([t, x], i) => { y -= 3; room(30); text((i + 1) + ". " + t + ". " + x, { size: s.page ? 12 : 10.5, gap: 4 }); });
+      if (s.steps) s.steps.forEach(([t, x], i) => { y -= 3; room(30); text((i + 1) + ". " + t + "." + (x ? " " + x : ""), { size: s.page ? 12 : 10.5, gap: 4 }); });
       if (s.note) { y -= 4; text(s.note, { size: 10, color: GREY }); }
       if (s.src) { y -= 4; text(s.src, { size: 8.5, color: GREY }); }
       y -= 10;

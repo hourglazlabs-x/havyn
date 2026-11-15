@@ -95,6 +95,13 @@ with sync_playwright() as p:
     page.locator(".chk input").nth(1).check()
     page.wait_for_timeout(300); page.reload(); page.wait_for_selector(".chk")
     ok("playbook tick persists after reload", page.locator(".chk input").nth(1).is_checked())
+    for pb in C["playbooks"]:
+        page.goto(BASE + "#/playbooks/" + pb["id"]); page.wait_for_selector(".chk")
+        n_items = sum(len(ph["items"]) for ph in pb["phases"])
+        ok(f"playbook '{pb['id']}' live with {n_items} steps", page.locator(".chk input").count() == n_items and (pb.get("ruleTitle") or "Hard rule: leave now if").upper() in page.inner_text("body").upper())
+    ok("boil-water has its own rule and no leave destination", "Destination" not in page.inner_text("body"))
+    page.goto(BASE + "#/emergency/scorpion"); page.wait_for_selector(".emstep")
+    ok("scorpion card: one-tap Poison Control", page.locator("a.emlink[href='tel:18002221222']").count() == 1)
 
     # 6. family + add person
     page.goto(BASE + "#/family/person/new"); page.wait_for_selector("form[data-form=person]")

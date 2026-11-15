@@ -76,7 +76,7 @@ def build():
     for c in content["cards"]:
         lines = [f"# {c['title']}", "", f"_{c['sub']}_", "", f"Checked against sources: {content['reviewed']} · Status: {content['gate']}", ""]
         for i, s in enumerate(c["steps"], 1):
-            lines.append(f"{i}. **{s['t']}.** {s['d']}" + (f" (metronome {s['beat']}/min)" if s.get("beat") else ""))
+            lines.append(f"{i}. **{s['t']}.**" + (f" {s['d']}" if s.get("d") else "") + (f" (metronome {s['beat']}/min)" if s.get("beat") else ""))
         if c.get("note"): lines += ["", f"> {c['note']}"]
         lines += ["", "Sources:"] + [f"- [{s['n']}]({s['u']})" for s in c["sources"]]
         lines += ["", "Reviewer sign-off: name ______  role (EMT / RN) ______  date ______", ""]

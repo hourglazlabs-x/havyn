@@ -1,5 +1,5 @@
 /* HAVYN FIELD service worker: cache the app once, then serve it with no network. */
-const VERSION = "1.2.0+c8aae6458f";
+const VERSION = "1.2.0+1b517beb1a";
 const CACHE = "havyn-field-" + VERSION;
 const ASSETS = ["./", "./index.html", "./manifest.webmanifest", "./apple-touch-icon.png", "./icon-192.png", "./icon-512.png", "./icon-maskable-512.png",
   "./pdfjs/pdf.min.js", "./pdfjs/pdf.worker.min.js", "./pdflib/pdf-lib.esm.min.js"];

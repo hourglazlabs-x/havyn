@@ -180,6 +180,106 @@ const HAVYN_CONTENT = {
         { n: "CDC: first aid for seizures", u: "https://www.cdc.gov/epilepsy/first-aid-for-seizures/index.html" },
         { n: "Epilepsy Foundation: first aid resources", u: "https://www.epilepsy.com/recognition/first-aid-resources" }
       ]
+    },
+    {
+      id: "drowning", title: "Drowning", sub: "Pulled from a pool or water, not breathing normally", icon: "wave",
+      steps: [
+        { t: "Get them out safely", d: "Reach or throw something that floats; don't jump in unless you're trained. Shout for help. Call 911 on speaker, or have someone call." },
+        { t: "Tap and shout. Breathing normally?", d: "Look at the chest for up to 10 seconds. Gasping is not normal breathing." },
+        { t: "Not breathing normally: 2 rescue breaths first", d: "Tilt the head back, lift the chin, pinch the nose, seal your mouth over theirs. 1 second each, enough to make the chest rise. Baby: cover the nose and mouth with your mouth. Not trained or can't give breaths? Skip to pushes." },
+        { t: "Then CPR: 30 pushes, 2 breaths", d: "Hard and fast in the center of the chest. Keep going until they breathe or help takes over. If you can't give breaths, push anyway.", beat: 110, link: "cpr" },
+        { t: "AED as soon as one arrives", d: "Quickly wipe the chest dry, put the pads on, follow its voice. Keep CPR going until it's ready." },
+        { t: "Breathing again: on their side, then the ER", d: "Anyone who needed breaths or CPR after being in the water needs a hospital check, even if they seem fine." }
+      ],
+      note: "Child CPR depth and hand position are on the CPR child card.", noteLink: "cprchild",
+      sources: [
+        { n: "AHA: CPR with rescue breaths vital after drowning (2024)", u: "https://www.heart.org/en/news/2024/11/12/cpr-with-rescue-breaths-vital-to-resuscitation-after-drowning" },
+        { n: "AHA 2025: special circumstances of resuscitation (drowning)", u: "https://cpr.heart.org/en/resuscitation-science/cpr-and-ecc-guidelines/adult-and-pediatric-special-circumstances-of-resuscitation" },
+        { n: "Red Cross: drowning resuscitation guidelines", u: "https://guidelines.redcross.org/guidelines-database/drowning-process-resuscitation/" },
+        { n: "AAP (HealthyChildren): CPR for drowning, updated guidance", u: "https://www.healthychildren.org/English/news/Pages/cpr-for-drowning-updated-guidance.aspx" }
+      ]
+    },
+    {
+      id: "overdose", title: "Opioid overdose", sub: "Won't wake up, slow or no breathing", icon: "pill",
+      steps: [
+        { t: "Shout their name and rub the breastbone hard", d: "Signs: won't wake up, slow or no breathing, blue or gray lips, tiny pupils, gurgling." },
+        { t: "Call 911 now", d: "Put it on speaker. Say someone won't wake up and isn't breathing normally." },
+        { t: "Give naloxone (Narcan)", d: "Nasal spray: tip in one nostril, press the plunger all the way. Don't wait to be sure it's opioids." },
+        { t: "Not breathing normally: start CPR with breaths", d: "30 pushes, 2 breaths. Can't give breaths? Keep pushing.", beat: 110, link: "cpr" },
+        { t: "No change in 2 to 3 minutes: give a second dose", d: "New device, other nostril. Keep up CPR in between." },
+        { t: "Breathing again: on their side, stay with them", d: "Naloxone can wear off before the drugs do, and breathing can stop again. They still need the ER." }
+      ],
+      sources: [
+        { n: "AHA and Red Cross: 2024 Guidelines for First Aid", u: "https://cpr.heart.org/en/resuscitation-science/2024-first-aid-guidelines" },
+        { n: "CDC: 5 things to know about naloxone", u: "https://www.cdc.gov/overdose-prevention/reversing-overdose/about-naloxone.html" },
+        { n: "CDC/NIOSH: using naloxone to reverse opioid overdose", u: "https://stacks.cdc.gov/view/cdc/77297/cdc_77297_DS1.pdf" },
+        { n: "Washington State DOH: naloxone", u: "https://doh.wa.gov/node/5308" }
+      ]
+    },
+    {
+      id: "asthma", title: "Asthma attack", sub: "Wheezing, can't catch their breath", icon: "lungs",
+      steps: [
+        { t: "After a sting, food or medicine? Epinephrine first", d: "Sudden trouble breathing then may be anaphylaxis.", link: "anaphylaxis" },
+        { t: "Sit them upright and stay with them", d: "Keep them calm. Loosen anything tight around the chest or neck." },
+        { t: "Help them use their rescue inhaler", d: "Their own quick-relief inhaler, with a spacer if they have one, as their asthma action plan says. No inhaler? Call 911." },
+        { t: "Call 911 for any danger sign", d: "Lips or nails blue or gray, struggling to breathe (hunched over, ribs showing), can't walk or talk well, very sleepy or confused, or the inhaler isn't helping." },
+        { t: "Keep using the inhaler as their plan says, or as 911 tells you" },
+        { t: "Won't wake up and not breathing normally: start CPR", link: "cpr" }
+      ],
+      sources: [
+        { n: "American Lung Association: first aid for asthma", u: "https://www.lung.org/getmedia/8d0df46c-de43-46a9-b884-21aca244acee/first-aid-for-asthma.pdf" },
+        { n: "AHA and Red Cross: 2024 Guidelines for First Aid", u: "https://cpr.heart.org/en/resuscitation-science/2024-first-aid-guidelines" }
+      ]
+    },
+    {
+      id: "lowsugar", title: "Low blood sugar", sub: "Diabetes: shaky, sweaty, confused", icon: "candy",
+      steps: [
+        { t: "Passed out, seizing or can't swallow? Nothing by mouth", d: "Food or drink can choke them. Call 911 now." },
+        { t: "Give their glucagon if they have it", d: "Follow the kit. Turn them on their side; they may throw up. Not awake in 15 minutes: a second dose if you have one." },
+        { t: "Awake and can swallow? 15 grams of fast sugar", d: "Glucose tablets or gel (check the label for 15 g), 1/2 cup of juice or regular soda, or 1 tablespoon of sugar or honey." },
+        { t: "Wait 15 minutes, then check again", d: "Still low, or the meter reads under 70: another 15 grams. No better, or worse: call 911." },
+        { t: "Back to normal: eat a meal or snack", d: "Not mealtime? Protein and carbs, like cheese and crackers." },
+        { t: "Never give insulin to someone who is low", d: "It drives the sugar even lower." }
+      ],
+      sources: [
+        { n: "ADA: what to know with a low (2025)", u: "https://professional.diabetes.org/sites/dpro/files/2025-10/xeris-severe-hypoglycemia-what-to-know-with-a-low-patient-7-14-25-002.pdf" },
+        { n: "ADA: hypoglycemia (low blood glucose)", u: "https://diabetes.org/living-with-diabetes/hypoglycemia-low-blood-glucose" },
+        { n: "AHA and Red Cross: 2024 Guidelines for First Aid", u: "https://cpr.heart.org/en/resuscitation-science/2024-first-aid-guidelines" }
+      ]
+    },
+    {
+      id: "scorpion", title: "Scorpion sting", sub: "Bark scorpion: pain, tingling, numbness", icon: "bug",
+      steps: [
+        { t: "Call Poison Control", d: "1-800-222-1222, free and open 24/7. Most stings are handled safely at home with their help. Children are at higher risk: call right away.", call: { n: "Poison Control", num: "1-800-222-1222" } },
+        { t: "Call 911 for trouble breathing", d: "Also chest pain, swelling of the face or throat, or hives.", link: "anaphylaxis" },
+        { t: "Serious signs at any age: call 911", d: "Wild or jerky eye movements, drooling, trouble swallowing or talking, twitching, nonstop crying in a child. Antivenom is given in the hospital." },
+        { t: "Wash it and cool it", d: "Soap and water, then a cool compress, not ice. Rest the arm or leg in a comfortable position." },
+        { t: "Kill the scorpion; don't try to catch it", d: "Knowing the type doesn't change the care." }
+      ],
+      note: "Pain, tingling and numbness usually start easing within a few hours.",
+      sources: [
+        { n: "Banner Poison and Drug Information Center: FAQ", u: "https://bannerhealth.com/services/poison-drug-information/support/frequently-asked-questions" },
+        { n: "Banner: bark scorpions", u: "https://www.bannerhealth.com/services/poison-drug-information/desert-critters/bark-scorpions" },
+        { n: "Banner: what not to do if stung or bitten", u: "https://www.bannerhealth.com/healthcareblog/teach-me/scorpions-to-snakes-heres-what-not-to-do-if-stung-or-bitten" },
+        { n: "Arizona Poison and Drug Information Center: scorpions", u: "https://azpoison.com/node/80" }
+      ]
+    },
+    {
+      id: "snake", title: "Rattlesnake bite", sub: "Every bite goes to the ER", icon: "snake",
+      steps: [
+        { t: "Move away from the snake", d: "Don't try to catch or kill it, and don't touch it even if it looks dead." },
+        { t: "Call 911", d: "Every bite needs the emergency room; antivenom is given there. Poison Control (1-800-222-1222) can help too." },
+        { t: "Keep them calm and still", d: "Walk only if needed to get help or a signal." },
+        { t: "Keep the bitten arm or leg still, at heart level or a little lower" },
+        { t: "Take off rings, watches, shoes and tight clothing on that limb", d: "Swelling can come fast." },
+        { t: "Don't: tourniquet, ice, cutting or sucking", d: "No tight bands, ice or ice water, cutting, suction, alcohol or medicines. They don't help and can make it worse." }
+      ],
+      sources: [
+        { n: "Banner Poison and Drug Information Center: rattlesnake bites", u: "https://www.bannerhealth.com/services/poison-drug-information/desert-critters/rattlesnakes" },
+        { n: "Arizona Poison and Drug Information Center: rattlesnake bite card", u: "https://azpoison.com/sites/default/files/rattlesnake_bite_info_card_english.pdf" },
+        { n: "Arizona Poison and Drug Information Center: rattlesnakes", u: "https://azpoison.com/venom/rattlesnakes" },
+        { n: "Poison Control: rattlesnake bites", u: "https://www.poison.org/articles/rattlesnakes" }
+      ]
     }
   ],
 
@@ -258,9 +358,94 @@ const HAVYN_CONTENT = {
       ],
       sources: ["cdcillness", "cdcoa", "cdckc", "cdcab", "cpsc"]
     },
-    { id: "storm", title: "Monsoon and dust storm", sub: "Coming next", icon: "wind", soon: true },
-    { id: "smoke", title: "Wildfire smoke or evacuation", sub: "Coming next", icon: "flame", soon: true },
-    { id: "boil", title: "Boil-water notice", sub: "Coming next", icon: "drop", soon: true }
+    {
+      id: "storm", title: "Monsoon and dust storm", sub: "Dust walls, flash floods, lightning, outages", icon: "wind",
+      trigger: "A dust storm or flash flood warning, or a monsoon storm on the way (mostly June to September).",
+      leave: ["Officials say GO for your area.", "Water is rising toward the house: get to higher ground by a dry route.", "Trapped? Get to the highest point, not a closed attic, and call 911.", "Never leave by driving or walking into floodwater."],
+      sources: ["adot", "nwsflood", "nwsflooddur", "readyfloods", "nwslightning", "srp", "tep", "maricopa"],
+      phases: [
+        { label: "Before it hits", items: [
+          { t: "Charge phones, power banks and the station", d: "Storms often knock the power out.", go: "blackout" },
+          { t: "Don't drive into a dust storm", d: "At home, wait it out. On the road, exit or pull completely off the pavement before it reaches you.", s: "adot" }
+        ] },
+        { label: "Driving in dust: Pull Aside, Stay Alive", items: [
+          { t: "Check traffic around you and slow down", s: "adot" },
+          { t: "Exit the highway if you can, or pull completely off the pavement", d: "Do it before visibility drops. Don't stop in a travel lane or the emergency lane.", s: "adot" },
+          { t: "Turn off all lights, flashers included", d: "Cars behind you can follow your lights and crash into you.", s: "adot" },
+          { t: "Set the parking brake and take your foot off the brake pedal", s: "adot" },
+          { t: "Stay in the car, buckled, until the storm passes", s: "adot" }
+        ] },
+        { label: "Flash floods", items: [
+          { t: "Turn around, don't drown", d: "Never drive or walk into floodwater or around barricades. 6 inches of fast water can knock an adult over; 12 inches can carry away most cars; 18 to 24 inches, most SUVs and trucks.", s: "nwsflood" },
+          { t: "Get to higher ground and stay out of washes", s: "nwsflooddur" },
+          { t: "Car stuck in moving water: stay inside", d: "Water rising inside? Get on the roof and call 911.", s: "readyfloods" }
+        ] },
+        { label: "Lightning", items: [
+          { t: "When thunder roars, go indoors", d: "A building with wiring and plumbing, or a hard-topped car with the windows up. Not a patio, shed or tent.", s: "nwslightning" },
+          { t: "Stay in until 30 minutes after the last thunder", s: "nwslightning" }
+        ] },
+        { label: "If the power goes out", items: [
+          { t: "Keep away from fallen power lines", d: "Treat every line as live. Call 911, then your electric company (numbers are in Comms).", s: "srp", href: "#/comms" },
+          { t: "Power line on your car: stay inside", d: "Call 911 and keep others away. If the car catches fire, jump clear without touching the car and the ground at the same time, land with feet together and shuffle away.", s: "tep" },
+          { t: "Turn off lights and appliances", d: "Avoids a surge when the power comes back.", s: "srp" },
+          { t: "Run the blackout playbook", go: "blackout", act: "outage-start" }
+        ] }
+      ]
+    },
+    {
+      id: "smoke", title: "Wildfire smoke or evacuation", sub: "Clean air inside; Ready, Set, Go to leave", icon: "flame",
+      trigger: "Smoke in the air, an air-quality alert, or a fire near you with READY, SET or GO notices.",
+      leave: ["GO is announced for your area: leave right away, with the pets.", "Danger is close and life-threatening, with or without an order.", "Smoke is making someone's breathing hard and you can't keep a clean room: move somewhere with clean air."],
+      sources: ["azein", "maricopa", "mcnotify", "epasmoke", "epasmoke2", "epaheatsmoke", "epacleanroom", "epadiy", "epalungs", "cdcsmokeheart"],
+      phases: [
+        { label: "READY: now", items: [
+          { t: "Sign up for Maricopa County alerts", d: "RAVE Alerts at smart911.com, plus the Ready Maricopa app. Evacuation alerts say READY, SET or GO.", s: "mcnotify" },
+          { t: "Pack a go-bag for each person", d: "Medicines, papers, chargers, water and 3 days of food, cash, pet supplies, and the binder.", s: "azein", href: "#/binder" },
+          { t: "Keep NIOSH N95 masks and a HEPA air cleaner", d: "Dust masks, bandanas and cloth masks don't stop smoke.", s: "epasmoke" }
+        ] },
+        { label: "Smoke: protect your lungs", items: [
+          { t: "Stay inside with windows and doors closed", d: "Close the AC's fresh-air intake or set it to recirculate, and run a swamp cooler as little as you can. Take it easy: less activity means less smoke breathed in. Too hot? Heat comes first.", s: "epaheatsmoke", go: "heat" },
+          { t: "Make a clean room", d: "A bedroom with few windows and no fireplace, with a HEPA air cleaner sized for the room that makes no ozone. Stopgap: a MERV 13 filter on a 2012-or-newer box fan. Older fans can catch fire: never run one unattended or while you sleep.", s: "epacleanroom" },
+          { t: "Don't add smoke indoors", d: "No candles, frying or broiling, smoking or vacuuming.", s: "epasmoke" },
+          { t: "Outside, wear a fitted N95", d: "It must say NIOSH. Both straps on, nose clip pinched; it only helps if it seals. Beards break the seal, and none fit young kids. Heart or lung problems, or pregnant? Ask a doctor. Dizzy? Get to cleaner air and take it off.", s: "epalungs" },
+          { t: "In the car, set the AC to recirculate", s: "epasmoke2" },
+          { t: "Chest pain or severe trouble breathing: call 911", d: "Other trouble breathing or a cough that won't stop: call your doctor. People with heart or lung disease are at higher risk.", s: "cdcsmokeheart" }
+        ] },
+        { label: "SET: be ready to leave", items: [
+          { t: "Go-bags, medicines and the binder by the door", d: "Be ready to leave the moment you're told.", s: "maricopa" },
+          { t: "Text your out-of-area contact the plan", href: "#/comms" }
+        ] },
+        { label: "GO: leave", items: [
+          { t: "Leave right away with everyone and the pets", s: "maricopa" },
+          { t: "Follow instructions from emergency crews and their routes", s: "azein" },
+          { t: "Text \"OK + location\" once you're out", href: "#/comms" }
+        ] }
+      ]
+    },
+    {
+      id: "boil", title: "Boil-water notice", sub: "Tap water isn't safe to drink until boiled", icon: "drop",
+      trigger: "Your water provider or the city issues a boil-water advisory.",
+      ruleTitle: "Hard rule until the notice is lifted",
+      leave: ["Only bottled or boiled water for drinking, cooking, ice, brushing teeth, baby formula and pets.", "Home water filters don't make it safe: most don't remove bacteria or viruses."],
+      sources: ["cdcboil", "cdcwater", "cdcstore", "ctflush"],
+      phases: [
+        { label: "Make water safe", items: [
+          { t: "Check the notice type", d: "\"Do not drink\" or \"Do not use\" means boiling won't help: use bottled or stored water.", s: "cdcboil" },
+          { t: "Boil: a rolling boil for 1 full minute, then let it cool", d: "Store it in clean, covered containers. Above 6,500 feet (Flagstaff, not Phoenix), boil 3 minutes.", s: "cdcwater" },
+          { t: "Can't boil? Use unscented bleach", d: "Check the label: 5% to 9%. 8 drops (just under 1/8 teaspoon) per gallon of clear water. Cloudy? Filter it or let it settle first, then use 16 drops. Stir and wait at least 30 minutes. Boiling kills more germs.", s: "cdcwater" },
+          { t: "Water you stored before the problem began can be used", d: "Your drums and bricks, if sealed and filled within the last 6 months. Unsure? Boil or treat it.", s: "cdcstore" }
+        ] },
+        { label: "Around the house", items: [
+          { t: "Food and drinks", d: "Wash produce and make coffee, tea and formula with boiled or bottled water; ready-to-use formula is best. Throw out ice made from tap water, and don't use the fridge's water or ice dispenser.", s: "cdcboil" },
+          { t: "Dishes", d: "By hand: wash and rinse, then soak 1 minute in 1 teaspoon of unscented bleach per gallon of warm water, and air-dry. A dishwasher is fine if it has a sanitizing cycle.", s: "cdcboil" },
+          { t: "Bathing", d: "Showers are fine; don't swallow the water. Give babies and young children a sponge bath.", s: "cdcboil" },
+          { t: "Handwashing and laundry", d: "Soap and tap water are fine for handwashing in most cases. Do laundry as usual.", s: "cdcboil" }
+        ] },
+        { label: "When the notice is lifted", items: [
+          { t: "Flush the pipes", d: "Follow your water provider's steps. If they give none: run each cold tap 5 minutes, throw out 3 batches of ice, and replace fridge and faucet filters.", s: "ctflush" }
+        ] }
+      ]
+    }
   ],
 
   // ---------------- v1.1: missions (from the mission map) ----------------
@@ -469,7 +654,28 @@ const HAVYN_CONTENT = {
     swgas: { n: "Southwest Gas: general safety (2026)", u: "https://www.swgas.com/1409225179571/General-Safety-2026.pdf" },
     phxwater: { n: "Phoenix Water Services: contact", u: "https://www.phoenix.gov/administration/departments/waterservices/contact-us.html" },
     phxpd: { n: "Phoenix Police: contact", u: "https://www.phoenix.gov/administration/departments/police/contact-us.html" },
-    applemaps: { n: "Apple: download maps to use offline", u: "https://support.apple.com/en-us/105084" }
+    applemaps: { n: "Apple: download maps to use offline", u: "https://support.apple.com/en-us/105084" },
+    adot: { n: "ADOT: Pull Aside, Stay Alive (dust storms)", u: "https://www.azdot.gov/about/transportation-safety/severe-weather/dust-storms" },
+    nwsflood: { n: "NWS: Turn Around Don't Drown", u: "https://www.weather.gov/safety/flood-turn-around-dont-drown" },
+    nwslightning: { n: "NWS: lightning safety", u: "https://www.weather.gov/safety/lightning-safety-overview" },
+    maricopa: { n: "Maricopa County: Ready, Set, Go", u: "https://www.maricopa.gov/5143/Most-Common-Natural-Hazards" },
+    azein: { n: "Arizona (AZEIN): Ready, Set, Go!", u: "https://azein.gov/ready-set-go" },
+    epasmoke: { n: "EPA: reduce your smoke exposure (EPA-452/F-18-003)", u: "https://www.neha.org/Images/resources/Reduce%20Wildfire%20Smoke%20Exposure.pdf" },
+    epasmoke2: { n: "EPA: reduce health risks from wildfire smoke", u: "https://www.epa.gov/sites/default/files/2018-11/documents/reduce-health-risks-with-wildfire-smoke-1.pdf" },
+    airnowresp: { n: "AirNow: protect your lungs from wildfire smoke or ash", u: "https://www.airnow.gov/sites/default/files/2021-07/respiratory-protection-factsheet-072021.pdf" },
+    cdcboil: { n: "CDC: drinking water advisories", u: "https://cdc.gov/water-emergency/about/drinking-water-advisories-an-overview.html" },
+    cdcwater: { n: "CDC: making water safe in an emergency", u: "https://www.cdc.gov/water-emergency/about/index.html" },
+    cdcstore: { n: "CDC: create and store an emergency water supply", u: "https://www.cdc.gov/water-emergency/about/how-to-create-and-store-an-emergency-water-supply.html" },
+    ctflush: { n: "Connecticut DPH: after a boil-water notice ends (template)", u: "https://portal.ct.gov/-/media/Departments-and-Agencies/DPH/dph/drinking_water/pdf/Boil-Water-Notice-Concluded_residential.pdf" },
+    readyfloods: { n: "Ready.gov: floods", u: "https://www.ready.gov/floods" },
+    nwsflooddur: { n: "NWS: during a flood", u: "https://www.weather.gov/safety/flood-during" },
+    tep: { n: "TEP: vehicle safety around downed power lines", u: "https://www.tep.com/news/vehicle-safety-around-downed-power-lines/" },
+    mcnotify: { n: "Maricopa County: emergency notifications", u: "https://www.maricopa.gov/1755/Emergency-Notifications" },
+    epaheatsmoke: { n: "EPA: heat and smoke (2026)", u: "https://www.epa.gov/system/files/documents/2026-06/heat-and-smoke-factsheet_1.pdf" },
+    epacleanroom: { n: "EPA: create a clean room", u: "https://www.epa.gov/indoor-air-quality-iaq/create-clean-room-protect-indoor-air-quality-during-wildfire" },
+    epadiy: { n: "EPA: DIY air cleaners for wildfire smoke", u: "https://www.epa.gov/air-research/research-diy-air-cleaners-reduce-wildfire-smoke-indoors" },
+    epalungs: { n: "EPA: protect your lungs from wildfire smoke (2026)", u: "https://www.epa.gov/system/files/documents/2026-06/protect-your-lungs-factsheet.pdf" },
+    cdcsmokeheart: { n: "CDC: wildfire smoke and heart disease", u: "https://www.cdc.gov/air/wildfire-smoke/heart-disease.htm" }
   }
 };
 if (typeof module !== "undefined") module.exports = HAVYN_CONTENT;

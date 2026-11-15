@@ -126,7 +126,7 @@ test("sanitize drops malformed records", () => {
 });
 
 test("content: every card has steps, sources, and a reviewed date", () => {
-  assert.equal(C.cards.length, 10);
+  assert.equal(C.cards.length, 16);
   for (const c of C.cards) {
     assert.ok(c.steps.length >= 4, c.id);
     assert.ok(c.sources.length >= 1, c.id);
@@ -214,7 +214,7 @@ test("v1.1 content: unique ids and every source key resolves", () => {
   assert.equal(new Set(C.buy.items.map((i) => i.id)).size, C.buy.items.length);
   for (const i of C.buy.items) assert.ok(C.buy.tiers.some((t) => t.id === i.tier), i.id);
   for (const r of [...C.plan.heat, ...C.comms.ladder, ...C.comms.rules]) if (r.s) assert.ok(C.refs[r.s], r.s);
-  assert.ok(!C.playbooks.some((p) => /v1\.1/.test(p.sub || "")));
+  assert.ok(!C.playbooks.some((p) => p.soon));
 });
 
 test("v1.2: every phone number has a source page (except 911 and Poison Control) and US spelling", () => {

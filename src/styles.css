@@ -218,6 +218,7 @@ body.em #app { padding-bottom: calc(var(--sb) + 20px); }
 .emnav .next { background: #fff; color: #000; }
 .emsrc { margin-top: 18px; font-size: .95rem; color: #d0d0d0; line-height: 1.4; }
 .emsrc a { color: #fff; }
+.emlink svg { width: 22px; height: 22px; margin-right: 8px; }
 .emlink { margin-top: 14px; display: inline-flex; min-height: 56px; padding: 0 18px; border-radius: 14px; background: var(--red); color: #fff; font-weight: 850; font-size: 1.2rem; align-items: center; text-decoration: none; }
 .dots { display: flex; gap: 6px; margin-top: 8px; }
 .dots i { flex: 1; height: 6px; border-radius: 3px; background: #444; }

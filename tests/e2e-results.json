@@ -2,7 +2,7 @@
  {
   "check": "first screen under 1 s (6x CPU throttle)",
   "pass": true,
-  "detail": "115 ms normal, 364 ms throttled"
+  "detail": "129 ms normal, 308 ms throttled"
  },
  {
   "check": "service worker controls the page",
@@ -110,6 +110,66 @@
   "detail": ""
  },
  {
+  "check": "card 'drowning' in 2 taps",
+  "pass": true,
+  "detail": "Get them out safely"
+ },
+ {
+  "check": "card 'drowning' shows source + checked date",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "check": "card 'overdose' in 2 taps",
+  "pass": true,
+  "detail": "Shout their name and rub the breastbone hard"
+ },
+ {
+  "check": "card 'overdose' shows source + checked date",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "check": "card 'asthma' in 2 taps",
+  "pass": true,
+  "detail": "After a sting, food or medicine? Epinephrine first"
+ },
+ {
+  "check": "card 'asthma' shows source + checked date",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "check": "card 'lowsugar' in 2 taps",
+  "pass": true,
+  "detail": "Passed out, seizing or can't swallow? Nothing by mouth"
+ },
+ {
+  "check": "card 'lowsugar' shows source + checked date",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "check": "card 'scorpion' in 2 taps",
+  "pass": true,
+  "detail": "Call Poison Control"
+ },
+ {
+  "check": "card 'scorpion' shows source + checked date",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "check": "card 'snake' in 2 taps",
+  "pass": true,
+  "detail": "Move away from the snake"
+ },
+ {
+  "check": "card 'snake' shows source + checked date",
+  "pass": true,
+  "detail": ""
+ },
+ {
   "check": "CPR beat step shows the metronome",
   "pass": true,
   "detail": ""
@@ -121,6 +181,41 @@
  },
  {
   "check": "playbook tick persists after reload",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "check": "playbook 'blackout' live with 22 steps",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "check": "playbook 'heat' live with 11 steps",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "check": "playbook 'storm' live with 16 steps",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "check": "playbook 'smoke' live with 14 steps",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "check": "playbook 'boil' live with 9 steps",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "check": "boil-water has its own rule and no leave destination",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "check": "scorpion card: one-tap Poison Control",
   "pass": true,
   "detail": ""
  },
@@ -267,12 +362,12 @@
  {
   "check": "binder PDF made on the phone",
   "pass": true,
-  "detail": "23180 bytes"
+  "detail": "37364 bytes"
  },
  {
   "check": "binder copy saved to the library",
   "pass": true,
-  "detail": "[['mwh5jwxjel3gqw', 14]]"
+  "detail": "[['mwh6n7bjqo1jiq', 23]]"
  },
  {
   "check": "binder PDF is searchable in the reader",
@@ -297,7 +392,7 @@
  {
   "check": "binder PDF can be made offline (pdf-lib from the offline copy)",
   "pass": true,
-  "detail": "Ready: 14 pages, 23 KB. Saved in your Library too."
+  "detail": "Ready: 23 pages, 36 KB. Saved in your Library too."
  },
  {
   "check": "CSP blocks fetch (external + same-origin) and external images",
