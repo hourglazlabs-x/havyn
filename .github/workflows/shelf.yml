@@ -16,6 +16,10 @@ on:
         type: boolean
         required: false
         default: false
+      probe:
+        description: "Instead: check how these URLs answer (status, size, CORS); kiwix:<dir>/<stem> finds the newest archive"
+        required: false
+        default: ""
   push:
     branches: [main]
     paths: ["shelf/catalog.json", "tools/shelf_fetch.py", ".github/workflows/shelf.yml"]
@@ -34,19 +38,26 @@ jobs:
     timeout-minutes: 90
     steps:
       - uses: actions/checkout@v6
+      - name: Check how servers answer
+        if: ${{ inputs.probe }}
+        env:
+          PROBE: ${{ inputs.probe }}
+        run: python3 tools/shelf_probe.py "$PROBE"
       - name: Install the PDF checker
+        if: ${{ !inputs.probe }}
         run: python3 -m pip install --quiet --user "pypdf>=5,<7"
       - name: Fetch and check every document
+        if: ${{ !inputs.probe }}
         env:
           SHELF_ONLY: ${{ inputs.only }}
           SHELF_PUBLISH: ${{ inputs.publish && '1' || '' }}
           SHELF_RETRY: ${{ github.event.schedule == '41 9 * * *' && '1' || '' }}
         run: python3 tools/shelf_fetch.py shelf/catalog.json out
       - name: Report
-        if: always()
+        if: ${{ always() && !inputs.probe }}
         run: cat out/report.md >> "$GITHUB_STEP_SUMMARY" || true
       - name: Publish to the shelf release
-        if: ${{ !inputs.only || inputs.publish }}
+        if: ${{ !inputs.probe && (!inputs.only || inputs.publish) }}
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -69,7 +80,7 @@ jobs:
             grep -qxF "$a" out/keep.txt || gh release delete-asset shelf "$a" -y
           done
       - name: Redeploy HAVYN with the new shelf
-        if: ${{ !inputs.only || inputs.publish }}
+        if: ${{ !inputs.probe && (!inputs.only || inputs.publish) }}
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
