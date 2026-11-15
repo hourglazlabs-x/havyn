@@ -183,6 +183,7 @@ with sync_playwright() as p:
     ok("pages in manuals not on this phone say so", off == 1 and "not on this phone yet" in page.inner_text("#f-latrine"), page.inner_text("#f-latrine"))
     page.goto(BASE + "#/emergency/bleeding"); page.wait_for_selector(".emhead")
     deep = page.inner_text(".emdeep") if page.locator(".emdeep").count() else ""
+    page.screenshot(path=str(SHOTS / "v15_card.png"), full_page=True)
     ok("an emergency card links to the pages behind it", "CERT manual p. 102" in deep and "Basic Emergency Care" not in deep, deep)
     page.click(".emdeep a.emlink")
     ok("and the card's page link opens the manual there", until(lambda: page.inner_text("#pgnum").startswith("102 /"), 15))
@@ -191,6 +192,7 @@ with sync_playwright() as p:
     page.goto(BASE + "#/emergency/heartattack"); page.wait_for_selector(".emhead")
     ok("new cards: heart attack, won't wake up, broken bone, poisoning", all(page.goto(BASE + "#/emergency/" + c) or page.wait_for_selector(".emhead") for c in ("heartattack", "unresponsive", "fracture", "poison")))
     page.goto(BASE + "#/playbooks/blackout"); page.wait_for_selector(".panel")
+    page.locator("text=Read more on this phone").scroll_into_view_if_needed(); page.screenshot(path=str(SHOTS / "v15_playbook.png"), full_page=False)
     ok("a playbook lists the pages that go with it", "READ MORE ON THIS PHONE" in page.inner_text("#app").upper() and page.locator("#f-gen a.ref:not(.off)").count() >= 1, page.inner_text("#f-gen") + " | " + json.dumps([x for x in lib(page) if x["shelf"]]))
     page.goto(BASE + "#/search?q=tourniquet"); 
     ok("Search everything finds field answers", until(lambda: "Stop heavy bleeding" in page.inner_text("#sres"), 10), page.inner_text("#sres")[:300] if page.locator("#sres").count() else "")

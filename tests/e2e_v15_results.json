@@ -22,7 +22,7 @@
  {
   "name": "progress shows while downloading",
   "pass": true,
-  "detail": "THIS PHONE\n10% READY NOT YET\nDownload everything \u00b7 21 MB\nStop\n11 items. Use Wi-Fi and keep HAVYN open (the screen stays on); it picks up where it stopped if you close it.\nDownloading 1 of 4: Emergency Disinfection of Drinking Water \u00b7 1%. Keep HAVYN open; the screen stays on.\nOn the Home Screen\nIn Sa"
+  "detail": "THIS PHONE\n10% READY NOT YET\nDownload everything \u00b7 21 MB\nStop\n11 items. Use Wi-Fi and keep HAVYN open (the screen stays on); it picks up where it stopped if you close it.\nDownloading 1 of 4: Emergency Disinfection of Drinking Water \u00b7 0%. Keep HAVYN open; the screen stays on.\nOn the Home Screen\nIn Sa"
  },
  {
   "name": "the shelf documents arrive first",
@@ -52,7 +52,7 @@
  {
   "name": "every downloaded archive was checked",
   "pass": true,
-  "detail": "[{'id': 'mwhjv64z9vz3xy', 'type': 'zim', 'name': 'Test WikiMed: medical encyclopedia', 'shelf': '', 'catalog': 'p-wikimed', 'verified': True, 'check': 'sha256', 'size': 44276, 'file': 'wikipedia_en_medicine_maxi_2026-10.zim'}, {'id': 'mwhjv8rardw5uc', 'type': 'zim', 'name': 'Test Water treatment', 'shelf': '', 'catalog': 'p-water', 'verified': True, 'check': 'md5', 'size': 44248, 'file': 'zimgit-water_en_2026-10.zim'}, {'id': 'mwhjv8ylgozq8d', 'type': 'zim', 'name': 'Test Food for preppers', 'shelf': '', 'catalog': 'p-food', 'verified': True, 'check': 'sha256', 'size': 44261, 'file': 'zimgit-food-preparation_en_2026-10.zim'}, {'id': 'mwhjv95b5m5xhl', 'type': 'zim', 'name': 'Test Medical library', 'shelf': '', 'catalog': 'p-medlib', 'verified': True, 'check': 'sha256', 'size': 44251, 'file': 'zimgit-medicine_en_2026-10.zim'}, {'id': 'mwhjv9css1qbzm', 'type': 'zim', 'name': 'Test A library of knots', 'shelf': '', 'catalog': 'p-knots', 'verified': True, 'check': 'sha256', 'size': 44251, 'file': 'zimgit-knots_en_2026-10.zim'}, {'id': 'mwhjv9k1qh0b1m', 'type': 'zim', 'name': 'Test Vikidia: encyclopedia for kids', 'shelf': '', 'catalog': 'p-vikidia', 'verified': True, 'check': 'sha256', 'size': 44270, 'file': 'vikidia_en_all_maxi_2026-10.zim'}]"
+  "detail": "[{'id': 'mwhjwz5fzc3v7f', 'type': 'zim', 'name': 'Test WikiMed: medical encyclopedia', 'shelf': '', 'catalog': 'p-wikimed', 'verified': True, 'check': 'sha256', 'size': 44276, 'file': 'wikipedia_en_medicine_maxi_2026-10.zim'}, {'id': 'mwhjx1sk7z0vww', 'type': 'zim', 'name': 'Test Water treatment', 'shelf': '', 'catalog': 'p-water', 'verified': True, 'check': 'md5', 'size': 44248, 'file': 'zimgit-water_en_2026-10.zim'}, {'id': 'mwhjx1zianqm6t', 'type': 'zim', 'name': 'Test Food for preppers', 'shelf': '', 'catalog': 'p-food', 'verified': True, 'check': 'sha256', 'size': 44261, 'file': 'zimgit-food-preparation_en_2026-10.zim'}, {'id': 'mwhjx272vup1zp', 'type': 'zim', 'name': 'Test Medical library', 'shelf': '', 'catalog': 'p-medlib', 'verified': True, 'check': 'sha256', 'size': 44251, 'file': 'zimgit-medicine_en_2026-10.zim'}, {'id': 'mwhjx2epxsr01o', 'type': 'zim', 'name': 'Test A library of knots', 'shelf': '', 'catalog': 'p-knots', 'verified': True, 'check': 'sha256', 'size': 44251, 'file': 'zimgit-knots_en_2026-10.zim'}, {'id': 'mwhjx2lu94xzg2', 'type': 'zim', 'name': 'Test Vikidia: encyclopedia for kids', 'shelf': '', 'catalog': 'p-vikidia', 'verified': True, 'check': 'sha256', 'size': 44270, 'file': 'vikidia_en_all_maxi_2026-10.zim'}]"
  },
  {
   "name": "against Kiwix's SHA-256, or the ZIM's own MD5 when Kiwix has none",
@@ -127,7 +127,7 @@
  {
   "name": "a page link opens the manual at that page",
   "pass": true,
-  "detail": "#/library/mwhjv63jfokikb?page=102&from=%23%2Ffield 102 / 268"
+  "detail": "#/library/mwhjwz3mllo2z7?page=102&from=%23%2Ffield 102 / 268"
  },
  {
   "name": "Back returns to the field index",
@@ -162,7 +162,7 @@
  {
   "name": "a playbook lists the pages that go with it",
   "pass": true,
-  "detail": "Run a generator safely\nCARD\nCPSC generator alert \u00b7 p. 1\nCarbon monoxide and backfeeding\nOSHA generator sheet \u00b7 p. 1\nGenerator safety fact sheet \u00b7 not on this phone yet | [{\"id\": \"mwhjv62isdyzt1\", \"type\": \"pdf\", \"name\": \"Emergency Disinfection of Drinking Water\", \"shelf\": \"sh-epawater\", \"catalog\": \"\", \"verified\": false, \"check\": \"\", \"size\": 976, \"file\": \"EPA-Emergency-Disinfection-of-Drinking-Water.pdf\"}, {\"id\": \"mwhjv631pajaoj\", \"type\": \"pdf\", \"name\": \"Portable Generator Hazards\", \"shelf\": \"sh-cpscgen\", \"catalog\": \"\", \"verified\": false, \"check\": \"\", \"size\": 637, \"file\": \"CPSC-Portable-Generator-Hazards.pdf\"}, {\"id\": \"mwhjv637rk8juw\", \"type\": \"pdf\", \"name\": \"National Interoperability Field Operations Guide (NIFOG 2.02)\", \"shelf\": \"sh-nifog\", \"catalog\": \"\", \"verified\": false, \"check\": \"\", \"size\": 67800, \"file\": \"CISA-NIFOG-2.02.pdf\"}, {\"id\": \"mwhjv63jfokikb\", \"type\": \"pdf\", \"name\": \"CERT Basic Training manual\", \"shelf\": \"sh-cert\", \"catalog\": \"\", \"verified\": false, \"check\": \"\", \"size\": 85516, \"file\": \"FEMA-CERT-Basic-Training-Participant-Manual-2019.pdf\"}]"
+  "detail": "Run a generator safely\nCARD\nCPSC generator alert \u00b7 p. 1\nCarbon monoxide and backfeeding\nOSHA generator sheet \u00b7 p. 1\nGenerator safety fact sheet \u00b7 not on this phone yet | [{\"id\": \"mwhjwz1t6sbrfa\", \"type\": \"pdf\", \"name\": \"Emergency Disinfection of Drinking Water\", \"shelf\": \"sh-epawater\", \"catalog\": \"\", \"verified\": false, \"check\": \"\", \"size\": 976, \"file\": \"EPA-Emergency-Disinfection-of-Drinking-Water.pdf\"}, {\"id\": \"mwhjwz25zt77eu\", \"type\": \"pdf\", \"name\": \"Portable Generator Hazards\", \"shelf\": \"sh-cpscgen\", \"catalog\": \"\", \"verified\": false, \"check\": \"\", \"size\": 637, \"file\": \"CPSC-Portable-Generator-Hazards.pdf\"}, {\"id\": \"mwhjwz2te0vd4p\", \"type\": \"pdf\", \"name\": \"National Interoperability Field Operations Guide (NIFOG 2.02)\", \"shelf\": \"sh-nifog\", \"catalog\": \"\", \"verified\": false, \"check\": \"\", \"size\": 67800, \"file\": \"CISA-NIFOG-2.02.pdf\"}, {\"id\": \"mwhjwz3mllo2z7\", \"type\": \"pdf\", \"name\": \"CERT Basic Training manual\", \"shelf\": \"sh-cert\", \"catalog\": \"\", \"verified\": false, \"check\": \"\", \"size\": 85516, \"file\": \"FEMA-CERT-Basic-Training-Participant-Manual-2019.pdf\"}]"
  },
  {
   "name": "Search everything finds field answers",
@@ -182,7 +182,7 @@
  {
   "name": "parts are separate storage entries that delete cleanly",
   "pass": true,
-  "detail": "(49, 43)"
+  "detail": "(45, 39)"
  },
  {
   "name": "no page errors",
