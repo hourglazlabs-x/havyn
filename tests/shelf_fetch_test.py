@@ -42,13 +42,22 @@ class H(http.server.BaseHTTPRequestHandler):
             head = [["urlkey", "timestamp", "original", "mimetype", "statuscode", "digest", "length"]]
             if orig.endswith("/403/tbmed.pdf"): return J(head + [["k", "20190101000000", orig, "application/pdf", "200", "d", "1"], ["k", "20240101000000", orig, "application/pdf", "200", "d", "1"]])
             if orig.endswith("/403/noindex.pdf"): return self.send(500, b"busy", "text/html")
+            if "/403/r" in orig: return J(head + [["k", "20250101000000", orig, "application/pdf", "200", "d", "1"]])
             return J(head)
         if p.startswith("/wb/"):
             ts, target = p[4:].split("id_/", 1)
             if target.endswith("/403/tbmed.pdf") and ts == "20240101000000": return self.send(200, b"<!DOCTYPE html><html>challenge</html>", "text/html")
             if target.endswith("/403/tbmed.pdf") and ts == "20190101000000": return self.send(200, DOC["TB MED 577 Field Water"])
             if target.endswith("/403/noindex.pdf") and ts == "2021": return self.send(200, DOC["RIGHT book"])
+            if "/403/r" in target: return self.send(429, b"slow down", "text/html")
             return self.send(404, b"no capture", "text/html")
+        if p == "/trunc/a.pdf":
+            body = DOC["FLAKY doc"]
+            if hits[p] == 1:
+                self.send_response(200); self.send_header("Content-Type", "application/pdf"); self.send_header("Content-Length", str(len(body) + 5000)); self.end_headers()
+                self.wfile.write(body); self.wfile.flush(); self.connection.shutdown(2); return
+            return self.send(200, body)
+        if p.startswith("/403/r"): return self.send(403, b"forbidden", "text/html")
         if p == "/flaky/a.pdf":
             if hits[p] <= 2: self.connection.shutdown(2); return
             return self.send(200, DOC["FLAKY doc"])
@@ -86,6 +95,7 @@ PREV = [
 ]
 cat = {"release": "shelf", "checked": "2026-11-14", "systems": [{"id": "a", "n": "01", "t": "Alpha"}], "items": [
  {"id": "it-wb", "sys": "a", "t": "TB MED", "by": "x", "lic": "pd", "ph": True, "file": "TB-MED.pdf", "src": [BASE + "/403/tbmed.pdf"], "expect": "TB MED 577"},
+ {"id": "it-trunc", "sys": "a", "t": "Cut short", "by": "x", "lic": "pd", "file": "Trunc.pdf", "src": [BASE + "/trunc/a.pdf"], "wb": False},
  {"id": "it-noindex", "sys": "a", "t": "No index", "by": "x", "lic": "pd", "file": "Noindex.pdf", "src": [BASE + "/403/noindex.pdf"], "wb": ["2021"], "expect": "RIGHT"},
  {"id": "it-flaky", "sys": "a", "t": "Flaky", "by": "x", "lic": "pd", "file": "Flaky-Doc.pdf", "src": [BASE + "/flaky/a.pdf"]},
  {"id": "it-expect", "sys": "a", "t": "Right", "by": "x", "lic": "pd", "file": "Right.pdf", "src": [BASE + "/pdf/wrong.pdf", BASE + "/pdf/right.pdf"], "expect": "RIGHT book", "wb": False},
@@ -133,4 +143,15 @@ import zipfile; names = zipfile.ZipFile(T / "out/release/HAVYN-shelf-phone.zip")
 check("HAVYN-shelf-phone/Stub-Doc.pdf" in names and "HAVYN-shelf-phone/TB-MED.pdf" in names, "phone zip includes carried and Wayback documents")
 rep = (T / "out/report.md").read_text()
 check("↺ | it-stub" in rep and "(Wayback copy)" in rep and "kept from the last build" in rep, "report marks kept and Wayback documents")
+r = idx["it-trunc"]; check(r["ok"] and hits["/trunc/a.pdf"] == 2, "download cut short is noticed and retried")
+
+# Phase 2: the Wayback Machine starts refusing (429): stop asking after a few refusals instead of waiting out every document
+cat2 = {"release": "shelf", "checked": "2026-11-14", "systems": cat["systems"], "items": [
+    {"id": "r%d" % i, "sys": "a", "t": "R%d" % i, "by": "x", "lic": "pd", "file": "R%d.pdf" % i, "src": [BASE + "/403/r%d.pdf" % i]} for i in range(1, 6)]}
+(T / "catalog2.json").write_text(json.dumps(cat2)); m.WB = m.Breaker(); os.environ["SHELF_ONLY"] = "r1,r2,r3,r4,r5"
+sys.argv = ["shelf_fetch.py", str(T / "catalog2.json"), str(T / "out2")]; t0 = time.time()
+m.main()
+idx2 = json.loads((T / "out2/release/shelf-index.json").read_text())["items"]
+wbhits = sum(v for k, v in hits.items() if k.startswith("/wb/") and "/403/r" in k)
+check(all(not r["ok"] for r in idx2) and m.WB.tripped and wbhits <= 4, "Wayback refusals trip the breaker: %d Wayback downloads for 5 documents" % wbhits)
 print("%d failed" % check.bad); sys.exit(1 if check.bad else 0)

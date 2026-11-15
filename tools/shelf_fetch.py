@@ -15,7 +15,7 @@ from the last build, so unchanged files aren't uploaded again).
 Documents under the publisher's own terms (lic "link") are downloaded only to check the links; they are never uploaded.
 
 Where each document comes from, in order: the catalog's "src" links; then resolvers ("ia" Internet Archive item,
-"ias" Internet Archive search, "ox" OpenStax book, "dspace" repository handle); then the Internet Archive's Wayback copy of each "src" link,
+"ias" Internet Archive search, "ox" OpenStax book, "dspace" repository handle); then "alt" copies on other sites; then the Internet Archive's Wayback copy of each "src" link,
 byte for byte (for publishers that block cloud servers); then "parts" joined into one PDF. "expect" (a pattern)
 must appear in the first pages, so a mirror can't hand over the wrong document. If a publisher is down on the
 day of a full build, last build's checked copy is kept and the report says so."""
@@ -51,7 +51,7 @@ def slot(url):
 
 class Paced:
     """A one-at-a-time slot that also waits a few seconds between requests."""
-    GAP = float(os.environ.get("SHELF_WB_GAP", "4"))
+    GAP = float(os.environ.get("SHELF_WB_GAP", "6"))   # the Wayback Machine allows about 15 requests a minute
     def __init__(self): self.lock = threading.Lock(); self.last = 0.0
     def __enter__(self):
         self.lock.acquire()
@@ -59,6 +59,22 @@ class Paced:
         if wait > 0: time.sleep(wait)
     def __exit__(self, *a):
         self.last = time.time(); self.lock.release()
+
+class Breaker:
+    """After the Wayback Machine refuses us a few times running (rate limit or block), stop asking it this build."""
+    LIMIT = 3
+    def __init__(self): self.lock = threading.Lock(); self.fails = 0; self.tripped = False
+    def ok(self):
+        with self.lock: self.fails = 0
+    def bad(self):
+        with self.lock:
+            self.fails += 1
+            if self.fails >= self.LIMIT and not self.tripped:
+                self.tripped = True; print("Wayback Machine is refusing requests: not asking it again in this build", flush=True)
+WB = Breaker()
+def is_wb(url): return urllib.parse.urlparse(url).netloc.lower() == WB_HOST
+def refused(e):
+    return (isinstance(e, urllib.error.HTTPError) and e.code in (429, 503)) or (isinstance(e, urllib.error.URLError) and "refused" in str(e.reason).lower())
 
 def slow_host(url):
     return urllib.parse.urlparse(url).netloc.lower().endswith("archive.org") or urllib.parse.urlparse(url).netloc.lower() == WB_HOST
@@ -71,14 +87,20 @@ def req(url, method="GET", headers=None, timeout=60):
 def get_text(url, timeout=60, headers=None, tries=3):
     last = None
     for a in range(tries):
+        if is_wb(url) and WB.tripped: raise RuntimeError("Wayback Machine refused earlier requests; skipped")
         try:
-            with slot(url), req(url, headers=headers, timeout=timeout) as r:
-                return r.read(8_000_000).decode("utf-8", "replace")
+            with slot(url):
+                if is_wb(url) and WB.tripped: raise RuntimeError("Wayback Machine refused earlier requests; skipped")
+                with req(url, headers=headers, timeout=timeout) as r:
+                    return r.read(8_000_000).decode("utf-8", "replace")
         except urllib.error.HTTPError as e:
             last = e
+            if is_wb(url) and refused(e): WB.bad()
             if e.code in (400, 401, 403, 404, 410): break
         except Exception as e:
             last = e
+            if is_wb(url) and refused(e): WB.bad()
+        if is_wb(url) and WB.tripped: raise RuntimeError("Wayback Machine refused earlier requests; skipped")
         if a + 1 < tries: time.sleep((30 if slow_host(url) else 4) * (a + 1))
     raise last
 
@@ -98,13 +120,16 @@ def probe_pdf(url):
 
 def download(url, dest, tries=None):
     """Stream url to dest; returns (size, sha256). Retries timeouts, dropped connections and TLS hiccups."""
-    last = None; slow = slow_host(url); tries = tries or (6 if slow else 4)
+    last = None; slow = slow_host(url); tries = tries or (5 if slow else 4)
     for attempt in range(tries):
-        part = Path(str(dest) + ".part")
+        if is_wb(url) and WB.tripped: raise RuntimeError(last or "Wayback Machine refused earlier requests; skipped")
+        part = Path(str(dest) + ".part"); expected = None
         try:
             with slot(url):
+                if is_wb(url) and WB.tripped: raise Fatal(last or "Wayback Machine refused earlier requests; skipped")
                 h = hashlib.sha256(); size = 0; t0 = time.time()
                 with req(url, timeout=60) as r, open(part, "wb") as f:
+                    if (r.headers.get("Content-Length") or "").isdigit() and not r.headers.get("Content-Encoding"): expected = int(r.headers["Content-Length"])
                     first = True
                     while True:
                         if time.time() - t0 > FILE_DEADLINE: raise Fatal("slower than %d s" % FILE_DEADLINE)
@@ -116,22 +141,27 @@ def download(url, dest, tries=None):
                         size += len(chunk)
                         if size > MAX_BYTES: raise Fatal("bigger than %d MB" % (MAX_BYTES // 1_000_000))
                         h.update(chunk); f.write(chunk)
+            if expected is not None and size != expected: raise ValueError("connection closed early: %d of %d bytes" % (size, expected))
             if size < MIN_BYTES:
                 n, text = pdf_info(part)
                 raise ValueError("only %d bytes, %d pages: %s" % (size, n, text[:160]))
+            if not pdf_info(part, pages=1)[0]: raise ValueError("the PDF doesn't open (damaged or cut short)")
             part.replace(dest)
+            if is_wb(url): WB.ok()
             return size, h.hexdigest()
         except Fatal as e:
             last = str(e); break
         except urllib.error.HTTPError as e:
             last = "HTTP %d" % e.code
+            if is_wb(url) and refused(e): WB.bad()
             if e.code in (401, 403, 404, 410, 451): break
         except Exception as e:
             last = "%s: %s" % (type(e).__name__, e)
+            if is_wb(url) and refused(e): WB.bad()
         finally:
             try: part.unlink()
             except FileNotFoundError: pass
-        if attempt + 1 < tries: time.sleep((20 if slow else 5) * (attempt + 1))
+        if attempt + 1 < tries: time.sleep((15 if slow else 5) * (attempt + 1))
     raise RuntimeError(last or "failed")
 
 def pdf_info(path, pages=4, chars=600):
@@ -187,6 +217,7 @@ def resolve_ia(spec):
         if hit: out.append(IA + "/download/%s/%s" % (urllib.parse.quote(s["item"]), urllib.parse.quote(hit[0])))
         else: notes.append("%s has no PDF matching %s (has: %s)" % (s["item"], s["match"], "; ".join(pdfs[:24])))
     if not out: raise RuntimeError(" / ".join(notes))
+    if notes: print("archive.org:", " / ".join(notes)[:600], file=sys.stderr)
     return out
 
 def resolve_ias(spec):
@@ -230,6 +261,7 @@ def wayback(urls, years):
     original bytes, no toolbar). If the capture index can't be reached, try the captures nearest the given years."""
     out = []
     for u in urls:
+        if WB.tripped: break
         if re.search(r"(archive\.org|webarchive\.)", u): continue
         try:
             q = urllib.parse.urlencode([("url", u), ("output", "json"), ("filter", "statuscode:200"), ("filter", "mimetype:application/pdf"), ("limit", "-3")])
@@ -253,7 +285,11 @@ def resolve_hp(code, years):
 
 def fetch_item(it, work, rel):
     r = fetch_item1(it, work, rel)
-    print("%s %-16s %7.1f MB  %s" % ("✓" if r.get("ok") else "✗", r["id"], (r.get("size") or 0) / 1e6, r.get("url") if r.get("ok") else r.get("error", "")[:1500]), flush=True)
+    if r.get("ok"):
+        info = " · ".join(filter(None, ["%s pages" % r.get("pages"), r.get("note"), r.get("license_seen"), (r.get("probe") or "")[:220]]))
+        print("✓ %-16s %7.1f MB  %s\n      %s" % (r["id"], (r.get("size") or 0) / 1e6, r.get("url"), info), flush=True)
+    else:
+        print("✗ %-16s          %s" % (r["id"], r.get("error", "")[:1500]), flush=True)
     return r
 
 def fetch_item1(it, work, rel):
@@ -281,6 +317,7 @@ def fetch_item1(it, work, rel):
                 try:
                     got = fn(it[key]); cands += got if isinstance(got, list) else [got]
                 except Exception as e: errors.append("%s: %s" % (key, e))
+        cands += list(it.get("alt") or [])   # other copies, after the publisher and the archive lookups
         out = d / it["file"]; used = None; note = None
         def first_good(urls):
             for u in urls:

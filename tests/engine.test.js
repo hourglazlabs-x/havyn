@@ -262,7 +262,7 @@ test("v1.4 reference shelf: every document licensed, fetchable, filed and consis
     assert.ok(["src", "parts", "ia", "ias", "ox", "dspace", "hp"].some((k) => it[k]), it.id + " has a way to fetch");
     if (it.expect) assert.doesNotThrow(() => new RegExp(it.expect, "i"), it.id + " identity pattern");
     if (it.wb) assert.ok(Array.isArray(it.wb) && it.wb.every((y) => /^\d{4}$/.test(y)), it.id + " Wayback years");
-    for (const u of (it.src || []).concat(it.parts || [])) assert.ok(/^https:\/\//.test(u), it.id + " https " + u);
+    for (const u of (it.src || []).concat(it.parts || [], it.alt || [])) assert.ok(/^https:\/\//.test(u), it.id + " https " + u);
     if (it.u) assert.ok(/^https:\/\//.test(it.u), it.id + " https page");
     if (it.hp) assert.equal(it.lic, "link", "Hesperian books are never re-hosted");
     if (/Hesperian|Médecins|University of Arizona|Traumatic Stress/.test(it.by)) assert.equal(it.lic, "link", it.id + " publisher's terms");

@@ -628,6 +628,11 @@
      "item": "neetsmodules_202003",
      "match": "Module[ _-]*0?1\\b"
     }
+   ],
+   "expect": "Matter|Direct Current",
+   "alt": [
+    "https://everyspec.com/USN/NAVEDTRA/download.php?spec=NAVEDTRA_14173_SEP1998.018392.pdf",
+    "https://everyspec.com/USN/NAVEDTRA/download.php?spec=NAVEDTRA_14173.018392.pdf"
    ]
   },
   {
@@ -669,6 +674,11 @@
      "item": "neetsmodules_202003",
      "match": "Module[ _-]*0?3\\b"
     }
+   ],
+   "expect": "Circuit Protection|Measurement",
+   "alt": [
+    "https://everyspec.com/USN/NAVEDTRA/download.php?spec=NAVEDTRA_14175_SEP1998.018396.pdf",
+    "https://everyspec.com/USN/NAVEDTRA/download.php?spec=NAVEDTRA_14175.018396.pdf"
    ]
   },
   {
@@ -710,6 +720,10 @@
      "item": "neetsmodules_202003",
      "match": "Module[ _-]*0?5\\b"
     }
+   ],
+   "expect": "Generators|Motors",
+   "alt": [
+    "https://everyspec.com/USN/NAVEDTRA/download.php?spec=NEETS-v05-Motors.004568.pdf"
    ]
   },
   {
@@ -762,6 +776,11 @@
      "item": "neetsmodules_202003",
      "match": "Module[ _-]*10\\b"
     }
+   ],
+   "expect": "Antennas|Propagation",
+   "alt": [
+    "https://everyspec.com/USN/NAVEDTRA/download.php?spec=NAVEDTRA_14182_SEP1998.018399.pdf",
+    "https://everyspec.com/USN/NAVEDTRA/download.php?spec=NAVEDTRA_14182.018399.pdf"
    ]
   },
   {
@@ -782,6 +801,11 @@
      "item": "neetsmodules_202003",
      "match": "Module[ _-]*17\\b"
     }
+   ],
+   "expect": "Communications",
+   "alt": [
+    "https://everyspec.com/USN/NAVEDTRA/download.php?spec=NAVEDTRA_14189_SEP1998.018388.pdf",
+    "https://everyspec.com/USN/NAVEDTRA/download.php?spec=NAVEDTRA_14189.018388.pdf"
    ]
   },
   {
