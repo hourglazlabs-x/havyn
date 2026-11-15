@@ -191,4 +191,7 @@ m.main()
 idx2 = json.loads((T / "out2/release/shelf-index.json").read_text())["items"]
 wbhits = sum(v for k, v in hits.items() if k.startswith("/wb/") and "/403/r" in k)
 check(all(not r["ok"] for r in idx2) and m.WB.tripped and wbhits <= 4, "Wayback refusals trip the breaker: %d Wayback downloads for 5 documents" % wbhits)
+# The current catalog's flags win over a record kept from an earlier build (phone set widened, document carried over)
+r = m.apply_catalog([{"id": "a", "ph": False, "core": True, "t": "old", "size": 5, "sha256": "x", "carried": ""}], [{"id": "a", "ph": True, "t": "new"}])[0]
+check(r["ph"] is True and r["core"] is False and r["t"] == "new" and r["size"] == 5 and r["sha256"] == "x", "a carried-over record takes the catalog's current flags, keeps its checked file")
 print("%d failed" % check.bad); sys.exit(1 if check.bad else 0)

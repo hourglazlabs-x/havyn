@@ -404,6 +404,19 @@ def carry_over(results, prev, prev_built, repo, tag, rel):
         results[i] = dict(p, carried=r.get("error", "")[:600], carried_from=prev_built)
         print("↺ %-16s kept last build's copy (today: %s)" % (r["id"], r.get("error", "")[:160]), flush=True)
 
+def apply_catalog(results, items):
+    """The catalog decides what a document is and where it goes (system, title, phone set, vault core set); a record kept
+    from an earlier build keeps only what was fetched and checked. Without this, a document carried over on a bad day keeps
+    last build's flags (2026-11-15: NEETS 4 and 5 stayed out of the phone set after it was widened)."""
+    by = {it["id"]: it for it in items}
+    for i, r in enumerate(results):
+        c = by.get(r.get("id"))
+        if not c: continue
+        r = dict(r, **{k: c[k] for k in ("sys", "t", "by", "yr", "lic", "u") if k in c})
+        r["ph"], r["core"] = bool(c.get("ph")), bool(c.get("core"))
+        results[i] = r
+    return results
+
 def main():
     cat = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
     out = Path(sys.argv[2]); rel = out / "release"; work = out / "work"
@@ -440,6 +453,7 @@ def main():
             if p and p.get("file") == it["file"] and p.get("rev", 0) == it.get("rev", 0) and keep_prev(p, repo, tag, rel): got[it["id"]] = p
             elif it["id"] in prev_all and not prev_all[it["id"]].get("ok"): got[it["id"]] = prev_all[it["id"]]   # still missing: keep it listed
         results = [got[it["id"]] for it in cat["items"] if it["id"] in got]
+    apply_catalog(results, cat["items"])
     sysdir = {s["id"]: "10-shelf/%s-%s" % (s["n"], re.sub(r"[^a-z0-9]+", "-", s["t"].lower()).strip("-")) for s in cat["systems"]}
     rows, sums = [], []
     for r in results:
