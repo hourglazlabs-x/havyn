@@ -18,6 +18,8 @@ from pathlib import Path
 UA = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36 HAVYN-shelf/1.4 (+https://github.com/hourglazlabs-x/havyn)"
 MIRROR = {"pd", "cc-by", "cc-by-sa", "cc-by-nc-sa"}
 MAX_BYTES = 450_000_000
+FILE_DEADLINE = 600          # seconds for one file, so one slow server can't stall the build
+START = time.time(); BUDGET = 55 * 60   # stop starting new documents after this; the job has 90 minutes
 LIC_NAME = {"pd": "Public domain (US government work)", "cc-by": "CC BY", "cc-by-sa": "CC BY-SA", "cc-by-nc-sa": "CC BY-NC-SA", "link": "Publisher's terms (not re-hosted)"}
 
 def req(url, method="GET", headers=None, timeout=60):
@@ -45,11 +47,12 @@ def download(url, dest, tries=4):
     for attempt in range(tries):
         part = Path(str(dest) + ".part")
         try:
-            h = hashlib.sha256(); size = 0
-            with req(url, timeout=90) as r, open(part, "wb") as f:
+            h = hashlib.sha256(); size = 0; t0 = time.time()
+            with req(url, timeout=60) as r, open(part, "wb") as f:
                 first = True
                 while True:
-                    chunk = r.read(1 << 20)
+                    if time.time() - t0 > FILE_DEADLINE: raise TimeoutError("slower than %d s" % FILE_DEADLINE)
+                    chunk = r.read1(1 << 20) if hasattr(r, "read1") else r.read(1 << 16)
                     if not chunk: break
                     if first:
                         if not is_pdf_bytes(chunk): raise ValueError("not a PDF (got %r)" % chunk[:60])
@@ -65,7 +68,7 @@ def download(url, dest, tries=4):
             if e.code in (401, 403, 404, 410): break
         except Exception as e:
             last = "%s: %s" % (type(e).__name__, e)
-            if isinstance(e, ValueError): break
+            if isinstance(e, (ValueError, TimeoutError)): break
         finally:
             try: part.unlink()
             except FileNotFoundError: pass
@@ -129,7 +132,14 @@ def resolve_hp(code, years):
     raise RuntimeError("no Hesperian %s edition found" % code)
 
 def fetch_item(it, work, rel):
+    r = fetch_item1(it, work, rel)
+    print("%s %-16s %7.1f MB  %s" % ("✓" if r.get("ok") else "✗", r["id"], (r.get("size") or 0) / 1e6, r.get("url") if r.get("ok") else r.get("error", "")[:200]), flush=True)
+    return r
+
+def fetch_item1(it, work, rel):
     r = {k: it.get(k) for k in ("id", "sys", "t", "by", "yr", "lic", "ph", "core", "file", "u")}
+    if time.time() - START > BUDGET:
+        r.update(ok=False, error="skipped: build time budget used up (run again)"); return r
     r["mirror"] = it["lic"] in MIRROR
     d = work / it["id"]; d.mkdir(parents=True, exist_ok=True)
     errors = []
@@ -183,7 +193,7 @@ def main():
     items = cat["items"]
     only = set(filter(None, os.environ.get("SHELF_ONLY", "").split(",")))
     if only: items = [i for i in items if i["id"] in only]
-    with cf.ThreadPoolExecutor(4) as ex:
+    with cf.ThreadPoolExecutor(6) as ex:
         results = list(ex.map(lambda it: fetch_item(it, work, rel), items))
     sysdir = {s["id"]: "10-shelf/%s-%s" % (s["n"], re.sub(r"[^a-z0-9]+", "-", s["t"].lower()).strip("-")) for s in cat["systems"]}
     rows, sums = [], []
