@@ -107,6 +107,853 @@
    "bytes": 28844,
    "sha256": "300894b77f039fa305b87cb64efd3a443b19944323f27fb0115998c455ec73d9",
    "ms": 2308
+  },
+  "c-cpr-0": {
+   "text": "C P R. Tap and shout. Breathing normally? Not responding and not breathing normally means start C P R. Gasping is not normal breathing.",
+   "file": "c/c-cpr-0.mp3",
+   "bytes": 67628,
+   "sha256": "3314d04cae67b7e1c18927731b4cf1c98bdd7ba5fda8d2f12f8e13574eb33eda",
+   "ms": 8367
+  },
+  "c-cpr-1": {
+   "text": "Call nine one one on speaker. Send someone to find an A E D. The dispatcher can coach you.",
+   "file": "c/c-cpr-1.mp3",
+   "bytes": 41900,
+   "sha256": "4fa322315549027204630c592b9952c57af02962565fd99cb880886487a4c811",
+   "ms": 5148
+  },
+  "c-cpr-2": {
+   "text": "Hands on the center of the chest. Heel of one hand, other hand on top. Arms straight, shoulders over your hands.",
+   "file": "c/c-cpr-2.mp3",
+   "bytes": 51500,
+   "sha256": "ad9f103f598a710a5cc0bdd535fd59b46575d5b8bae1dad22a8d958796720e87",
+   "ms": 6341
+  },
+  "c-cpr-3": {
+   "text": "Push hard and fast. 100 to 120 a minute, to the beat. At least 2 inches, not more than 2.4 inches. Let the chest come all the way back up.",
+   "file": "c/c-cpr-3.mp3",
+   "bytes": 77612,
+   "sha256": "e6aa56dc0e7dfefd61d343979094ed0ff435ca9c2c89f18a62230073f2e47ac1",
+   "ms": 9617
+  },
+  "c-cpr-4": {
+   "text": "A E D here? Turn it on. Follow its voice. Keep pushing until it tells you to stop.",
+   "file": "c/c-cpr-4.mp3",
+   "bytes": 39020,
+   "sha256": "89452708e04d28a9b36a954380a786445ee6f64890470b174ce2ffedbed2d018",
+   "ms": 4797
+  },
+  "c-cpr-5": {
+   "text": "Do not stop. Keep going until help takes over or they breathe normally. If someone can take over, switch about every 2 minutes.",
+   "file": "c/c-cpr-5.mp3",
+   "bytes": 57452,
+   "sha256": "052be24938ae3117359b6e6090a52196e7402c9d7113864886684e50163f02c6",
+   "ms": 7098
+  },
+  "c-cprchild-0": {
+   "text": "C P R child. Tap and shout. Breathing normally? Baby: tap the foot. Not responding and not breathing normally means start C P R. Gasping is not normal breathing.",
+   "file": "c/c-cprchild-0.mp3",
+   "bytes": 84140,
+   "sha256": "5bc045309f97ec3448ce4a3329cf8dd140efd3a922ad225bfb692699382679cf",
+   "ms": 10435
+  },
+  "c-cprchild-1": {
+   "text": "Call nine one one on speaker. Alone with no phone at hand: give about 2 minutes of C P R first, then go call.",
+   "file": "c/c-cprchild-1.mp3",
+   "bytes": 55532,
+   "sha256": "572e1c54dade3dad1c6abeb30351d06750d0b560dee89c4885d80ecf96977d55",
+   "ms": 6853
+  },
+  "c-cprchild-2": {
+   "text": "Hand position. Child: heel of one or two hands, center of the chest. Baby under 1, heel of one hand, center of the chest just below the nipple line.",
+   "file": "c/c-cprchild-2.mp3",
+   "bytes": 70700,
+   "sha256": "b3f97fb147c74a5921a0dbe19fe60a3c27c4179acaa17b275446f8566c14cbaa",
+   "ms": 8743
+  },
+  "c-cprchild-3": {
+   "text": "Push fast, the right depth. 100 to 120 a minute. Child: about 2 inches. Baby: about 1.5 inches. Let the chest come all the way back up.",
+   "file": "c/c-cprchild-3.mp3",
+   "bytes": 81644,
+   "sha256": "1f9d017cafcb0c8d393751806ede186ca0e822c25efa462175485c9cf3267464",
+   "ms": 10108
+  },
+  "c-cprchild-4": {
+   "text": "If you can: 30 pushes, then 2 breaths. Each breath just enough to make the chest rise. Breaths matter for children and babies.",
+   "file": "c/c-cprchild-4.mp3",
+   "bytes": 60908,
+   "sha256": "6600b5dd8ff60453b87d2d0f341819e700aa91e22b8064d8babd7b2043e4ab16",
+   "ms": 7520
+  },
+  "c-cprchild-5": {
+   "text": "Do not stop. Keep going until help takes over or they breathe normally. A E D: use it, with child pads if it has them.",
+   "file": "c/c-cprchild-5.mp3",
+   "bytes": 55148,
+   "sha256": "1afd4aea2e639e872688868173cfaafe1be50996eb63418d0b71e81154693b17",
+   "ms": 6811
+  },
+  "c-choking-0": {
+   "text": "Choking. Ask: are you choking? If they can cough hard or talk, let them keep coughing and stay with them.",
+   "file": "c/c-choking-0.mp3",
+   "bytes": 44780,
+   "sha256": "4bcc02404fc473adb52201ab34c629d3128b35e76275d8d58c11944f0228ea65",
+   "ms": 5502
+  },
+  "c-choking-1": {
+   "text": "Can't breathe, cough or speak? Call nine one one. Or have someone else call while you act.",
+   "file": "c/c-choking-1.mp3",
+   "bytes": 37292,
+   "sha256": "cd03495e7490a1d0355239a78357b816f77a3a37ec7982dbcfff2a1dd23a3f51",
+   "ms": 4573
+  },
+  "c-choking-2": {
+   "text": "5 back blows. Stand behind and slightly to the side. Lean them forward. Hit firmly between the shoulder blades with the heel of your hand.",
+   "file": "c/c-choking-2.mp3",
+   "bytes": 63980,
+   "sha256": "457df784b53285e46af8ec99c5bdd9735ec16b20b5fd6e312ca64b14bb3979e3",
+   "ms": 7914
+  },
+  "c-choking-3": {
+   "text": "5 abdominal thrusts. Fist just above the belly button, other hand over it. Quick pulls inward and upward.",
+   "file": "c/c-choking-3.mp3",
+   "bytes": 53228,
+   "sha256": "5baea25c42d6eddc7deffb21805733e241142f9f741809c9b758ddac580ed7e7",
+   "ms": 6568
+  },
+  "c-choking-4": {
+   "text": "Repeat 5 and 5. Keep alternating until the object comes out or they stop responding.",
+   "file": "c/c-choking-4.mp3",
+   "bytes": 43820,
+   "sha256": "a6ae0222e289ca0aa0487a7a9aeb746b5703b1eb1c0b18320c423be014ec30e5",
+   "ms": 5395
+  },
+  "c-choking-5": {
+   "text": "Pregnant or too big to reach around? Use 5 chest thrusts instead: hands at the base of the breastbone, quick hard thrusts.",
+   "file": "c/c-choking-5.mp3",
+   "bytes": 59948,
+   "sha256": "1b6c775cea4aca5446c2d3f2fe2f0b5c87818764dbe3318df38b7f365713a8fb",
+   "ms": 7403
+  },
+  "c-choking-6": {
+   "text": "They collapse: start C P R. Lower them to the ground, make sure nine one one is called, and start C P R. If you see the object in the mouth, take it out. Never sweep blindly with a finger.",
+   "file": "c/c-choking-6.mp3",
+   "bytes": 87020,
+   "sha256": "bad280aa0ffb4d1d22d5def1624a903169c14161079a115d9adc2ef3b4f097b6",
+   "ms": 10783
+  },
+  "c-bleeding-0": {
+   "text": "Bleeding. Make sure you are safe. Call nine one one. Put on gloves if you have them.",
+   "file": "c/c-bleeding-0.mp3",
+   "bytes": 35564,
+   "sha256": "d4ebff09fa8505ebd3050b0c267bd2c51355da36d31a1c99522ebf8395240bc9",
+   "ms": 4365
+  },
+  "c-bleeding-1": {
+   "text": "Find where the blood comes from. Open or cut away clothing to see the wound.",
+   "file": "c/c-bleeding-1.mp3",
+   "bytes": 33836,
+   "sha256": "f98437d53398ed290e70f2e914619bcf9b703824f00c5d8a5a81084985cfa192",
+   "ms": 4151
+  },
+  "c-bleeding-2": {
+   "text": "Press hard with both hands. Directly on the wound, with gauze or any clean cloth. Do not let up.",
+   "file": "c/c-bleeding-2.mp3",
+   "bytes": 44972,
+   "sha256": "a945b4ba773c855c2e848d3ed62d4008922790dae385035cfc70ca15d733025e",
+   "ms": 5534
+  },
+  "c-bleeding-3": {
+   "text": "Arm or leg? Tourniquet. 2 to 3 inches above the wound, never on a joint. Tighten until the bleeding stops, even though it hurts.",
+   "file": "c/c-bleeding-3.mp3",
+   "bytes": 59564,
+   "sha256": "74b9075239dc4350fb889fd848f4ee6c8572761a6084c9f3824a4440bb90f028",
+   "ms": 7366
+  },
+  "c-bleeding-4": {
+   "text": "Neck, armpit or groin, or no tourniquet? Pack it. Stuff gauze or clean cloth tightly into the wound, then press hard with both hands.",
+   "file": "c/c-bleeding-4.mp3",
+   "bytes": 62060,
+   "sha256": "4fcbf3121518c153c08a678cfbe375f13669a954747a4a8673feef4fd8c61ebf",
+   "ms": 7678
+  },
+  "c-bleeding-5": {
+   "text": "Note the time. Never loosen it. Write the time on the tourniquet or skin. Still bleeding? Add a second tourniquet above the first.",
+   "file": "c/c-bleeding-5.mp3",
+   "bytes": 59372,
+   "sha256": "81a27a7d153b5991519b6f69f94be3e27196028355670f8a83fe983efcff77d3",
+   "ms": 7338
+  },
+  "c-bleeding-6": {
+   "text": "Keep pressure until help takes over. Do not lift the packing to check it.",
+   "file": "c/c-bleeding-6.mp3",
+   "bytes": 33836,
+   "sha256": "22da038a33ea96676ae3f6e547e114f42dec4724ca5d032457c7a0745c46b59a",
+   "ms": 4141
+  },
+  "c-heartattack-0": {
+   "text": "Heart attack. Chest pain or pressure? Call nine one one now. Don't wait to be sure. It can spread to an arm, the back, neck, jaw or stomach, and come with shortness of breath, a cold sweat, nausea or lightheadedness. Women more often have breathlessness, nausea, back or jaw pain.",
+   "file": "c/c-heartattack-0.mp3",
+   "bytes": 123116,
+   "sha256": "3a5850204aabf845bcfa8c6dcd1ee3242f25a6913e4f8dabc93cfd916031ee2a",
+   "ms": 15298
+  },
+  "c-heartattack-1": {
+   "text": "Sit them down and keep them still. Loosen tight clothing. Nobody drives them to the hospital: paramedics start treatment on the way.",
+   "file": "c/c-heartattack-1.mp3",
+   "bytes": 60716,
+   "sha256": "8a3712153ad1eeae9e2b177a162ba1dc239dc78e1eab5477b06d4ea617afcc3b",
+   "ms": 7511
+  },
+  "c-heartattack-2": {
+   "text": "Aspirin: chew and swallow. An alert adult with no aspirin allergy, who hasn't been told by a doctor to avoid it: 162 to 325 milligrams (one regular 325 milligram tablet, or two to four 81 milligram low-dose tablets). Not sure? Wait for the paramedics or ask the nine one one dispatcher.",
+   "file": "c/c-heartattack-2.mp3",
+   "bytes": 164780,
+   "sha256": "f0e716a3931a9db77f140bcc8ca603c113e039952a6141cb3f02ec9e5c8abf59",
+   "ms": 20502
+  },
+  "c-heartattack-3": {
+   "text": "Get ready for the paramedics. Unlock the door. Have their medicines and medicine list ready (Family, their card).",
+   "file": "c/c-heartattack-3.mp3",
+   "bytes": 49964,
+   "sha256": "f2a4a1c19b10e90d48b67b649ae6aab8267fb0aef25232f393b99bcf5b166a96",
+   "ms": 6149
+  },
+  "c-heartattack-4": {
+   "text": "They collapse and aren't breathing normally: C P R. Start C P R and send someone for an A E D if there is one.",
+   "file": "c/c-heartattack-4.mp3",
+   "bytes": 51500,
+   "sha256": "eda39de45aa93cd587cbf0a38fc9f7f1371bd6217e37b78587137cbfbe3d86d3",
+   "ms": 6343
+  },
+  "c-anaphylaxis-0": {
+   "text": "Allergy. Spot it. After a food, sting or medicine: trouble breathing or wheezing, tight throat, swollen lips or tongue, hives all over, repeated vomiting, pale or blue skin, dizziness or fainting. Or mild signs in two body areas at once.",
+   "file": "c/c-anaphylaxis-0.mp3",
+   "bytes": 117164,
+   "sha256": "a0f3ae95ae3c0772abd1903d0f0f3fb8407e30e966b2f7e31f1442d52e23dc80",
+   "ms": 14565
+  },
+  "c-anaphylaxis-1": {
+   "text": "Epinephrine now. Auto-injector: middle of the outer thigh, through clothing is fine. Nasal spray: into one nostril. Follow the device's own instructions.",
+   "file": "c/c-anaphylaxis-1.mp3",
+   "bytes": 74540,
+   "sha256": "7f3329847a61c6e197a66d64667f64c04cc8b9849e86d1c112dd127c22ed1884",
+   "ms": 9236
+  },
+  "c-anaphylaxis-2": {
+   "text": "Call nine one one. Say anaphylaxis. They need the E R even if they start to feel better.",
+   "file": "c/c-anaphylaxis-2.mp3",
+   "bytes": 42860,
+   "sha256": "c509db202f9c12f233e622f2b02bcb6f700a84a2f03f506c57863d097784b7b9",
+   "ms": 5272
+  },
+  "c-anaphylaxis-3": {
+   "text": "Lay them flat, legs raised. Trouble breathing: let them sit up. Vomiting: turn them on their side.",
+   "file": "c/c-anaphylaxis-3.mp3",
+   "bytes": 45740,
+   "sha256": "4e58eee68ff4f862772e07f9aff48b7f74f0a0a5e5c22b095ee01afc1bd66341",
+   "ms": 5620
+  },
+  "c-anaphylaxis-4": {
+   "text": "No better after 5 minutes? Or getting worse: give a second dose with a new device, if you have one.",
+   "file": "c/c-anaphylaxis-4.mp3",
+   "bytes": 47084,
+   "sha256": "2696e429c5e2def2fa3b534d9d061c1648e311c2ed798510b67f63e51c6d8f09",
+   "ms": 5805
+  },
+  "c-anaphylaxis-5": {
+   "text": "Stops responding, not breathing normally: C P R. Start C P R and keep going until help arrives.",
+   "file": "c/c-anaphylaxis-5.mp3",
+   "bytes": 48236,
+   "sha256": "701a4eba88ff5e670c5ea253e9d991e8dd11e17e136dcc1a8e12b8e57ee094d1",
+   "ms": 5948
+  },
+  "c-stroke-0": {
+   "text": "Stroke. B: Balance. Sudden loss of balance or coordination?",
+   "file": "c/c-stroke-0.mp3",
+   "bytes": 30572,
+   "sha256": "1e821d13ff14b4640c45e64cd0fd95faaccec4e42608b9264f6341746f93847b",
+   "ms": 3730
+  },
+  "c-stroke-1": {
+   "text": "E: Eyes. Sudden loss or change of vision?",
+   "file": "c/c-stroke-1.mp3",
+   "bytes": 20588,
+   "sha256": "b1af7c2e0f39cc9ac242eb01598f32f2ea04a402b13ec71ce8fd21b28737f6ed",
+   "ms": 2478
+  },
+  "c-stroke-2": {
+   "text": "F: Face. Ask them to smile. Does one side droop?",
+   "file": "c/c-stroke-2.mp3",
+   "bytes": 26156,
+   "sha256": "d527d880c96396743422e0f1371f36dbd705e514a4ad9f8a00e2e517d2fee4c8",
+   "ms": 3185
+  },
+  "c-stroke-3": {
+   "text": "A: Arms. Ask them to raise both arms. Does one drift down?",
+   "file": "c/c-stroke-3.mp3",
+   "bytes": 30956,
+   "sha256": "eba86cce8d88adf903562caa3707b90932740484c9cc5083b0f58ecfe04c1031",
+   "ms": 3770
+  },
+  "c-stroke-4": {
+   "text": "S: Speech. Slurred, strange, or unable to speak?",
+   "file": "c/c-stroke-4.mp3",
+   "bytes": 23468,
+   "sha256": "0fb3e2ee5eb9bb671fc00368c6bc3e56f700dad53de1a9c21472a38a0eb880c2",
+   "ms": 2845
+  },
+  "c-stroke-5": {
+   "text": "T: Time to call nine one one. Any one sign, call now, even if it goes away. Note the time it started or when they were last seen well. Don't drive them yourself unless nine one one can't be reached.",
+   "file": "c/c-stroke-5.mp3",
+   "bytes": 91052,
+   "sha256": "462cb60c407f87a3d00718095f3f5652a00b3eb8202998f4fb8d07fb8521138f",
+   "ms": 11294
+  },
+  "c-unresponsive-0": {
+   "text": "Won't wake up. Shout, tap their shoulders, check breathing. Look at the chest for up to 10 seconds. Gasping or irregular breathing is not normal breathing: call nine one one and start C P R.",
+   "file": "c/c-unresponsive-0.mp3",
+   "bytes": 90092,
+   "sha256": "4ea52681c2eb12d22394fbf58ab874aa8a979f5fa5f6fd6d4b4b082897d91f9f",
+   "ms": 11167
+  },
+  "c-unresponsive-1": {
+   "text": "Breathing normally: call nine one one. Put the phone on speaker and stay with them.",
+   "file": "c/c-unresponsive-1.mp3",
+   "bytes": 36332,
+   "sha256": "0e1ac12f877a238ca6541e29fc0c3ccdb3d94f450aa41cb00542d8e8c996e015",
+   "ms": 4446
+  },
+  "c-unresponsive-2": {
+   "text": "Kneel beside them, straighten their legs. Take off glasses and anything bulky in their pockets.",
+   "file": "c/c-unresponsive-2.mp3",
+   "bytes": 40748,
+   "sha256": "f1fa7fa75daeb04a86511f886a625c55b05e3e7c2fa889e7bc5ef1ac151b632b",
+   "ms": 4994
+  },
+  "c-unresponsive-3": {
+   "text": "Near arm out, far hand to cheek. Put the arm nearest you out at a right angle, elbow bent, palm up. Bring the far arm across the chest and hold the back of that hand against the cheek nearest you.",
+   "file": "c/c-unresponsive-3.mp3",
+   "bytes": 89516,
+   "sha256": "540f77b9fa11908de72d3444a5dd780a28d33378a48a7d93feccac7b740c1091",
+   "ms": 11089
+  },
+  "c-unresponsive-4": {
+   "text": "Far knee up, roll them toward you. Pull the far knee up with the foot flat on the floor, then pull on that leg to roll them onto their side. Bend the top leg at a right angle so they can't roll over.",
+   "file": "c/c-unresponsive-4.mp3",
+   "bytes": 86828,
+   "sha256": "739fb143606494469af4547a6c00059543c02813dca3c407ee458ff77cf4e530",
+   "ms": 10764
+  },
+  "c-unresponsive-5": {
+   "text": "Tilt the head back, keep watching. Lift the chin so the airway stays open and anything in the mouth drains out. Check their breathing until help comes. After 30 minutes, turn them onto the other side.",
+   "file": "c/c-unresponsive-5.mp3",
+   "bytes": 88940,
+   "sha256": "349f008ef60c17b6b72f53a53d15da6777432e42b4e0c70f4ba5497d09e354b5",
+   "ms": 11018
+  },
+  "c-unresponsive-6": {
+   "text": "Breathing stops or turns to gasps: C P R. Roll them onto their back and start C P R.",
+   "file": "c/c-unresponsive-6.mp3",
+   "bytes": 43820,
+   "sha256": "9dfdb916711d3012854c8cc02c070afe4b856d7986f33e2fba02420d0c6c537a",
+   "ms": 5389
+  },
+  "c-heatstroke-0": {
+   "text": "Heat stroke. Spot it. Body 103 degrees Fahrenheit or higher. Hot, red, dry or damp skin. Fast, strong pulse. Confusion or passing out. No thermometer? Confusion in the heat is enough.",
+   "file": "c/c-heatstroke-0.mp3",
+   "bytes": 96236,
+   "sha256": "f0fa8bdd7923e00f8a49706264f1d60bc070445e90b5380a830fbed0fdfffc28",
+   "ms": 11946
+  },
+  "c-heatstroke-1": {
+   "text": "Call nine one one. Heat stroke is a medical emergency.",
+   "file": "c/c-heatstroke-1.mp3",
+   "bytes": 29228,
+   "sha256": "f37378493f9d6d33465e0d9f0db8447e2a0e33f828c320fd9dd1656c95521356",
+   "ms": 3571
+  },
+  "c-heatstroke-2": {
+   "text": "Move them somewhere cooler. Shade, indoors, a cool car parked outside.",
+   "file": "c/c-heatstroke-2.mp3",
+   "bytes": 33452,
+   "sha256": "e6e87339c4cf93b333b6a513a67e1c74fbcebb4c9dfffea42537f8801d275f12",
+   "ms": 4095
+  },
+  "c-heatstroke-3": {
+   "text": "Cool them now. Cold-water immersion up to the neck is best: 15 minutes, or until they are no longer confused. Otherwise soak them with cold water and fan them, and put ice or cold packs on the neck, armpits and groin.",
+   "file": "c/c-heatstroke-3.mp3",
+   "bytes": 101804,
+   "sha256": "7f6a93a79f16985fa0de297897308d54941dfacbff6f1a01445d4e3adf75682e",
+   "ms": 12630
+  },
+  "c-heatstroke-4": {
+   "text": "Give nothing to drink. C D C's rule for heat stroke.",
+   "file": "c/c-heatstroke-4.mp3",
+   "bytes": 27692,
+   "sha256": "874364d79f6e8ca770f47fca4e7cd1afd811f0b0e1300a0293e71305c66deabf",
+   "ms": 3361
+  },
+  "c-heatstroke-5": {
+   "text": "Keep cooling until they improve or help arrives. Stops responding, not breathing normally: start C P R.",
+   "file": "c/c-heatstroke-5.mp3",
+   "bytes": 52268,
+   "sha256": "0ca00b1eb5e180c77392806a6b078c90ac524fa156edc28dfa39953d6d68552a",
+   "ms": 6436
+  },
+  "c-co-0": {
+   "text": "Carbon monoxide alarm. Everyone outside now. Alarm, or headache, dizziness, nausea, confusion. Don't look for the source.",
+   "file": "c/c-co-0.mp3",
+   "bytes": 59564,
+   "sha256": "dfddd2b88555dc5ec763d70af9aab0b019b3c86465a74988bc4b64b849ff8664",
+   "ms": 7347
+  },
+  "c-co-1": {
+   "text": "Call nine one one from outside. Tell them a carbon monoxide alarm went off.",
+   "file": "c/c-co-1.mp3",
+   "bytes": 38060,
+   "sha256": "344b4343a62d0db74dee5697631e95039c54fe10de512bc126120355cfdd9fb3",
+   "ms": 4663
+  },
+  "c-co-2": {
+   "text": "Count everyone, pets too. Do not go back inside for anyone or anything.",
+   "file": "c/c-co-2.mp3",
+   "bytes": 35372,
+   "sha256": "19509abe0e3ab9aa4d6c62b76969bc0ef9c918ccf4cbb29202bf1d945977cd28",
+   "ms": 4326
+  },
+  "c-co-3": {
+   "text": "Stay out until responders say it's safe. Don't restart the generator, stove or heater.",
+   "file": "c/c-co-3.mp3",
+   "bytes": 42668,
+   "sha256": "77969097594e05a7e05b3c3e9871eea19ebae197c756dcd79f5be75e3dcef772",
+   "ms": 5253
+  },
+  "c-co-4": {
+   "text": "Anyone sick, sleepy or confused? Tell nine one one it may be carbon monoxide. They need medical care. Can't reach nine one one? Poison Control: one eight hundred, two two two, one two two two.",
+   "file": "c/c-co-4.mp3",
+   "bytes": 92012,
+   "sha256": "cfd53b4a13949369c95fc21d025ec3c2ac660c0e5d3ef06ada72746e70ffef00",
+   "ms": 11415
+  },
+  "c-co-5": {
+   "text": "Not responding, not breathing normally: C P R. Give breaths if you are trained.",
+   "file": "c/c-co-5.mp3",
+   "bytes": 36140,
+   "sha256": "8b7d85d35afadcbf282ea0e84f249ac0917b3dcaa651c2a2ae217ba317e2deb4",
+   "ms": 4417
+  },
+  "c-burns-0": {
+   "text": "Burns. Stop the burning. Away from the heat. Take off jewelry and clothing near the burn, unless it is stuck.",
+   "file": "c/c-burns-0.mp3",
+   "bytes": 47084,
+   "sha256": "662dd64bdeb6ae2194e2f69a152bb7e697a897390553d690bdb31bc46f71d015",
+   "ms": 5804
+  },
+  "c-burns-1": {
+   "text": "Cool running water, right away. Cool, not ice. At least 10 minutes, ideally 20. No running water? Use a clean, cool wet cloth. Large burn or small child: watch that they don't get too cold.",
+   "file": "c/c-burns-1.mp3",
+   "bytes": 92972,
+   "sha256": "f852b25fe878e692a0ffab59247509852d25fd2dc089d270c297c5382d1ad806",
+   "ms": 11533
+  },
+  "c-burns-2": {
+   "text": "Cover loosely. Clean, dry, non-stick dressing or clean cloth.",
+   "file": "c/c-burns-2.mp3",
+   "bytes": 29804,
+   "sha256": "a442917d6ed54fe8029e38e1024fe09d3799e1643e6c34e79e03e73a13fcdda2",
+   "ms": 3631
+  },
+  "c-burns-3": {
+   "text": "Don't pop blisters. No butter, oil or toothpaste.",
+   "file": "c/c-burns-3.mp3",
+   "bytes": 25388,
+   "sha256": "1e254d1e149b7fbec8fe3c82438aef095fbe61c6aad58e5d0c510e24c1ce07bb",
+   "ms": 3080
+  },
+  "c-burns-4": {
+   "text": "When to call nine one one. Deep burns, or larger than 3 inches. Face, hands, feet, groin or a major joint. Wraps around an arm, leg, chest or neck. Chemical, electrical or explosion burns. Breathed in smoke, or any trouble breathing. Babies, young children and older adults.",
+   "file": "c/c-burns-4.mp3",
+   "bytes": 137516,
+   "sha256": "66bad18ec574fa68295a700ff7a07412072f1649ad2bffd67ef460b298ea5872",
+   "ms": 17089
+  },
+  "c-fracture-0": {
+   "text": "Broken bone. Call nine one one for big injuries. A bad fall or crash, heavy bleeding, bone through the skin, a limb that looks bent, numb or bluish fingers or toes, a possible broken neck, back or hip, or they won't respond.",
+   "file": "c/c-fracture-0.mp3",
+   "bytes": 104876,
+   "sha256": "f08ef4ac72489f2f5b09af014a18768b8c04429c5fb931711cd4fe4bdb6d4ab9",
+   "ms": 13029
+  },
+  "c-fracture-1": {
+   "text": "Stop bleeding first. Press with a clean cloth. Bone through the skin: cover the wound and don't push the bone back in.",
+   "file": "c/c-fracture-1.mp3",
+   "bytes": 50924,
+   "sha256": "e708ec46e6569dd5f4dd0653c12385b2cf1096ea46bd39100e2f2aca175a5d65",
+   "ms": 6282
+  },
+  "c-fracture-2": {
+   "text": "Keep it still. Don't try to straighten it. Support it in the position you found it.",
+   "file": "c/c-fracture-2.mp3",
+   "bytes": 36140,
+   "sha256": "d79bbffa042f95f149f2069467de9a3b4f9ecff475200c7206eac8d149b94245",
+   "ms": 4419
+  },
+  "c-fracture-3": {
+   "text": "Help is far away: splint it. Pad it, then fix it so the joints above and below the break can't move: a board, rolled magazines or a pillow, tied on with strips of cloth. Fingers or toes should stay warm and pink; loosen it if they go numb or blue.",
+   "file": "c/c-fracture-3.mp3",
+   "bytes": 114668,
+   "sha256": "2dbf12e27cc0401ccedd70298f83085da9f6ac69d4b074a0018114c1c562d19c",
+   "ms": 14245
+  },
+  "c-fracture-4": {
+   "text": "Ice, wrapped in cloth. Never straight on the skin. 15 to 20 minutes at a time, to ease swelling and pain.",
+   "file": "c/c-fracture-4.mp3",
+   "bytes": 50540,
+   "sha256": "924acea73d3d1342757014b1bc220dd263ad9d804edc559c308b2f59faf06501",
+   "ms": 6224
+  },
+  "c-fracture-5": {
+   "text": "Watch for shock. Faint, pale, fast shallow breathing: lay them down with the head slightly lower than the body, raise the legs if that doesn't move the injury, and keep them warm.",
+   "file": "c/c-fracture-5.mp3",
+   "bytes": 74924,
+   "sha256": "eeb353c6f6fd450db2781f296babbcc76e01b1fbca78189229b89bc084cacf28",
+   "ms": 9283
+  },
+  "c-seizure-0": {
+   "text": "Seizure. Ease them to the ground. Move hard and sharp things away.",
+   "file": "c/c-seizure-0.mp3",
+   "bytes": 31148,
+   "sha256": "e167519433110439de9b09691fa46584faf996b97977bd87770e4d73c925fa34",
+   "ms": 3801
+  },
+  "c-seizure-1": {
+   "text": "Protect the head. Something soft and flat under the head. Take off glasses. Loosen anything around the neck.",
+   "file": "c/c-seizure-1.mp3",
+   "bytes": 49388,
+   "sha256": "83ddca1b5c760e06e12ce41ddb5fcb960b2243f8558680056b045dd6399b7ce4",
+   "ms": 6087
+  },
+  "c-seizure-2": {
+   "text": "Turn them on their side. Gently, mouth pointing to the ground, to keep the airway clear.",
+   "file": "c/c-seizure-2.mp3",
+   "bytes": 37484,
+   "sha256": "b7501168f0e59e456a8f07a08e38313ce9c9170fef8349f0745980aafc9cb4a8",
+   "ms": 4590
+  },
+  "c-seizure-3": {
+   "text": "Time it. Hands off. Don't hold them down. Put nothing in their mouth.",
+   "file": "c/c-seizure-3.mp3",
+   "bytes": 29996,
+   "sha256": "36b925a0fd52b25dd6e537097f0ecf2fcbee195f3840369daf43848aad2278bc",
+   "ms": 3660
+  },
+  "c-seizure-4": {
+   "text": "Call nine one one if. Over 5 minutes. Another seizure soon after. Trouble breathing or waking. Not back to normal. Injured. In water. First seizure. Pregnant or diabetic.",
+   "file": "c/c-seizure-4.mp3",
+   "bytes": 85100,
+   "sha256": "df4f3cc7ef745e45355fd10b8986f9b22beab64898c3b278e2ddc40c8faa46a6",
+   "ms": 10552
+  },
+  "c-seizure-5": {
+   "text": "Stay until they are fully awake. No food or drink until fully alert.",
+   "file": "c/c-seizure-5.mp3",
+   "bytes": 34988,
+   "sha256": "eb2ef30c81e53762193bd1750da22651cf90a938242d06bf90b46cdc961927c0",
+   "ms": 4292
+  },
+  "c-drowning-0": {
+   "text": "Drowning. Get them out safely. Reach or throw something that floats; don't jump in unless you're trained. Shout for help. Call nine one one on speaker, or have someone call.",
+   "file": "c/c-drowning-0.mp3",
+   "bytes": 75308,
+   "sha256": "8cbd438fc1f28f762f9af0243ae944825df491ac057032ee553f8dd5f2840aaa",
+   "ms": 9319
+  },
+  "c-drowning-1": {
+   "text": "Tap and shout. Breathing normally? Look at the chest for up to 10 seconds. Gasping is not normal breathing.",
+   "file": "c/c-drowning-1.mp3",
+   "bytes": 48812,
+   "sha256": "e2f5b6caa365dae0afc071034232ed584b2adf675a66bdc958fc200ab110d9a6",
+   "ms": 6001
+  },
+  "c-drowning-2": {
+   "text": "Not breathing normally: 2 rescue breaths first. Tilt the head back, lift the chin, pinch the nose, seal your mouth over theirs. 1 second each, enough to make the chest rise. Baby: cover the nose and mouth with your mouth. Not trained or can't give breaths? Skip to pushes.",
+   "file": "c/c-drowning-2.mp3",
+   "bytes": 122732,
+   "sha256": "52786f946d7c12e84757428adf68f0bb0d02dbe3e1586295c74100c1e5dc1dd6",
+   "ms": 15252
+  },
+  "c-drowning-3": {
+   "text": "Then C P R: 30 pushes, 2 breaths. Hard and fast in the center of the chest. Keep going until they breathe or help takes over. If you can't give breaths, push anyway.",
+   "file": "c/c-drowning-3.mp3",
+   "bytes": 80492,
+   "sha256": "72f62aaeba4b49782693baae02a1746ae03bf604222093479b4b297cf9e5ad20",
+   "ms": 9974
+  },
+  "c-drowning-4": {
+   "text": "A E D as soon as one arrives. Quickly wipe the chest dry, put the pads on, follow its voice. Keep C P R going until it's ready.",
+   "file": "c/c-drowning-4.mp3",
+   "bytes": 63212,
+   "sha256": "436a6bb8fac904b56f616c88041b8dd0225a8a467ed3111cd9088ba02b9e84ee",
+   "ms": 7810
+  },
+  "c-drowning-5": {
+   "text": "Breathing again: on their side, then the E R. Anyone who needed breaths or C P R after being in the water needs a hospital check, even if they seem fine.",
+   "file": "c/c-drowning-5.mp3",
+   "bytes": 72812,
+   "sha256": "2db058b57b9a6184f1152b2b2b0063b1864411f8b9e296413df5f5c78c9f06fe",
+   "ms": 9003
+  },
+  "c-overdose-0": {
+   "text": "Opioid overdose. Shout their name and rub the breastbone hard. Signs: won't wake up, slow or no breathing, blue or gray lips, tiny pupils, gurgling.",
+   "file": "c/c-overdose-0.mp3",
+   "bytes": 72236,
+   "sha256": "ab81553f456a401d2c64319f493e4901bb4b36062b79c4df819a7c9498a6f4ea",
+   "ms": 8936
+  },
+  "c-overdose-1": {
+   "text": "Call nine one one now. Put it on speaker. Say someone won't wake up and isn't breathing normally.",
+   "file": "c/c-overdose-1.mp3",
+   "bytes": 43628,
+   "sha256": "59ad30da36df6f4046ad57ab92f29c1b831b6a3dc4dd17de12a0ab477ee37610",
+   "ms": 5366
+  },
+  "c-overdose-2": {
+   "text": "Give naloxone (Narcan). Nasal spray: tip in one nostril, press the plunger all the way. Don't wait to be sure it's opioids.",
+   "file": "c/c-overdose-2.mp3",
+   "bytes": 59564,
+   "sha256": "e365910b212590938e3e5ad08b0010ffd7e3e41dfe3d07fdcb7c0813cc95c2ce",
+   "ms": 7350
+  },
+  "c-overdose-3": {
+   "text": "Not breathing normally: start C P R with breaths. 30 pushes, 2 breaths. Can't give breaths? Keep pushing.",
+   "file": "c/c-overdose-3.mp3",
+   "bytes": 48620,
+   "sha256": "74702fc3ae5fda446b6ee3839d3349cdc7062d36f322bbde315bd91583c72981",
+   "ms": 5988
+  },
+  "c-overdose-4": {
+   "text": "No change in 2 to 3 minutes: give a second dose. New device, other nostril. Keep up C P R in between.",
+   "file": "c/c-overdose-4.mp3",
+   "bytes": 52460,
+   "sha256": "0d28be320407a0281a14240b5f3d5feeee86d1c5f76c0db4b5d0da8075a6865b",
+   "ms": 6478
+  },
+  "c-overdose-5": {
+   "text": "Breathing again: on their side, stay with them. Naloxone can wear off before the drugs do, and breathing can stop again. They still need the E R.",
+   "file": "c/c-overdose-5.mp3",
+   "bytes": 63212,
+   "sha256": "2f109aafd0e7789dedc6edec8fd583cb5b655a811ca6c0876aaad6b4ea95af67",
+   "ms": 7810
+  },
+  "c-poison-0": {
+   "text": "Poisoning. Won't wake up, not breathing, or a seizure? Call nine one one. Start C P R if they aren't breathing normally.",
+   "file": "c/c-poison-0.mp3",
+   "bytes": 55148,
+   "sha256": "fb201e6514925a4e0546c2b6f3f329414c276cf677e8f1363df32a0d8a8e36f2",
+   "ms": 6803
+  },
+  "c-poison-1": {
+   "text": "Everything else: call Poison Control. one eight hundred, two two two, one two two two, free and open twenty-four seven; it reaches your local poison center. Call right away, before any signs. Keep the container in your hand.",
+   "file": "c/c-poison-1.mp3",
+   "bytes": 105644,
+   "sha256": "3135c070850d1604935ee7d52f9eb60031f4d32b2317db3869632105b28bfb60",
+   "ms": 13117
+  },
+  "c-poison-2": {
+   "text": "Swallowed: don't make them vomit. Don't give anything to eat or drink, and no activated charcoal, unless the poison center tells you to.",
+   "file": "c/c-poison-2.mp3",
+   "bytes": 59372,
+   "sha256": "179fd3907a31dc93184d57eab9633d5d97b17cde6dccd4e0ee9671ea1bbd5f33",
+   "ms": 7327
+  },
+  "c-poison-3": {
+   "text": "On the skin: clothes off, rinse 15 to 20 minutes. Under running water.",
+   "file": "c/c-poison-3.mp3",
+   "bytes": 35372,
+   "sha256": "678e3fed5117cb2cde22e974133ef6e6eeba26b45b3bd7fe1d964955bf9908f1",
+   "ms": 4321
+  },
+  "c-poison-4": {
+   "text": "In the eyes: rinse 15 to 20 minutes. Running lukewarm water. Take out contact lenses.",
+   "file": "c/c-poison-4.mp3",
+   "bytes": 46508,
+   "sha256": "6a9dd6172c7cf990fd59eb1290ca265db0e6d1505515764ab040c7aa19c3e5b4",
+   "ms": 5725
+  },
+  "c-poison-5": {
+   "text": "Breathed in: get to fresh air. Don't breathe the fumes yourself. Generator, grill or heater indoors: open the carbon monoxide card.",
+   "file": "c/c-poison-5.mp3",
+   "bytes": 60524,
+   "sha256": "015ce507645a69a9e168d8066c9a66f94623c9ca001430c86396cba25c7aaa4e",
+   "ms": 7471
+  },
+  "c-poison-6": {
+   "text": "Tell them. Age and weight, what it was and how much, when, how (mouth, skin, eyes, breathing), first aid given, whether they vomited, and where you are.",
+   "file": "c/c-poison-6.mp3",
+   "bytes": 61484,
+   "sha256": "db18efd153f349efaa61f84d7984a2b2ad0141d5ac2a1df409dabb849e8cbe1a",
+   "ms": 7587
+  },
+  "c-asthma-0": {
+   "text": "Asthma attack. After a sting, food or medicine? Epinephrine first. Sudden trouble breathing then may be anaphylaxis.",
+   "file": "c/c-asthma-0.mp3",
+   "bytes": 58988,
+   "sha256": "9dbf7256723d811b94b0e6f2aa2a40f7530cf5296e208d87505b047a088f8512",
+   "ms": 7273
+  },
+  "c-asthma-1": {
+   "text": "Sit them upright and stay with them. Keep them calm. Loosen anything tight around the chest or neck.",
+   "file": "c/c-asthma-1.mp3",
+   "bytes": 46124,
+   "sha256": "8266672eb778a6a19e242c79caacfa5e988367aee1b3ad5a7aaa4f989a050870",
+   "ms": 5682
+  },
+  "c-asthma-2": {
+   "text": "Help them use their rescue inhaler. Their own quick-relief inhaler, with a spacer if they have one, as their asthma action plan says. No inhaler? Call nine one one.",
+   "file": "c/c-asthma-2.mp3",
+   "bytes": 75500,
+   "sha256": "2025cbae4237b8187b488de67d26ebb256bea5b0f6f4fb70de4ba0007b1da161",
+   "ms": 9358
+  },
+  "c-asthma-3": {
+   "text": "Call nine one one for any danger sign. Lips or nails blue or gray, struggling to breathe (hunched over, ribs showing), can't walk or talk well, very sleepy or confused, or the inhaler isn't helping.",
+   "file": "c/c-asthma-3.mp3",
+   "bytes": 94700,
+   "sha256": "956b06b8b866b2b369b67181c27a766b5be404731c1ca5a35f537a6e271f85ad",
+   "ms": 11738
+  },
+  "c-asthma-4": {
+   "text": "Keep using the inhaler as their plan says, or as nine one one tells you.",
+   "file": "c/c-asthma-4.mp3",
+   "bytes": 34028,
+   "sha256": "e3d8732f6c6b3dee99ace4de8d1d6cf4f5ff711a1624638c5fcc556298244468",
+   "ms": 4166
+  },
+  "c-asthma-5": {
+   "text": "Won't wake up and not breathing normally: start C P R.",
+   "file": "c/c-asthma-5.mp3",
+   "bytes": 27308,
+   "sha256": "64a81577d346d124f045f355b3f99ccd7b3b64f0f94ddae3d13e45ff7039c9cf",
+   "ms": 3333
+  },
+  "c-lowsugar-0": {
+   "text": "Low blood sugar. Passed out, seizing or can't swallow? Nothing by mouth. Food or drink can choke them. Call nine one one now.",
+   "file": "c/c-lowsugar-0.mp3",
+   "bytes": 61100,
+   "sha256": "9de59fcd07f68c3c19b1b6e02eef20fb4650e096c29795b7cdbfc69fbca82909",
+   "ms": 7537
+  },
+  "c-lowsugar-1": {
+   "text": "Give their glucagon if they have it. Follow the kit. Turn them on their side; they may throw up. Not awake in 15 minutes: a second dose if you have one.",
+   "file": "c/c-lowsugar-1.mp3",
+   "bytes": 70508,
+   "sha256": "ff9b5b032d23f386acd6d701d12eddc3fdbd48b0d4c16c37b79b21450babc850",
+   "ms": 8730
+  },
+  "c-lowsugar-2": {
+   "text": "Awake and can swallow? 15 grams of fast sugar. Glucose tablets or gel (check the label for 15 grams), half a cup of juice or regular soda, or 1 tablespoon of sugar or honey.",
+   "file": "c/c-lowsugar-2.mp3",
+   "bytes": 92204,
+   "sha256": "1190a9570f7c9f0ad746aaef90c3ab5f44a33033555f7afa209b5d6cefd20ff6",
+   "ms": 11440
+  },
+  "c-lowsugar-3": {
+   "text": "Wait 15 minutes, then check again. Still low, or the meter reads under 70, another 15 grams. No better, or worse: call nine one one.",
+   "file": "c/c-lowsugar-3.mp3",
+   "bytes": 70124,
+   "sha256": "e1310f028f45c15db643dfca65999555dfe346ff0e26220cdac8cad8d2c1e2c6",
+   "ms": 8674
+  },
+  "c-lowsugar-4": {
+   "text": "Back to normal: eat a meal or snack. Not mealtime? Protein and carbs, like cheese and crackers.",
+   "file": "c/c-lowsugar-4.mp3",
+   "bytes": 46508,
+   "sha256": "3ab0645dc0b574af02690d238ee7e3ea2cebdfd70bcba186b1c13b7870943116",
+   "ms": 5733
+  },
+  "c-lowsugar-5": {
+   "text": "Never give insulin to someone who is low. It drives the sugar even lower.",
+   "file": "c/c-lowsugar-5.mp3",
+   "bytes": 36524,
+   "sha256": "2e7727296376bb65dc4a7dde9b3cec006e032c287a69af14791cba42ea3a0941",
+   "ms": 4479
+  },
+  "c-scorpion-0": {
+   "text": "Scorpion sting. Call Poison Control. one eight hundred, two two two, one two two two, free and open twenty-four seven. Most stings are handled safely at home with their help. Children are at higher risk: call right away.",
+   "file": "c/c-scorpion-0.mp3",
+   "bytes": 102188,
+   "sha256": "11d287ecc908b58dc0962b9545b15b562e497c2cc52be1424cea660d66087e33",
+   "ms": 12676
+  },
+  "c-scorpion-1": {
+   "text": "Call nine one one for trouble breathing. Also chest pain, swelling of the face or throat, or hives.",
+   "file": "c/c-scorpion-1.mp3",
+   "bytes": 48812,
+   "sha256": "aeecdb2951a9cbe643204e6ff079ef3bbb35a94c005696955115060b738a1c9a",
+   "ms": 6014
+  },
+  "c-scorpion-2": {
+   "text": "Serious signs at any age: call nine one one. Wild or jerky eye movements, drooling, trouble swallowing or talking, twitching, nonstop crying in a child. Antivenom is given in the hospital.",
+   "file": "c/c-scorpion-2.mp3",
+   "bytes": 93740,
+   "sha256": "5226345f8a334db4a94f995ee3bbe08ba6aaa9c75b9bc66de5052b1f8b4648ec",
+   "ms": 11617
+  },
+  "c-scorpion-3": {
+   "text": "Wash it and cool it. Soap and water, then a cool compress, not ice. Rest the arm or leg in a comfortable position.",
+   "file": "c/c-scorpion-3.mp3",
+   "bytes": 54572,
+   "sha256": "878cf60979e00c43660c773c72f21da22fb7ebc064d3439d75ebb662597eff85",
+   "ms": 6736
+  },
+  "c-scorpion-4": {
+   "text": "Kill the scorpion; don't try to catch it. Knowing the type doesn't change the care.",
+   "file": "c/c-scorpion-4.mp3",
+   "bytes": 35564,
+   "sha256": "21f408a43959baf17b691c3d61e2dc2cffd289afb09da3c95149a8578f216b86",
+   "ms": 4352
+  },
+  "c-snake-0": {
+   "text": "Rattlesnake bite. Move away from the snake. Don't try to catch or kill it, and don't touch it even if it looks dead.",
+   "file": "c/c-snake-0.mp3",
+   "bytes": 49388,
+   "sha256": "90d79b053f01012ceaf2b023358feff4d24605ba030876916595f4c2d900fa67",
+   "ms": 6093
+  },
+  "c-snake-1": {
+   "text": "Call nine one one. Every bite needs the emergency room; antivenom is given there. Poison Control (one eight hundred, two two two, one two two two) can help too.",
+   "file": "c/c-snake-1.mp3",
+   "bytes": 77996,
+   "sha256": "7f61573bf3bdb3176631790ae73759a1ad593d6cc36ec2be5435f44d6c554a05",
+   "ms": 9654
+  },
+  "c-snake-2": {
+   "text": "Keep them calm and still. Walk only if needed to get help or a signal.",
+   "file": "c/c-snake-2.mp3",
+   "bytes": 34412,
+   "sha256": "68576ced7cb64b583457bc6fa864b2b44fd89fdad89c453425ca3605b87dd47d",
+   "ms": 4217
+  },
+  "c-snake-3": {
+   "text": "Keep the bitten arm or leg still, at heart level or a little lower.",
+   "file": "c/c-snake-3.mp3",
+   "bytes": 29228,
+   "sha256": "ee5956ef9f1c877c973f1dacca9456046e6afb3e1b82d4c598faff8ff30e5d16",
+   "ms": 3558
+  },
+  "c-snake-4": {
+   "text": "Take off rings, watches, shoes and tight clothing on that limb. Swelling can come fast.",
+   "file": "c/c-snake-4.mp3",
+   "bytes": 39596,
+   "sha256": "7973df61be4aac8f4c93422b9c980e2d2204ae5725ea119ab5405a02bdfb0ba0",
+   "ms": 4871
+  },
+  "c-snake-5": {
+   "text": "Don't: tourniquet, ice, cutting or sucking. No tight bands, ice or ice water, cutting, suction, alcohol or medicines. They don't help and can make it worse.",
+   "file": "c/c-snake-5.mp3",
+   "bytes": 75884,
+   "sha256": "4617606138110dedd41ff25d5d05b1624aaedd0c00d784e0d36ce74838e17d4d",
+   "ms": 9398
   }
  }
 }
