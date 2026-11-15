@@ -413,11 +413,12 @@ def main():
     only = set(filter(None, os.environ.get("SHELF_ONLY", "").split(",")))
     merge = bool(only) and os.environ.get("SHELF_PUBLISH") == "1"   # re-check a few documents, keep everything else as it is
     retry = os.environ.get("SHELF_RETRY") == "1"                    # daily: only what failed last time (or changed revision)
-    prev, prev_built = {}, None
+    prev, prev_all, prev_built = {}, {}, None
     if not only or merge or retry:
         try:
             pj = json.loads(get_text(RELEASES % (repo, tag) + "shelf-index.json"))
-            prev = {p["id"]: p for p in pj.get("items", []) if p.get("ok")}; prev_built = pj.get("built")
+            prev_all = {p["id"]: p for p in pj.get("items", [])}
+            prev = {k: p for k, p in prev_all.items() if p.get("ok")}; prev_built = pj.get("built")
         except Exception as e:
             print("no earlier shelf build to compare with (%s)" % e)
     if retry and prev:
@@ -435,7 +436,9 @@ def main():
         got = {r["id"]: r for r in results}
         for it in cat["items"]:
             p = prev.get(it["id"])
-            if it["id"] not in got and p and p.get("file") == it["file"] and p.get("rev", 0) == it.get("rev", 0) and keep_prev(p, repo, tag, rel): got[it["id"]] = p
+            if it["id"] in got: continue
+            if p and p.get("file") == it["file"] and p.get("rev", 0) == it.get("rev", 0) and keep_prev(p, repo, tag, rel): got[it["id"]] = p
+            elif it["id"] in prev_all and not prev_all[it["id"]].get("ok"): got[it["id"]] = prev_all[it["id"]]   # still missing: keep it listed
         results = [got[it["id"]] for it in cat["items"] if it["id"] in got]
     sysdir = {s["id"]: "10-shelf/%s-%s" % (s["n"], re.sub(r"[^a-z0-9]+", "-", s["t"].lower()).strip("-")) for s in cat["systems"]}
     rows, sums = [], []

@@ -86,7 +86,7 @@ havyn/
   content/cards/*.md       each protocol card with sources and a reviewer sign-off line
   shelf/catalog.json       the shelf catalog for the fetch workflow (generated)
   tools/build.py · tools/icons.py · tools/vault.py · tools/shelf.py · tools/shelf_fetch.py · tools/shelf_pages.py
-  tests/engine.test.js · tests/zimkit.test.js · tests/e2e.py · tests/e2e_v13.py · tests/e2e_v14.py · tests/mkzim.py · tests/xzvec.py · tests/fixtures/
+  tests/engine.test.js · tests/zimkit.test.js · tests/e2e.py · tests/e2e_v13.py · tests/e2e_v14.py · tests/shelf_fetch_test.py · tests/mkzim.py · tests/xzvec.py · tests/fixtures/
 ```
 
 ## Status

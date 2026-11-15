@@ -1,7 +1,22 @@
 # HAVYN: mission state
 
-**Current milestone:** M3, HAVYN FIELD v1.3: the offline library ("our own Google offline"): archive reader, one Add files button, PDF text search, video and audio, Search everything, the Get more catalog, the vault drive kit and the home library. Live deployment still waits on one GitHub setting (Settings → Pages → Source: GitHub Actions).
-**Build:** 1.3.0 · 2026-11-14 · `app/index.html` 322 KB + `zimkit.js` 54 KB + PDF.js and pdf-lib (2.3 MB, cached for offline)
+**Current milestone:** M4, HAVYN FIELD v1.4: the reference shelf, an offline "Alexandria" of real manuals and textbooks filed by the system they help you run or rebuild, plus offline dictionaries. Live deployment still waits on one GitHub setting (Settings → Pages → Source: GitHub Actions).
+**Build:** 1.4.0 · 2026-11-14 · `app/index.html` 381 KB + `zimkit.js` 54 KB + PDF.js and pdf-lib (cached for offline) · shelf release `shelf` built 2026-11-15 06:13 UTC
+
+## v1.4 "done when": evidence
+
+| Criterion | Status | Evidence |
+| --- | --- | --- |
+| The shelf holds the publishers' own documents, checked | PASS (63 of 66) | `shelf` workflow on GitHub's servers: each file a complete, readable PDF; size, SHA-256, page count and first words recorded in `shelf-index.json` (63 documents, 26,633 pages). Identity patterns, with the edition where it matters, matched on every document fetched from an archive or search. Not fetched yet: ATP 3-34.45 (FAS blocks cloud servers; the Wayback Machine rate-limited the runners), the 2024 Emergency Response Guidebook (PHMSA blocks cloud servers; same), MSF Clinical Guidelines (MSF's PDF export returns an error page today; publisher's terms, never mirrored anyway). A daily run retries them; the app shows the publisher's link meanwhile. |
+| Wrong, outdated or restricted copies kept out | PASS | Review of every first page caught: Basic Machines was a Dover reprint (replaced with the Navy's NAVEDTRA 14037, 1994); the concrete manual carried a re-host's cover page (removed automatically); an archive search returned a 19th-century "family and ship medicine chest companion" and 1946/1960 scans for three manuals (search results must now carry text matching the title and edition; all three replaced with the right editions, wrong files deleted from the release). Map Reading uses the 2001 edition: the 2005 edition was never approved for public release. NAVEDTRA "A" editions (DoD-restricted wording) avoided. |
+| Licensing | PASS | Mirrored only public domain and Creative Commons (57 files, 2.45 GB). Publisher's-terms documents (Hesperian ×3, MSF, University of Arizona ×2, NCTSN) are checked, linked and never re-hosted. The license line is read from every Creative Commons PDF: OpenStax's current PDFs state CC BY-NC-SA 4.0, so the catalog says so. |
+| One tap puts a document on the phone, checked | PASS (Chrome) | e2e_v14 31/31: one-tap and phone-set downloads from HAVYN's own address with progress, SHA-256 refusal of a bad file, CSP still blocks other hosts, Search finds words inside a fetched document, Hesperian chapters joined into one book in order, duplicate refused, the offline and no-shelf messages, the zip and publisher fallbacks. Phone set: 19 of 20 shareable phone documents, 156 MB. |
+| The vault drive copies the shelf | PASS (bash) | Local test: release SHA match, bad release file deleted, changed publisher file kept with a note, Hesperian chapter folders, idempotent re-run, `--list --full`. PowerShell version reviewed, not run. |
+| The fetcher survives the real web | PASS | `tests/shelf_fetch_test.py` 26 checks against a fake web: Wayback capture index (newest PDF capture first), paced requests and a breaker when it refuses, retries for dropped TLS handshakes and cut-short downloads, wrong-document and scan-without-text refusals, Internet Archive items and searches, DSpace (WHO IRIS), cover-page stripping, page minimum, last build's copy kept when a publisher fails, revisions that drop a wrong copy, targeted publish, daily retry, upload only what changed. |
+| Dictionaries and translation offline | PASS | Get more › Apps › "Dictionary and translation, offline (built in)": the iPhone's own dictionaries and Translate languages, with the steps to download them and test in Airplane Mode; and the Wiktionary archive on the vault drive. |
+| v1.0–v1.3 checks still pass | PASS | e2e 83/83, 76/76; archive reader 208/208; engine 23/23. |
+
+Test totals: engine 23/23, archive reader 208/208, end-to-end 83/83 + 76/76 + 31/31, shelf fetcher 26/26.
 
 ## v1.3 "done when": evidence
 
@@ -67,13 +82,14 @@ An independent pass compared every card step with its sources (AHA 2025 adult an
 
 ## Open items
 
-1. **Turn on GitHub Pages** (one setting), then install on every phone.
-2. **Medical review gate (16 cards).** A trained EMT or nurse must review and sign each file in `content/cards/`; until then every card shows "Awaiting EMT or nurse review".
-3. **On-device checks that headless Chrome can't do:**
+1. **Turn on GitHub Pages** (one setting), then install on every phone and tap Get more › Shelf › Get the phone set.
+2. **Three shelf documents still to fetch** (ATP 3-34.45, ERG 2024, MSF Clinical Guidelines): the daily `shelf` run retries them; check the release's `shelf-index.json`.
+3. **Medical review gate (16 cards).** A trained EMT or nurse must review and sign each file in `content/cards/`; until then every card shows "Awaiting EMT or nurse review".
+4. **On-device checks that headless Chrome can't do:**
    - v1.3: import a 1–2 GB archive on an iPhone (Safari's IndexedDB with a multi-GB file); archive video inside the reader on iOS (service-worker byte ranges in WebKit); the reader frame's link handling and dark pages in WebKit; how much HAVYN may store (`navigator.storage.estimate()` on the family phones).
    - Earlier: the binder share sheet; the PDF reader on long books; the metronome with the silent switch on; wake lock; AirDrop of a Memory Card; Dynamic Type at the largest size; first-screen time on the oldest iPhone.
-4. **Windows vault script:** run once on a Windows PC (only the bash version ran here).
-5. **Codex audit** against these tables, then **founder acceptance**.
+5. **Windows vault script:** run once on a Windows PC (only the bash version ran here).
+6. **Codex audit** against these tables, then **founder acceptance**.
 
 ## Next
 
