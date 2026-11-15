@@ -6,7 +6,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 SRC, APP, PREV = ROOT / "src", ROOT / "app", ROOT / "preview"
-APP_VERSION = "1.4.0"
+APP_VERSION = "1.5.0"
 
 def read(p): return (SRC / p).read_text(encoding="utf-8")
 
@@ -31,11 +31,12 @@ def build():
         h = h.replace("<script>/*JS*/</script>", "<script>" + script + "</script>")
         return h.replace("<!--CSP-->", csp)
 
-    # Deploy build: CSP pins the one inline script by hash; the only network requests allowed go to HAVYN's own address (the shelf).
+    # Deploy build: CSP pins the one inline script by hash; the only network requests allowed go to HAVYN's own address (the
+    # shelf) and to Kiwix (the archive list and Kiwix's own mirror, which allows downloads from web pages), only when you tap Get.
     sha = base64.b64encode(hashlib.sha256(js.encode("utf-8")).digest()).decode()
     csp = ("<meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'self'; "
            f"script-src 'self' 'sha256-{sha}'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; "
-           "connect-src 'self'; font-src 'none'; media-src 'self' blob:; object-src 'none'; frame-src 'self'; "
+           "connect-src 'self' https://mirror.download.kiwix.org https://download.kiwix.org; font-src 'none'; media-src 'self' blob:; object-src 'none'; frame-src 'self'; "
            "worker-src 'self'; manifest-src 'self'; base-uri 'none'; form-action 'none'\">")
     if APP.exists(): shutil.rmtree(APP)
     APP.mkdir(parents=True)

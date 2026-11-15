@@ -3,7 +3,7 @@
    saved on this phone (IndexedDB), with byte ranges so video can seek. Only shelf downloads (./shelf/) reach the network,
    and only HAVYN's own address. */
 importScripts("./zimkit.js");
-const VERSION = "1.4.0+f57eabe50b";
+const VERSION = "1.5.0+4e1c148677";
 const CACHE = "havyn-field-" + VERSION;
 const ASSETS = ["./", "./index.html", "./manifest.webmanifest", "./apple-touch-icon.png", "./icon-192.png", "./icon-512.png", "./icon-maskable-512.png",
   "./pdfjs/pdf.min.js", "./pdfjs/pdf.worker.min.js", "./pdflib/pdf-lib.esm.min.js", "./zimkit.js",
@@ -46,7 +46,13 @@ const archives = new Map();
 function archive(id) {
   let p = archives.get(id);
   if (!p) {
-    p = kvGet("zim:" + id).then((blob) => {
+    p = kvGet("zim:" + id).then(async (blob) => {
+      // Archives downloaded inside HAVYN are stored in parts ({parts: [keys]}); they open as one Blob without copying.
+      if (blob && Array.isArray(blob.parts)) {
+        const bs = [];
+        for (const k of blob.parts) { const b = await kvGet(k); if (!b) throw Object.assign(new Error("Part of this archive is missing on this phone."), { status: 404 }); bs.push(b); }
+        blob = new Blob(bs);
+      }
       if (!blob) throw Object.assign(new Error("This archive isn't on this phone any more."), { status: 404 });
       return HavynZim.Archive.open(blob, { clusterCacheBytes: 24 * 1024 * 1024 });
     });

@@ -2,8 +2,10 @@ name: Deploy HAVYN FIELD
 on:
   push:
     branches: [main]
-    paths: ["app/**", ".github/workflows/pages.yml", "tools/shelf_pages.py"]
+    paths: ["app/**", ".github/workflows/pages.yml", "tools/shelf_pages.py", "shelf/kiwix.json"]
   workflow_dispatch:
+  schedule:
+    - cron: "17 11 * * 1"   # weekly: refresh the archive links (Kiwix publishes new editions)
 permissions:
   contents: read
   pages: write

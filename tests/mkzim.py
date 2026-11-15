@@ -8,7 +8,7 @@ def png(w=8, h=8, rgb=(40, 170, 255)):
     def chunk(t, d): return struct.pack(">I", len(d)) + t + d + struct.pack(">I", zlib.crc32(t + d) & 0xffffffff)
     return b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", struct.pack(">IIBBBBB", w, h, 8, 2, 0, 0, 0)) + chunk(b"IDAT", zlib.compress(raw)) + chunk(b"IEND", b"")
 
-def build(out, pdf, mp4):
+def build(out, pdf, mp4, name="havyn_test_en", title="HAVYN Test Library", uid="6a1b2c3d-4e5f-4a7b-8c9d-0e1f2a3b4c5d"):
     css = b"body{font-family:sans-serif} .t{color:rgb(1,2,3)} .bg{background:url(../img/drop.png) no-repeat}"
     page = lambda title, body: ("<!doctype html><html><head><meta charset='utf-8'><title>%s</title><link rel='stylesheet' href='%s'></head><body>%s</body></html>" % (title, "css/style.css", body)).encode()
     index = page("HAVYN Test Library", """
@@ -40,8 +40,8 @@ def build(out, pdf, mp4):
         ("C", "css/style.css", "", "text/css", css),
         ("C", "media/clip.mp4", "", "video/mp4", open(mp4, "rb").read()),
         ("C", "doc/manual.pdf", "Field manual", "application/pdf", open(pdf, "rb").read()),
-        ("M", "Title", "", "text/plain", b"HAVYN Test Library"),
-        ("M", "Name", "", "text/plain", b"havyn_test_en"),
+        ("M", "Title", "", "text/plain", title.encode()),
+        ("M", "Name", "", "text/plain", name.encode()),
         ("M", "Language", "", "text/plain", b"eng"),
         ("M", "Description", "", "text/plain", b"Fixture archive for HAVYN tests"),
         ("M", "Date", "", "text/plain", b"2026-11-14"),
@@ -85,7 +85,7 @@ def build(out, pdf, mp4):
     clptr = pos; pos += 8
     checksum = pos
     main = idx[("W", "mainPage")]
-    hdr = struct.pack("<IHH16sIIQQQQIIQ", 72173914, 6, 1, uuid.UUID("6a1b2c3d-4e5f-4a7b-8c9d-0e1f2a3b4c5d").bytes, len(entries), 1, urlptr, 0xffffffffffffffff, clptr, 80, main, 0xffffffff, checksum)
+    hdr = struct.pack("<IHH16sIIQQQQIIQ", 72173914, 6, 1, uuid.UUID(uid).bytes, len(entries), 1, urlptr, 0xffffffffffffffff, clptr, 80, main, 0xffffffff, checksum)
     body = hdr + mimelist + cluster + b"".join(dirents) + b"".join(struct.pack("<Q", p) for p in dpos) + struct.pack("<Q", cluster_pos)
     assert len(body) == checksum
     open(out, "wb").write(body + hashlib.md5(body).digest())

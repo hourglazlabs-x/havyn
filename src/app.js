@@ -31,6 +31,7 @@
   /* ---------------- icons ---------------- */
   const P = {
     drop: '<path d="M12 3c3.6 4.6 6 8 6 11a6 6 0 0 1-12 0c0-3 2.4-6.4 6-11z"/>',
+    clock: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
     food: '<path d="M4 11h16a8 8 0 0 1-16 0z"/><path d="M9 7c0-1.4.9-1.8.9-3M13 7c0-1.4.9-1.8.9-3"/>',
     pill: '<path d="M10.5 3.5a5 5 0 0 1 7 7l-7 7a5 5 0 0 1-7-7z"/><path d="M7 7l7 7"/>',
     bolt: '<path d="M13 2 4 14h7l-1 8 9-12h-7z"/>',
@@ -105,7 +106,9 @@
       open,
       get ok() { return !!db; },
       get: (k) => (db ? tx("readonly", (s) => s.get(k)) : Promise.resolve(mem[k])),
-      set: (k, v) => { mem[k] = v; return db ? tx("readwrite", (s) => { s.put(v, k); return true; }) : Promise.resolve(true); },
+      // Only fall back to memory when IndexedDB is unavailable: keeping a reference to every saved file here would hold
+      // downloaded documents and archives in RAM for the whole session.
+      set: (k, v) => { if (!db) { mem[k] = v; return Promise.resolve(true); } return tx("readwrite", (s) => { s.put(v, k); return true; }); },
       del: (k) => { delete mem[k]; return db ? tx("readwrite", (s) => { s.delete(k); return true; }) : Promise.resolve(true); },
       keys: () => (db ? tx("readonly", (s) => s.getAllKeys()) : Promise.resolve(Object.keys(mem)))
     };
@@ -258,6 +261,7 @@
     if (route.path === "library" && !route.parts[1]) { libQuota(); PdfIndex.kick(); }
     if (route.path === "search") SearchUI.mount();
     if (route.path === "archive") Get.mount();
+    if (route.path === "status" || route.path === "") Ready.mount();
   }
 
   /* ---------------- shared chrome ---------------- */
@@ -336,6 +340,9 @@
         '<span class="chip ' + (a.season === "heat" ? "heat" : "") + '">' + (a.season === "heat" ? "Heat mode" : "Normal mode") + "</span>" +
         (a.measured.water || a.measured.food || a.measured.power ? ' <span class="chip cyan">Measured use</span>' : "") + "</div></section>";
     }
+    // Until everything is on this phone, getting it there is the most important thing on this screen.
+    const rs = Ready.score();
+    if (rs < 100) h += Ready.panel();
     h += '<div class="scene">' + towersSVG(a) + "</div>";
 
     // Outage + check-in
@@ -371,6 +378,7 @@
     const g = E.gaps(S, t);
     if (people.length && g.list.length) alerts.push('<a class="alert" href="#/supplies"><span class="dot"></span><span><b>To reach ' + g.target + " days</b><small>" + g.list.slice(0, 3).map((x) => "+" + fmtN(x.gap, x.unit === "gal" ? 1 : 0) + " " + x.unit + " " + (x.name ? esc(x.name) : x.res)).join(" · ") + "</small></span></a>");
     if (alerts.length) h += '<div class="sec"><span class="lab">Attention</span></div>' + alerts.join("");
+    if (rs >= 100) h += '<a class="alert info" href="#/archive?t=shelf" id="ready"><span class="dot" style="background:var(--ok)"></span><span><b>This phone is ready</b><small>Manuals, encyclopedias, plan and backup are all on it. Open Get more for updates.</small></span></a>';
     if (PREVIEW) h += '<div class="alert info"><span class="dot"></span><span><b>Preview build</b><small>Data stays in this browser only. Install from your own link for offline use on iPhone.</small></span></div>';
     return h;
   }
@@ -923,7 +931,7 @@
     let h = backbar("#/library", "Archive");
     h += '<section class="glass hero zhero">' + (x.fav ? '<img class="zfav" alt="" src="' + esc(x.fav) + '">' : "") + '<div class="lab">' + esc([langName(x.lang), x.flavour].filter(Boolean).join(" · ") || "Archive") + '</div><h2 class="ztitle">' + esc(x.name) + "</h2>" +
       (x.desc ? '<div class="sub">' + esc(x.desc) + "</div>" : "") +
-      '<div class="sub mono" style="font-size:.78rem;margin-top:8px">' + esc([x.articles ? fmtN(x.articles) + (x.articles === 1 ? " article" : " articles") : "", x.media ? fmtN(x.media) + " video and audio" : "", sz(x.size), x.date ? "made " + x.date : ""].filter(Boolean).join(" · ")) + "</div></section>";
+      '<div class="sub mono" style="font-size:.78rem;margin-top:8px">' + esc([x.articles ? fmtN(x.articles) + (x.articles === 1 ? " article" : " articles") : "", x.media ? fmtN(x.media) + " video and audio" : "", sz(x.size), x.date ? "made " + x.date : "", x.from === "kiwix" ? "from Kiwix" + (x.verified ? ", checksum matched" : "") : ""].filter(Boolean).join(" · ")) + "</div></section>";
     if (x.needsScripts) h += '<div class="alert"><span class="dot"></span><span><b>This archive needs the Kiwix app</b><small>It is a copy of a website that runs its own scripts. HAVYN keeps archive scripts off for safety, so its pages may not work here. Open it in Kiwix, or on the home library.</small></span></div>';
     if (x.search !== false) h += '<form data-form="zsearch" data-id="' + esc(x.id) + '" class="zs"><input id="zq" name="q" type="search" enterkeyhint="search" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Search ' + (x.articles ? esc(fmtN(x.articles)) + (x.articles === 1 ? " title" : " titles") : "titles") + '" aria-label="Search titles in ' + esc(x.name) + '"></form><div id="zres" class="list" style="margin-top:8px"></div>';
     h += '<div class="btnrow" style="margin-top:12px">' + (x.main ? '<a class="btn" href="' + zHref(x.id, x.main) + '">' + ic("home") + "Main page</a>" : "") + '<button class="btn ghost" data-act="zim-random" data-id="' + esc(x.id) + '">' + ic("dice") + "Random</button></div>";
@@ -951,7 +959,7 @@
       let p = this.open.get(id);
       if (!p) {
         p = (async () => {
-          const Z = await this.lib(), blob = await Store.get("zim:" + id);
+          const Z = await this.lib(), blob = await archiveBlob(id);
           if (!blob) throw Object.assign(new Error("This archive is missing on this phone. Add it again."), { name: "Missing" });
           return Z.Archive.open(blob);
         })();
@@ -1300,7 +1308,7 @@
     const x = LIB.find((d) => d.id === id); if (!x) return;
     const t = typeOf(x);
     if (t === "pdf") await PdfV.close();
-    if (t === "zim") ZR.drop(id);
+    if (t === "zim") { ZR.drop(id); const v = await Store.get("zim:" + id); if (v && Array.isArray(v.parts)) for (const k of v.parts) await Store.del(k); }
     if (t === "video" || t === "audio") Media.close();
     await Store.del(KEY[t] + id); await Store.del("ptext:" + id);
     LIB = LIB.filter((d) => d.id !== id); await saveLib(); toast("Deleted from this phone"); go("#/library");
@@ -1482,6 +1490,10 @@
       '<div class="gd">' + esc(it.d) + "</div>";
     const btns = [];
     if (have) btns.push('<a class="btn sm" href="#/library/' + esc(have.id) + '">' + ic("check") + "On this phone · open</a>");
+    else if (tier === "phone" && Arc.can(it)) {
+      btns.push('<button class="btn sm" data-arcget data-act="arc-get" data-id="' + esc(it.id) + '"' + (Arc.busy || Shelf.busy ? " disabled" : "") + ">" + ic("download") + "Get · " + sz(Arc.size(it)) + "</button>");
+      if (link) btns.push('<a class="btn sm ghost" href="' + esc(link) + '" target="_blank" rel="noopener">In Safari</a>');
+    }
     else if (link && it.kind !== "hub" && it.kind !== "own" && it.kind !== "setup") btns.push('<a class="btn sm' + (tier === "phone" || tier === "apps" ? "" : " ghost") + '" href="' + esc(link) + '" target="_blank" rel="noopener">' + ic("download") + (it.kind === "app" || (it.kind === "ai" && tier === "apps") ? "App Store" : tier === "drive" ? "Source" : "Download") + "</a>");
     if (!have && tier !== "phone") btns.push('<label class="mk"><input type="checkbox" data-chk="archive|' + esc(it.id) + '"' + (marked ? " checked" : "") + "><span>" + (it.kind === "setup" ? "Done" : tier === "apps" ? "Installed" : tier === "drive" ? "On the drive" : "Set up") + "</span></label>");
     if (!have && tier === "phone" && it.kind !== "own") btns.push('<label class="mk"><input type="checkbox" data-chk="archive|' + esc(it.id) + '"' + (marked ? " checked" : "") + "><span>Downloaded</span></label>");
@@ -1498,9 +1510,13 @@
     h += '<section class="glass hero"><div class="lab">' + esc(T.t) + " · checked " + esc(A.checked) + '</div><div class="sub" style="margin-top:6px">' + esc(T.d) + "</div>";
     if (t === "phone") {
       const core = items.filter((i) => i.core), cs = core.reduce((a, i) => a + (i.size || 0), 0), got = core.filter((i) => haveOnPhone(i)).length;
-      h += '<div class="num" style="margin-top:10px"><span class="big" style="font-size:2.4rem">' + got + "/" + core.length + '</span><span class="unit">CORE ON THIS PHONE · ' + sz(cs) + "</span></div>" +
+      const todo = Arc.todo(core), tsz = todo.reduce((a, i) => a + Arc.size(i), 0);
+      h += '<div id="arc"></div><div class="num" style="margin-top:10px"><span class="big" style="font-size:2.4rem">' + got + "/" + core.length + '</span><span class="unit">CORE ON THIS PHONE · ' + sz(cs) + "</span></div>" +
         '<div class="bar" style="margin:6px 0 4px"><i style="width:' + Math.round((got / Math.max(1, core.length)) * 100) + '%"></i></div><div class="sub mono" id="getq" style="font-size:.75rem"></div>' +
-        '<div class="btnrow" style="margin-top:12px"><a class="btn" href="#/library">' + ic("plus") + "Add downloaded files</a></div>";
+        '<div class="btnrow" style="margin-top:12px">' + (todo.length ? '<button class="btn" data-arcget data-act="arc-get-core"' + (Arc.busy || Shelf.busy ? " disabled" : "") + ">" + ic("download") + "Get the core set · " + todo.length + " · " + sz(tsz) + "</button>" : got === core.length ? '<span class="chip ok">' + ic("check") + "Core set on this phone</span>" : "") +
+        '<button class="btn ghost' + (Arc.busy ? "" : " hide") + '" id="arcstop" data-act="arc-stop">Stop</button><a class="btn ghost" href="#/library">' + ic("plus") + "Add files</a></div>" +
+        '<div class="sub" style="font-size:.78rem;margin-top:6px">' + (PREVIEW ? "This preview can't download archives; the installed app can." : "Straight from Kiwix's own mirror into HAVYN, checked against Kiwix's published SHA-256. Use Wi-Fi; if the download stops, Get carries on from where it left off.") + "</div>" +
+        '<div class="bar' + (Arc.busy ? "" : " hide") + '" id="arcbar" style="margin-top:10px"><i style="width:' + Arc.pct() + '%"></i></div><div id="arcmsg" class="empty" style="min-height:1.1em;font-size:.82rem">' + esc(Arc.msg()) + "</div>";
     }
     if (t === "drive") {
       const all = A.items.filter((i) => i.tier === "drive" || i.tier === "phone");
@@ -1545,6 +1561,7 @@
     raw: (f) => "https://raw.githubusercontent.com/hourglazlabs-x/havyn/main/vault/" + f,
     async mount() {
       if ($("#shelf")) Shelf.mount();
+      if ($("#arc")) Arc.mount();
       const el = $("#getq"); if (!el || !navigator.storage || !navigator.storage.estimate) return;
       try {
         const e = await navigator.storage.estimate(), free = Math.max(0, (e.quota || 0) - (e.usage || 0));
@@ -1560,9 +1577,12 @@
   function shelfHave(it) { return LIB.find((x) => typeOf(x) === "pdf" && (x.shelf === it.id || x.file === it.file)) || null; }
   const shelfSize = (it) => { const i = Shelf.info(it); return i ? i.size : it.size || 0; };
   const Shelf = {
-    idx: null, state: "idle", reason: "", built: "", busy: false, stop: false, done: 0, total: 0, cur: "", got: 0, need: 0, base: 0, ok: 0, failed: [],
-    async load() {
-      if (this.state !== "idle") return;
+    idx: null, state: "idle", reason: "", built: "", loading: null, busy: false, stop: false, done: 0, total: 0, cur: "", got: 0, need: 0, base: 0, ok: 0, failed: [], t0: 0,
+    load() {
+      if (this.state !== "idle") return this.loading || Promise.resolve();
+      return (this.loading = this.load1());
+    },
+    async load1() {
       this.state = "checking";
       try {
         const r = await fetch("./shelf/index.json", { cache: "no-store" });
@@ -1572,7 +1592,7 @@
         this.built = j.built || ""; this.state = this.idx.size ? "ready" : "absent";
         this.reason = this.idx.size ? "" : "missing";
       } catch (e) { this.idx = null; this.state = "absent"; this.reason = navigator.onLine === false || (e && e.name === "TypeError") ? "offline" : "missing"; }
-      if ($("#shelf")) render();
+      if ($("#shelf") || $("#ready")) render();
     },
     info(it) { return this.idx ? this.idx.get(it.id) || null : null; },
     served(it) { return !!this.info(it); },
@@ -1597,13 +1617,14 @@
       }
       return new File([blob], info.file, { type: "application/pdf" });
     },
-    async get(list) {
+    async get(list, opt) {
+      opt = opt || {};
       if (this.busy) return;
       list = this.todo(list);
-      if (!list.length) { toast("Already on this phone"); return; }
+      if (!list.length) { if (!opt.quiet) toast("Already on this phone"); return; }
       const need = list.reduce((a, it) => a + shelfSize(it), 0);
       if (!(await roomFor(need))) { toast("Not enough space on this phone for " + sz(need)); return; }
-      Object.assign(this, { busy: true, stop: false, done: 0, total: list.length, need, base: 0, ok: 0, failed: [] });
+      Object.assign(this, { busy: true, stop: false, done: 0, total: list.length, need, base: 0, ok: 0, failed: [], t0: Date.now() });
       Wake.on(); requestPersist(); this.paint();
       for (const it of list) {
         if (this.stop) break;
@@ -1613,23 +1634,309 @@
         this.done++; this.base += info.size || 0; this.got = 0;
       }
       this.busy = false; this.cur = "";
-      if (!document.body.classList.contains("em")) Wake.off();
+      if (!document.body.classList.contains("em") && !Everything.busy) Wake.off();
       if (this.ok) Snd.chime("save");
-      toast(this.ok ? (this.ok === 1 ? "1 document saved on this phone" : this.ok + " documents saved on this phone") + (this.failed.length ? "; " + this.failed.length + " didn't download" : "") : this.stop ? "Stopped" : "Nothing downloaded");
+      if (!opt.quiet) toast(this.ok ? (this.ok === 1 ? "1 document saved on this phone" : this.ok + " documents saved on this phone") + (this.failed.length ? "; " + this.failed.length + " didn't download" : "") : this.stop ? "Stopped" : "Nothing downloaded");
       PdfIndex.kick(); render();
+    },
+    pct() { return this.need ? Math.min(100, Math.round(((this.base + this.got) / this.need) * 100)) : 0; },
+    msg() {
+      if (this.busy) return "Downloading " + Math.min(this.done + 1, this.total) + " of " + this.total + ": " + this.cur + " · " + this.pct() + "%" + Arc.eta.call(this) + ". Keep HAVYN open; the screen stays on.";
+      return this.failed.length ? "Didn't download: " + this.failed.join("; ") + ". Try again later; if it keeps failing, use the publisher's link." : "";
     },
     paint() {
       const bar = $("#shbar"), msg = $("#shmsg"), stop = $("#shstop");
-      if (!bar || !msg) return;
-      bar.classList.toggle("hide", !this.busy); if (stop) stop.classList.toggle("hide", !this.busy);
-      if (this.busy) {
-        const pct = this.need ? Math.min(100, Math.round(((this.base + this.got) / this.need) * 100)) : 0;
-        bar.firstElementChild.style.width = pct + "%";
-        msg.textContent = "Downloading " + Math.min(this.done + 1, this.total) + " of " + this.total + ": " + this.cur + " · " + pct + "%. Keep HAVYN open; the screen stays on.";
-      } else msg.textContent = this.failed.length ? "Didn't download: " + this.failed.join("; ") + ". Try again later; if it keeps failing, use the publisher's link." : "";
-      $$("[data-shget]").forEach((b) => { b.disabled = this.busy; });
+      if (bar) { bar.classList.toggle("hide", !this.busy); bar.firstElementChild.style.width = this.pct() + "%"; }
+      if (stop) stop.classList.toggle("hide", !this.busy);
+      if (msg) msg.textContent = this.msg();
+      $$("[data-shget]").forEach((b) => { b.disabled = this.busy || Arc.busy; });
+      if (typeof Ready !== "undefined") Ready.paint();
     },
     mount() { if (this.state === "absent" && this.reason === "offline" && navigator.onLine !== false) this.state = "idle"; if (this.state === "idle") this.load(); else this.paint(); }
+  };
+  /* ---------------- SHA-256 that can stop and resume (FIPS 180-4) ----------------
+     crypto.subtle can only hash a whole file held in memory; a 2 GB archive is hashed as it arrives instead, and the
+     state is saved with each stored part so the check survives an interrupted download or a closed app. */
+  const K256 = new Uint32Array([
+    0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5, 0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
+    0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da, 0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967,
+    0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85, 0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
+    0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3, 0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2]);
+  class Sha256 {
+    constructor() { this.h = new Uint32Array([0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19]); this.buf = new Uint8Array(64); this.bl = 0; this.len = 0; this.w = new Int32Array(64); }
+    block(p, o) {
+      const w = this.w, h = this.h;
+      for (let i = 0; i < 16; i++, o += 4) w[i] = (p[o] << 24) | (p[o + 1] << 16) | (p[o + 2] << 8) | p[o + 3];
+      for (let i = 16; i < 64; i++) {
+        const a = w[i - 15], b = w[i - 2];
+        w[i] = (w[i - 16] + (((a >>> 7) | (a << 25)) ^ ((a >>> 18) | (a << 14)) ^ (a >>> 3)) + w[i - 7] + (((b >>> 17) | (b << 15)) ^ ((b >>> 19) | (b << 13)) ^ (b >>> 10))) | 0;
+      }
+      let A = h[0] | 0, B = h[1] | 0, Cc = h[2] | 0, D = h[3] | 0, Ee = h[4] | 0, F = h[5] | 0, G = h[6] | 0, H = h[7] | 0;
+      for (let i = 0; i < 64; i++) {
+        const t1 = (H + (((Ee >>> 6) | (Ee << 26)) ^ ((Ee >>> 11) | (Ee << 21)) ^ ((Ee >>> 25) | (Ee << 7))) + ((Ee & F) ^ (~Ee & G)) + K256[i] + w[i]) | 0;
+        const t2 = ((((A >>> 2) | (A << 30)) ^ ((A >>> 13) | (A << 19)) ^ ((A >>> 22) | (A << 10))) + ((A & B) ^ (A & Cc) ^ (B & Cc))) | 0;
+        H = G; G = F; F = Ee; Ee = (D + t1) | 0; D = Cc; Cc = B; B = A; A = (t1 + t2) | 0;
+      }
+      h[0] += A; h[1] += B; h[2] += Cc; h[3] += D; h[4] += Ee; h[5] += F; h[6] += G; h[7] += H;
+    }
+    update(d) {
+      let i = 0; const n = d.length; this.len += n;
+      if (this.bl) { const k = Math.min(64 - this.bl, n); this.buf.set(d.subarray(0, k), this.bl); this.bl += k; i = k; if (this.bl === 64) { this.block(this.buf, 0); this.bl = 0; } }
+      for (; i + 64 <= n; i += 64) this.block(d, i);
+      if (i < n) { this.buf.set(d.subarray(i), 0); this.bl = n - i; }
+      return this;
+    }
+    hex() {
+      const t = new Uint8Array(this.bl < 56 ? 64 : 128); t.set(this.buf.subarray(0, this.bl)); t[this.bl] = 0x80;
+      const bits = this.len * 8, hi = Math.floor(bits / 4294967296), lo = bits % 4294967296, e = t.length;
+      t[e - 8] = hi >>> 24; t[e - 7] = (hi >>> 16) & 255; t[e - 6] = (hi >>> 8) & 255; t[e - 5] = hi & 255;
+      t[e - 4] = lo >>> 24; t[e - 3] = (lo >>> 16) & 255; t[e - 2] = (lo >>> 8) & 255; t[e - 1] = lo & 255;
+      const x = new Sha256(); x.h.set(this.h);
+      for (let o = 0; o < e; o += 64) x.block(t, o);
+      return Array.from(x.h, (v) => v.toString(16).padStart(8, "0")).join("");
+    }
+    save() { return { h: Array.from(this.h), b: Array.from(this.buf.subarray(0, this.bl)), n: this.len }; }
+    static load(s) { const x = new Sha256(); if (s) { x.h.set(s.h); x.buf.set(s.b); x.bl = s.b.length; x.len = s.n; } return x; }
+  }
+
+  // An archive downloaded in parts is stored as {parts: [keys], size}; one added from Files is a single Blob. Either opens as one Blob.
+  async function archiveBlob(id) {
+    const v = await Store.get("zim:" + id);
+    if (v && Array.isArray(v.parts)) {
+      const bs = [];
+      for (const k of v.parts) { const b = await Store.get(k); if (!b) throw new Error("Part of this archive is missing on this phone. Delete it and get it again."); bs.push(b); }
+      return new Blob(bs);
+    }
+    return v;
+  }
+
+  /* ---------------- ARCHIVES: Kiwix archives straight into HAVYN ----------------
+     Kiwix's own mirror (mirror.download.kiwix.org) lets web pages download its archives. HAVYN streams each one into the
+     phone's storage in 32 MB parts, checks it against Kiwix's published SHA-256 as it arrives, and carries on from the last
+     stored part if the connection drops or the app is closed. The links come from HAVYN's own address (shelf/archives.json,
+     refreshed with each deploy); if a link has gone stale, HAVYN looks up the newest file in Kiwix's library itself. */
+  const coreArchives = () => C.archive.items.filter((i) => i.tier === "phone" && i.core && i.get && i.get.zim);
+  const KIWIX = { mirror: "https://mirror.download.kiwix.org/zim/", list: "https://download.kiwix.org/zim/" };
+  const stopErr = () => Object.assign(new Error("Stopped"), { name: "Stop" });
+  const pause = (ms) => new Promise((r) => setTimeout(r, ms));
+  const Arc = {
+    idx: null, state: "idle", built: "", loading: null, busy: false, stop: false, done: 0, total: 0, cur: "", got: 0, need: 0, base: 0, ok: 0, failed: [], t0: 0, b0: 0,
+    PART: 32 * 1024 * 1024,
+    load() {
+      if (this.state !== "idle") return this.loading || Promise.resolve();
+      this.state = "checking";
+      return (this.loading = (async () => {
+        try {
+          const r = await fetch("./shelf/archives.json", { cache: "no-store" });
+          if (!r.ok) throw new Error("HTTP " + r.status);
+          const j = await r.json();
+          this.idx = new Map((j.items || []).filter((x) => x && x.id && x.url && x.size).map((x) => [x.id, x]));
+          this.built = j.built || "";
+          if (j.mirror) KIWIX.mirror = j.mirror; if (j.list) KIWIX.list = j.list;   // the deploy can point at another Kiwix base (the CSP still limits where)
+        } catch (e) { this.idx = new Map(); }
+        this.state = "ready";   // even without the list: each archive can still be looked up in Kiwix's library when you tap Get
+        if ($("#arc") || $("#ready")) render();
+      })());
+    },
+    info(it) { return this.idx ? this.idx.get(it.id) || null : null; },
+    can(it) { return !!(it && it.get && it.get.zim && it.get.stem) && !PREVIEW; },
+    todo(list) { return list.filter((it) => this.can(it) && !haveOnPhone(it)); },
+    size(it) { const i = this.info(it); return i ? i.size : it.size || 0; },
+    // Look up the newest copy in Kiwix's library (used when HAVYN's own list is missing or out of date).
+    async resolve(it) {
+      const d = it.get.zim, stem = it.get.stem;
+      const html = await (await fetch(KIWIX.list + d + "/", { cache: "no-store", credentials: "omit" })).text();
+      const re = new RegExp('href="(' + stem.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + '_\\d{4}-\\d{2}\\.zim)"', "g");
+      const names = Array.from(new Set(Array.from(html.matchAll(re), (m) => m[1]))).sort();
+      if (!names.length) throw new Error("Kiwix's library doesn't list it right now");
+      const file = names[names.length - 1], url = KIWIX.mirror + d + "/" + file;
+      const r = await fetch(url, { headers: { Range: "bytes=0-0" }, cache: "no-store", credentials: "omit" });
+      const total = +(String(r.headers.get("Content-Range") || "").split("/")[1] || 0); try { await r.body.cancel(); } catch (e) {}
+      if (!total) throw new Error("Kiwix's mirror didn't say how big it is");
+      let sha256 = "";
+      try { const t = await (await fetch(url + ".sha256", { cache: "no-store", credentials: "omit" })).text(); const m = /^[0-9a-f]{64}/i.exec(t.trim()); if (m) sha256 = m[0].toLowerCase(); } catch (e) {}
+      const info = { id: it.id, file, url, size: total, sha256 };
+      if (this.idx) this.idx.set(it.id, info);
+      return info;
+    },
+    async getOne(it) {
+      let info = this.info(it);
+      if (!info) info = await this.resolve(it);
+      const key = "zdl:" + it.id;
+      let st = await Store.get(key);
+      const fresh = async () => { if (st && st.parts) for (const k of st.parts) await Store.del(k); st = { file: info.file, url: info.url, size: info.size, sha256: info.sha256 || "", uid: uid(), parts: [], have: 0, h: null }; await Store.set(key, st); };
+      if (!st || st.file !== info.file || st.size !== info.size) await fresh();
+      if (!(await roomFor(st.size - st.have))) throw new Error("not enough space on this phone (needs " + sz(st.size - st.have) + ")");
+      let hash = Sha256.load(st.h), tries = 0, relooked = false, buf = [], bl = 0;
+      // Whatever has arrived is kept, even when the connection drops or you tap Stop: the next request carries on from the
+      // last byte saved. (Each part is in order and the checksum state is saved with it.)
+      const commit = async () => {
+        if (!bl) return;
+        const k = "zpart:" + st.uid + ":" + st.parts.length;
+        if (!(await Store.set(k, new Blob(buf)))) throw new Error("couldn't save on this phone (out of space?)");
+        st.parts.push(k); st.have += bl; st.h = hash.save(); buf = []; bl = 0;
+        await Store.set(key, st);
+      };
+      this.got = st.have; this.paint();
+      while (st.have < st.size) {
+        if (this.stop) throw stopErr();
+        buf = []; bl = 0;
+        try {
+          const res = await fetch(st.url, { headers: st.have ? { Range: "bytes=" + st.have + "-" } : {}, cache: "no-store", credentials: "omit", referrerPolicy: "no-referrer" });
+          if (res.status === 404 && !relooked) { relooked = true; info = await this.resolve(it); if (info.file !== st.file || info.size !== st.size) await fresh(); else st.url = info.url; hash = Sha256.load(st.h); continue; }
+          if (!res.ok) throw new Error("HTTP " + res.status);
+          const from = res.status === 206 ? +((/bytes (\d+)-/.exec(res.headers.get("Content-Range") || "") || [])[1]) : 0;
+          if (st.have && (res.status !== 206 || from !== st.have)) { try { await res.body.cancel(); } catch (e) {} await fresh(); hash = new Sha256(); continue; }   // the server didn't carry on from where we were: start over
+          const rd = res.body.getReader();
+          for (;;) {
+            const { done, value } = await rd.read();
+            if (value && value.length) { buf.push(value); bl += value.length; hash.update(value); this.got = st.have + bl; this.paint(); }
+            if (bl >= this.PART || done) await commit();
+            if (done) break;
+            if (this.stop) { try { await rd.cancel(); } catch (e) {} await commit(); throw stopErr(); }
+          }
+          if (st.have > st.size) throw new Error("the download was bigger than expected");
+          if (st.have < st.size) throw new Error("the connection closed early");
+          tries = 0;
+        } catch (e) {
+          if (e && e.name === "Stop") throw e;
+          try { await commit(); } catch (e2) { buf = []; bl = 0; hash = Sha256.load(st.h); }
+          this.got = st.have; this.paint();
+          if (++tries > 5 || navigator.onLine === false) throw e;
+          await pause(2500 * tries);
+        }
+      }
+      if (st.sha256 && hash.hex() !== st.sha256) {
+        for (const k of st.parts) await Store.del(k); await Store.del(key);
+        throw new Error("its checksum didn't match Kiwix's, so it was deleted (try again)");
+      }
+      // Open it from the stored parts (read back from storage: no copy, nothing held in memory) and add it to the library.
+      const blob = await archiveBlob.fromParts(st.parts), Z = await ZR.lib(), a = await Z.Archive.open(blob), zi = await a.info();
+      let fav = ""; try { const f = await a.favicon(); if (f) fav = await toDataUrl(f); } catch (e) {}
+      if (LIB.some((x) => typeOf(x) === "zim" && x.uuid === zi.uuid)) { for (const k of st.parts) await Store.del(k); await Store.del(key); return false; }
+      await Store.set("zim:" + st.uid, { parts: st.parts, size: st.size, file: st.file, sha256: st.sha256 });
+      LIB.push({ id: st.uid, type: "zim", name: zi.title, file: st.file, size: st.size, added: now(), uuid: zi.uuid, date: zi.date, lang: zi.language, desc: zi.description,
+        articles: zi.articles, media: zi.media, main: zi.main, mainTitle: zi.mainTitle, fav, needsScripts: zi.needsScripts, search: zi.titleSearch, flavour: zi.flavour, zname: zi.name, creator: zi.creator,
+        from: "kiwix", catalog: it.id, verified: !!st.sha256 });
+      await saveLib(); await Store.del(key);
+      return true;
+    },
+    async get(list, opt) {
+      opt = opt || {};
+      if (this.busy) return;
+      list = this.todo(list);
+      if (!list.length) { if (!opt.quiet) toast("Already on this phone"); return; }
+      const need = list.reduce((a, it) => a + this.size(it), 0);
+      if (!(await roomFor(need))) { toast("Not enough space on this phone for " + sz(need)); return; }
+      Object.assign(this, { busy: true, stop: false, done: 0, total: list.length, need, base: 0, ok: 0, failed: [], t0: Date.now(), b0: 0 });
+      Wake.on(); requestPersist(); this.paint();
+      for (const it of list) {
+        if (this.stop) break;
+        this.cur = it.t; this.got = 0; this.paint();
+        try { if (await this.getOne(it)) this.ok++; }
+        catch (e) { if (e && e.name === "Stop") break; this.failed.push(it.t + " (" + (e && e.message ? e.message : "failed") + ")"); }
+        this.done++; this.base += this.size(it); this.got = 0;
+      }
+      this.busy = false; this.cur = "";
+      if (!document.body.classList.contains("em") && !Everything.busy) Wake.off();
+      if (this.ok) Snd.chime("save");
+      if (!opt.quiet) toast(this.ok ? (this.ok === 1 ? "1 archive saved on this phone" : this.ok + " archives saved on this phone") + (this.failed.length ? "; " + this.failed.length + " didn't finish" : "") : this.stop ? "Stopped. Tap Get again to carry on from where it stopped." : this.failed.length ? "Didn't finish: " + this.failed[0] : "Nothing downloaded");
+      render();
+    },
+    pct() { return this.need ? Math.min(100, Math.round(((this.base + this.got) / this.need) * 100)) : 0; },
+    eta() {
+      const el = (Date.now() - this.t0) / 1000, gotNow = this.base + this.got; if (el < 8 || !gotNow) return "";
+      const rate = gotNow / el, left = (this.need - gotNow) / Math.max(rate, 1);
+      return left > 90 ? " · about " + Math.round(left / 60) + " min left" : left > 5 ? " · under 2 min left" : "";
+    },
+    msg() {
+      if (this.busy) return "Downloading " + Math.min(this.done + 1, this.total) + " of " + this.total + ": " + this.cur + " · " + sz(this.base + this.got) + " of " + sz(this.need) + this.eta() + ". Keep HAVYN open; the screen stays on.";
+      return this.failed.length ? "Didn't finish: " + this.failed.join("; ") + ". Tap Get again on Wi-Fi: it carries on from where it stopped." : "";
+    },
+    paint() {
+      const bar = $("#arcbar"), msg = $("#arcmsg"), stop = $("#arcstop");
+      if (bar) { bar.classList.toggle("hide", !this.busy); bar.firstElementChild.style.width = this.pct() + "%"; }
+      if (msg) msg.textContent = this.msg();
+      if (stop) stop.classList.toggle("hide", !this.busy);
+      $$("[data-arcget]").forEach((b) => { b.disabled = this.busy || Shelf.busy; });
+      Ready.paint();
+    },
+    mount() { if (this.state === "idle") this.load(); else this.paint(); }
+  };
+  archiveBlob.fromParts = async (keys) => { const bs = []; for (const k of keys) { const b = await Store.get(k); if (!b) throw new Error("a stored part is missing"); bs.push(b); } return new Blob(bs); };
+  // Stored downloads that never finished (app closed mid-way): how far each got, for "carry on" buttons.
+  async function arcPartial(it) { const st = await Store.get("zdl:" + it.id); return st && st.size ? st.have / st.size : 0; }
+
+  /* ---------------- READY: everything this phone should hold before an emergency, and one button to get it ---------------- */
+  const Everything = {
+    busy: false, stop: false,
+    async run(auto) {
+      if (this.busy || Shelf.busy || Arc.busy || PREVIEW) return;
+      this.busy = true; this.stop = false;
+      if (!auto) { PR.autoGet = true; flush(); }
+      try {
+        Shelf.mount(); await Promise.all([Shelf.loading || Promise.resolve(), Arc.load()]);
+        const sh = Shelf.state === "ready" ? Shelf.todo(C.shelf.items.filter((i) => i.ph)) : [], ar = Arc.todo(coreArchives());
+        if (!sh.length && !ar.length) { if (!auto) toast(Shelf.state === "ready" ? "Everything is already on this phone" : "Nothing to download right now"); return; }
+        if (auto) toast("Carrying on with this phone's downloads (" + sz(sh.reduce((a, i) => a + shelfSize(i), 0) + ar.reduce((a, i) => a + Arc.size(i), 0)) + " left)");
+        Wake.on();
+        if (sh.length) await Shelf.get(sh, { quiet: true });
+        if (ar.length && !this.stop && !Shelf.stop) await Arc.get(ar, { quiet: true });
+        const failed = Shelf.failed.length + Arc.failed.length;
+        if (!this.stop && !Shelf.stop && !Arc.stop) toast(failed ? failed + " item" + (failed > 1 ? "s" : "") + " didn't finish: open Get more to see which and try again" : "This phone has everything it needs offline");
+      } finally { this.busy = false; if (!document.body.classList.contains("em")) Wake.off(); render(); }
+    },
+    halt() { this.stop = true; Shelf.stop = true; Arc.stop = true; }
+  };
+  const Ready = {
+    rows() {
+      const ph = C.shelf.items.filter((i) => i.ph), share = ph.filter((i) => i.lic !== "link"), shHave = share.filter((i) => shelfHave(i)).length;
+      const link = ph.filter((i) => i.lic === "link"), lkHave = link.filter((i) => shelfHave(i)).length;
+      const core = coreArchives(), arHave = core.filter((i) => haveOnPhone(i)).length;
+      const people = L("people").length, P = S.plan || {};
+      const plan = [people > 0, !!P.contactPhone, !!(P.rally2 || P.rally3), !!P.leaveTo].filter(Boolean).length;
+      const sw = !!(navigator.serviceWorker && navigator.serviceWorker.controller);
+      return [
+        { k: "app", w: 10, f: isStandalone() ? 1 : 0, t: "On the Home Screen", d: isStandalone() ? "Opens like an app, with its own storage." : "In Safari: Share › Add to Home Screen, then open HAVYN from its icon. Downloads made in a Safari tab stay in that tab.", go: "#/system" },
+        { k: "offline", w: 10, f: sw || PREVIEW ? 1 : 0, t: "Works with no internet", d: sw ? "The app itself is saved on this phone." : "Open HAVYN once while online; it saves itself for offline use.", go: "#/system" },
+        { k: "shelf", w: 25, f: share.length ? shHave / share.length : 1, t: "Manuals and guides: " + shHave + " of " + share.length, d: shHave === share.length ? "Every phone-set document is here and searchable." : "First aid, water, food, power, radio, repair and survival manuals (" + sz(share.filter((i) => !shelfHave(i)).reduce((a, i) => a + shelfSize(i), 0)) + " to go).", go: "#/archive?t=shelf" },
+        { k: "arc", w: 25, f: core.length ? arHave / core.length : 1, t: "Encyclopedias: " + arHave + " of " + core.length, d: arHave === core.length ? "WikiMed and the survival libraries are here." : "WikiMed, post-disaster, water, food, medicine, knots and a kids' encyclopedia (" + sz(core.filter((i) => !haveOnPhone(i)).reduce((a, i) => a + Arc.size(i), 0)) + " to go).", go: "#/archive?t=phone" },
+        { k: "books", w: 5, f: link.length ? lkHave / link.length : 1, t: "Health books from their publishers: " + lkHave + " of " + link.length, d: "Where There Is No Doctor and the others aren't re-hosted; get them from Get more › Shelf (Hesperian chapters are joined into one book).", go: "#/archive?t=shelf" },
+        { k: "family", w: 15, f: plan / 4, t: "Family plan: " + plan + " of 4", d: "Your household, an out-of-area contact, meeting places and where to go if you must leave.", go: "#/family" },
+        { k: "card", w: 10, f: now() - (PR.lastBackup || 0) < 30 * DAY ? 1 : 0, t: "Memory Card saved this month", d: "Copies your plan to every family phone and keeps a backup.", go: "#/system" }
+      ];
+    },
+    score() { const r = this.rows(); return Math.round(r.reduce((a, x) => a + x.w * Math.max(0, Math.min(1, x.f)), 0) / r.reduce((a, x) => a + x.w, 0) * 100); },
+    left() {
+      const sh = Shelf.state === "ready" ? Shelf.todo(C.shelf.items.filter((i) => i.ph)) : C.shelf.items.filter((i) => i.ph && i.lic !== "link" && !shelfHave(i));
+      const ar = coreArchives().filter((i) => Arc.can(i) && !haveOnPhone(i));
+      return { n: sh.length + ar.length, bytes: sh.reduce((a, i) => a + shelfSize(i), 0) + ar.reduce((a, i) => a + Arc.size(i), 0) };
+    },
+    panel() {
+      const rows = this.rows(), sc = this.score(), lf = this.left(), busy = Shelf.busy || Arc.busy || Everything.busy, done = lf.n === 0;
+      const st = sc >= 90 ? "ok" : sc >= 50 ? "warn" : "crit";
+      let h = '<section class="glass panel ready" id="ready"><div class="rdyhead"><div><div class="lab">This phone</div><div class="num"><span class="big" style="font-size:2.4rem">' + sc + '</span><span class="unit">% READY</span> <span class="chip ' + st + '">' + (sc >= 90 ? "READY" : sc >= 50 ? "ALMOST" : "NOT YET") + "</span></div></div></div>" +
+        '<div class="bar" style="margin:8px 0 10px"><i style="width:' + sc + '%"></i></div>';
+      if (!PREVIEW && !done) {
+        h += '<div class="btnrow">' + '<button class="btn" data-act="get-everything" data-arcget data-shget' + (busy ? " disabled" : "") + ">" + ic("download") + (PR.autoGet ? "Carry on downloading · " : "Download everything · ") + sz(lf.bytes) + "</button>" +
+          '<button class="btn ghost' + (busy ? "" : " hide") + '" id="rdystop" data-act="get-stop">Stop</button></div>' +
+          '<div class="sub" style="font-size:.8rem;margin-top:6px">' + lf.n + " items. Use Wi-Fi and keep HAVYN open (the screen stays on); it picks up where it stopped if you close it.</div>";
+      }
+      h += '<div class="bar' + (busy ? "" : " hide") + '" id="rdybar" style="margin-top:10px"><i style="width:0%"></i></div><div id="rdymsg" class="empty" style="min-height:1.1em;font-size:.82rem"></div>';
+      h += '<div class="list rdy">' + rows.map((r) => {
+        const ok = r.f >= 1, part = !ok && r.f > 0;
+        return '<a class="li' + (ok ? " ok" : "") + '" href="' + r.go + '"><span class="ic">' + ic(ok ? "check" : part ? "clock" : "plus") + '</span><span class="tx"><b>' + esc(r.t) + "</b><small>" + esc(r.d) + "</small></span>" + ic("chev") + "</a>";
+      }).join("") + "</div></section>";
+      return h;
+    },
+    paint() {
+      const bar = $("#rdybar"), msg = $("#rdymsg"), stop = $("#rdystop"); if (!bar && !msg) return;
+      const m = Shelf.busy ? Shelf : Arc.busy ? Arc : null;
+      if (bar) { bar.classList.toggle("hide", !m); if (m) bar.firstElementChild.style.width = (m === Shelf ? Shelf.pct() : Arc.pct()) + "%"; }
+      if (msg) msg.textContent = m === Shelf ? Shelf.msg() : m === Arc ? Arc.msg() : "";
+      if (stop) stop.classList.toggle("hide", !(Shelf.busy || Arc.busy || Everything.busy));
+    },
+    mount() { Shelf.mount(); Arc.mount(); this.paint(); }
   };
   function shelfRow(it) {
     const have = shelfHave(it), info = Shelf.info(it), sy = C.shelf.systems.find((x) => x.id === it.sys);
@@ -2172,6 +2479,11 @@
     else if (act === "pdf-zoom") PdfV.setZoom(num(b.dataset.z));
     else if (act === "pdf-dest") PdfV.dest(num(b.dataset.i));
     else if (act === "pdf-go") { const pn = $("#pdfpanel"); if (pn) pn.classList.add("hide"); PdfV.go(num(b.dataset.n)); }
+    else if (act === "get-everything") Everything.run(false);
+    else if (act === "get-stop") { Everything.halt(); b.textContent = "Stopping…"; }
+    else if (act === "arc-get") { const it = C.archive.items.find((i) => i.id === b.dataset.id); if (it) Arc.get([it]); }
+    else if (act === "arc-get-core") Arc.get(coreArchives());
+    else if (act === "arc-stop") { Arc.stop = true; b.textContent = "Stopping…"; }
     else if (act === "shelf-get") { const it = C.shelf.items.find((i) => i.id === b.dataset.id); if (it) Shelf.get([it]); }
     else if (act === "shelf-get-phone") Shelf.get(C.shelf.items.filter((i) => i.ph));
     else if (act === "shelf-get-sys") Shelf.get(C.shelf.items.filter((i) => i.sys === b.dataset.s));
@@ -2311,12 +2623,13 @@
     const v = $(".void"); if (v && !v.children.length) for (let i = 0; i < 14; i++) { const m = document.createElement("i"); m.style.left = (5 + Math.random() * 90) + "%"; m.style.top = (40 + Math.random() * 55) + "%"; m.style.animationDelay = (-Math.random() * 22).toFixed(1) + "s"; v.appendChild(m); }
     render();
     PdfIndex.kick();
+    if (PR.autoGet && !PREVIEW && navigator.onLine !== false) setTimeout(() => { if (!document.body.classList.contains("em")) Everything.run(true); }, 3500);
     document.body.dataset.ready = "1";
     window.__HAVYN_READY_MS = Math.round(performance.now() - t0); window.__HAVYN_READY_AT = Math.round(performance.now());
     if (!PREVIEW && "serviceWorker" in navigator) {
       navigator.serviceWorker.register("./sw.js").then(() => navigator.serviceWorker.ready).then(() => { const s = $("#swst"); if (s) s.textContent = "Saved for offline"; }).catch(() => { const s = $("#swst"); if (s) s.textContent = "Not available"; });
     }
   }
-  window.__HAVYN = { get state() { return S; }, get prefs() { return PR; }, get lib() { return LIB; }, E, C, version: VERSION };
+  window.__HAVYN = { get state() { return S; }, get prefs() { return PR; }, get lib() { return LIB; }, E, C, version: VERSION, arc: Arc, shelf: Shelf, ready: Ready, store: Store };
   boot();
 })();

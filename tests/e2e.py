@@ -44,6 +44,8 @@ with sync_playwright() as p:
     page.on("pageerror", lambda e: errors.append(str(e)))
     page.on("console", lambda m: errors.append(m.text) if m.type == "error" else None)
     page.on("response", lambda r: reqs.append(r.url))  # only requests that actually got a response
+    missing = []  # 404s; the shelf lists (shelf/index.json, shelf/archives.json) are only added at deploy, so a local build has none
+    page.on("response", lambda r: missing.append(r.url) if r.status == 404 else None)
     blocked_reqs = []
     page.on("requestfailed", lambda r: blocked_reqs.append((r.url, r.failure)))
 
@@ -275,7 +277,8 @@ with sync_playwright() as p:
     ext_all = sorted({u for u in reqs if not (u.startswith(BASE) or u.startswith("data:") or u.startswith("blob:"))})
     ok("no external requests during the whole session", not ext_all, ext_all)
     ok("no CSP violations in normal use (incl. pdf.js)", not vio_all, vio_all[:5])
-    ok("no script errors", not [e for e in errors if "Content Security Policy" not in e and "net::ERR" not in e and "Failed to fetch" not in e], errors[:5])
+    deploy_only = all("/shelf/" in u for u in missing)
+    ok("no script errors", not [e for e in errors if "Content Security Policy" not in e and "net::ERR" not in e and "Failed to fetch" not in e and not (deploy_only and "status of 404" in e)], errors[:5] + [u for u in missing if "/shelf/" not in u][:3])
     br.close()
 srv.shutdown()
 fails = [r for r in results if not r[1]]

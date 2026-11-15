@@ -2,7 +2,7 @@
  {
   "check": "first screen under 1 s (6x CPU throttle)",
   "pass": true,
-  "detail": "148 ms normal, 125 ms throttled"
+  "detail": "121 ms normal, 400 ms throttled"
  },
  {
   "check": "service worker controls the page",
@@ -362,12 +362,12 @@
  {
   "check": "binder PDF made on the phone",
   "pass": true,
-  "detail": "37369 bytes"
+  "detail": "37378 bytes"
  },
  {
   "check": "binder copy saved to the library",
   "pass": true,
-  "detail": "[['mwhfwsorsk5k7f', 23]]"
+  "detail": "[['mwhiwfh9i9llmn', 23]]"
  },
  {
   "check": "binder PDF is searchable in the reader",
@@ -392,7 +392,7 @@
  {
   "check": "binder PDF can be made offline (pdf-lib from the offline copy)",
   "pass": true,
-  "detail": "Ready: 23 pages, 36 KB. Saved in your Library too."
+  "detail": "Ready: 23 pages, 37 KB. Saved in your Library too."
  },
  {
   "check": "CSP blocks fetch to other sites and external images; only HAVYN's own address is allowed",
@@ -412,6 +412,6 @@
  {
   "check": "no script errors",
   "pass": true,
-  "detail": "['Connecting to \\'https://example.com/x\\' violates the following Content Security Policy directive: \"connect-src \\'self\\'\". The action has been blocked.', \"Fetch API cannot load https://example.com/x. Refused to connect because it violates the document's Content Security Policy.\", 'Loading the image \\'https://example.com/pixel.png\\' violates the following Content Security Policy directive: \"img-src \\'self\\' data: blob:\". The action has been blocked.']"
+  "detail": "['Failed to load resource: the server responded with a status of 404 (File not found)', 'Failed to load resource: the server responded with a status of 404 (File not found)', 'Failed to load resource: the server responded with a status of 404 (File not found)', 'Failed to load resource: the server responded with a status of 404 (File not found)', 'Failed to load resource: the server responded with a status of 404 (File not found)']"
  }
 ]

@@ -270,9 +270,24 @@ test("v1.4 reference shelf: every document licensed, fetchable, filed and consis
   }
   for (const s of S.systems) assert.ok(S.items.some((i) => i.sys === s.id), s.id + " has documents");
   const phone = S.items.filter((i) => i.ph && i.lic !== "link").reduce((a, i) => a + i.size, 0);
-  assert.ok(phone > 50e6 && phone < 400e6, "phone set is a sensible size: " + phone);
+  assert.ok(phone > 50e6 && phone < 800e6, "phone set fits HAVYN's Pages site (under 800 MB): " + phone);
   assert.equal(S.items.find((i) => i.id === "sh-cert").file, "FEMA-CERT-Basic-Training-Participant-Manual-2019.pdf", "keeps v1.3 file names so copies already on phones are recognized");
   assert.ok(!C.archive.items.some((i) => i.kind === "pdf"), "manuals live on the shelf now");
   assert.ok(S.others.length >= 5 && S.others.every((o) => o.t && o.d && o.took));
   assert.ok(C.archive.items.some((i) => i.id === "a-dict" && i.kind === "setup"), "offline dictionary and translation setup");
+});
+
+test("v1.5 resumable SHA-256 (archive downloads) matches Node's, across random chunks and save/restore", () => {
+  const src = require("fs").readFileSync(require("path").join(__dirname, "..", "src", "app.js"), "utf8");
+  const a = src.indexOf("  const K256 = "), b = src.indexOf("  // An archive downloaded in parts");
+  assert.ok(a > 0 && b > a, "SHA-256 code found in app.js");
+  const Sha256 = new Function(src.slice(a, b) + "; return Sha256;")();
+  const crypto = require("crypto");
+  for (const n of [0, 1, 55, 56, 63, 64, 65, 119, 120, 127, 128, 1000, 65536, 300001, 3 * 1024 * 1024 + 17]) {
+    const data = crypto.randomBytes(n), want = crypto.createHash("sha256").update(data).digest("hex");
+    let h = new Sha256(), i = 0;
+    while (i < n) { const k = Math.min(n - i, 1 + Math.floor(Math.random() * 70000)); h.update(new Uint8Array(data.buffer, data.byteOffset + i, k)); i += k; if (Math.random() < 0.3) h = Sha256.load(JSON.parse(JSON.stringify(h.save()))); }
+    assert.equal(h.hex(), want, "length " + n);
+  }
+  assert.equal(new Sha256().update(new TextEncoder().encode("abc")).hex(), "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad");
 });

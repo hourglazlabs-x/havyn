@@ -1,0 +1,56 @@
+[
+ {
+  "id": "p-wikimed",
+  "dir": "wikipedia",
+  "stem": "wikipedia_en_medicine_maxi",
+  "core": true
+ },
+ {
+  "id": "p-postdisaster",
+  "dir": "other",
+  "stem": "zimgit-post-disaster_en",
+  "core": true
+ },
+ {
+  "id": "p-water",
+  "dir": "other",
+  "stem": "zimgit-water_en",
+  "core": true
+ },
+ {
+  "id": "p-food",
+  "dir": "other",
+  "stem": "zimgit-food-preparation_en",
+  "core": true
+ },
+ {
+  "id": "p-medlib",
+  "dir": "other",
+  "stem": "zimgit-medicine_en",
+  "core": true
+ },
+ {
+  "id": "p-knots",
+  "dir": "other",
+  "stem": "zimgit-knots_en",
+  "core": true
+ },
+ {
+  "id": "p-vikidia",
+  "dir": "vikidia",
+  "stem": "vikidia_en_all_maxi",
+  "core": true
+ },
+ {
+  "id": "p-wptop",
+  "dir": "wikipedia",
+  "stem": "wikipedia_en_top_maxi",
+  "core": false
+ },
+ {
+  "id": "p-wpmini",
+  "dir": "wikipedia",
+  "stem": "wikipedia_en_all_mini",
+  "core": false
+ }
+]

@@ -3,3 +3,4 @@ tests/shots/
 node_modules/
 .DS_Store
 tools/__pycache__/
+tests/__pycache__/

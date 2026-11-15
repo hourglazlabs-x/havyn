@@ -1,0 +1,122 @@
+[
+ {
+  "name": "service worker controls the page",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "Status shows how ready this phone is",
+  "pass": true,
+  "detail": "THIS PHONE\n10% READY NOT YET\nDownload everything for this phone \u00b7 21 MB\n10 items. Use Wi-Fi and keep HAVYN open (the screen stays on); it picks up where it stopped if you close it.\nOn the Home Screen\n"
+ },
+ {
+  "name": "one button offers to download everything",
+  "pass": true,
+  "detail": "THIS PHONE\n10% READY NOT YET\nDownload everything for this phone \u00b7 21 MB\n10 items. Use Wi-Fi and keep HAVYN open (the screen stays on); it picks up where it stopped if you close it.\nOn the Home Screen\nIn Safari: Share \u203a Add to Home Screen, then open HAVYN from its icon. Downloads made in a Safari tab"
+ },
+ {
+  "name": "the checklist covers manuals, encyclopedias, plan and backup",
+  "pass": true,
+  "detail": "THIS PHONE\n10% READY NOT YET\nDownload everything for this phone \u00b7 21 MB\n10 items. Use Wi-Fi and keep HAVYN open (the screen stays on); it picks up where it stopped if you close it.\nOn the Home Screen\nIn Safari: Share \u203a Add to Home Screen, then open HAVYN from its icon. Downloads made in a Safari tab stay in that tab.\nWorks with no internet\nThe app itself is saved on this phone.\nManuals and guides:"
+ },
+ {
+  "name": "progress shows while downloading",
+  "pass": true,
+  "detail": "THIS PHONE\n10% READY NOT YET\nDownload everything for this phone \u00b7 21 MB\nStop\n10 items. Use Wi-Fi and keep HAVYN open (the screen stays on); it picks up where it stopped if you close it.\nDownloading 2 of 3: Portable Generator Hazards \u00b7 65%. Keep HAVYN open; the screen stays on.\nOn the Home Screen\nIn "
+ },
+ {
+  "name": "the shelf documents arrive first",
+  "pass": true,
+  "detail": "['sh-epawater', 'sh-cpscgen', 'sh-nifog']"
+ },
+ {
+  "name": "archives download from the Kiwix mirror into HAVYN",
+  "pass": true,
+  "detail": "['p-wikimed', 'p-water', 'p-food', 'p-medlib', 'p-knots', 'p-vikidia']"
+ },
+ {
+  "name": "a dropped connection carries on from the last byte saved (Range)",
+  "pass": true,
+  "detail": "[('p-wikimed', 'bytes=22138-'), ('p-water', 'bytes=0-0')]"
+ },
+ {
+  "name": "an archive missing from HAVYN's list is found in Kiwix's directory",
+  "pass": true,
+  "detail": "{'/zim/wikipedia/wikipedia_en_medicine_maxi_2026-10.zim': 2, '/zim/other/zimgit-post-disaster_en_2026-10.zim': 1, '/list/zim/other/': 1, '/zim/other/zimgit-water_en_2026-10.zim': 2, '/zim/other/zimgit-water_en_2026-10.zim.sha256': 1, '/zim/other/zimgit-food-preparation_en_2026-10.zim': 1, '/zim/other/zimgit-medicine_en_2026-10.zim': 1, '/zim/other/zimgit-knots_en_2026-10.zim': 1, '/zim/vikidia/vikidia_en_all_maxi_2026-10.zim': 1}"
+ },
+ {
+  "name": "a corrupted archive is refused (checksum) and not added",
+  "pass": true,
+  "detail": "[\"Post-disaster library (its checksum didn't match Kiwix's, so it was deleted (try again))\"]"
+ },
+ {
+  "name": "every downloaded archive was checked against SHA-256",
+  "pass": true,
+  "detail": "[{'id': 'mwhit2d9bv2s35', 'type': 'zim', 'name': 'Test WikiMed: medical encyclopedia', 'shelf': '', 'catalog': 'p-wikimed', 'verified': True, 'size': 44276, 'file': 'wikipedia_en_medicine_maxi_2026-10.zim'}, {'id': 'mwhit4yvr30pls', 'type': 'zim', 'name': 'Test Water treatment', 'shelf': '', 'catalog': 'p-water', 'verified': True, 'size': 44248, 'file': 'zimgit-water_en_2026-10.zim'}, {'id': 'mwhit55otx1rei', 'type': 'zim', 'name': 'Test Food for preppers', 'shelf': '', 'catalog': 'p-food', 'verified': True, 'size': 44261, 'file': 'zimgit-food-preparation_en_2026-10.zim'}, {'id': 'mwhit5cneqzcbs', 'type': 'zim', 'name': 'Test Medical library', 'shelf': '', 'catalog': 'p-medlib', 'verified': True, 'size': 44251, 'file': 'zimgit-medicine_en_2026-10.zim'}, {'id': 'mwhit5jibq09o4', 'type': 'zim', 'name': 'Test A library of knots', 'shelf': '', 'catalog': 'p-knots', 'verified': True, 'size': 44251, 'file': 'zimgit-knots_en_2026-10.zim'}, {'id': 'mwhit5q6s5qlk5', 'type': 'zim', 'name': 'Test Vikidia: encyclopedia for kids', 'shelf': '', 'catalog': 'p-vikidia', 'verified': True, 'size': 44270, 'file': 'vikidia_en_all_maxi_2026-10.zim'}]"
+ },
+ {
+  "name": "archives are stored in parts (no second full copy)",
+  "pass": true,
+  "detail": "6"
+ },
+ {
+  "name": "no Content-Security-Policy violations",
+  "pass": true,
+  "detail": "[]"
+ },
+ {
+  "name": "Get more \u203a Phone offers Get for the one still missing",
+  "pass": true,
+  "detail": "Post-disaster library\n~645 MB\nARCHIVE\nOPENS IN HAVYN\nCORE\nManuals for shelter, sanitation, water and recovery after a disaster.\nGet \u00b7 44 KB\nIn Safari\nDownloaded"
+ },
+ {
+  "name": "trying again downloads it",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "the core set is complete",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "a downloaded archive opens in the reader",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "its library page says it came from Kiwix with a matching checksum",
+  "pass": true,
+  "detail": "ARCHIVE\nENGLISH\nTest WikiMed: medical encyclopedia\nFixture archive for HAVYN tests\n5 articles \u00b7 1 video and audio \u00b7 44 KB \u00b7 made 2026-11-14 \u00b7 from Kiwix, checksum matched\nMain page\nRandom\n\nSearch finds titles that start with what you type. Full-text search of every word runs on the home library (see"
+ },
+ {
+  "name": "on opening, HAVYN carries on with downloads you started",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "part of the slow archive is stored before the app closes",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "after closing and reopening, it finishes from where it stopped",
+  "pass": true,
+  "detail": "[('p-food', 'bytes=8192-')]"
+ },
+ {
+  "name": "Status says the downloads are done",
+  "pass": true,
+  "detail": "HAVYN\nFIELD\nFAMILY AUTONOMY\n\u2014\nDAYS\nAdd your household and supplies to see how long you can last.\n\u2014\nWATER\nNO DATA\n\u2014\nFOOD\nNO DATA\n\u2014\nMEDS\nNO DATA\n\u2014\nPOWER\nNO DATA\nTHIS PHONE\n37% READY NOT YET\nOn the Home Screen\nIn Safari: Share \u203a Add to Home Screen, then open HAVYN from its icon. Downloads made in a Safari tab stay in that tab.\nWorks with no internet\nThe app itself is saved on this phone.\nManuals and "
+ },
+ {
+  "name": "parts are separate storage entries that delete cleanly",
+  "pass": true,
+  "detail": "(41, 35)"
+ },
+ {
+  "name": "no page errors",
+  "pass": true,
+  "detail": "[]"
+ }
+]
