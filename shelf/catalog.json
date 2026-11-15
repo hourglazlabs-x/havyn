@@ -219,7 +219,7 @@
    "file": "OpenStax-Clinical-Nursing-Skills.pdf",
    "u": "https://openstax.org/details/books/clinical-nursing-skills",
    "ox": "clinical-nursing-skills",
-   "expect": "Attribution 4\\.0 International"
+   "expect": "Rice University"
   },
   {
    "id": "sh-ox-pharm",
@@ -231,7 +231,7 @@
    "file": "OpenStax-Pharmacology-for-Nurses.pdf",
    "u": "https://openstax.org/details/books/pharmacology",
    "ox": "pharmacology",
-   "expect": "Attribution 4\\.0 International"
+   "expect": "Rice University"
   },
   {
    "id": "sh-ox-birth",
@@ -243,7 +243,7 @@
    "file": "OpenStax-Maternal-Newborn-Nursing.pdf",
    "u": "https://openstax.org/details/books/maternal-newborn-nursing",
    "ox": "maternal-newborn-nursing",
-   "expect": "Attribution 4\\.0 International"
+   "expect": "Rice University"
   },
   {
    "id": "sh-foodwater",
@@ -416,7 +416,12 @@
    "u": "https://vulcanhammer.net/wp-content/uploads/2017/01/fm5_428.pdf",
    "src": [
     "https://vulcanhammer.net/wp-content/uploads/2017/01/fm5_428.pdf"
-   ]
+   ],
+   "expect": "5-428",
+   "strip": {
+    "marker": "vulcanhammer",
+    "pages": 1
+   }
   },
   {
    "id": "sh-builder",
@@ -797,29 +802,33 @@
   {
    "id": "sh-machines",
    "sys": "tools",
-   "t": "Basic Machines and How They Work",
-   "by": "US Navy, Bureau of Naval Personnel",
-   "yr": 1965,
+   "t": "Basic Machines (NAVEDTRA 14037)",
+   "by": "US Navy",
+   "yr": 1994,
    "lic": "pd",
    "core": true,
-   "file": "Navy-Basic-Machines-1965.pdf",
-   "u": "https://archive.org/details/basicmachineshow00unit",
+   "file": "NAVEDTRA-14037-Basic-Machines-1994.pdf",
+   "u": "https://www.constructionknowledge.net/public_domain_documents/Div_1_General/Basic_Skills/Levers_Basic%20Machines%20NAVEDTRA%2014037%201994.pdf",
    "src": [
-    "https://archive.org/download/basicmachineshow00unit/basicmachineshow00unit.pdf"
-   ]
+    "https://www.constructionknowledge.net/public_domain_documents/Div_1_General/Basic_Skills/Levers_Basic%20Machines%20NAVEDTRA%2014037%201994.pdf",
+    "https://dieselduck.ca/machine/04%20auxiliary/1994%20USN%20Basic%20Machines.pdf"
+   ],
+   "expect": "14037",
+   "minpages": 100
   },
   {
    "id": "sh-blueprint",
    "sys": "tools",
-   "t": "Blueprint Reading and Sketching (NAVEDTRA 14040)",
+   "t": "Blueprint Reading and Sketching (NAVEDTRA 12014)",
    "by": "US Navy",
    "yr": 1994,
    "lic": "pd",
-   "file": "NAVEDTRA-14040-Blueprint-Reading-1994.pdf",
+   "file": "NAVEDTRA-12014-Blueprint-Reading-1994.pdf",
    "u": "https://archive.org/download/MManuals/UsNavyBlueprintReadingSketching1994.pdf",
    "src": [
     "https://archive.org/download/MManuals/UsNavyBlueprintReadingSketching1994.pdf"
-   ]
+   ],
+   "expect": "Blueprint Reading"
   },
   {
    "id": "sh-machinetools",

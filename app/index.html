@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-YFjgLRpKJDy3vhqtergrZTHMwMHqR0XSgcLt+cKC5oc='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; font-src 'none'; media-src 'self' blob:; object-src 'none'; frame-src 'self'; worker-src 'self'; manifest-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-/0F8bAelJjouvUYmVlHGJdz8AGeG4RDdlqJAZv1DwMk='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; font-src 'none'; media-src 'self' blob:; object-src 'none'; frame-src 'self'; worker-src 'self'; manifest-src 'self'; base-uri 'none'; form-action 'none'">
 <title>HAVYN FIELD</title>
 <meta name="theme-color" content="#04050d">
 <meta name="color-scheme" content="dark">
@@ -1183,13 +1183,13 @@ const HAVYN_CONTENT = {
         u: "https://medicalguidelines.msf.org/en/viewport/CG/english/clinical-guidelines-16686604.html", src: ["https://medicalguidelines.msf.org/sites/default/files/pdf/guideline-170-en.pdf"], expect: "Clinical guidelines", file: "MSF-Clinical-Guidelines.pdf", size: 9000000, est: true },
       { id: "sh-ox-nursing", sys: "med", core: true, lic: "cc-by", by: "OpenStax, Rice University", yr: 2024, t: "Clinical Nursing Skills",
         d: "The hands-on work of nursing, step by step: vital signs, wound and burn care, giving medicines and injections, IV lines, catheters, infection control and moving patients safely.",
-        u: "https://openstax.org/details/books/clinical-nursing-skills", ox: "clinical-nursing-skills", expect: "Attribution 4\\.0 International", file: "OpenStax-Clinical-Nursing-Skills.pdf", size: 100000000, est: true },
+        u: "https://openstax.org/details/books/clinical-nursing-skills", ox: "clinical-nursing-skills", expect: "Rice University", file: "OpenStax-Clinical-Nursing-Skills.pdf", size: 100000000, est: true },
       { id: "sh-ox-pharm", sys: "med", lic: "cc-by", by: "OpenStax, Rice University", yr: 2024, t: "Pharmacology for Nurses",
         d: "What each common kind of medicine does, its side effects and dangerous combinations, and how to give it safely, body system by body system.",
-        u: "https://openstax.org/details/books/pharmacology", ox: "pharmacology", expect: "Attribution 4\\.0 International", file: "OpenStax-Pharmacology-for-Nurses.pdf", size: 100000000, est: true },
+        u: "https://openstax.org/details/books/pharmacology", ox: "pharmacology", expect: "Rice University", file: "OpenStax-Pharmacology-for-Nurses.pdf", size: 100000000, est: true },
       { id: "sh-ox-birth", sys: "med", lic: "cc-by", by: "OpenStax, Rice University", yr: 2024, t: "Maternal-Newborn Nursing",
         d: "Pregnancy, labor and birth, what can go wrong, the weeks after, breastfeeding and newborn care: for when a baby comes and the hospital can't be reached.",
-        u: "https://openstax.org/details/books/maternal-newborn-nursing", ox: "maternal-newborn-nursing", expect: "Attribution 4\\.0 International", file: "OpenStax-Maternal-Newborn-Nursing.pdf", size: 100000000, est: true },
+        u: "https://openstax.org/details/books/maternal-newborn-nursing", ox: "maternal-newborn-nursing", expect: "Rice University", file: "OpenStax-Maternal-Newborn-Nursing.pdf", size: 100000000, est: true },
 
       // ----- 02 water -----
       { id: "sh-foodwater", sys: "water", ph: true, core: true, lic: "pd", by: "FEMA and American Red Cross", yr: 2004, t: "Food and Water in an Emergency",
@@ -1232,7 +1232,7 @@ const HAVYN_CONTENT = {
         u: "https://archive.org/download/MManuals/UsArmyEngineerCarpentry1995.pdf", src: ["https://archive.org/download/MManuals/UsArmyEngineerCarpentry1995.pdf"], file: "FM-5-426-Carpentry-1995.pdf", size: 25000000, est: true },
       { id: "sh-concrete", sys: "shelter", core: true, lic: "pd", by: "US Army", yr: 1998, t: "Concrete and Masonry (FM 5-428)",
         d: "Mixing, placing and curing concrete; block, brick and stone walls; footings and repairs.",
-        u: "https://vulcanhammer.net/wp-content/uploads/2017/01/fm5_428.pdf", src: ["https://vulcanhammer.net/wp-content/uploads/2017/01/fm5_428.pdf"], file: "FM-5-428-Concrete-and-Masonry-1998.pdf", size: 20000000, est: true },
+        u: "https://vulcanhammer.net/wp-content/uploads/2017/01/fm5_428.pdf", src: ["https://vulcanhammer.net/wp-content/uploads/2017/01/fm5_428.pdf"], expect: "5-428", strip: { marker: "vulcanhammer", pages: 1 }, file: "FM-5-428-Concrete-and-Masonry-1998.pdf", size: 20000000, est: true },
       { id: "sh-builder", sys: "shelter", lic: "pd", by: "US Navy", yr: 1993, t: "Builder 3 & 2, Volume 1 (NAVEDTRA 14043)",
         d: "The Navy Seabees' builder course: drawings and plans, woodworking, concrete, masonry and rigging.",
         u: "https://www.constructionknowledge.net/public_domain_documents/Builder_and_2_vol_1_NAVEDTRA_14043_1993.pdf", src: ["https://www.constructionknowledge.net/public_domain_documents/Builder_and_2_vol_1_NAVEDTRA_14043_1993.pdf"], file: "NAVEDTRA-14043-Builder-Vol1-1993.pdf", size: 30000000, est: true },
@@ -1308,12 +1308,14 @@ const HAVYN_CONTENT = {
       { id: "sh-tools", sys: "tools", ph: true, core: true, lic: "pd", by: "US Navy", yr: 1992, t: "Tools and Their Uses (NAVEDTRA 14256)",
         d: "Every common hand and power tool: what it's for, how to use it safely and how to care for it. Start here.",
         u: "https://everyspec.com/USN/NAVEDTRA/NAVEDTRA_14256_JUN1992_18379/", src: ["https://www.constructionknowledge.net/public_domain_documents/Div_1_General/Basic_Skills/Tools%20&%20their%20Uses%20NAVEDTRA%2014256.pdf"], file: "NAVEDTRA-14256-Tools-and-Their-Uses-1992.pdf", size: 19670000, est: true },
-      { id: "sh-machines", sys: "tools", core: true, lic: "pd", by: "US Navy, Bureau of Naval Personnel", yr: 1965, t: "Basic Machines and How They Work",
+      { id: "sh-machines", sys: "tools", core: true, lic: "pd", by: "US Navy", yr: 1994, t: "Basic Machines (NAVEDTRA 14037)",
         d: "Levers, pulleys, gears, hydraulics and engines from first principles: the physics behind every machine you might fix or build.",
-        u: "https://archive.org/details/basicmachineshow00unit", src: ["https://archive.org/download/basicmachineshow00unit/basicmachineshow00unit.pdf"], file: "Navy-Basic-Machines-1965.pdf", size: 10000000, est: true },
-      { id: "sh-blueprint", sys: "tools", lic: "pd", by: "US Navy", yr: 1994, t: "Blueprint Reading and Sketching (NAVEDTRA 14040)",
+        u: "https://www.constructionknowledge.net/public_domain_documents/Div_1_General/Basic_Skills/Levers_Basic%20Machines%20NAVEDTRA%2014037%201994.pdf",
+        src: ["https://www.constructionknowledge.net/public_domain_documents/Div_1_General/Basic_Skills/Levers_Basic%20Machines%20NAVEDTRA%2014037%201994.pdf", "https://dieselduck.ca/machine/04%20auxiliary/1994%20USN%20Basic%20Machines.pdf"],
+        expect: "14037", minpages: 100, file: "NAVEDTRA-14037-Basic-Machines-1994.pdf", size: 10000000, est: true },
+      { id: "sh-blueprint", sys: "tools", lic: "pd", by: "US Navy", yr: 1994, t: "Blueprint Reading and Sketching (NAVEDTRA 12014)",
         d: "Reading and drawing plans for machines, piping, wiring and buildings.",
-        u: "https://archive.org/download/MManuals/UsNavyBlueprintReadingSketching1994.pdf", src: ["https://archive.org/download/MManuals/UsNavyBlueprintReadingSketching1994.pdf"], file: "NAVEDTRA-14040-Blueprint-Reading-1994.pdf", size: 6000000, est: true },
+        u: "https://archive.org/download/MManuals/UsNavyBlueprintReadingSketching1994.pdf", src: ["https://archive.org/download/MManuals/UsNavyBlueprintReadingSketching1994.pdf"], expect: "Blueprint Reading", file: "NAVEDTRA-12014-Blueprint-Reading-1994.pdf", size: 6000000, est: true },
       { id: "sh-machinetools", sys: "tools", lic: "pd", by: "US Army", yr: 1996, t: "Fundamentals of Machine Tools (TC 9-524)",
         d: "Drills, lathes, mills and grinders: how a machine shop makes and repairs metal parts, with charts and formulas.",
         u: "https://archive.org/download/MManuals/UsArmyMachinistFundamentals-machineTools1996.pdf", src: ["https://archive.org/download/MManuals/UsArmyMachinistFundamentals-machineTools1996.pdf"], file: "TC-9-524-Machine-Tools-1996.pdf", size: 7000000, est: true },
@@ -1744,7 +1746,7 @@ if (typeof module !== "undefined") module.exports = HAVYN_ENGINE;
 (() => {
   "use strict";
   const C = HAVYN_CONTENT, E = HAVYN_ENGINE;
-  const VERSION = "1.4.0+edc1942e68";
+  const VERSION = "1.4.0+b66b894885";
   const PREVIEW = !!window.HAVYN_PREVIEW;
   const DAY = 86400000;
   const t0 = performance.now();

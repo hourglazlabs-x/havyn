@@ -19,6 +19,13 @@ def stub():
 
 DOC = {k: mkpdf(k) for k in ["TB MED 577 Field Water", "WRONG book", "RIGHT book", "NEETS Module 03", "Automotive old copy", "Principles of Automotive Vehicles TM 9-8000", "Drinking-water quality guidelines", "LINK doc", "FLAKY doc"]}
 PREV_STUB = mkpdf("Stub doc last month")
+def covered():
+    b = io.BytesIO(); c = canvas.Canvas(b, pageCompression=0); c.drawString(40, 800, "this document downloaded from vulcanhammer.net Terms and Conditions of Use"); c.showPage()
+    for i in range(10):
+        for j in range(40): c.drawString(40, 800 - j * 18, "FM 5-428 Concrete and Masonry page %d line %d lorem ipsum dolor sit amet" % (i + 1, j))
+        c.showPage()
+    c.save(); return b.getvalue()
+COVERED = covered()
 hits = {}
 class H(http.server.BaseHTTPRequestHandler):
     def log_message(self, *a): pass
@@ -28,11 +35,19 @@ class H(http.server.BaseHTTPRequestHandler):
         u = urllib.parse.urlparse(self.path); p = urllib.parse.unquote(u.path); q = urllib.parse.parse_qs(u.query)
         hits[p] = hits.get(p, 0) + 1
         J = lambda o: self.send(200, json.dumps(o).encode(), "application/json")
-        if p == "/403/tbmed.pdf": return self.send(403, b"forbidden", "text/html")
+        if p in ("/403/tbmed.pdf", "/403/noindex.pdf"): return self.send(403, b"forbidden", "text/html")
+        if p == "/cdx":
+            orig = q["url"][0]
+            assert q["filter"] == ["statuscode:200", "mimetype:application/pdf"] and q["limit"] == ["-3"], q
+            head = [["urlkey", "timestamp", "original", "mimetype", "statuscode", "digest", "length"]]
+            if orig.endswith("/403/tbmed.pdf"): return J(head + [["k", "20190101000000", orig, "application/pdf", "200", "d", "1"], ["k", "20240101000000", orig, "application/pdf", "200", "d", "1"]])
+            if orig.endswith("/403/noindex.pdf"): return self.send(500, b"busy", "text/html")
+            return J(head)
         if p.startswith("/wb/"):
-            target = p.split("id_/", 1)[1]
-            if target.endswith("/403/tbmed.pdf") and p.startswith("/wb/2025"): return self.send(200, b"<!DOCTYPE html><html>challenge</html>", "text/html")
-            if target.endswith("/403/tbmed.pdf"): return self.send(200, DOC["TB MED 577 Field Water"])
+            ts, target = p[4:].split("id_/", 1)
+            if target.endswith("/403/tbmed.pdf") and ts == "20240101000000": return self.send(200, b"<!DOCTYPE html><html>challenge</html>", "text/html")
+            if target.endswith("/403/tbmed.pdf") and ts == "20190101000000": return self.send(200, DOC["TB MED 577 Field Water"])
+            if target.endswith("/403/noindex.pdf") and ts == "2021": return self.send(200, DOC["RIGHT book"])
             return self.send(404, b"no capture", "text/html")
         if p == "/flaky/a.pdf":
             if hits[p] <= 2: self.connection.shutdown(2); return
@@ -40,6 +55,7 @@ class H(http.server.BaseHTTPRequestHandler):
         if p == "/pdf/wrong.pdf": return self.send(200, DOC["WRONG book"])
         if p == "/pdf/right.pdf": return self.send(200, DOC["RIGHT book"])
         if p == "/pdf/link.pdf": return self.send(200, DOC["LINK doc"])
+        if p == "/pdf/covered.pdf": return self.send(200, COVERED)
         if p == "/html/iris.pdf": return self.send(200, b'<!DOCTYPE html><html><head><base href="/">', "text/html")
         if p == "/stub/s.pdf": return self.send(200, stub())
         if p == "/metadata/itemA": return J({"files": [{"name": "NEETS Module 13 - Other.pdf"}, {"name": "NEETS Module 03- Introduction.pdf"}, {"name": "x.txt"}]})
@@ -70,6 +86,7 @@ PREV = [
 ]
 cat = {"release": "shelf", "checked": "2026-11-14", "systems": [{"id": "a", "n": "01", "t": "Alpha"}], "items": [
  {"id": "it-wb", "sys": "a", "t": "TB MED", "by": "x", "lic": "pd", "ph": True, "file": "TB-MED.pdf", "src": [BASE + "/403/tbmed.pdf"], "expect": "TB MED 577"},
+ {"id": "it-noindex", "sys": "a", "t": "No index", "by": "x", "lic": "pd", "file": "Noindex.pdf", "src": [BASE + "/403/noindex.pdf"], "wb": ["2021"], "expect": "RIGHT"},
  {"id": "it-flaky", "sys": "a", "t": "Flaky", "by": "x", "lic": "pd", "file": "Flaky-Doc.pdf", "src": [BASE + "/flaky/a.pdf"]},
  {"id": "it-expect", "sys": "a", "t": "Right", "by": "x", "lic": "pd", "file": "Right.pdf", "src": [BASE + "/pdf/wrong.pdf", BASE + "/pdf/right.pdf"], "expect": "RIGHT book", "wb": False},
  {"id": "it-ia", "sys": "a", "t": "NEETS 3", "by": "x", "lic": "pd", "file": "NEETS-03.pdf", "ia": [{"item": "itemA", "match": r"Module[ _-]*0?3\b"}, {"item": "itemB", "match": r"Module[ _-]*0?3\b"}]},
@@ -77,10 +94,12 @@ cat = {"release": "shelf", "checked": "2026-11-14", "systems": [{"id": "a", "n":
  {"id": "it-dspace", "sys": "a", "t": "GDWQ", "by": "x", "lic": "cc-by-nc-sa", "file": "GDWQ.pdf", "src": [BASE + "/html/iris.pdf"], "dspace": {"base": BASE, "handle": "10665/352532", "match": r"eng\.pdf$"}, "wb": ["2023"], "expect": "drinking-water quality"},
  {"id": "it-stub", "sys": "a", "t": "Stub doc", "by": "x", "lic": "pd", "ph": True, "file": "Stub-Doc.pdf", "src": [BASE + "/stub/s.pdf"], "wb": False},
  {"id": "it-link", "sys": "a", "t": "Link", "by": "x", "lic": "link", "file": "Link.pdf", "src": [BASE + "/pdf/link.pdf"]},
+ {"id": "it-strip", "sys": "a", "t": "Concrete", "by": "x", "lic": "pd", "file": "Concrete.pdf", "src": [BASE + "/pdf/covered.pdf"], "expect": "5-428", "strip": {"marker": "vulcanhammer", "pages": 1}},
+ {"id": "it-min", "sys": "a", "t": "Short", "by": "x", "lic": "pd", "file": "Short.pdf", "src": [BASE + "/pdf/right.pdf"], "minpages": 50, "wb": False},
  {"id": "it-gone", "sys": "a", "t": "Gone", "by": "x", "lic": "pd", "file": "Gone.pdf", "src": [BASE + "/404/x.pdf"], "wb": False},
 ]}
 (T / "catalog.json").write_text(json.dumps(cat))
-os.environ.update(SHELF_IA=BASE, SHELF_WAYBACK=BASE + "/wb/%sid_/%s", SHELF_RELEASES=BASE + "/rel/%s/%s/", GITHUB_REPOSITORY="me/havyn")
+os.environ.update(SHELF_IA=BASE, SHELF_WAYBACK=BASE + "/wb/%sid_/%s", SHELF_CDX=BASE + "/cdx", SHELF_WB_GAP="0", SHELF_RELEASES=BASE + "/rel/%s/%s/", GITHUB_REPOSITORY="me/havyn")
 time.sleep = lambda s: None
 spec = importlib.util.spec_from_file_location("shelf_fetch", FETCHER); m = importlib.util.module_from_spec(spec)
 sys.argv = ["shelf_fetch.py", str(T / "catalog.json"), str(T / "out")]; spec.loader.exec_module(m)
@@ -91,7 +110,10 @@ def check(cond, msg):
     if not cond: check.bad += 1
 check.bad = 0
 check(rc == 0, "exit code 0")
-r = idx["it-wb"]; check(r["ok"] and r.get("via") == "wayback" and "/wb/2021id_/" in r["url"], "403 publisher -> Wayback copy, skipping a Wayback capture that is an HTML page: %s" % r.get("url"))
+r = idx["it-wb"]; check(r["ok"] and r.get("via") == "wayback" and "/wb/20190101000000id_/" in r["url"] and hits.get("/wb/20240101000000id_/" + BASE + "/403/tbmed.pdf") == 1, "403 publisher -> Wayback: newest PDF capture first, a bad capture skipped: %s" % r.get("url"))
+r = idx["it-noindex"]; check(r["ok"] and "/wb/2021id_/" in r["url"], "Wayback index down -> capture nearest the given year")
+check(hits.get("/cdx", 0) == 4, "Wayback index asked only when the publisher failed, busy index retried (%d requests)" % hits.get("/cdx", 0))
+check("license_seen" in idx["it-dspace"], "license statement recorded for Creative Commons documents")
 r = idx["it-flaky"]; check(r["ok"] and hits["/flaky/a.pdf"] == 3 and not r.get("carried"), "dropped connections retried (3 tries) and fetched fresh")
 r = idx["it-expect"]; check(r["ok"] and r["url"].endswith("/pdf/right.pdf") and any("wrong document" in e for e in r.get("tried", [])), "wrong document refused, next source used")
 r = idx["it-ia"]; check(r["ok"] and r["url"].endswith("Module%2003-%20Introduction.pdf"), "IA item: loose match picks Module 03, not 13: %s" % r.get("url"))
@@ -100,6 +122,9 @@ r = idx["it-dspace"]; check(r["ok"] and r["url"].endswith("/bitstreams/s1/conten
 r = idx["it-stub"]; check(r["ok"] and "only 1366 bytes" in r.get("carried", "") and (T / "out/release/Stub-Doc.pdf").read_bytes() == PREV_STUB, "publisher stub today -> last build's checked copy kept: %s" % r.get("carried", "")[:60])
 r = idx["it-link"]; check(r["ok"] and not r["mirror"] and not (T / "out/release/Link.pdf").exists(), "link-only document checked, not mirrored")
 r = idx["it-gone"]; check(not r["ok"] and "HTTP 404" in r["error"], "missing document reported")
+r = idx["it-strip"]; from pypdf import PdfReader; rd = PdfReader(str(T / "out/release/Concrete.pdf"))
+check(r["ok"] and len(rd.pages) == 10 and "vulcanhammer" not in (rd.pages[0].extract_text() or "") and r["sha256"] == sha((T / "out/release/Concrete.pdf").read_bytes()) and "cover page" in r.get("note", ""), "re-host's cover page taken off, checksum of the result")
+r = idx["it-min"]; check(not r["ok"] and "only 10 pages" in r["error"], "partial book refused by the page minimum")
 changed = (T / "out/changed.txt").read_text().split()
 check("Flaky-Doc.pdf" not in changed and "Stub-Doc.pdf" not in changed and "TB-MED.pdf" in changed and "shelf-index.json" in changed, "upload list skips unchanged files: %s" % changed)
 tsv = (T / "out/release/shelf-files.tsv").read_text()

@@ -31,6 +31,7 @@ FILE_DEADLINE = 600          # seconds for one file, so one slow server can't st
 START = time.time(); BUDGET = 55 * 60   # stop starting new documents after this; the job has 90 minutes
 IA = os.environ.get("SHELF_IA", "https://archive.org")                         # overridable for the local test only
 WAYBACK = os.environ.get("SHELF_WAYBACK", "https://web.archive.org/web/%sid_/%s")
+CDX = os.environ.get("SHELF_CDX", "https://web.archive.org/cdx/search/cdx")
 RELEASES = os.environ.get("SHELF_RELEASES", "https://github.com/%s/releases/download/%s/")
 WB_YEARS = ["2025", "2021"]
 LIC_NAME = {"pd": "Public domain (US government work)", "cc-by": "CC BY", "cc-by-sa": "CC BY-SA", "cc-by-nc-sa": "CC BY-NC-SA", "link": "Publisher's terms (not re-hosted)"}
@@ -39,12 +40,28 @@ class Fatal(Exception):
     """This URL won't work however often it's tried: wrong file, too big, too slow."""
 
 _slots_lock = threading.Lock(); _slots = {}
+WB_HOST = urllib.parse.urlparse(WAYBACK).netloc.lower()
 def slot(url):
-    """At most two downloads at a time from the Internet Archive (it drops TLS handshakes under load), three elsewhere."""
+    """One request at a time to the Wayback Machine (it rate-limits hard), two to the rest of the Internet Archive
+    (it drops TLS handshakes under load), three to anyone else."""
     host = urllib.parse.urlparse(url).netloc.lower()
     with _slots_lock:
-        if host not in _slots: _slots[host] = threading.BoundedSemaphore(2 if host.endswith("archive.org") else 3)
+        if host not in _slots: _slots[host] = Paced() if host == WB_HOST else threading.BoundedSemaphore(2 if host.endswith("archive.org") else 3)
         return _slots[host]
+
+class Paced:
+    """A one-at-a-time slot that also waits a few seconds between requests."""
+    GAP = float(os.environ.get("SHELF_WB_GAP", "4"))
+    def __init__(self): self.lock = threading.Lock(); self.last = 0.0
+    def __enter__(self):
+        self.lock.acquire()
+        wait = self.last + self.GAP - time.time()
+        if wait > 0: time.sleep(wait)
+    def __exit__(self, *a):
+        self.last = time.time(); self.lock.release()
+
+def slow_host(url):
+    return urllib.parse.urlparse(url).netloc.lower().endswith("archive.org") or urllib.parse.urlparse(url).netloc.lower() == WB_HOST
 
 def req(url, method="GET", headers=None, timeout=60):
     h = {"User-Agent": UA, "Accept": "application/pdf,application/json,text/html;q=0.9,*/*;q=0.8"}
@@ -62,7 +79,7 @@ def get_text(url, timeout=60, headers=None, tries=3):
             if e.code in (400, 401, 403, 404, 410): break
         except Exception as e:
             last = e
-        if a + 1 < tries: time.sleep(4 * (a + 1))
+        if a + 1 < tries: time.sleep((30 if slow_host(url) else 4) * (a + 1))
     raise last
 
 def is_pdf_bytes(b): return b[:1024].find(b"%PDF-") >= 0
@@ -79,9 +96,9 @@ def probe_pdf(url):
             time.sleep(3)
     return False
 
-def download(url, dest, tries=4):
+def download(url, dest, tries=None):
     """Stream url to dest; returns (size, sha256). Retries timeouts, dropped connections and TLS hiccups."""
-    last = None
+    last = None; slow = slow_host(url); tries = tries or (6 if slow else 4)
     for attempt in range(tries):
         part = Path(str(dest) + ".part")
         try:
@@ -114,7 +131,7 @@ def download(url, dest, tries=4):
         finally:
             try: part.unlink()
             except FileNotFoundError: pass
-        if attempt + 1 < tries: time.sleep(5 * (attempt + 1))
+        if attempt + 1 < tries: time.sleep((20 if slow else 5) * (attempt + 1))
     raise RuntimeError(last or "failed")
 
 def pdf_info(path, pages=4, chars=600):
@@ -137,6 +154,19 @@ def check_expect(path, pattern):
     if len(text) < 200: return "identity not checked: no text layer"
     if re.search(pattern, text, re.I): return None
     raise Fatal("wrong document: first pages don't match %r (%s)" % (pattern, text[:120]))
+
+def strip_pages(path, spec):
+    """Take off cover pages a re-host added ({"marker": text on the added page, "pages": how many}); None if there were none."""
+    from pypdf import PdfReader, PdfWriter
+    if not re.search(spec["marker"], PdfReader(str(path)).pages[0].extract_text() or "", re.I): return None
+    w = PdfWriter(clone_from=str(path))
+    for _ in range(spec.get("pages", 1)): w.remove_page(0)
+    try: w.compress_identical_objects()
+    except Exception: pass
+    tmp = Path(str(path) + ".strip")
+    with open(tmp, "wb") as f: w.write(f)
+    tmp.replace(path)
+    return "took off %d cover page(s) added by the site it came from" % spec.get("pages", 1)
 
 def merge(paths, dest):
     from pypdf import PdfWriter
@@ -196,8 +226,19 @@ def resolve_dspace(spec):
     raise RuntimeError("DSpace %s: no file matching %s" % (spec["handle"], spec.get("match")))
 
 def wayback(urls, years):
-    """The Internet Archive's stored copy of each link (id_ = the original bytes, no toolbar)."""
-    return [WAYBACK % (y, u) for u in urls if not re.search(r"(archive\.org|webarchive\.)", u) for y in years]
+    """The Internet Archive's stored copies of each link that were PDFs when captured, newest first (id_ = the
+    original bytes, no toolbar). If the capture index can't be reached, try the captures nearest the given years."""
+    out = []
+    for u in urls:
+        if re.search(r"(archive\.org|webarchive\.)", u): continue
+        try:
+            q = urllib.parse.urlencode([("url", u), ("output", "json"), ("filter", "statuscode:200"), ("filter", "mimetype:application/pdf"), ("limit", "-3")])
+            rows = json.loads(get_text(CDX + "?" + q) or "[]")
+            out += [WAYBACK % (c[1], c[2]) for c in reversed(rows[1:])]
+        except Exception as e:
+            print("Wayback index unavailable for %s (%s): trying by year" % (u, e), file=sys.stderr)
+            out += [WAYBACK % (y, u) for y in years]
+    return out
 
 HP_SUFFIX = ["fm", "if", "toc", "intro", "how", "wo"] + ["%02d" % i for i in range(0, 46)] + ["gp", "green", "voc", "vocab", "resc", "res", "indx", "index", "bm", "ib", "ob"]
 def resolve_hp(code, years):
@@ -212,7 +253,7 @@ def resolve_hp(code, years):
 
 def fetch_item(it, work, rel):
     r = fetch_item1(it, work, rel)
-    print("%s %-16s %7.1f MB  %s" % ("✓" if r.get("ok") else "✗", r["id"], (r.get("size") or 0) / 1e6, r.get("url") if r.get("ok") else r.get("error", "")[:300]), flush=True)
+    print("%s %-16s %7.1f MB  %s" % ("✓" if r.get("ok") else "✗", r["id"], (r.get("size") or 0) / 1e6, r.get("url") if r.get("ok") else r.get("error", "")[:1500]), flush=True)
     return r
 
 def fetch_item1(it, work, rel):
@@ -240,14 +281,22 @@ def fetch_item1(it, work, rel):
                 try:
                     got = fn(it[key]); cands += got if isinstance(got, list) else [got]
                 except Exception as e: errors.append("%s: %s" % (key, e))
-        if it.get("wb") is not False: cands += wayback(src, it.get("wb") or WB_YEARS)
         out = d / it["file"]; used = None; note = None
-        for u in cands:
-            try:
-                size, sha = download(u, out)
-                note = check_expect(out, it.get("expect")); used = u; break
-            except Exception as e:
-                errors.append("%s → %s" % (u, e)); out.unlink(missing_ok=True)
+        def first_good(urls):
+            for u in urls:
+                try:
+                    size, sha = download(u, out)
+                    note = check_expect(out, it.get("expect"))
+                    if it.get("minpages") and pdf_info(out, pages=1)[0] < it["minpages"]:
+                        raise Fatal("only %d pages, expected at least %d (part of the book?)" % (pdf_info(out, pages=1)[0], it["minpages"]))
+                    return u, size, sha, note
+                except Exception as e:
+                    errors.append("%s → %s" % (u, e)); out.unlink(missing_ok=True)
+            return None
+        got = first_good(cands)
+        if not got and src and it.get("wb") is not False:   # only now ask the Wayback Machine (it rate-limits)
+            got = first_good(wayback(src, it.get("wb") or WB_YEARS))
+        if got: used, size, sha, note = got
         if not used and it.get("parts"):
             try:
                 ps = []
@@ -258,9 +307,16 @@ def fetch_item1(it, work, rel):
             except Exception as e:
                 errors.append("parts → %s" % e)
         if not used: raise RuntimeError("; ".join(errors) or "no source")
+        if it.get("strip"):
+            cut = strip_pages(out, it["strip"])
+            if cut:
+                note = "; ".join(filter(None, [note, cut])); size = out.stat().st_size; sha = hashlib.sha256(out.read_bytes()).hexdigest()
         n, text = pdf_info(out)
         r.update(ok=True, url=used, size=size, sha256=sha, pages=n, probe=text)
         if used.startswith(WAYBACK.split("%s")[0]): r["via"] = "wayback"
+        if it["lic"].startswith("cc"):
+            m = re.search(r"(Creative Commons[^.;]{0,160}|Attribution[- ][^.;]{0,120}(?:International|IGO|Unported))", pdf_info(out, pages=12, chars=20000)[1])
+            r["license_seen"] = m.group(0)[:200] if m else "(no license statement in the first pages)"
         if note: r["note"] = note
         if errors: r["tried"] = errors[:6]
         if r["mirror"]: shutil.copy(out, rel / it["file"])
