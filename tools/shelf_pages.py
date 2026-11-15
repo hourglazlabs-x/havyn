@@ -31,7 +31,9 @@ def archives(dest):
             if r.headers.get("Access-Control-Allow-Origin") not in ("*", "https://hourglazlabs-x.github.io"): raise RuntimeError("the mirror no longer allows downloads from web pages")
             sha = ""
             try:
-                m = re.match(r"\s*([0-9a-fA-F]{64})", get(url + ".sha256", n=4096)[1].decode("ascii", "replace"))
+                # Kiwix publishes each file's SHA-256 next to it on download.kiwix.org (redirects to lb.download.kiwix.org);
+                # the mirror host doesn't serve them (checked 2026-11-15 with the probe workflow).
+                m = re.match(r"\s*([0-9a-fA-F]{64})", get(LIST + a["dir"] + "/" + f + ".sha256", n=4096)[1].decode("ascii", "replace"))
                 sha = m.group(1).lower() if m else ""
             except Exception as e:
                 print("no published SHA-256 for", f, e)

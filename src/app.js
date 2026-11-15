@@ -992,7 +992,7 @@
     let h = backbar("#/library", "Archive");
     h += '<section class="glass hero zhero">' + (x.fav ? '<img class="zfav" alt="" src="' + esc(x.fav) + '">' : "") + '<div class="lab">' + esc([langName(x.lang), x.flavour].filter(Boolean).join(" · ") || "Archive") + '</div><h2 class="ztitle">' + esc(x.name) + "</h2>" +
       (x.desc ? '<div class="sub">' + esc(x.desc) + "</div>" : "") +
-      '<div class="sub mono" style="font-size:.78rem;margin-top:8px">' + esc([x.articles ? fmtN(x.articles) + (x.articles === 1 ? " article" : " articles") : "", x.media ? fmtN(x.media) + " video and audio" : "", sz(x.size), x.date ? "made " + x.date : "", x.from === "kiwix" ? "from Kiwix" + (x.verified ? ", checksum matched" : "") : ""].filter(Boolean).join(" · ")) + "</div></section>";
+      '<div class="sub mono" style="font-size:.78rem;margin-top:8px">' + esc([x.articles ? fmtN(x.articles) + (x.articles === 1 ? " article" : " articles") : "", x.media ? fmtN(x.media) + " video and audio" : "", sz(x.size), x.date ? "made " + x.date : "", x.from === "kiwix" ? "from Kiwix" + (x.verified ? (x.check === "md5" ? ", checked: arrived intact" : ", checksum matched") : "") : ""].filter(Boolean).join(" · ")) + "</div></section>";
     if (x.needsScripts) h += '<div class="alert"><span class="dot"></span><span><b>This archive needs the Kiwix app</b><small>It is a copy of a website that runs its own scripts. HAVYN keeps archive scripts off for safety, so its pages may not work here. Open it in Kiwix, or on the home library.</small></span></div>';
     if (x.search !== false) h += '<form data-form="zsearch" data-id="' + esc(x.id) + '" class="zs"><input id="zq" name="q" type="search" enterkeyhint="search" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Search ' + (x.articles ? esc(fmtN(x.articles)) + (x.articles === 1 ? " title" : " titles") : "titles") + '" aria-label="Search titles in ' + esc(x.name) + '"></form><div id="zres" class="list" style="margin-top:8px"></div>';
     h += '<div class="btnrow" style="margin-top:12px">' + (x.main ? '<a class="btn" href="' + zHref(x.id, x.main) + '">' + ic("home") + "Main page</a>" : "") + '<button class="btn ghost" data-act="zim-random" data-id="' + esc(x.id) + '">' + ic("dice") + "Random</button></div>";
@@ -1760,6 +1760,41 @@
     save() { return { h: Array.from(this.h), b: Array.from(this.buf.subarray(0, this.bl)), n: this.len }; }
     static load(s) { const x = new Sha256(); if (s) { x.h.set(s.h); x.buf.set(s.b); x.bl = s.b.length; x.len = s.n; } return x; }
   }
+  // MD5, incremental and resumable like Sha256: checks a ZIM file against the checksum written inside it (its last 16 bytes
+  // are the MD5 of everything before them). Used when Kiwix's own SHA-256 for the file can't be fetched.
+  const MD5K = [0xd76aa478, 0xe8c7b756, 0x242070db, 0xc1bdceee, 0xf57c0faf, 0x4787c62a, 0xa8304613, 0xfd469501, 0x698098d8, 0x8b44f7af, 0xffff5bb1, 0x895cd7be, 0x6b901122, 0xfd987193, 0xa679438e, 0x49b40821,
+    0xf61e2562, 0xc040b340, 0x265e5a51, 0xe9b6c7aa, 0xd62f105d, 0x02441453, 0xd8a1e681, 0xe7d3fbc8, 0x21e1cde6, 0xc33707d6, 0xf4d50d87, 0x455a14ed, 0xa9e3e905, 0xfcefa3f8, 0x676f02d9, 0x8d2a4c8a,
+    0xfffa3942, 0x8771f681, 0x6d9d6122, 0xfde5380c, 0xa4beea44, 0x4bdecfa9, 0xf6bb4b60, 0xbebfbc70, 0x289b7ec6, 0xeaa127fa, 0xd4ef3085, 0x04881d05, 0xd9d4d039, 0xe6db99e5, 0x1fa27cf8, 0xc4ac5665,
+    0xf4292244, 0x432aff97, 0xab9423a7, 0xfc93a039, 0x655b59c3, 0x8f0ccc92, 0xffeff47d, 0x85845dd1, 0x6fa87e4f, 0xfe2ce6e0, 0xa3014314, 0x4e0811a1, 0xf7537e82, 0xbd3af235, 0x2ad7d2bb, 0xeb86d391].map((v) => v | 0);
+  const MD5S = [7, 12, 17, 22, 5, 9, 14, 20, 4, 11, 16, 23, 6, 10, 15, 21];
+  class Md5 {
+    constructor() { this.h = new Int32Array([0x67452301, 0xefcdab89 | 0, 0x98badcfe | 0, 0x10325476]); this.buf = new Uint8Array(64); this.bl = 0; this.len = 0; this.x = new Int32Array(16); }
+    block(p, o) {
+      const X = this.x, h = this.h;
+      for (let i = 0; i < 16; i++, o += 4) X[i] = p[o] | (p[o + 1] << 8) | (p[o + 2] << 16) | (p[o + 3] << 24);
+      let a = h[0], b = h[1], c = h[2], d = h[3];
+      for (let i = 0; i < 64; i++) {
+        let f, g;
+        if (i < 16) { f = (b & c) | (~b & d); g = i; } else if (i < 32) { f = (d & b) | (~d & c); g = (5 * i + 1) & 15; }
+        else if (i < 48) { f = b ^ c ^ d; g = (3 * i + 5) & 15; } else { f = c ^ (b | ~d); g = (7 * i) & 15; }
+        const t = d, x = (a + f + MD5K[i] + X[g]) | 0, r = MD5S[(i >> 4) * 4 + (i & 3)];
+        d = c; c = b; b = (b + ((x << r) | (x >>> (32 - r)))) | 0; a = t;
+      }
+      h[0] = (h[0] + a) | 0; h[1] = (h[1] + b) | 0; h[2] = (h[2] + c) | 0; h[3] = (h[3] + d) | 0;
+    }
+    update(d) { return Sha256.prototype.update.call(this, d); }
+    hex() {
+      const t = new Uint8Array(this.bl < 56 ? 64 : 128); t.set(this.buf.subarray(0, this.bl)); t[this.bl] = 0x80;
+      const bits = this.len * 8, e = t.length; let lo = bits % 4294967296, hi = Math.floor(bits / 4294967296);
+      for (let i = 0; i < 4; i++) { t[e - 8 + i] = lo & 255; lo = Math.floor(lo / 256); t[e - 4 + i] = hi & 255; hi = Math.floor(hi / 256); }
+      const x = new Md5(); x.h.set(this.h);
+      for (let o = 0; o < e; o += 64) x.block(t, o);
+      return Array.from(new Uint8Array(x.h.buffer), (v) => v.toString(16).padStart(2, "0")).join("");
+    }
+    save() { return { h: Array.from(this.h), b: Array.from(this.buf.subarray(0, this.bl)), n: this.len, md5: 1 }; }
+    static load(s) { const x = new Md5(); if (s) { x.h.set(s.h); x.buf.set(s.b); x.bl = s.b.length; x.len = s.n; } return x; }
+  }
+  const hasher = (st) => (st.algo === "md5" ? Md5 : Sha256).load(st.h);
 
   // An archive downloaded in parts is stored as {parts: [keys], size}; one added from Files is a single Blob. Either opens as one Blob.
   async function archiveBlob(id) {
@@ -1816,7 +1851,8 @@
       const total = +(String(r.headers.get("Content-Range") || "").split("/")[1] || 0); try { await r.body.cancel(); } catch (e) {}
       if (!total) throw new Error("Kiwix's mirror didn't say how big it is");
       let sha256 = "";
-      try { const t = await (await fetch(url + ".sha256", { cache: "no-store", credentials: "omit" })).text(); const m = /^[0-9a-f]{64}/i.exec(t.trim()); if (m) sha256 = m[0].toLowerCase(); } catch (e) {}
+      // Kiwix publishes the SHA-256 beside each file in its directory (the mirror host doesn't); without it, the ZIM's own MD5 is checked.
+      try { const r2 = await fetch(KIWIX.list + d + "/" + file + ".sha256", { cache: "no-store", credentials: "omit" }); const m = r2.ok ? /^[0-9a-f]{64}/i.exec((await r2.text()).trim()) : null; if (m) sha256 = m[0].toLowerCase(); } catch (e) {}
       const info = { id: it.id, file, url, size: total, sha256 };
       if (this.idx) this.idx.set(it.id, info);
       return info;
@@ -1826,10 +1862,13 @@
       if (!info) info = await this.resolve(it);
       const key = "zdl:" + it.id;
       let st = await Store.get(key);
-      const fresh = async () => { if (st && st.parts) for (const k of st.parts) await Store.del(k); st = { file: info.file, url: info.url, size: info.size, sha256: info.sha256 || "", uid: uid(), parts: [], have: 0, h: null }; await Store.set(key, st); };
+      const fresh = async () => { if (st && st.parts) for (const k of st.parts) await Store.del(k); st = { file: info.file, url: info.url, size: info.size, sha256: info.sha256 || "", algo: info.sha256 ? "sha256" : "md5", uid: uid(), parts: [], have: 0, h: null }; await Store.set(key, st); };
       if (!st || st.file !== info.file || st.size !== info.size) await fresh();
       if (!(await roomFor(st.size - st.have))) throw new Error("not enough space on this phone (needs " + sz(st.size - st.have) + ")");
-      let hash = Sha256.load(st.h), tries = 0, relooked = false, buf = [], bl = 0;
+      if (!st.algo) st.algo = st.sha256 ? "sha256" : "md5";
+      let hash = hasher(st), tries = 0, relooked = false, buf = [], bl = 0;
+      // SHA-256 covers the whole file; the ZIM's own MD5 covers all but its last 16 bytes (the checksum itself).
+      const feed = (v, at) => { if (st.algo !== "md5") return hash.update(v); const n = Math.min(v.length, st.size - 16 - at); if (n > 0) hash.update(n === v.length ? v : v.subarray(0, n)); };
       // Whatever has arrived is kept, even when the connection drops or you tap Stop: the next request carries on from the
       // last byte saved. (Each part is in order and the checksum state is saved with it.)
       const commit = async () => {
@@ -1845,14 +1884,14 @@
         buf = []; bl = 0;
         try {
           const res = await fetch(st.url, { headers: st.have ? { Range: "bytes=" + st.have + "-" } : {}, cache: "no-store", credentials: "omit", referrerPolicy: "no-referrer" });
-          if (res.status === 404 && !relooked) { relooked = true; info = await this.resolve(it); if (info.file !== st.file || info.size !== st.size) await fresh(); else st.url = info.url; hash = Sha256.load(st.h); continue; }
+          if (res.status === 404 && !relooked) { relooked = true; info = await this.resolve(it); if (info.file !== st.file || info.size !== st.size) await fresh(); else st.url = info.url; hash = hasher(st); continue; }
           if (!res.ok) throw new Error("HTTP " + res.status);
           const from = res.status === 206 ? +((/bytes (\d+)-/.exec(res.headers.get("Content-Range") || "") || [])[1]) : 0;
-          if (st.have && (res.status !== 206 || from !== st.have)) { try { await res.body.cancel(); } catch (e) {} await fresh(); hash = new Sha256(); continue; }   // the server didn't carry on from where we were: start over
+          if (st.have && (res.status !== 206 || from !== st.have)) { try { await res.body.cancel(); } catch (e) {} await fresh(); hash = hasher(st); continue; }   // the server didn't carry on from where we were: start over
           const rd = res.body.getReader();
           for (;;) {
             const { done, value } = await rd.read();
-            if (value && value.length) { buf.push(value); bl += value.length; hash.update(value); this.got = st.have + bl; this.paint(); }
+            if (value && value.length) { feed(value, st.have + bl); buf.push(value); bl += value.length; this.got = st.have + bl; this.paint(); }
             if (bl >= this.PART || done) await commit();
             if (done) break;
             if (this.stop) { try { await rd.cancel(); } catch (e) {} await commit(); throw stopErr(); }
@@ -1862,24 +1901,31 @@
           tries = 0;
         } catch (e) {
           if (e && e.name === "Stop") throw e;
-          try { await commit(); } catch (e2) { buf = []; bl = 0; hash = Sha256.load(st.h); }
+          try { await commit(); } catch (e2) { buf = []; bl = 0; hash = hasher(st); }
           this.got = st.have; this.paint();
           if (++tries > 5 || navigator.onLine === false) throw e;
           await pause(2500 * tries);
         }
       }
-      if (st.sha256 && hash.hex() !== st.sha256) {
-        for (const k of st.parts) await Store.del(k); await Store.del(key);
-        throw new Error("its checksum didn't match Kiwix's, so it was deleted (try again)");
+      // Open it from the stored parts (read back from storage: no copy, nothing held in memory) and check it.
+      const blob = await archiveBlob.fromParts(st.parts);
+      let want = st.sha256;
+      if (st.algo === "md5") {
+        const tail = new Uint8Array(await blob.slice(Math.max(0, st.size - 16), st.size).arrayBuffer()), head = new DataView(await blob.slice(72, 80).arrayBuffer());
+        const pos = head.getUint32(0, true) + head.getUint32(4, true) * 4294967296;
+        want = pos === st.size - 16 ? Array.from(tail, (v) => v.toString(16).padStart(2, "0")).join("") : "";   // an old ZIM without a checksum can't be checked
       }
-      // Open it from the stored parts (read back from storage: no copy, nothing held in memory) and add it to the library.
-      const blob = await archiveBlob.fromParts(st.parts), Z = await ZR.lib(), a = await Z.Archive.open(blob), zi = await a.info();
+      if (want && hash.hex() !== want) {
+        for (const k of st.parts) await Store.del(k); await Store.del(key);
+        throw new Error(st.algo === "md5" ? "it arrived damaged (its built-in checksum didn't match), so it was deleted (try again)" : "its checksum didn't match Kiwix's, so it was deleted (try again)");
+      }
+      const Z = await ZR.lib(), a = await Z.Archive.open(blob), zi = await a.info();
       let fav = ""; try { const f = await a.favicon(); if (f) fav = await toDataUrl(f); } catch (e) {}
       if (LIB.some((x) => typeOf(x) === "zim" && x.uuid === zi.uuid)) { for (const k of st.parts) await Store.del(k); await Store.del(key); return false; }
       await Store.set("zim:" + st.uid, { parts: st.parts, size: st.size, file: st.file, sha256: st.sha256 });
       LIB.push({ id: st.uid, type: "zim", name: zi.title, file: st.file, size: st.size, added: now(), uuid: zi.uuid, date: zi.date, lang: zi.language, desc: zi.description,
         articles: zi.articles, media: zi.media, main: zi.main, mainTitle: zi.mainTitle, fav, needsScripts: zi.needsScripts, search: zi.titleSearch, flavour: zi.flavour, zname: zi.name, creator: zi.creator,
-        from: "kiwix", catalog: it.id, verified: !!st.sha256 });
+        from: "kiwix", catalog: it.id, verified: !!want, check: want ? st.algo : "" });
       await saveLib(); await Store.del(key);
       return true;
     },

@@ -54,8 +54,9 @@ class Mirror(BaseHTTPRequestHandler):
             d = path[len("/list/zim/"):].strip("/")
             body = "".join('<a href="%s">%s</a>\n' % (k.rsplit("/", 1)[1], k.rsplit("/", 1)[1]) for k in zims if k.startswith("/zim/%s/" % d)).encode()
             self.send_response(200); self.cors(); self.send_header("Content-Type", "text/html"); self.send_header("Content-Length", str(len(body))); self.end_headers(); self.wfile.write(body); return
-        if path.endswith(".sha256") and path[:-7] in zims:
-            body = ("%s  %s\n" % (hashlib.sha256(zims[path[:-7]]).hexdigest(), path[:-7].rsplit("/", 1)[1])).encode()
+        z = path[:-7].replace("/list/zim/", "/zim/", 1) if path.endswith(".sha256") else None
+        if z in zims and path.startswith("/list/") and not z.endswith("/%s_2026-10.zim" % core[2]["get"]["stem"]):   # like Kiwix: in the directory, not on the mirror; none for LISTED
+            body = ("%s  %s\n" % (hashlib.sha256(zims[z]).hexdigest(), z.rsplit("/", 1)[1])).encode()
             self.send_response(200); self.cors(); self.send_header("Content-Length", str(len(body))); self.end_headers(); self.wfile.write(body); return
         if path not in zims:
             self.send_response(404); self.cors(); self.send_header("Content-Length", "0"); self.end_headers(); return
@@ -105,7 +106,7 @@ serve(functools.partial(Quiet, directory=str(site)), SPORT); serve(Mirror, MPORT
 BASE = "http://localhost:%d/" % SPORT
 UA = "Mozilla/5.0 (iPhone; CPU iPhone OS 18_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.6 Mobile/15E148 Safari/604.1"
 INIT = "if (window.top === window) { window.__vall = []; document.addEventListener('securitypolicyviolation', e => window.__vall.push(e.violatedDirective + ' ' + e.blockedURI)); }"
-def lib(page): return page.evaluate("__HAVYN.lib.map(x => ({id: x.id, type: x.type || 'pdf', name: x.name, shelf: x.shelf || '', catalog: x.catalog || '', verified: !!x.verified, size: x.size, file: x.file || ''}))")
+def lib(page): return page.evaluate("__HAVYN.lib.map(x => ({id: x.id, type: x.type || 'pdf', name: x.name, shelf: x.shelf || '', catalog: x.catalog || '', verified: !!x.verified, check: x.check || '', size: x.size, file: x.file || ''}))")
 def zims_on(page): return [x for x in lib(page) if x["type"] == "zim"]
 
 with sync_playwright() as p:
@@ -130,7 +131,8 @@ with sync_playwright() as p:
     ok("a dropped connection carries on from the last byte saved (Range)", any(i == DROP and not r.startswith("bytes=0-") for i, r in state["ranges"]) and any(x["catalog"] == DROP for x in zims_on(page)), state["ranges"][:5])
     ok("an archive missing from HAVYN's list is found in Kiwix's directory", any(x["catalog"] == LISTED for x in zims_on(page)) and state["hits"].get("/list/zim/%s/" % core[2]["get"]["zim"], 0) >= 1, state["hits"])
     ok("a corrupted archive is refused (checksum) and not added", until(lambda: "checksum" in page.evaluate("__HAVYN.arc.failed.join(' ')"), 30) and not any(x["catalog"] == BAD for x in zims_on(page)), page.evaluate("__HAVYN.arc.failed"))
-    ok("every downloaded archive was checked against SHA-256", zims_on(page) and all(x["verified"] for x in zims_on(page)), zims_on(page))
+    ok("every downloaded archive was checked", zims_on(page) and all(x["verified"] for x in zims_on(page)), zims_on(page))
+    ok("against Kiwix's SHA-256, or the ZIM's own MD5 when Kiwix has none", all(x["check"] == ("md5" if x["catalog"] == LISTED else "sha256") for x in zims_on(page)), [(x["catalog"], x["check"]) for x in zims_on(page)])
     parts = page.evaluate("(async () => { const id = __HAVYN.lib.find(x => x.type === 'zim').id; const v = await __HAVYN.store.get('zim:' + id); return v && v.parts ? v.parts.length : 0; })()")
     ok("archives are stored in parts (no second full copy)", parts >= 3, parts)
     ok("no Content-Security-Policy violations", page.evaluate("window.__vall.length") == 0, page.evaluate("window.__vall"))

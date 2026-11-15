@@ -36,7 +36,7 @@ def build():
     sha = base64.b64encode(hashlib.sha256(js.encode("utf-8")).digest()).decode()
     csp = ("<meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'self'; "
            f"script-src 'self' 'sha256-{sha}'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; "
-           "connect-src 'self' https://mirror.download.kiwix.org https://download.kiwix.org; font-src 'none'; media-src 'self' blob:; object-src 'none'; frame-src 'self'; "
+           "connect-src 'self' https://mirror.download.kiwix.org https://download.kiwix.org https://lb.download.kiwix.org; font-src 'none'; media-src 'self' blob:; object-src 'none'; frame-src 'self'; "
            "worker-src 'self'; manifest-src 'self'; base-uri 'none'; form-action 'none'\">")
     if APP.exists(): shutil.rmtree(APP)
     APP.mkdir(parents=True)

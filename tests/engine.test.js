@@ -292,6 +292,23 @@ test("v1.5 resumable SHA-256 (archive downloads) matches Node's, across random c
   assert.equal(new Sha256().update(new TextEncoder().encode("abc")).hex(), "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad");
 });
 
+test("v1.5 resumable MD5 (a ZIM's built-in checksum) matches Node's, across random chunks and save/restore", () => {
+  const src = require("fs").readFileSync(require("path").join(__dirname, "..", "src", "app.js"), "utf8");
+  const a = src.indexOf("  const K256 = "), b = src.indexOf("  // An archive downloaded in parts");
+  const Md5 = new Function(src.slice(a, b) + "; return Md5;")();
+  const crypto = require("crypto");
+  for (const n of [0, 1, 55, 56, 63, 64, 65, 119, 120, 127, 128, 1000, 65536, 300001, 3 * 1024 * 1024 + 17]) {
+    const data = crypto.randomBytes(n), want = crypto.createHash("md5").update(data).digest("hex");
+    let h = new Md5(), i = 0;
+    while (i < n) { const k = Math.min(n - i, 1 + Math.floor(Math.random() * 70000)); h.update(new Uint8Array(data.buffer, data.byteOffset + i, k)); i += k; if (Math.random() < 0.3) h = Md5.load(JSON.parse(JSON.stringify(h.save()))); }
+    assert.equal(h.hex(), want, "length " + n);
+  }
+  assert.equal(new Md5().update(new TextEncoder().encode("abc")).hex(), "900150983cd24fb0d6963f7d28e17f72");
+  // and a real ZIM: its last 16 bytes are the MD5 of everything before them
+  const zim = require("fs").readFileSync(require("path").join(__dirname, "fixtures", "havyn-test.zim"));
+  assert.equal(new Md5().update(new Uint8Array(zim.buffer, zim.byteOffset, zim.length - 16)).hex(), zim.subarray(zim.length - 16).toString("hex"));
+});
+
 // ---------------- v1.5 ----------------
 test("v1.5 field index: every answer points at a real page of a phone-set document HAVYN hosts", () => {
   const F = C.field, ids = new Set(), groups = new Set(F.groups.map((g) => g[0]));

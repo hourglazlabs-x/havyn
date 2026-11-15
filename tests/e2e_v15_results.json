@@ -42,7 +42,7 @@
  {
   "name": "an archive missing from HAVYN's list is found in Kiwix's directory",
   "pass": true,
-  "detail": "{'/zim/wikipedia/wikipedia_en_medicine_maxi_2026-10.zim': 2, '/zim/other/zimgit-post-disaster_en_2026-10.zim': 1, '/list/zim/other/': 1, '/zim/other/zimgit-water_en_2026-10.zim': 2, '/zim/other/zimgit-water_en_2026-10.zim.sha256': 1, '/zim/other/zimgit-food-preparation_en_2026-10.zim': 1, '/zim/other/zimgit-medicine_en_2026-10.zim': 1, '/zim/other/zimgit-knots_en_2026-10.zim': 1, '/zim/vikidia/vikidia_en_all_maxi_2026-10.zim': 1}"
+  "detail": "{'/zim/wikipedia/wikipedia_en_medicine_maxi_2026-10.zim': 2, '/zim/other/zimgit-post-disaster_en_2026-10.zim': 1, '/list/zim/other/': 1, '/zim/other/zimgit-water_en_2026-10.zim': 2, '/list/zim/other/zimgit-water_en_2026-10.zim.sha256': 1, '/zim/other/zimgit-food-preparation_en_2026-10.zim': 1, '/zim/other/zimgit-medicine_en_2026-10.zim': 1, '/zim/other/zimgit-knots_en_2026-10.zim': 1, '/zim/vikidia/vikidia_en_all_maxi_2026-10.zim': 1}"
  },
  {
   "name": "a corrupted archive is refused (checksum) and not added",
@@ -50,9 +50,14 @@
   "detail": "[\"Post-disaster library (its checksum didn't match Kiwix's, so it was deleted (try again))\"]"
  },
  {
-  "name": "every downloaded archive was checked against SHA-256",
+  "name": "every downloaded archive was checked",
   "pass": true,
-  "detail": "[{'id': 'mwhjgipzgkw1s3', 'type': 'zim', 'name': 'Test WikiMed: medical encyclopedia', 'shelf': '', 'catalog': 'p-wikimed', 'verified': True, 'size': 44276, 'file': 'wikipedia_en_medicine_maxi_2026-10.zim'}, {'id': 'mwhjgld3iglyua', 'type': 'zim', 'name': 'Test Water treatment', 'shelf': '', 'catalog': 'p-water', 'verified': True, 'size': 44248, 'file': 'zimgit-water_en_2026-10.zim'}, {'id': 'mwhjglki95bhhv', 'type': 'zim', 'name': 'Test Food for preppers', 'shelf': '', 'catalog': 'p-food', 'verified': True, 'size': 44261, 'file': 'zimgit-food-preparation_en_2026-10.zim'}, {'id': 'mwhjglrox99aox', 'type': 'zim', 'name': 'Test Medical library', 'shelf': '', 'catalog': 'p-medlib', 'verified': True, 'size': 44251, 'file': 'zimgit-medicine_en_2026-10.zim'}, {'id': 'mwhjglz59unrl7', 'type': 'zim', 'name': 'Test A library of knots', 'shelf': '', 'catalog': 'p-knots', 'verified': True, 'size': 44251, 'file': 'zimgit-knots_en_2026-10.zim'}, {'id': 'mwhjgm67s1hjrb', 'type': 'zim', 'name': 'Test Vikidia: encyclopedia for kids', 'shelf': '', 'catalog': 'p-vikidia', 'verified': True, 'size': 44270, 'file': 'vikidia_en_all_maxi_2026-10.zim'}]"
+  "detail": "[{'id': 'mwhjody6fznqp1', 'type': 'zim', 'name': 'Test WikiMed: medical encyclopedia', 'shelf': '', 'catalog': 'p-wikimed', 'verified': True, 'check': 'sha256', 'size': 44276, 'file': 'wikipedia_en_medicine_maxi_2026-10.zim'}, {'id': 'mwhjogjm1o2klu', 'type': 'zim', 'name': 'Test Water treatment', 'shelf': '', 'catalog': 'p-water', 'verified': True, 'check': 'md5', 'size': 44248, 'file': 'zimgit-water_en_2026-10.zim'}, {'id': 'mwhjogqkdvmgxk', 'type': 'zim', 'name': 'Test Food for preppers', 'shelf': '', 'catalog': 'p-food', 'verified': True, 'check': 'sha256', 'size': 44261, 'file': 'zimgit-food-preparation_en_2026-10.zim'}, {'id': 'mwhjogxkbq9huu', 'type': 'zim', 'name': 'Test Medical library', 'shelf': '', 'catalog': 'p-medlib', 'verified': True, 'check': 'sha256', 'size': 44251, 'file': 'zimgit-medicine_en_2026-10.zim'}, {'id': 'mwhjoh4xo8vnuw', 'type': 'zim', 'name': 'Test A library of knots', 'shelf': '', 'catalog': 'p-knots', 'verified': True, 'check': 'sha256', 'size': 44251, 'file': 'zimgit-knots_en_2026-10.zim'}, {'id': 'mwhjohc5ggdpns', 'type': 'zim', 'name': 'Test Vikidia: encyclopedia for kids', 'shelf': '', 'catalog': 'p-vikidia', 'verified': True, 'check': 'sha256', 'size': 44270, 'file': 'vikidia_en_all_maxi_2026-10.zim'}]"
+ },
+ {
+  "name": "against Kiwix's SHA-256, or the ZIM's own MD5 when Kiwix has none",
+  "pass": true,
+  "detail": "[('p-wikimed', 'sha256'), ('p-water', 'md5'), ('p-food', 'sha256'), ('p-medlib', 'sha256'), ('p-knots', 'sha256'), ('p-vikidia', 'sha256')]"
  },
  {
   "name": "archives are stored in parts (no second full copy)",
@@ -112,7 +117,7 @@
  {
   "name": "the field index lists answers and how many manuals are here",
   "pass": true,
-  "detail": "d the emergency cards come first; these pages are the detail behind them.\n64 answers \u00b7 25 documents \u00b7 4 of 25 on this phone\nGet the manuals: Download everything"
+  "detail": "need. Training and the emergency cards come first; these pages are the detail behind them.\n64 answers \u00b7 25 documents \u00b7 4 of 25 on this phone\nDownload everything"
  },
  {
   "name": "typing filters the answers",
@@ -122,7 +127,7 @@
  {
   "name": "a page link opens the manual at that page",
   "pass": true,
-  "detail": "#/library/mwhjgio7j7u4ds?page=102&from=%23%2Ffield 102 / 268"
+  "detail": "#/library/mwhjodwaskkev2?page=102&from=%23%2Ffield 102 / 268"
  },
  {
   "name": "Back returns to the field index",
@@ -157,7 +162,7 @@
  {
   "name": "a playbook lists the pages that go with it",
   "pass": true,
-  "detail": "Run a generator safely\nCARD\nCPSC generator alert \u00b7 p. 1\nCarbon monoxide and backfeeding\nOSHA generator sheet \u00b7 p. 1\nGenerator safety fact sheet \u00b7 not on this phone yet | [{\"id\": \"mwhjgimkd9v5ko\", \"type\": \"pdf\", \"name\": \"Emergency Disinfection of Drinking Water\", \"shelf\": \"sh-epawater\", \"catalog\": \"\", \"verified\": false, \"size\": 976, \"file\": \"EPA-Emergency-Disinfection-of-Drinking-Water.pdf\"}, {\"id\": \"mwhjginaoay6yx\", \"type\": \"pdf\", \"name\": \"Portable Generator Hazards\", \"shelf\": \"sh-cpscgen\", \"catalog\": \"\", \"verified\": false, \"size\": 637, \"file\": \"CPSC-Portable-Generator-Hazards.pdf\"}, {\"id\": \"mwhjginomryhtg\", \"type\": \"pdf\", \"name\": \"National Interoperability Field Operations Guide (NIFOG 2.02)\", \"shelf\": \"sh-nifog\", \"catalog\": \"\", \"verified\": false, \"size\": 67800, \"file\": \"CISA-NIFOG-2.02.pdf\"}, {\"id\": \"mwhjgio7j7u4ds\", \"type\": \"pdf\", \"name\": \"CERT Basic Training manual\", \"shelf\": \"sh-cert\", \"catalog\": \"\", \"verified\": false, \"size\": 85516, \"file\": \"FEMA-CERT-Basic-Training-Participant-Manual-2019.pdf\"}]"
+  "detail": "Run a generator safely\nCARD\nCPSC generator alert \u00b7 p. 1\nCarbon monoxide and backfeeding\nOSHA generator sheet \u00b7 p. 1\nGenerator safety fact sheet \u00b7 not on this phone yet | [{\"id\": \"mwhjodv6rfmf0z\", \"type\": \"pdf\", \"name\": \"Emergency Disinfection of Drinking Water\", \"shelf\": \"sh-epawater\", \"catalog\": \"\", \"verified\": false, \"check\": \"\", \"size\": 976, \"file\": \"EPA-Emergency-Disinfection-of-Drinking-Water.pdf\"}, {\"id\": \"mwhjodvlt73hht\", \"type\": \"pdf\", \"name\": \"Portable Generator Hazards\", \"shelf\": \"sh-cpscgen\", \"catalog\": \"\", \"verified\": false, \"check\": \"\", \"size\": 637, \"file\": \"CPSC-Portable-Generator-Hazards.pdf\"}, {\"id\": \"mwhjodw1ywczs8\", \"type\": \"pdf\", \"name\": \"National Interoperability Field Operations Guide (NIFOG 2.02)\", \"shelf\": \"sh-nifog\", \"catalog\": \"\", \"verified\": false, \"check\": \"\", \"size\": 67800, \"file\": \"CISA-NIFOG-2.02.pdf\"}, {\"id\": \"mwhjodwaskkev2\", \"type\": \"pdf\", \"name\": \"CERT Basic Training manual\", \"shelf\": \"sh-cert\", \"catalog\": \"\", \"verified\": false, \"check\": \"\", \"size\": 85516, \"file\": \"FEMA-CERT-Basic-Training-Participant-Manual-2019.pdf\"}]"
  },
  {
   "name": "Search everything finds field answers",
@@ -167,7 +172,7 @@
  {
   "name": "parts are separate storage entries that delete cleanly",
   "pass": true,
-  "detail": "(45, 39)"
+  "detail": "(41, 35)"
  },
  {
   "name": "no page errors",
