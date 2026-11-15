@@ -86,7 +86,7 @@ const HAVYN_CONTENT = {
         { t: "Get ready for the paramedics", d: "Unlock the door. Have their medicines and medicine list ready (Family › their card)." },
         { t: "They collapse and aren't breathing normally: CPR", d: "Start CPR and send someone for an AED if there is one.", link: "cpr" }
       ],
-      note: "Aspirin never replaces the 911 call. Don't give it to children for chest pain.",
+      note: "Aspirin never replaces the 911 call. This aspirin advice is for adults: don't give aspirin to children or teens.",
       sources: [
         { n: "AHA: warning signs of a heart attack", u: "https://www.heart.org/en/health-topics/heart-attack/warning-signs-of-a-heart-attack" },
         { n: "2024 AHA and Red Cross first aid guidelines", u: "https://professional.heart.org/en/science-news/2024-aha-and-american-red-cross-guidelines-for-first-aid" },
@@ -734,7 +734,7 @@ const HAVYN_CONTENT = {
       { id: "f-eye", g: "med", q: "Eye injury", k: "eye chemical splash object", r: [["sh-bec", 228, "Eye injuries (table of conditions)"]] },
       { id: "f-birth", g: "med", q: "The baby is coming fast", k: "labor childbirth delivery pregnant birth cord", r: [["sh-ox-birth", 849, "Precipitous (very fast) birth"], ["sh-ox-birth", 806, "The birth and cord clamping"], ["sh-ox-birth", 978, "The newborn's first minutes"]] },
       { id: "f-vitals", g: "med", q: "Take pulse, breathing and temperature", k: "vital signs heart rate respiration blood pressure", r: [["sh-ox-nursing", 627, "Vital signs"]] },
-      { id: "f-dose", g: "med", q: "Work out a medicine dose", k: "dosage milligrams calculation liquid medicine", r: [["sh-ox-pharm", 101, "Dosage arithmetic (check with a pharmacist when you can)"]] },
+      { id: "f-dose", g: "med", q: "Work out a medicine dose", k: "dosage milligrams calculation liquid medicine", r: [["sh-ox-pharm", 101, "Dosage arithmetic, as nurses learn it. For a dose, follow the label, the prescription or a pharmacist"]] },
       { id: "f-move", g: "med", q: "Move an injured person", k: "drag carry lift rescue", r: [["sh-cert", 217, "Blanket drag and other drags"], ["sh-cert", 218, "Carries"]] },
       { id: "f-stress", g: "med", q: "Stress after a disaster", k: "anxiety coping trauma mental health sleep", r: [["sh-cert", 144, "Normal stress reactions"], ["sh-wrigleycope", 12, "Slow breathing, for kids"]] },
       { id: "f-kids", g: "fam", q: "Help children cope", k: "kids scared nightmares fear children", r: [["sh-wrigleycope", 5, "It's not your fault"], ["sh-wrigleycope", 13, "When a child needs more help"]] },

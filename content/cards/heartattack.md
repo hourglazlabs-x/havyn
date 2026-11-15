@@ -10,7 +10,7 @@ Checked against sources: 2026-11-14 · Status: Awaiting EMT or nurse review
 4. **Get ready for the paramedics.** Unlock the door. Have their medicines and medicine list ready (Family › their card).
 5. **They collapse and aren't breathing normally: CPR.** Start CPR and send someone for an AED if there is one.
 
-> Aspirin never replaces the 911 call. Don't give it to children for chest pain.
+> Aspirin never replaces the 911 call. This aspirin advice is for adults: don't give aspirin to children or teens.
 
 Sources:
 - [AHA: warning signs of a heart attack](https://www.heart.org/en/health-topics/heart-attack/warning-signs-of-a-heart-attack)
