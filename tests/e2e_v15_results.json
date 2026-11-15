@@ -17,12 +17,12 @@
  {
   "name": "the checklist covers manuals, encyclopedias, plan and backup",
   "pass": true,
-  "detail": "THIS PHONE\n10% READY NOT YET\nDownload everything \u00b7 21 MB\n11 items. Use Wi-Fi and keep HAVYN open (the screen stays on); it picks up where it stopped if you close it.\nOn the Home Screen\nIn Safari: Share \u203a Add to Home Screen, then open HAVYN from its icon. Downloads made in a Safari tab stay in that tab.\nWorks with no internet\nManuals and guides: 0 of 50\nFirst aid, water, food, power, radio, repair "
+  "detail": "THIS PHONE\n10% READY NOT YET\nDownload everything \u00b7 21 MB\n11 items. Use Wi-Fi and keep HAVYN open (the screen stays on); it picks up where it stopped if you close it.\nOn the Home Screen\nIn Safari: Share \u203a Add to Home Screen, then open HAVYN from its icon. Downloads made in a Safari tab stay in that tab.\nWorks with no internet\nManuals and guides: 0 of 4\nFirst aid, water, food, power, radio, repair a"
  },
  {
   "name": "progress shows while downloading",
   "pass": true,
-  "detail": "THIS PHONE\n10% READY NOT YET\nDownload everything \u00b7 21 MB\nStop\n11 items. Use Wi-Fi and keep HAVYN open (the screen stays on); it picks up where it stopped if you close it.\nDownloading 1 of 4: Emergency Disinfection of Drinking Water \u00b7 0%. Keep HAVYN open; the screen stays on.\nOn the Home Screen\nIn Sa"
+  "detail": "THIS PHONE\n10% READY NOT YET\nDownload everything \u00b7 21 MB\nStop\n11 items. Use Wi-Fi and keep HAVYN open (the screen stays on); it picks up where it stopped if you close it.\nDownloading 1 of 4: Emergency Disinfection of Drinking Water \u00b7 1%. Keep HAVYN open; the screen stays on.\nOn the Home Screen\nIn Sa"
  },
  {
   "name": "the shelf documents arrive first",
@@ -52,7 +52,7 @@
  {
   "name": "every downloaded archive was checked",
   "pass": true,
-  "detail": "[{'id': 'mwhjwz5fzc3v7f', 'type': 'zim', 'name': 'Test WikiMed: medical encyclopedia', 'shelf': '', 'catalog': 'p-wikimed', 'verified': True, 'check': 'sha256', 'size': 44276, 'file': 'wikipedia_en_medicine_maxi_2026-10.zim'}, {'id': 'mwhjx1sk7z0vww', 'type': 'zim', 'name': 'Test Water treatment', 'shelf': '', 'catalog': 'p-water', 'verified': True, 'check': 'md5', 'size': 44248, 'file': 'zimgit-water_en_2026-10.zim'}, {'id': 'mwhjx1zianqm6t', 'type': 'zim', 'name': 'Test Food for preppers', 'shelf': '', 'catalog': 'p-food', 'verified': True, 'check': 'sha256', 'size': 44261, 'file': 'zimgit-food-preparation_en_2026-10.zim'}, {'id': 'mwhjx272vup1zp', 'type': 'zim', 'name': 'Test Medical library', 'shelf': '', 'catalog': 'p-medlib', 'verified': True, 'check': 'sha256', 'size': 44251, 'file': 'zimgit-medicine_en_2026-10.zim'}, {'id': 'mwhjx2epxsr01o', 'type': 'zim', 'name': 'Test A library of knots', 'shelf': '', 'catalog': 'p-knots', 'verified': True, 'check': 'sha256', 'size': 44251, 'file': 'zimgit-knots_en_2026-10.zim'}, {'id': 'mwhjx2lu94xzg2', 'type': 'zim', 'name': 'Test Vikidia: encyclopedia for kids', 'shelf': '', 'catalog': 'p-vikidia', 'verified': True, 'check': 'sha256', 'size': 44270, 'file': 'vikidia_en_all_maxi_2026-10.zim'}]"
+  "detail": "[{'id': 'mwhk1118tk55l9', 'type': 'zim', 'name': 'Test WikiMed: medical encyclopedia', 'shelf': '', 'catalog': 'p-wikimed', 'verified': True, 'check': 'sha256', 'size': 44276, 'file': 'wikipedia_en_medicine_maxi_2026-10.zim'}, {'id': 'mwhk13n92qo17c', 'type': 'zim', 'name': 'Test Water treatment', 'shelf': '', 'catalog': 'p-water', 'verified': True, 'check': 'md5', 'size': 44248, 'file': 'zimgit-water_en_2026-10.zim'}, {'id': 'mwhk13unwrw5ni', 'type': 'zim', 'name': 'Test Food for preppers', 'shelf': '', 'catalog': 'p-food', 'verified': True, 'check': 'sha256', 'size': 44261, 'file': 'zimgit-food-preparation_en_2026-10.zim'}, {'id': 'mwhk141nqfcip1', 'type': 'zim', 'name': 'Test Medical library', 'shelf': '', 'catalog': 'p-medlib', 'verified': True, 'check': 'sha256', 'size': 44251, 'file': 'zimgit-medicine_en_2026-10.zim'}, {'id': 'mwhk148xwvwpa4', 'type': 'zim', 'name': 'Test A library of knots', 'shelf': '', 'catalog': 'p-knots', 'verified': True, 'check': 'sha256', 'size': 44251, 'file': 'zimgit-knots_en_2026-10.zim'}, {'id': 'mwhk14gavdgnb9', 'type': 'zim', 'name': 'Test Vikidia: encyclopedia for kids', 'shelf': '', 'catalog': 'p-vikidia', 'verified': True, 'check': 'sha256', 'size': 44270, 'file': 'vikidia_en_all_maxi_2026-10.zim'}]"
  },
  {
   "name": "against Kiwix's SHA-256, or the ZIM's own MD5 when Kiwix has none",
@@ -112,7 +112,12 @@
  {
   "name": "Status says the downloads are done",
   "pass": true,
-  "detail": "HAVYN\nFIELD\nFAMILY AUTONOMY\n\u2014\nDAYS\nAdd your household and supplies to see how long you can last.\nTHIS PHONE\n37% READY NOT YET\nOn the Home Screen\nIn Safari: Share \u203a Add to Home Screen, then open HAVYN from its icon. Downloads made in a Safari tab stay in that tab.\nWorks with no internet\nManuals and guides: 4 of 50\nFirst aid, water, food, power, radio, repair and survival manuals (492 MB to go).\nEnc"
+  "detail": "HAVYN\nFIELD\nFAMILY AUTONOMY\n\u2014\nDAYS\nAdd your household and supplies to see how long you can last.\nTHIS PHONE\n60% READY ALMOST\nOn the Home Screen\nIn Safari: Share \u203a Add to Home Screen, then open HAVYN from its icon. Downloads made in a Safari tab stay in that tab.\nWorks with no internet\nManuals and guides: 4 of 4\n46 more aren't on HAVYN's shelf yet (the publisher was unreachable); HAVYN's shelf retr"
+ },
+ {
+  "name": "readiness counts only manuals HAVYN's shelf holds, and says what's missing",
+  "pass": true,
+  "detail": "THIS PHONE\n60% READY ALMOST\nOn the Home Screen\nIn Safari: Share \u203a Add to Home Screen, then open HAVYN from its icon. Downloads made in a Safari tab stay in that tab.\nWorks with no internet\nManuals and guides: 4 of 4\n46 more aren't on HAVYN's shelf yet (the publisher was unreachable); HAVYN's shelf retries every day.\nEncyclopedias: 7 of 7\nHealth books from their publishers: 0 of 7\nWhere There Is No Doctor and the others aren't re-hosted; get them from Get more \u203a Shelf (Hesperian chapters are joined into one book).\nFamily plan: 0 of 4\nYour household, an out-of-area contact, meeting places and wh"
  },
  {
   "name": "the field index lists answers and how many manuals are here",
@@ -127,7 +132,7 @@
  {
   "name": "a page link opens the manual at that page",
   "pass": true,
-  "detail": "#/library/mwhjwz3mllo2z7?page=102&from=%23%2Ffield 102 / 268"
+  "detail": "#/library/mwhk10zekil34d?page=102&from=%23%2Ffield 102 / 268"
  },
  {
   "name": "Back returns to the field index",
@@ -162,7 +167,7 @@
  {
   "name": "a playbook lists the pages that go with it",
   "pass": true,
-  "detail": "Run a generator safely\nCARD\nCPSC generator alert \u00b7 p. 1\nCarbon monoxide and backfeeding\nOSHA generator sheet \u00b7 p. 1\nGenerator safety fact sheet \u00b7 not on this phone yet | [{\"id\": \"mwhjwz1t6sbrfa\", \"type\": \"pdf\", \"name\": \"Emergency Disinfection of Drinking Water\", \"shelf\": \"sh-epawater\", \"catalog\": \"\", \"verified\": false, \"check\": \"\", \"size\": 976, \"file\": \"EPA-Emergency-Disinfection-of-Drinking-Water.pdf\"}, {\"id\": \"mwhjwz25zt77eu\", \"type\": \"pdf\", \"name\": \"Portable Generator Hazards\", \"shelf\": \"sh-cpscgen\", \"catalog\": \"\", \"verified\": false, \"check\": \"\", \"size\": 637, \"file\": \"CPSC-Portable-Generator-Hazards.pdf\"}, {\"id\": \"mwhjwz2te0vd4p\", \"type\": \"pdf\", \"name\": \"National Interoperability Field Operations Guide (NIFOG 2.02)\", \"shelf\": \"sh-nifog\", \"catalog\": \"\", \"verified\": false, \"check\": \"\", \"size\": 67800, \"file\": \"CISA-NIFOG-2.02.pdf\"}, {\"id\": \"mwhjwz3mllo2z7\", \"type\": \"pdf\", \"name\": \"CERT Basic Training manual\", \"shelf\": \"sh-cert\", \"catalog\": \"\", \"verified\": false, \"check\": \"\", \"size\": 85516, \"file\": \"FEMA-CERT-Basic-Training-Participant-Manual-2019.pdf\"}]"
+  "detail": "Run a generator safely\nCARD\nCPSC generator alert \u00b7 p. 1\nCarbon monoxide and backfeeding\nOSHA generator sheet \u00b7 p. 1\nGenerator safety fact sheet \u00b7 not on this phone yet | [{\"id\": \"mwhk10xsff2g3y\", \"type\": \"pdf\", \"name\": \"Emergency Disinfection of Drinking Water\", \"shelf\": \"sh-epawater\", \"catalog\": \"\", \"verified\": false, \"check\": \"\", \"size\": 976, \"file\": \"EPA-Emergency-Disinfection-of-Drinking-Water.pdf\"}, {\"id\": \"mwhk10yd67r8mi\", \"type\": \"pdf\", \"name\": \"Portable Generator Hazards\", \"shelf\": \"sh-cpscgen\", \"catalog\": \"\", \"verified\": false, \"check\": \"\", \"size\": 637, \"file\": \"CPSC-Portable-Generator-Hazards.pdf\"}, {\"id\": \"mwhk10yohjajey\", \"type\": \"pdf\", \"name\": \"National Interoperability Field Operations Guide (NIFOG 2.02)\", \"shelf\": \"sh-nifog\", \"catalog\": \"\", \"verified\": false, \"check\": \"\", \"size\": 67800, \"file\": \"CISA-NIFOG-2.02.pdf\"}, {\"id\": \"mwhk10zekil34d\", \"type\": \"pdf\", \"name\": \"CERT Basic Training manual\", \"shelf\": \"sh-cert\", \"catalog\": \"\", \"verified\": false, \"check\": \"\", \"size\": 85516, \"file\": \"FEMA-CERT-Basic-Training-Participant-Manual-2019.pdf\"}]"
  },
  {
   "name": "Search everything finds field answers",
@@ -182,7 +187,7 @@
  {
   "name": "parts are separate storage entries that delete cleanly",
   "pass": true,
-  "detail": "(45, 39)"
+  "detail": "(48, 42)"
  },
  {
   "name": "no page errors",

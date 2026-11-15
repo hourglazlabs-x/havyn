@@ -167,6 +167,7 @@ with sync_playwright() as p:
     ok("after closing and reopening, it finishes from where it stopped", until(lambda: any(x["catalog"] == core[3]["id"] for x in zims_on(page)), 40) and any(i == core[3]["id"] for i, _ in state["ranges"][n_before:]), state["ranges"][n_before:])
     page.goto(BASE + "#/status")
     ok("Status says the downloads are done", until(lambda: "Encyclopedias: %d of %d" % (len(core), len(core)) in page.inner_text("#app"), 15), page.inner_text("#app")[:400])
+    ok("readiness counts only manuals HAVYN's shelf holds, and says what's missing", "Manuals and guides: 4 of 4" in page.inner_text("#app") and "on HAVYN's shelf yet" in page.inner_text("#app"), page.inner_text("#ready")[:600] if page.locator("#ready").count() else "")
     # the field index: "How do I…" opens the exact page in a manual on this phone, and comes back
     page.goto(BASE + "#/field"); page.wait_for_selector("#fq")
     hero = page.inner_text(".hero")

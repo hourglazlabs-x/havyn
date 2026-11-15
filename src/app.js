@@ -2010,7 +2010,8 @@
   };
   const Ready = {
     rows() {
-      const ph = C.shelf.items.filter((i) => i.ph), share = ph.filter((i) => i.lic !== "link"), shHave = share.filter((i) => shelfHave(i)).length;
+      // Count only what HAVYN's shelf actually holds today (a document whose publisher was down on build day can't be fetched yet).
+      const ph = C.shelf.items.filter((i) => i.ph), hosted = ph.filter((i) => i.lic !== "link"), share = hosted.filter((i) => Shelf.state !== "ready" || Shelf.info(i) || shelfHave(i)), shHave = share.filter((i) => shelfHave(i)).length, later = hosted.length - share.length;
       const link = ph.filter((i) => i.lic === "link"), lkHave = link.filter((i) => shelfHave(i)).length;
       const core = coreArchives(), arHave = core.filter((i) => haveOnPhone(i)).length;
       const people = L("people").length, P = S.plan || {};
@@ -2019,7 +2020,7 @@
       return [
         { k: "app", w: 10, f: isStandalone() ? 1 : 0, t: "On the Home Screen", d: isStandalone() ? "Opens like an app, with its own storage." : "In Safari: Share › Add to Home Screen, then open HAVYN from its icon. Downloads made in a Safari tab stay in that tab.", go: "#/system" },
         { k: "offline", w: 10, f: sw || PREVIEW ? 1 : 0, t: "Works with no internet", d: sw ? "The app itself is saved on this phone." : "Open HAVYN once while online; it saves itself for offline use.", go: "#/system" },
-        { k: "shelf", w: 25, f: share.length ? shHave / share.length : 1, t: "Manuals and guides: " + shHave + " of " + share.length, d: shHave === share.length ? "Every phone-set document is here and searchable." : "First aid, water, food, power, radio, repair and survival manuals (" + sz(share.filter((i) => !shelfHave(i)).reduce((a, i) => a + shelfSize(i), 0)) + " to go).", go: "#/archive?t=shelf" },
+        { k: "shelf", w: 25, f: share.length ? shHave / share.length : 1, t: "Manuals and guides: " + shHave + " of " + share.length, d: (shHave === share.length ? "Every phone-set document on HAVYN's shelf is here and searchable." : "First aid, water, food, power, radio, repair and survival manuals (" + sz(share.filter((i) => !shelfHave(i)).reduce((a, i) => a + shelfSize(i), 0)) + " to go)."), n: later ? later + (later === 1 ? " more isn't" : " more aren't") + " on HAVYN's shelf yet (the publisher was unreachable); HAVYN's shelf retries every day." : "", go: "#/archive?t=shelf" },
         { k: "arc", w: 25, f: core.length ? arHave / core.length : 1, t: "Encyclopedias: " + arHave + " of " + core.length, d: arHave === core.length ? "WikiMed and the survival libraries are here." : "WikiMed, post-disaster, water, food, medicine, knots and a kids' encyclopedia (" + sz(core.filter((i) => !haveOnPhone(i)).reduce((a, i) => a + Arc.size(i), 0)) + " to go).", go: "#/archive?t=phone" },
         { k: "books", w: 5, f: link.length ? lkHave / link.length : 1, t: "Health books from their publishers: " + lkHave + " of " + link.length, d: "Where There Is No Doctor and the others aren't re-hosted; get them from Get more › Shelf (Hesperian chapters are joined into one book).", go: "#/archive?t=shelf" },
         { k: "family", w: 15, f: plan / 4, t: "Family plan: " + plan + " of 4", d: "Your household, an out-of-area contact, meeting places and where to go if you must leave.", go: "#/family" },
@@ -2045,7 +2046,8 @@
       h += '<div class="bar' + (busy ? "" : " hide") + '" id="rdybar" style="margin-top:10px"><i style="width:0%"></i></div><div id="rdymsg" class="empty" style="min-height:1.1em;font-size:.82rem"></div>';
       h += '<div class="list rdy">' + rows.map((r) => {
         const ok = r.f >= 1, part = !ok && r.f > 0;
-        return '<a class="li' + (ok ? " ok" : "") + '" href="' + r.go + '"><span class="ic">' + ic(ok ? "check" : part ? "clock" : "plus") + '</span><span class="tx"><b>' + esc(r.t) + "</b><small>" + esc(r.d) + "</small></span>" + ic("chev") + "</a>";
+        const note = ok ? r.n || "" : [r.d, r.n].filter(Boolean).join(" ");
+        return '<a class="li' + (ok ? " ok" : "") + '" href="' + r.go + '"><span class="ic">' + ic(ok ? "check" : part ? "clock" : "plus") + '</span><span class="tx"><b>' + esc(r.t) + "</b>" + (note ? "<small" + (ok ? ' class="keep"' : "") + ">" + esc(note) + "</small>" : "") + "</span>" + ic("chev") + "</a>";
       }).join("") + "</div></section>";
       return h;
     },

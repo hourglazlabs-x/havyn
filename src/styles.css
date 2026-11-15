@@ -382,6 +382,7 @@ code.cmd { display: block; margin: 6px 0 8px; padding: 10px 12px; border-radius:
 .rdy .li.ok .ic { color: var(--ok); border-color: color-mix(in srgb, var(--ok) 45%, transparent); background: color-mix(in srgb, var(--ok) 12%, transparent); }
 .rdy .li.ok .tx b { color: var(--ink2); }
 .rdy .li.ok .tx small { display: none; }
+.rdy .li.ok .tx small.keep { display: block; }
 .rdy .li.ok { padding-top: 9px; padding-bottom: 9px; align-items: center; }
 .rdy .li.ok > svg { margin-top: 0; }
 
