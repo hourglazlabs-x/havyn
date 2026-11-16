@@ -6,7 +6,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 SRC, APP, PREV = ROOT / "src", ROOT / "app", ROOT / "preview"
-APP_VERSION = "1.8.0"
+APP_VERSION = "1.8.1"
 
 def read(p): return (SRC / p).read_text(encoding="utf-8")
 

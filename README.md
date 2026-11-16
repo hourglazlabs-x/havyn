@@ -1,4 +1,4 @@
-# HAVYN FIELD v1.8
+# HAVYN FIELD v1.8.1
 
 HAVYN FIELD is an offline emergency command app for every family iPhone, with its own offline library: a **reference shelf** of real manuals and guides filed by the system they help you run or rebuild, encyclopedias (Kiwix ZIM archives such as Wikipedia and WikiMed), PDFs, video and audio, all searchable from one box with no internet. It is one HTML file plus a service worker, a manifest, icons, HAVYN's archive reader (`zimkit.js`) and vendored copies of PDF.js (the PDF reader), pdf-lib (the binder PDF and joining chapter PDFs) and fzstd (Zstandard decompression). There is no framework and no build step at runtime. The app never sends anything anywhere; the only requests it makes go to its own address (to install, update and download shelf documents) and, when you tap Download, to Kiwix's download servers for the encyclopedias.
 
@@ -31,7 +31,11 @@ Night mode switches the app to red on black. The app follows Reduce Motion and D
 4. Open HAVYN from its icon once while still online. Under System, **Offline copy** should read **Saved for offline**.
 5. Turn on Airplane Mode and open HAVYN again to confirm it works offline.
 
-Deleting the icon deletes the app's data, so keep Memory Cards on another phone and on the vault drive.
+Deleting the icon deletes the app's data, so keep Memory Cards on another phone and on the vault drive. Safari and the Home Screen app keep separate data: import and download inside the app, opened from its icon.
+
+### Updates: the app stays attached to the site
+
+Every push to `main` that changes `app/` publishes in about a minute. Each installed phone looks for a new version when HAVYN opens and whenever it comes back to the front (at most every 10 minutes), downloads it in the background, then restarts into it by itself on an idle Home screen. Anywhere else it shows **Update ready** (tap to restart); it never restarts during an emergency card, a drill or a download. **System → This phone → Updates → Check now** checks on demand, and **Version** shows what the phone is running. Family data, downloads and settings carry over; they belong to the site's address, so keep the same address (see Deploy).
 
 ## Deploy
 

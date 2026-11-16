@@ -117,7 +117,7 @@
  {
   "name": "The timer runs",
   "pass": true,
-  "detail": "('0:00', '0:01')"
+  "detail": "('0:00', '0:02')"
  },
  {
   "name": "No warning before the card's 5 minutes",
@@ -132,7 +132,7 @@
  {
   "name": "Stopping shows how long it lasted, and the warning goes",
   "pass": true,
-  "detail": "TIMES FOR THE PARAMEDICS\nSeizure started\n4:58 PM \u00b7 lasted 5:22\nSeizure stopped\n5:04 PM \u00b7 lasted 5:22\nShow the log\n3"
+  "detail": "TIMES FOR THE PARAMEDICS\nSeizure started\n11:31 AM \u00b7 lasted 5:22\nSeizure stopped\n11:37 AM \u00b7 lasted 5:22\nShow the log\n3"
  },
  {
   "name": "Calling 911 from a card goes in the log",
@@ -142,7 +142,7 @@
  {
   "name": "The log lists every entry in order",
   "pass": true,
-  "detail": "['4:58 PM Opened the Seizure card first', '4:58 PM Seizure started +0:00', '5:04 PM Seizure stopped lasted 5:22 +5:22', '5:04 PM Called 911 +5:22']"
+  "detail": "['11:31 AM Opened the Seizure card first', '11:31 AM Seizure started +0:00', '11:37 AM Seizure stopped lasted 5:22 +5:22', '11:37 AM Called 911 +5:22']"
  },
  {
   "name": "\u2026with the time since the first entry",

@@ -1,7 +1,7 @@
 # HAVYN: mission state
 
 **Current milestone:** M8, HAVYN FIELD v1.8: the Sim Lab, train by doing in about a minute (CPR Beat, Alarm ID, the 2-Minute Drill, five illustrated scans and three missions, narrated, with stars). Built on v1.7 (cards read aloud, the log for responders, the status line), v1.6 (the command deck and the British voice) and v1.5 (Download everything). Live at https://hourglazlabs-x.github.io/havyn/ (GitHub Pages, deployed on every push to `app/`).
-**Build:** 1.8.0 · 2026-11-15 · `app/index.html` 630 KB + `zimkit.js` 54 KB + PDF.js and pdf-lib + 206 voice recordings (10.3 MB), all cached for offline
+**Build:** 1.8.1 · 2026-11-16 · `app/index.html` 634 KB + `zimkit.js` 54 KB + PDF.js and pdf-lib + 206 voice recordings (10.3 MB), all cached for offline. Installed phones update themselves (v1.8.1).
 
 ## v1.8 "done when": evidence
 
@@ -13,7 +13,7 @@
 | Less to read | PASS (Chrome) / not yet heard on an iPhone | 69 narration recordings (Voice workflow 2026-11-15); e2e_v18: questions and explanations play in HAVYN's voice; leaving a sim silences it. Engine: questions ≤ 70 characters, choices ≤ 46, explanations ≤ 170. |
 | Accurate | PASS (content check) / awaiting EMT or nurse review | Every answer restates a card or playbook, or a source listed with the sim (NFPA material via Purdue Extension and Kidde, NPS, UC IPM, Arizona Game and Fish, SoCalGas, SDG&E, Long Beach, Minnesota State Fire Marshal, Seattle Children's, First Alert), checked 2026-11-15. |
 
-Test totals for 1.8.0: engine 32/32, archive reader 208/208, end-to-end 91/91 + 76/76 + 31/31 + 72/72 + 35/35 + 38/38, shelf fetcher 27/27.
+Test totals for 1.8.0: engine 32/32, archive reader 208/208, end-to-end 91/91 + 76/76 + 31/31 + 72/72 + 35/35 + 38/38, shelf fetcher 27/27. 1.8.1 adds updates end-to-end 9/9 (a manual check offers Restart away from Home; an update never interrupts an emergency card; an idle Home restarts into the new version; old caches are removed), and the full suite still passes.
 
 ## v1.7 "done when": evidence
 

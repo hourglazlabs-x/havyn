@@ -1,0 +1,47 @@
+[
+ {
+  "name": "First open: saved for offline, no restart offered",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "Check now finds the new version and offers Restart",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "\u2026without restarting by itself away from Home",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "Home shows Update ready",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "Restart opens the new version",
+  "pass": true,
+  "detail": "['havyn-field-9.9.1+test']"
+ },
+ {
+  "name": "An update during an emergency card never restarts it",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "On an idle Home screen it restarts into the new version by itself",
+  "pass": true,
+  "detail": "['havyn-field-9.9.3+test']"
+ },
+ {
+  "name": "Old versions are cleaned up",
+  "pass": true,
+  "detail": "['havyn-field-9.9.3+test']"
+ },
+ {
+  "name": "No errors on the page",
+  "pass": true,
+  "detail": "[]"
+ }
+]

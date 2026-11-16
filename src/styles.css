@@ -875,3 +875,11 @@ body:not([data-ready]) .tabbar { opacity: 0; }
 .drsteps small { font-size: .72rem; color: var(--ink2); line-height: 1.15; }
 .dra { color: var(--mute); }
 @media (prefers-reduced-motion: reduce) { .simgrid, .bigstars i, .xpgain, .simwhy, .beatart.guide .ring, .sdots i.cur, .simscene i { animation: none !important; opacity: 1 !important; transform: none !important; } .mark { animation: none !important; opacity: 1 !important; } .scanline { display: none; } }
+
+/* updates */
+.updbtn { min-height: 34px; padding: 0 12px; border-radius: 999px; border: 1px solid rgba(111, 243, 255, .45); background: rgba(111, 243, 255, .08); color: var(--ink); font: 650 .82rem var(--sans); }
+.updbtn.go { border-color: transparent; background: linear-gradient(180deg, #a9f5ff, #36d6f5); color: #021018; }
+.updbar { display: flex; align-items: center; gap: 12px; width: 100%; margin: 2px 0 10px; padding: 12px 14px; text-align: left; border-radius: 16px; border: 1px solid rgba(111, 243, 255, .55); background: linear-gradient(90deg, rgba(111, 243, 255, .16), rgba(111, 243, 255, .04)); color: var(--ink); }
+.updbar svg { width: 22px; height: 22px; flex: none; color: var(--aqua); }
+.updbar b { display: block; font-size: 1rem; }
+.updbar small { font-size: .8rem; color: var(--ink2); }

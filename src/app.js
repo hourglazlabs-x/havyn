@@ -395,6 +395,7 @@
     const rs = Ready.score(), lv = level(rs);
     if (PR.level && lv.n > PR.level && !Welcome.on) setTimeout(() => { toast("LEVEL UP · " + lv.rank.toUpperCase() + " · LV " + lv.n); Snd.chime("save"); }, 400);
     if (PR.level !== lv.n) { PR.level = lv.n; flush(); }
+    if (Upd.ready) h += '<button class="updbar" data-act="upd-restart">' + ic("download") + "<span><b>Update ready</b><small>Tap to restart HAVYN with the new version</small></span></button>";
     h += Strip.html() + '<div class="sec first"><span class="lab"><b>01</b> Readiness</span></div>' + Ready.panel() + deck();
     h += '<div class="sec"><span class="lab"><b>05</b> Family status</span></div>';
     h += '<section class="glass hero"><div class="lab">Family autonomy</div>';
@@ -2948,6 +2949,7 @@
       '<div class="kv"><span>Library</span><span>' + esc(libSummary() || "Empty") + "</span></div>" +
       '<div class="kv"><span>Network use</span><span>Downloads you start, from HAVYN and Kiwix only</span></div>' +
       '<div class="kv"><span>Version</span><span class="mono">' + esc(VERSION) + "</span></div>" +
+      '<div class="kv"><span>Updates</span><span>' + (Upd.ready ? '<button class="updbtn go" data-act="upd-restart">Restart to update</button>' : '<button class="updbtn" data-act="upd-check">' + esc(Upd.msg || "Check now") + "</button>") + "</span></div>" +
       '<p class="empty" style="font-size:.85rem">Deleting the app icon deletes its data. Keep Memory Cards on another phone and the vault drive.</p>' +
       '<div class="btnrow"><button class="btn ghost" data-act="wel-replay">' + ic("play") + "Replay the welcome tour</button></div></section>";
     const vi = Voice.ok() ? Voice.info() : null, VV = window.HAVYN_VOICE;
@@ -3060,6 +3062,38 @@
 
   /* ---------------- events ---------------- */
   let toastTimer = 0;
+  // Updates. The installed app stays attached to the live site: it looks for a new version when it opens and whenever
+  // it comes back to the front (at most every 10 minutes), fetches it in the background, then restarts by itself on an
+  // idle Home screen, or offers a one-tap restart anywhere else. Nothing restarts mid-emergency, mid-drill or mid-download.
+  const Upd = {
+    reg: null, ready: false, last: 0, msg: "", had: false,
+    init(reg) {
+      this.reg = reg; this.had = !!navigator.serviceWorker.controller;
+      navigator.serviceWorker.addEventListener("controllerchange", () => {
+        if (!this.had) { this.had = true; return; }   // the very first install: nothing to restart
+        this.ready = true; this.msg = "";
+        if (this.idle()) { location.reload(); return; }
+        toast("Update ready: tap Restart"); render();
+      });
+      document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") this.check(false); });
+      setTimeout(() => this.check(false), 6000);
+    },
+    idle() {
+      return (route.path === "status" || route.path === "") && !document.body.classList.contains("em") && !Welcome.on && !Shelf.busy && !Arc.busy && !Everything.busy &&
+        !(SR && ((SR.drill && SR.drill.phase === "run") || (SR.beat && SR.beat.phase !== "ready" && SR.beat.phase !== "done")));
+    },
+    check(manual) {
+      if (this.ready) { if (manual) location.reload(); return; }
+      if (!this.reg || navigator.onLine === false) { if (manual) { this.msg = navigator.onLine === false ? "No internet right now" : "Open the installed app to update"; render(); } return; }
+      if (!manual && now() - this.last < 10 * 60e3) return;
+      this.last = now(); if (manual) { this.msg = "Checking…"; render(); }
+      this.reg.update().then(() => {
+        if (!manual || this.ready) return;
+        const w = this.reg.installing || this.reg.waiting;
+        this.msg = w ? "Downloading the update…" : "Up to date"; render();
+      }).catch(() => { if (manual) { this.msg = "Couldn't reach the site"; render(); } });
+    }
+  };
   function toast(msg) {
     if (Welcome.on) return;   // the tour card is saying what's happening
     let el = $(".toast"); if (!el) { el = document.createElement("div"); el.className = "toast"; el.setAttribute("role", "status"); document.body.appendChild(el); }
@@ -3117,6 +3151,8 @@
       Snd.chime("nav");
     }
     else if (act === "q-save") quickSave();
+    else if (act === "upd-check") Upd.check(true);
+    else if (act === "upd-restart") location.reload();
     else if (act === "sim-pick") simPick(Number(b.dataset.i));
     else if (act === "sim-next") simNext();
     else if (act === "sim-uv") { if (SR) { SR.uv = !SR.uv; const sb = $(".scanbox"), tg = $(".scantag"); if (sb) sb.classList.toggle("uv", SR.uv); if (tg) tg.textContent = SR.uv ? "UV SCAN" : "SCAN COMPLETE"; b.classList.toggle("on", SR.uv); } }
@@ -3566,9 +3602,9 @@
     document.body.dataset.ready = "1";
     window.__HAVYN_READY_MS = Math.round(performance.now() - t0); window.__HAVYN_READY_AT = Math.round(performance.now());
     if (!PREVIEW && "serviceWorker" in navigator) {
-      navigator.serviceWorker.register("./sw.js").then(() => navigator.serviceWorker.ready).then(() => { const s = $("#swst"); if (s) s.textContent = "Saved for offline"; }).catch(() => { const s = $("#swst"); if (s) s.textContent = "Not available"; });
+      navigator.serviceWorker.register("./sw.js").then((reg) => { Upd.init(reg); return navigator.serviceWorker.ready; }).then(() => { const s = $("#swst"); if (s) s.textContent = "Saved for offline"; }).catch(() => { const s = $("#swst"); if (s) s.textContent = "Not available"; });
     }
   }
-  window.__HAVYN = { get sim() { return SR; }, sims: SIMS, beat: Beat, drill: Drill, alarm: AlarmSnd, get incident() { return INC; }, get state() { return S; }, get prefs() { return PR; }, get lib() { return LIB; }, E, C, version: VERSION, arc: Arc, shelf: Shelf, ready: Ready, store: Store, welcome: Welcome, voice: Voice, clips: Clips };
+  window.__HAVYN = { upd: Upd, get sim() { return SR; }, sims: SIMS, beat: Beat, drill: Drill, alarm: AlarmSnd, get incident() { return INC; }, get state() { return S; }, get prefs() { return PR; }, get lib() { return LIB; }, E, C, version: VERSION, arc: Arc, shelf: Shelf, ready: Ready, store: Store, welcome: Welcome, voice: Voice, clips: Clips };
   boot();
 })();

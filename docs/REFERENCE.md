@@ -154,3 +154,7 @@ Each card's sources are listed in `src/content.js` and in `content/cards/*.md`. 
 - **Narration**: `voice_lines.sims()` adds `s-<sim>` (intros), `s-<sim>-<frame>` (questions and scans; not the sound questions) and `s-<sim>-<frame>-ok` (explanations), kind `sim`, rendered to `src/voice/s/` at 64 kbit/s (69 lines). The speaker button in a run's header switches narration (`prefs.simVoice`). While a sim is open, `navigator.audioSession.type` is `playback`; leaving stops its sound, voice and timers.
 - **Readiness**: a Sim Lab quest (three sims run, 10 points); manuals and encyclopedias go from 20 to 15 points each. Home section 03 is Train (the Sim Lab banner); the welcome tour shows it after What's happening?
 
+## v1.8.1 additions
+
+- **Updates** (`Upd` in `app.js`): after the service worker registers, `reg.update()` runs 6 seconds after launch and on every `visibilitychange` to visible (at most every 10 minutes; System → Updates → Check now runs it on demand). The new worker installs (core files atomically, recordings one by one), calls `skipWaiting()` and `clients.claim()`; the page's `controllerchange` (ignored on the very first install) sets `Upd.ready`. On an idle Home screen (no emergency card, welcome tour, download, drill or CPR round) the page reloads itself into the new version; elsewhere it shows a toast, a Home banner (**Update ready**) and a System button (**Restart to update**). The old caches are deleted when the new worker activates. Tested by `tests/e2e_update.py` against a copy of the built app with three simulated deploys.
+
