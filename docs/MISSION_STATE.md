@@ -1,7 +1,19 @@
 # HAVYN: mission state
 
-**Current milestone:** M7, HAVYN FIELD v1.7: every emergency card reads its steps aloud in HAVYN's recorded voice, and keeps the times for the paramedics (live timers that warn when a card's wait is up, a log to hand over); a professional status line on Home. Built on v1.6 (game-style command deck, quick setup, the elegant British voice) and v1.5 (Download everything, the field index). Live at https://hourglazlabs-x.github.io/havyn/ (GitHub Pages, deployed on every push to `app/`).
-**Build:** 1.7.0 · 2026-11-15 · `app/index.html` 550 KB + `zimkit.js` 54 KB + PDF.js and pdf-lib + 136 voice recordings (8.0 MB), all cached for offline
+**Current milestone:** M8, HAVYN FIELD v1.8: the Sim Lab, train by doing in about a minute (CPR Beat, Alarm ID, the 2-Minute Drill, five illustrated scans and three missions, narrated, with stars). Built on v1.7 (cards read aloud, the log for responders, the status line), v1.6 (the command deck and the British voice) and v1.5 (Download everything). Live at https://hourglazlabs-x.github.io/havyn/ (GitHub Pages, deployed on every push to `app/`).
+**Build:** 1.8.0 · 2026-11-15 · `app/index.html` 630 KB + `zimkit.js` 54 KB + PDF.js and pdf-lib + 206 voice recordings (10.3 MB), all cached for offline
+
+## v1.8 "done when": evidence
+
+| Criterion | Status | Evidence |
+| --- | --- | --- |
+| Learn by doing, not reading | PASS (Chrome) | e2e_v18: the hub lists 11 sims in Train, Scan and Missions, each with its drawing and stars; a perfect mission earns 3 stars, one miss 2 (the wrong answer marked, the right one lit, the explanation shown); the debrief shows score, best, misses, the card's sources and the next sim. |
+| Pictures to identify things | PASS (Chrome, screenshots) | Engine: 22 drawings are well-formed SVG and every reference resolves. e2e_v18: the bark scorpion scan shows four labels and a UV view; picture questions offer two drawings. Screenshots `tests/shots/v18-*.png`. |
+| Simulations | PASS (Chrome) | e2e_v18: Alarm ID plays and draws smoke (6 long beeps), CO (8 short) and low battery (1 chirp); CPR Beat at a steady 110 a minute reads "Good" live and scores 100 % in the zone, 3 stars; the 2-Minute Drill runs the clock with the alarm sounding, stops it, keeps the best time. |
+| Less to read | PASS (Chrome) / not yet heard on an iPhone | 69 narration recordings (Voice workflow 2026-11-15); e2e_v18: questions and explanations play in HAVYN's voice; leaving a sim silences it. Engine: questions ≤ 70 characters, choices ≤ 46, explanations ≤ 170. |
+| Accurate | PASS (content check) / awaiting EMT or nurse review | Every answer restates a card or playbook, or a source listed with the sim (NFPA material via Purdue Extension and Kidde, NPS, UC IPM, Arizona Game and Fish, SoCalGas, SDG&E, Long Beach, Minnesota State Fire Marshal, Seattle Children's, First Alert), checked 2026-11-15. |
+
+Test totals for 1.8.0: engine 32/32, archive reader 208/208, end-to-end 91/91 + 76/76 + 31/31 + 72/72 + 35/35 + 38/38, shelf fetcher 27/27.
 
 ## v1.7 "done when": evidence
 
@@ -124,8 +136,9 @@ An independent pass compared every card step with its sources (AHA 2025 adult an
 
 1. **Install on every phone** from https://hourglazlabs-x.github.io/havyn/ (Share › Add to Home Screen) and open it from the icon on Wi-Fi: Download everything starts by itself.
 2. **Two shelf documents still to fetch** (ATP 3-34.45, DOT ERG 2024): the daily `shelf` run retries them; check the release's `shelf-index.json`.
-3. **Medical review gate (20 cards, and the v1.7 timer hints).** A trained EMT or nurse must review and sign each file in `content/cards/`; until then every card shows "Awaiting EMT or nurse review".
+3. **Medical review gate (20 cards, the v1.7 timer hints and the v1.8 Sim Lab answers).** A trained EMT or nurse must review and sign each file in `content/cards/`; until then every card shows "Awaiting EMT or nurse review".
 4. **On-device checks that headless Chrome can't do:**
+   - v1.8: CPR Beat tap timing on an iPhone (touch latency); the alarm tones through the phone speaker with the ring switch on silent.
    - v1.7: the card voice on an iPhone (first touch unlocks sound; the ring switch shouldn't silence it while a card talks); the 8 MB of recordings caching on first install over cellular.
    - v1.3: import a 1–2 GB archive on an iPhone (Safari's IndexedDB with a multi-GB file); archive video inside the reader on iOS (service-worker byte ranges in WebKit); the reader frame's link handling and dark pages in WebKit; how much HAVYN may store (`navigator.storage.estimate()` on the family phones).
    - Earlier: the binder share sheet; the PDF reader on long books; the metronome with the silent switch on; wake lock; AirDrop of a Memory Card; Dynamic Type at the largest size; first-screen time on the oldest iPhone.
