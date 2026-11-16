@@ -31,6 +31,13 @@
    "sha256": "5c6a6c730f0678fa77a5e40d1475ea985c0655b61a91d8a9ccd7d0b62e6eee83",
    "ms": 4118
   },
+  "sim": {
+   "text": "Sim Lab trains you in about a minute. Tap, listen and decide.",
+   "file": "sim.mp3",
+   "bytes": 43244,
+   "sha256": "8123e60fe58ab11d1916821f0ce913bdad3c6c41392531bc422ccf07f7f6dacb",
+   "ms": 3509
+  },
   "sos": {
    "text": "In an emergency, tap the red button. Each card talks you through it, step by step, and keeps the times for the paramedics.",
    "file": "sos.mp3",
@@ -954,6 +961,489 @@
    "bytes": 75884,
    "sha256": "4617606138110dedd41ff25d5d05b1624aaedd0c00d784e0d36ce74838e17d4d",
    "ms": 9398
+  },
+  "s-cpr-beat": {
+   "text": "Tap the chest to the beat: one hundred to one hundred and twenty a minute. Keep going when the beat stops.",
+   "file": "s/s-cpr-beat.mp3",
+   "bytes": 46316,
+   "sha256": "42fd9748d47fac3e3b93af386c017c41a0b3bf91eb4cf4543cf379e1cc6e97a6",
+   "ms": 5695
+  },
+  "s-alarm-id-0-ok": {
+   "text": "Three long beeps, a pause, three again: smoke or fire. Get out, stay out, and call nine one one from outside.",
+   "file": "s/s-alarm-id-0-ok.mp3",
+   "bytes": 52076,
+   "sha256": "8b7f2a2b3a808dab50dae9759cc5d902c13c1617f057e544de4a06c3741572a8",
+   "ms": 6421
+  },
+  "s-alarm-id-1-ok": {
+   "text": "Four quick beeps, then a pause: carbon monoxide. Everyone outside now, then call nine one one. Stay out.",
+   "file": "s/s-alarm-id-1-ok.mp3",
+   "bytes": 50348,
+   "sha256": "ecfa4eade46e387164a8470610f00659cc02d1df932994e45e14187bdf34a868",
+   "ms": 6208
+  },
+  "s-alarm-id-2-ok": {
+   "text": "One chirp every 30 to 60 seconds: the battery is low. Still chirping with a new battery? Replace the alarm.",
+   "file": "s/s-alarm-id-2-ok.mp3",
+   "bytes": 54764,
+   "sha256": "f8465962d6c649489dbc8e387e5194e1b395f575ff6782e7a33a0ca49169a149",
+   "ms": 6764
+  },
+  "s-escape": {
+   "text": "A home fire can leave as little as two minutes to get out. Start the clock, everyone out to the meeting place, then stop.",
+   "file": "s/s-escape.mp3",
+   "bytes": 52844,
+   "sha256": "a739c065f89c40d84e11551d09a501c61a2deb88ae65c9f45bb8f9fa8a376491",
+   "ms": 6524
+  },
+  "s-scan-scorpion-0": {
+   "text": "Arizona bark scorpion. Thin pincers, a long thin tail, two to three inches, tan. It climbs walls and ceilings. Tap U V: it glows under a black light.",
+   "file": "s/s-scan-scorpion-0.mp3",
+   "bytes": 76460,
+   "sha256": "3b954471e3da34bea0539c8b533b1b29fa4e7a671efddb29dd75b5ad11a1bb02",
+   "ms": 9479
+  },
+  "s-scan-scorpion-1": {
+   "text": "Which one is the bark scorpion?",
+   "file": "s/s-scan-scorpion-1.mp3",
+   "bytes": 16172,
+   "sha256": "3e9c734a6b47967d625f5f67d19a9db6cf5d76f923efd961e9a1ccd3768b35af",
+   "ms": 1943
+  },
+  "s-scan-scorpion-1-ok": {
+   "text": "Thin pincers and a thin tail. Thick, crab-like pincers usually mean a less dangerous kind. A sting gets the same care either way.",
+   "file": "s/s-scan-scorpion-1-ok.mp3",
+   "bytes": 60716,
+   "sha256": "d05d3bba3f19db63fdccf6f75fa6a08426c451ea2b13fe1124f785d597fbde4a",
+   "ms": 7499
+  },
+  "s-scan-scorpion-2": {
+   "text": "Where do bark scorpions turn up?",
+   "file": "s/s-scan-scorpion-2.mp3",
+   "bytes": 16748,
+   "sha256": "0c007803109b43431af58bd49bec1cb62cc62863e16bc66a675c30d42fb5915d",
+   "ms": 1997
+  },
+  "s-scan-scorpion-2-ok": {
+   "text": "They climb, and they come indoors. A black light makes them glow at night.",
+   "file": "s/s-scan-scorpion-2-ok.mp3",
+   "bytes": 30956,
+   "sha256": "c7da4f44fc4be92149227c393472fa56590b1d93ac4a666ffaaae3b46c77e12e",
+   "ms": 3787
+  },
+  "s-scan-scorpion-3": {
+   "text": "Someone is stung. Who do you call?",
+   "file": "s/s-scan-scorpion-3.mp3",
+   "bytes": 15788,
+   "sha256": "44d7be643d6968c009913e7e350f0dce028f119b15d495c87eb62866575f240f",
+   "ms": 1873
+  },
+  "s-scan-scorpion-3-ok": {
+   "text": "Poison Control, one eight hundred, two two two, one two two two, free and open twenty-four seven. Trouble breathing, or a child with odd eye movements or drooling: nine one one.",
+   "file": "s/s-scan-scorpion-3-ok.mp3",
+   "bytes": 82796,
+   "sha256": "0686a12f091f7c9f6c95e4ec17f56ec40036d6d10ef8a2bfd352635e3f94987b",
+   "ms": 10270
+  },
+  "s-scan-snake-0": {
+   "text": "Rattlesnake. A wide triangle head on a thin neck, and a rattle, which can be missing. The tail stays blunt.",
+   "file": "s/s-scan-snake-0.mp3",
+   "bytes": 48044,
+   "sha256": "4bd8b12e088456d64f16eea4c94de0f561724968f809f8aa030795b5f53ce8ba",
+   "ms": 5918
+  },
+  "s-scan-snake-1": {
+   "text": "Which one is the rattlesnake?",
+   "file": "s/s-scan-snake-1.mp3",
+   "bytes": 15788,
+   "sha256": "201aef81e4a127a8814a704de8b140c9e4e39bb70653cd401dbd783db04a174e",
+   "ms": 1873
+  },
+  "s-scan-snake-1-ok": {
+   "text": "Triangle head and a blunt, rattled tail. A gopher snake has a narrow head and a pointed tail.",
+   "file": "s/s-scan-snake-1-ok.mp3",
+   "bytes": 44780,
+   "sha256": "eef943927b9bb39500863ef81f62f5dd92ef0a70043a6b693ab10fb92932394e",
+   "ms": 5500
+  },
+  "s-scan-snake-2": {
+   "text": "One is on the path ahead. What do you do?",
+   "file": "s/s-scan-snake-2.mp3",
+   "bytes": 19244,
+   "sha256": "586d34faad82158dcb6084b1ec6e1491300e20d3edb58ecadc1181471a551138",
+   "ms": 2317
+  },
+  "s-scan-snake-2-ok": {
+   "text": "Give it room and go around. Never touch one, even a dead one: the head can still bite for hours.",
+   "file": "s/s-scan-snake-2-ok.mp3",
+   "bytes": 45548,
+   "sha256": "8a9d85794e91cb2a39ae7165b6a3911bd1df7c4b5713894930b7a97bbe7d2745",
+   "ms": 5610
+  },
+  "s-scan-snake-3": {
+   "text": "Someone is bitten. What helps?",
+   "file": "s/s-scan-snake-3.mp3",
+   "bytes": 15596,
+   "sha256": "4164fdd22933348c8e559e59e6421935fea2558023e570337dffaed54599b10b",
+   "ms": 1850
+  },
+  "s-scan-snake-3-ok": {
+   "text": "Nine one one: every bite needs the emergency room. No tourniquet, ice, cutting or sucking.",
+   "file": "s/s-scan-snake-3-ok.mp3",
+   "bytes": 44396,
+   "sha256": "bf3def0b9a9416eed0bf6081b9c525c26e596419375781a2c1d0544525e19a33",
+   "ms": 5462
+  },
+  "s-scan-heat-0": {
+   "text": "Heat exhaustion: heavy sweating and cold, pale, clammy skin. Heat stroke: hot, red skin and confusion. Confusion means nine one one.",
+   "file": "s/s-scan-heat-0.mp3",
+   "bytes": 65708,
+   "sha256": "c5f633845048d4809467ce1359e4e51e0057121645982259769bef922ecd79fb",
+   "ms": 8129
+  },
+  "s-scan-heat-1": {
+   "text": "Sweating hard, pale and clammy, but thinking clearly. Which is it?",
+   "file": "s/s-scan-heat-1.mp3",
+   "bytes": 29996,
+   "sha256": "f0fb864d2359e3ad6a9c9cd48e2f999f84727679329395458e72302c45849440",
+   "ms": 3660
+  },
+  "s-scan-heat-1-ok": {
+   "text": "Heat exhaustion: a cooler place, loosen clothes, cool wet cloths, sips of water. Throwing up, worse, or over an hour: get medical help.",
+   "file": "s/s-scan-heat-1-ok.mp3",
+   "bytes": 65708,
+   "sha256": "458d82fe2b1370a8a5c526fe4a3dcc6c75753b283c1534927b23af2e0033a7ee",
+   "ms": 8133
+  },
+  "s-scan-heat-2": {
+   "text": "Hot, red skin, and confused. Which is it?",
+   "file": "s/s-scan-heat-2.mp3",
+   "bytes": 21740,
+   "sha256": "4e3f386d201b833cf2a3c8ca15f506ac8841eec27b6660f1991dfad42cfdadd7",
+   "ms": 2617
+  },
+  "s-scan-heat-2-ok": {
+   "text": "Heat stroke: call nine one one and cool them now. Give nothing to drink.",
+   "file": "s/s-scan-heat-2-ok.mp3",
+   "bytes": 32108,
+   "sha256": "fbc376850e6fdd34d923d6c7010314860902ed9e08d328ed8aa53d73f614da99",
+   "ms": 3932
+  },
+  "s-scan-heat-3": {
+   "text": "Heat stroke. The best way to cool them?",
+   "file": "s/s-scan-heat-3.mp3",
+   "bytes": 17324,
+   "sha256": "20a9230551e03982e172f502c885237f5ad64b26c186ddb7ac501db992cb7263",
+   "ms": 2065
+  },
+  "s-scan-heat-3-ok": {
+   "text": "Cold-water immersion up to the neck is best. Otherwise soak them, fan them, and ice the neck, armpits and groin.",
+   "file": "s/s-scan-heat-3-ok.mp3",
+   "bytes": 50156,
+   "sha256": "e9f5606d840b6ad64fda9aefb6000b4ed2d731cb7a329a7ad306d3f208581d07",
+   "ms": 6170
+  },
+  "s-scan-stroke-0": {
+   "text": "Be fast. Balance. Eyes. Face. Arms. Speech. Time to call nine one one. Any one sign is enough.",
+   "file": "s/s-scan-stroke-0.mp3",
+   "bytes": 45164,
+   "sha256": "bfac3512f8d645e0c15cc0d376960a350a99b154264a6acdadb085ba552c3863",
+   "ms": 5561
+  },
+  "s-scan-stroke-1": {
+   "text": "You ask them to smile. Is this a stroke sign?",
+   "file": "s/s-scan-stroke-1.mp3",
+   "bytes": 21932,
+   "sha256": "cda54c7b75eaaf22e3d9d3adf55e4565ef129c24180193aa1c1f9e9ecbcb1a32",
+   "ms": 2662
+  },
+  "s-scan-stroke-1-ok": {
+   "text": "Face droop. Any one sign: call nine one one now, even if it goes away.",
+   "file": "s/s-scan-stroke-1-ok.mp3",
+   "bytes": 35564,
+   "sha256": "8ec909e6eaf18e7f818a1d76cf22a78778c1aece5ff9ff2ce8cfdbdc21bda8c5",
+   "ms": 4361
+  },
+  "s-scan-stroke-2": {
+   "text": "Both arms up. One drifts down. Now what?",
+   "file": "s/s-scan-stroke-2.mp3",
+   "bytes": 20780,
+   "sha256": "defd9331fa8e9c4a02291fe7372ee898dfe918aa8cce00d4143adbd5d0464b11",
+   "ms": 2513
+  },
+  "s-scan-stroke-2-ok": {
+   "text": "Call nine one one. Don't drive them yourself unless nine one one can't be reached.",
+   "file": "s/s-scan-stroke-2-ok.mp3",
+   "bytes": 36908,
+   "sha256": "8bf45c4fcc66bcae6c62a87871d5b030e503057ad26fdd526cf0179a7b9ed3f8",
+   "ms": 4513
+  },
+  "s-scan-stroke-3": {
+   "text": "Which time do you tell nine one one?",
+   "file": "s/s-scan-stroke-3.mp3",
+   "bytes": 16172,
+   "sha256": "b220e8c8cfecec8d50a7d91f00a6f40f6b9b7338257dcb16a45134b8be4c0977",
+   "ms": 1935
+  },
+  "s-scan-stroke-3-ok": {
+   "text": "When it started, or when they were last seen well. Tell the dispatcher: I think this is a stroke.",
+   "file": "s/s-scan-stroke-3-ok.mp3",
+   "bytes": 41324,
+   "sha256": "fc0a1d25d54365670ef78606b7ffa7da1fd3ab323c54dcf1f02638d2876c0b1a",
+   "ms": 5084
+  },
+  "s-scan-gas-0": {
+   "text": "The gas valve is on the pipe next to the meter, near the ground. A tab in line with the pipe means on. A quarter turn, crosswise, means off.",
+   "file": "s/s-scan-gas-0.mp3",
+   "bytes": 63596,
+   "sha256": "7ac7cb9ede75ba457116ee777186c9e908899766116709de296a962ba496f553",
+   "ms": 7870
+  },
+  "s-scan-gas-1": {
+   "text": "Which valve is OFF?",
+   "file": "s/s-scan-gas-1.mp3",
+   "bytes": 11756,
+   "sha256": "5c2ae47c777c7baf8b84bec7e94806609de8821e45fa9da6429cee8c73e96861",
+   "ms": 1369
+  },
+  "s-scan-gas-1-ok": {
+   "text": "Crosswise to the pipe is off. A 12-inch wrench turns it a quarter turn. Keep one with your emergency supplies.",
+   "file": "s/s-scan-gas-1-ok.mp3",
+   "bytes": 53420,
+   "sha256": "cbc8870595bcd5367c900f5d0fad3dc072fc9a13b2d761e057f3fb834ecdc9a5",
+   "ms": 6592
+  },
+  "s-scan-gas-2": {
+   "text": "When should you shut it off?",
+   "file": "s/s-scan-gas-2.mp3",
+   "bytes": 12524,
+   "sha256": "0d84804ca1971e7d60a3d1d7d40070e30ac75806b5714fd4ddf9b41d3e45ab37",
+   "ms": 1487
+  },
+  "s-scan-gas-2-ok": {
+   "text": "Only for a smell or sign of a leak, and only if it's safe to do.",
+   "file": "s/s-scan-gas-2-ok.mp3",
+   "bytes": 28460,
+   "sha256": "50ab0f5b7e38dbcf7428435456a06193b8c31e22ad781321677be9c5dcb1d68c",
+   "ms": 3467
+  },
+  "s-scan-gas-3": {
+   "text": "It's off. Who turns it back on?",
+   "file": "s/s-scan-gas-3.mp3",
+   "bytes": 15404,
+   "sha256": "ff5bf0ef3425ecb3ffdba605d4b81a2d2167aaa391034c414682ab88b8ed5f60",
+   "ms": 1834
+  },
+  "s-scan-gas-3-ok": {
+   "text": "Leave it off. The gas company turns it back on and relights the pilot lights.",
+   "file": "s/s-scan-gas-3-ok.mp3",
+   "bytes": 32876,
+   "sha256": "ca0453073c3c7f9d0069769057908f3271db0446177dfd0f5b02be7eface2d97",
+   "ms": 4022
+  },
+  "s-m-power-0": {
+   "text": "The power just went out. First move?",
+   "file": "s/s-m-power-0.mp3",
+   "bytes": 18092,
+   "sha256": "df45753c1a4f64679a859198ee95ca60dc2c39fdd552ecd07907a0be6f8e5e2a",
+   "ms": 2175
+  },
+  "s-m-power-0-ok": {
+   "text": "People first. Start the outage clock, and keep the fridge and freezer shut.",
+   "file": "s/s-m-power-0-ok.mp3",
+   "bytes": 30764,
+   "sha256": "be271e4a961e579cd3dc8bf3bd219eefc0806c1ca805f398f8170544f79f2e3d",
+   "ms": 3754
+  },
+  "s-m-power-1": {
+   "text": "How long does a shut fridge keep food safe?",
+   "file": "s/s-m-power-1.mp3",
+   "bytes": 20012,
+   "sha256": "e949fd591f38630d25527803fe050e2a38031a0da2e98cda57c305e4ae0b86d7",
+   "ms": 2403
+  },
+  "s-m-power-1-ok": {
+   "text": "About 4 hours if it stays shut. A full freezer about 48 hours, half full about 24.",
+   "file": "s/s-m-power-1-ok.mp3",
+   "bytes": 49004,
+   "sha256": "0dea5bcc4599d08b5a2dbccb51ede63a607d12ed8ace0a0e28ceb560a96f57c8",
+   "ms": 6043
+  },
+  "s-m-power-2": {
+   "text": "Where does the generator run?",
+   "file": "s/s-m-power-2.mp3",
+   "bytes": 14636,
+   "sha256": "297a1f971a5f249b5f05f39a2d8ddd387c3abda4059e2d6444689483f49d0766",
+   "ms": 1735
+  },
+  "s-m-power-2-ok": {
+   "text": "Outdoors only, 20 feet from doors, windows and vents, exhaust pointed away. Never in a garage, even with the door open.",
+   "file": "s/s-m-power-2-ok.mp3",
+   "bytes": 58796,
+   "sha256": "234448985eb7707ed79c5162cafadb1ce7e040e92c644819d3a7809328de6a73",
+   "ms": 7270
+  },
+  "s-m-power-3": {
+   "text": "It's getting hot inside. Grandma is 78. Now?",
+   "file": "s/s-m-power-3.mp3",
+   "bytes": 27116,
+   "sha256": "31fa24ab07695589ba62f94c064c0cb5c9a8713ec3a95947f306d0004df04e63",
+   "ms": 3304
+  },
+  "s-m-power-3-ok": {
+   "text": "Hot inside, and anyone is over 65, an infant or chronically ill: leave for somewhere cool.",
+   "file": "s/s-m-power-3-ok.mp3",
+   "bytes": 47660,
+   "sha256": "f4c34901049375c3d4ea65a06c298a2287a5040e12ab687b0bccb6223ff3ca1b",
+   "ms": 5859
+  },
+  "s-m-power-4": {
+   "text": "The carbon monoxide alarm goes off. What do you do?",
+   "file": "s/s-m-power-4.mp3",
+   "bytes": 26156,
+   "sha256": "5c9f96a3fcd6d00b24fabbd2da4204e4c12f034686c6ce194253f43ae68fd9e3",
+   "ms": 3169
+  },
+  "s-m-power-4-ok": {
+   "text": "Everyone outside now, then call nine one one from outside. Don't look for the source.",
+   "file": "s/s-m-power-4-ok.mp3",
+   "bytes": 38828,
+   "sha256": "4869c1fd9ec0f9f0c763da266ddd52c93cf9687c9d2b0e799b4c86e9722394c0",
+   "ms": 4769
+  },
+  "s-m-collapse-0": {
+   "text": "Dad drops to the floor. First?",
+   "file": "s/s-m-collapse-0.mp3",
+   "bytes": 16556,
+   "sha256": "4d39cb39bf322461c57ba5466804604afe18ec896b7a0f8a6d2ebd4d48613ab7",
+   "ms": 1981
+  },
+  "s-m-collapse-0-ok": {
+   "text": "Tap and shout. Not responding and not breathing normally: start C P R. Gasping is not normal breathing.",
+   "file": "s/s-m-collapse-0-ok.mp3",
+   "bytes": 51692,
+   "sha256": "e61df6a5539994d758a6aa2afba18b29a7b6c42ea175247613f5e3386eed9e0b",
+   "ms": 6372
+  },
+  "s-m-collapse-1": {
+   "text": "No response. He's gasping. Next?",
+   "file": "s/s-m-collapse-1.mp3",
+   "bytes": 18284,
+   "sha256": "f62e0f0f347f222d0b01217365d3185c98538ab883b7c18db55be6e1c77bd602",
+   "ms": 2200
+  },
+  "s-m-collapse-1-ok": {
+   "text": "Call nine one one on speaker and send someone for an A E D. The dispatcher can coach you.",
+   "file": "s/s-m-collapse-1-ok.mp3",
+   "bytes": 40556,
+   "sha256": "d10381a57f49fd3bb19f9e8a0aee622b319ef859eaff450d2275595ed3ab975d",
+   "ms": 4972
+  },
+  "s-m-collapse-2": {
+   "text": "Where do your hands go?",
+   "file": "s/s-m-collapse-2.mp3",
+   "bytes": 11756,
+   "sha256": "3e8724932ffa4b0240abdfa9a6fd44e019ce4e1f2743e928a6c78d70672ac80c",
+   "ms": 1391
+  },
+  "s-m-collapse-2-ok": {
+   "text": "Heel of one hand on the center of the chest, the other on top, arms straight.",
+   "file": "s/s-m-collapse-2-ok.mp3",
+   "bytes": 33068,
+   "sha256": "34630137044430b6cec1e4a84651c848dbf0fc00f6a6f9bc9eceafb06be5e755",
+   "ms": 4047
+  },
+  "s-m-collapse-3": {
+   "text": "How fast do you push?",
+   "file": "s/s-m-collapse-3.mp3",
+   "bytes": 12524,
+   "sha256": "8fa55b1793288bc55ebf7dd48349d36b484d27a794ee8d01ade7fa247c0efa3b",
+   "ms": 1465
+  },
+  "s-m-collapse-3-ok": {
+   "text": "100 to 120 a minute, at least 2 inches deep. Let the chest come all the way back up.",
+   "file": "s/s-m-collapse-3-ok.mp3",
+   "bytes": 47660,
+   "sha256": "84a69a46041bfba9c82675f86fef1d14a9e23e24ed8d5af785d09ced8d5e9323",
+   "ms": 5876
+  },
+  "s-m-collapse-4": {
+   "text": "The A E D arrives. Now?",
+   "file": "s/s-m-collapse-4.mp3",
+   "bytes": 14252,
+   "sha256": "3d5a38dc1f7de74a2a05da307f2d64c60d498b84a221cb21e83b85214c62380a",
+   "ms": 1701
+  },
+  "s-m-collapse-4-ok": {
+   "text": "Turn it on and follow its voice. Keep pushing until it tells you to stop.",
+   "file": "s/s-m-collapse-4-ok.mp3",
+   "bytes": 32684,
+   "sha256": "51af5898987c96fa013fe62b75d401651226fccec6168598c2f49186fc26cc73",
+   "ms": 3993
+  },
+  "s-m-night-0-ok": {
+   "text": "Three beeps and a pause: smoke or fire. You may have as little as two minutes.",
+   "file": "s/s-m-night-0-ok.mp3",
+   "bytes": 35948,
+   "sha256": "bf4e501acb9f283f1d138c6a1084da9bbad28e2c82e23a4fe65a50583c2bca04",
+   "ms": 4402
+  },
+  "s-m-night-1": {
+   "text": "Smoke in the hall. How do you move?",
+   "file": "s/s-m-night-1.mp3",
+   "bytes": 15212,
+   "sha256": "e2801eac4afa46c91c6e5b94df5392c34cb0a28208688fb9c1e76f0dbd9e4a13",
+   "ms": 1805
+  },
+  "s-m-night-1-ok": {
+   "text": "Get low and go under the smoke, straight to a way out.",
+   "file": "s/s-m-night-1-ok.mp3",
+   "bytes": 23276,
+   "sha256": "1cd6c0730d45cfc811eed78b9f16f14cda78333478ceefea1126de07207a1828",
+   "ms": 2825
+  },
+  "s-m-night-2": {
+   "text": "The door handle is hot. Now?",
+   "file": "s/s-m-night-2.mp3",
+   "bytes": 15404,
+   "sha256": "3b0a8c34fa64993e54bf787472983d4ca9f9e099e7459d35a3d219f1b99157ef",
+   "ms": 1828
+  },
+  "s-m-night-2-ok": {
+   "text": "Test doors with the back of your hand. Hot: use your second way out. Every room needs two.",
+   "file": "s/s-m-night-2-ok.mp3",
+   "bytes": 42284,
+   "sha256": "ac85e7c3e935d1cec4e72b46fcea8a6471364fb29a8d2eb27e6ebdd7cfc28570",
+   "ms": 5196
+  },
+  "s-m-night-3": {
+   "text": "You're out. The cat is still inside.",
+   "file": "s/s-m-night-3.mp3",
+   "bytes": 16748,
+   "sha256": "2db48128712be97551ec2c308e99397a06bb56da6f73ad494e0f6bc85628f559",
+   "ms": 1993
+  },
+  "s-m-night-3-ok": {
+   "text": "Get out and stay out. Tell the firefighters who or what is still inside.",
+   "file": "s/s-m-night-3-ok.mp3",
+   "bytes": 33068,
+   "sha256": "dcda0a08ea9fa8b9720c4c25af7e52e8932e7809787a13e0d720cff405bda199",
+   "ms": 4047
+  },
+  "s-m-night-4": {
+   "text": "Where does everyone go?",
+   "file": "s/s-m-night-4.mp3",
+   "bytes": 12524,
+   "sha256": "e6d2cba5637452e475cb965dcc34f3ea073b904b6b6b77cd05e040f9f8e90f33",
+   "ms": 1478
+  },
+  "s-m-night-4-ok": {
+   "text": "Your meeting place outside, like a tree or a mailbox. Call nine one one from there.",
+   "file": "s/s-m-night-4-ok.mp3",
+   "bytes": 39404,
+   "sha256": "d1ef6a5b95c1d455d8c3902c34cb4f9f98d31ac899a1fc0be97fe4d23758b91b",
+   "ms": 4844
   }
  }
 }
