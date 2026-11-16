@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-cWOUKnWdjDYNglRgE5+u5iyb2mf3xmwhpM7jNSU204M='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://mirror.download.kiwix.org https://download.kiwix.org https://lb.download.kiwix.org; font-src 'none'; media-src 'self' blob:; object-src 'none'; frame-src 'self'; worker-src 'self'; manifest-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-ZGBwhXIkyaUVNqsiwZwIR7xzPR/NizJyXX163d477E0='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://mirror.download.kiwix.org https://download.kiwix.org https://lb.download.kiwix.org; font-src 'none'; media-src 'self' blob:; object-src 'none'; frame-src 'self'; worker-src 'self'; manifest-src 'self'; base-uri 'none'; form-action 'none'">
 <title>HAVYN FIELD</title>
 <meta name="theme-color" content="#04050d">
 <meta name="color-scheme" content="dark">
@@ -2644,7 +2644,7 @@ if (typeof module !== "undefined") module.exports = HAVYN_ENGINE;
 (() => {
   "use strict";
   const C = HAVYN_CONTENT, E = HAVYN_ENGINE;
-  const VERSION = "1.8.0+e301766024";
+  const VERSION = "1.8.0+5002c11d84";
   const PREVIEW = !!window.HAVYN_PREVIEW;
   const DAY = 86400000;
   const t0 = performance.now();
@@ -5761,7 +5761,7 @@ if (typeof module !== "undefined") module.exports = HAVYN_ENGINE;
     else if (act === "q-save") quickSave();
     else if (act === "sim-pick") simPick(Number(b.dataset.i));
     else if (act === "sim-next") simNext();
-    else if (act === "sim-uv") { if (SR) { SR.uv = !SR.uv; render(); } }
+    else if (act === "sim-uv") { if (SR) { SR.uv = !SR.uv; const sb = $(".scanbox"), tg = $(".scantag"); if (sb) sb.classList.toggle("uv", SR.uv); if (tg) tg.textContent = SR.uv ? "UV SCAN" : "SCAN COMPLETE"; b.classList.toggle("on", SR.uv); } }
     else if (act === "sim-play") simSound();
     else if (act === "sim-again") { if (SR) { Beat.stop(); Drill.stopT(); AlarmSnd.stop(); Clips.stop(); SR = simStart(SR.id); render(); } }
     else if (act === "sim-voice") { PR.simVoice = PR.simVoice === false; flush(); if (PR.simVoice === false) Clips.stop(); render(); }

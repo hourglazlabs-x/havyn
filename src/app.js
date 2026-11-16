@@ -3119,7 +3119,7 @@
     else if (act === "q-save") quickSave();
     else if (act === "sim-pick") simPick(Number(b.dataset.i));
     else if (act === "sim-next") simNext();
-    else if (act === "sim-uv") { if (SR) { SR.uv = !SR.uv; render(); } }
+    else if (act === "sim-uv") { if (SR) { SR.uv = !SR.uv; const sb = $(".scanbox"), tg = $(".scantag"); if (sb) sb.classList.toggle("uv", SR.uv); if (tg) tg.textContent = SR.uv ? "UV SCAN" : "SCAN COMPLETE"; b.classList.toggle("on", SR.uv); } }
     else if (act === "sim-play") simSound();
     else if (act === "sim-again") { if (SR) { Beat.stop(); Drill.stopT(); AlarmSnd.stop(); Clips.stop(); SR = simStart(SR.id); render(); } }
     else if (act === "sim-voice") { PR.simVoice = PR.simVoice === false; flush(); if (PR.simVoice === false) Clips.stop(); render(); }
