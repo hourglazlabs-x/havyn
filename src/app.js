@@ -722,7 +722,8 @@
       const rates = B.taps.map((_, k) => this.rate(B.taps, k)).filter(Boolean), zone = rates.filter((r) => r >= 100 && r <= 120).length;
       B.pct = rates.length ? Math.round(zone / rates.length * 100) : 0;
       B.avg = B.taps.length > 2 ? Math.round(60000 / ((B.taps[B.taps.length - 1] - B.taps[0]) / (B.taps.length - 1))) : 0;
-      B.stars = B.taps.length < 12 ? 1 : B.pct >= 75 ? 3 : B.pct >= 50 ? 2 : 1;
+      const secs = (SR.s.secs || 20) * (window.__HAVYN_SIM_FAST ? 0.25 : 1); // fewer than one push a second isn't CPR
+      B.stars = B.taps.length < secs ? 1 : B.pct >= 75 ? 3 : B.pct >= 50 ? 2 : 1;
       B.phase = "done"; SR.stars = B.stars; simSave(SR.id, B.stars, B.pct); Snd.chime("save"); render();
     },
     stop() { cancelAnimationFrame(this.raf); clearTimeout(this.t); }

@@ -1,0 +1,192 @@
+[
+ {
+  "name": "Home sections are 01 to 05, with 03 Train",
+  "pass": true,
+  "detail": "['01 READINESS', \"02 WHAT'S HAPPENING?\", '03 TRAIN', '04 KNOW-HOW', '05 FAMILY STATUS', 'ATTENTION']"
+ },
+ {
+  "name": "Home: the Sim Lab banner",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "Readiness has a Sim Lab quest worth 10",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "Hub: 11 sims in Train, Scan, Missions",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "Hub: every tile has its drawing",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "Hub: score starts at 0 of 33",
+  "pass": true,
+  "detail": "0\nOF 33 \u2605"
+ },
+ {
+  "name": "Mission opens on its scene line and drawing",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "Narration reads the question in HAVYN's voice",
+  "pass": true,
+  "detail": "1"
+ },
+ {
+  "name": "Right answer: marked, explained, chimed",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "\u2026and the explanation is read aloud",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "Five right: 3 stars, saved",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "Debrief: score, best, missed, sources, next sim",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "Wrong answer: shown wrong, the right one lit, explained",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "One miss: 2 stars",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "Scan: four labels on the drawing",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "UV light: the scorpion glows",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "Picture choices: two drawings to choose from",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "Scan done: 3 stars",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "Alarm ID 1: the alarm plays by itself and is drawn",
+  "pass": true,
+  "detail": "chirp"
+ },
+ {
+  "name": "Alarm ID 2: the alarm plays by itself and is drawn",
+  "pass": true,
+  "detail": "t3"
+ },
+ {
+  "name": "Alarm ID 3: the alarm plays by itself and is drawn",
+  "pass": true,
+  "detail": "t4"
+ },
+ {
+  "name": "Smoke: 3 long beeps twice; CO: 4 short beeps twice; low battery: one chirp",
+  "pass": true,
+  "detail": "[('chirp', 1), ('t3', 6), ('t4', 8)]"
+ },
+ {
+  "name": "Alarm ID: 3 stars",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "Leaving a sim silences it",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "CPR Beat: chest, pace gauge, target 100 to 120",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "While pushing: the pace shows live and says Good at 110",
+  "pass": true,
+  "detail": "['110', 'Good', 'rotate(0.3deg)']"
+ },
+ {
+  "name": "Steady 110 a minute: most pushes in the zone, 3 stars",
+  "pass": true,
+  "detail": "(100, 110, 3)"
+ },
+ {
+  "name": "Debrief keeps the real-CPR tip",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "Drill: suggests a meeting place when none is set",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "Drill running: the smoke alarm sounds",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "\u2026and the clock runs",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "Stop: under 2 minutes is 3 stars, the alarm stops, the time is kept",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "Drill debrief: tips from the fire marshal",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "Three or more sims run: the quest is complete",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "Stars survive a restart (3 + 2 + 3 + 3 + 3 + 3 = 17)",
+  "pass": true,
+  "detail": "17"
+ },
+ {
+  "name": "Hub tiles show stars and the drill's best time",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "Home banner shows the progress",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "No errors on the page",
+  "pass": true,
+  "detail": "[]"
+ }
+]

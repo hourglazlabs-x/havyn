@@ -37,7 +37,7 @@
  {
   "name": "[sw] archive CSS applies, including url() images",
   "pass": true,
-  "detail": "url(\"http://localhost:8766/z/mwighci282mnta/img/drop.png\")"
+  "detail": "url(\"http://localhost:8766/z/mwii7ag9bloxmd/img/drop.png\")"
  },
  {
   "name": "[sw] link inside the archive navigates",
@@ -117,7 +117,7 @@
  {
   "name": "[sw] Random opens an article",
   "pass": true,
-  "detail": "HAVYN Test Library"
+  "detail": "Deep page"
  },
  {
   "name": "[sw] Wikipedia archive: search finds many titles",
@@ -267,7 +267,7 @@
  {
   "name": "[fallback] archive CSS applies, including url() images",
   "pass": true,
-  "detail": "url(\"blob:http://localhost:8766/48c0a80a-e9e4-4bca-a08d-224424acfaf4\")"
+  "detail": "url(\"blob:http://localhost:8766/c4b3161c-1cf5-4778-954d-a74baecce94a\")"
  },
  {
   "name": "[fallback] link inside the archive navigates",

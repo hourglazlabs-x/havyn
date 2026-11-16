@@ -395,3 +395,37 @@ test("v1.7 time buttons: labels unique per card, timers point at real steps, sto
   const sz = C.cards.find((c) => c.id === "seizure").log;
   assert.equal(sz[0].due, 5); assert.match(sz[0].hint, /911/);
 });
+
+test("v1.8 Sim Lab: every sim is complete, every question has one right answer, art and links resolve", () => {
+  const S = require("../src/sims.js"), C = require("../src/content.js");
+  const ids = new Set(), arts = Object.keys(S.art);
+  assert.ok(S.list.length >= 11);
+  for (const s of S.list) {
+    assert.ok(!ids.has(s.id), "unique " + s.id); ids.add(s.id);
+    for (const k of ["kind", "type", "title", "sub", "icon", "art"]) assert.ok(s[k], s.id + " has " + k);
+    assert.ok(["train", "scan", "mission"].includes(s.kind) && ["quiz", "beat", "drill"].includes(s.type), s.id);
+    assert.ok(arts.includes(s.art), s.id + " art");
+    if (s.card) assert.ok(C.cards.some((c) => c.id === s.card), s.id + " card " + s.card);
+    for (const x of s.src || []) assert.ok(x.n && /^https:\/\//.test(x.u), s.id + " source");
+    if (s.type !== "quiz") { assert.ok(s.say, s.id + " intro"); continue; }
+    assert.ok(s.frames.length >= 3 && s.frames.length <= 6, s.id + " length");
+    for (const f of s.frames) {
+      for (const a of [f.art, f.art2].concat((f.choices || []).map((c) => c.art))) if (a) assert.ok(arts.includes(a), s.id + " art " + a);
+      if (f.scan) { assert.ok(f.title && f.say && f.marks.length, s.id + " scan"); f.marks.forEach((m) => assert.ok(m[0].length <= 34 && m[1] >= 0 && m[1] <= 100 && m[2] >= 0 && m[2] <= 100, s.id + " mark " + m[0])); continue; }
+      assert.ok(f.q.length <= 70, s.id + ": short question: " + f.q);
+      assert.equal(f.choices.filter((c) => c.ok).length, 1, s.id + ": one right answer: " + f.q);
+      assert.ok(f.choices.length >= 2 && f.choices.every((c) => c.t && c.t.length <= 46), s.id + ": short choices: " + f.q);
+      assert.ok(f.ok && f.ok.length <= 170, s.id + ": an explanation: " + f.q);
+      if (f.sound) assert.ok(["t3", "t4", "chirp"].includes(f.sound), s.id + " sound");
+    }
+  }
+  for (const s of S.list) if (s.next) assert.ok(ids.has(s.next), s.id + " next");
+  // every scan is about something the cards cover, or a source given with it
+  for (const s of S.list.filter((x) => x.kind !== "train")) assert.ok(s.card || (s.src && s.src.length) || s.from, s.id + " says where its answers come from");
+});
+
+test("v1.8 Sim Lab drawings are well-formed SVG", () => {
+  const { execFileSync } = require("node:child_process"), S = require("../src/sims.js");
+  const out = execFileSync("python3", ["-c", "import sys, json, xml.etree.ElementTree as E\nfor k, v in json.load(sys.stdin).items(): E.fromstring('<svg xmlns=\"http://www.w3.org/2000/svg\">' + v + '</svg>')\nprint('ok')"], { input: JSON.stringify(S.art) }).toString();
+  assert.equal(out.trim(), "ok");
+});

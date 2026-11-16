@@ -47,7 +47,7 @@ with sync_playwright() as p:
     ok("Home status line: storage on this phone fills in", until(lambda: re.search(r"\d+ (KB|MB|GB)", ev("document.querySelector('#stuse').textContent"))), ev("document.querySelector('#stuse').textContent"))
     ok("Home status line: no Memory Card yet reads Never (amber)", ev("(() => { const c = [...document.querySelectorAll('.strip .sc')][2]; return c.classList.contains('warn') && c.textContent.includes('Never'); })()"))
     nums = ev("() => [...document.querySelectorAll('.sec .lab b')].map((e) => e.textContent)")
-    ok("Home sections are numbered 01 to 04", nums == ["01", "02", "03", "04"], nums)
+    ok("Home sections are numbered 01 to 05", nums == ["01", "02", "03", "04", "05"], nums)
     ok("Know-how tiles say short things (nothing cut off)", ev("() => [...document.querySelectorAll('.mt small')].every((e) => e.scrollHeight <= e.clientHeight + 1)"))
     pg.screenshot(path=str(SHOTS / "v17-home.png"))
 

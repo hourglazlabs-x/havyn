@@ -284,12 +284,12 @@ with sync_playwright() as p:
         ok("welcome: in HAVYN's own recorded British voice, not the phone's", until(lambda: "Welcome to Haven." in w.evaluate("__HAVYN.clips.played"), 5) and "Welcome to Haven." not in w.evaluate("window.__said"), (w.evaluate("__HAVYN.clips.played"), w.evaluate("window.__said")))
     w.screenshot(path=str(SHOTS / "v15_welcome_mark.png"))
     ok("welcome: then a tour of the real screens", until(lambda: w.locator("#tour .tcard h3").count() == 1, 10))
-    targets = ["#ready .rdyhead", ".nowgrid", ".tab.sos", ".tab[data-tab=guides]", ".tab[data-tab=family]", ".tab[data-tab=supplies]", ".tools a[href='#/search']"]
+    targets = ["#ready .rdyhead", ".nowgrid", ".simbanner", ".tab.sos", ".tab[data-tab=guides]", ".tab[data-tab=family]", ".tab[data-tab=supplies]", ".tools a[href='#/search']"]  # v1.8: Sim Lab after What's happening?
     lit = []
     for k, sel in enumerate(targets):
         until(lambda: w.inner_text("#tour .tmeta .lab").startswith("%d of" % (k + 1)), 5); time.sleep(0.8)   # the spotlight glides into place
         lit.append(contains(rect(w, "#tour .thole"), rect(w, sel))); w.click("#tour [data-act=wel-next]")
-    ok("welcome: the spotlight lands on the level, What's happening, each tab and Search", all(lit), lit)
+    ok("welcome: the spotlight lands on the level, What's happening, Sim Lab, each tab and Search", all(lit), lit)
     ok("welcome: every step is spoken", len([x for x in heard() if x.strip()]) >= 10, heard())
     ok("welcome: the last step starts Download everything by itself", until(lambda: "Getting this phone ready" in w.inner_text("#tour") and w.evaluate("__HAVYN.shelf.busy || __HAVYN.arc.busy || __HAVYN.lib.length > 0"), 10), w.inner_text("#tour")[:200])
     w.click("#tour [data-act=wel-next]")
