@@ -55,7 +55,9 @@ const style = { version: 8, name: "HAVYN Night", glyphs: "GLYPHS", sprite: "SPRI
   sources: { protomaps: { type: "vector", url: "pmtiles://PACK", attribution: "© OpenStreetMap contributors · Protomaps" } },
   layers: layers("protomaps", flavor, { lang: "en" }) };
 fs.writeFileSync("style.json", JSON.stringify(style));
-const fonts = new Set(); for (const l of style.layers) { const f = l.layout && l.layout["text-font"]; if (Array.isArray(f)) fonts.add(f.join(",")); }
+// text-font can be a plain list or an expression: collect every font name in it (font names have a space; operators don't)
+const fonts = new Set(), walk = (v) => { if (Array.isArray(v)) v.forEach(walk); else if (typeof v === "string" && / /.test(v)) fonts.add(v); };
+for (const l of style.layers) if (l.layout && l.layout["text-font"]) walk(l.layout["text-font"]);
 fs.writeFileSync("fonts.json", JSON.stringify([...fonts]));
 console.log(style.layers.length, "layers; fonts:", [...fonts].join(" | "));
 `);
@@ -67,7 +69,7 @@ fs.copyFileSync(path.join(T, "style.json"), path.join(M, "style.json"));
 // Glyphs (only the ranges these names need: Latin, Latin extended, IPA/modifier letters, Vietnamese, punctuation) and symbols.
 const A = "https://protomaps.github.io/basemaps-assets/";
 const get = async (u) => { for (let i = 0; i < 4; i++) { const r = await fetch(u); if (r.ok) return Buffer.from(await r.arrayBuffer()); if (r.status === 404) throw new Error("404 " + u); await new Promise((s) => setTimeout(s, 2000 * (i + 1))); } throw new Error("failed " + u); };
-const stacks = JSON.parse(fs.readFileSync(path.join(T, "fonts.json"), "utf8")).flatMap((s) => s.split(","));
+const stacks = JSON.parse(fs.readFileSync(path.join(T, "fonts.json"), "utf8"));
 const RANGES = ["0-255", "256-511", "512-767", "7680-7935", "8192-8447"];
 let n = 0;
 for (const f of [...new Set(stacks)]) {
