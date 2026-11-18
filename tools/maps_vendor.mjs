@@ -66,11 +66,13 @@ const M = path.join(ROOT, "src", "maps");
 fs.mkdirSync(M, { recursive: true });
 fs.copyFileSync(path.join(T, "style.json"), path.join(M, "style.json"));
 
-// Glyphs (only the ranges these names need: Latin, Latin extended, IPA/modifier letters, Vietnamese, punctuation) and symbols.
+// Glyphs (only the ranges these names need: Latin, Latin extended, IPA/modifier letters, combining accents (Navajo place
+// names such as Tsé Dildǫ́ʼí) and Greek, Vietnamese, punctuation) and symbols. tests/map_glyphs.js checks every label in
+// the packs against them. The style lists what's here (metadata "havyn:glyphs"), so the app never asks for a range it lacks.
 const A = "https://protomaps.github.io/basemaps-assets/";
 const get = async (u) => { for (let i = 0; i < 4; i++) { const r = await fetch(u); if (r.ok) return Buffer.from(await r.arrayBuffer()); if (r.status === 404) throw new Error("404 " + u); await new Promise((s) => setTimeout(s, 2000 * (i + 1))); } throw new Error("failed " + u); };
 const stacks = JSON.parse(fs.readFileSync(path.join(T, "fonts.json"), "utf8"));
-const RANGES = ["0-255", "256-511", "512-767", "7680-7935", "8192-8447"];
+const RANGES = ["0-255", "256-511", "512-767", "768-1023", "7680-7935", "8192-8447"];
 let n = 0;
 for (const f of [...new Set(stacks)]) {
   for (const r of RANGES) {
@@ -78,6 +80,11 @@ for (const f of [...new Set(stacks)]) {
     fs.writeFileSync(path.join(dir, r + ".pbf"), await get(A + "fonts/" + encodeURIComponent(f) + "/" + r + ".pbf")); n++;
   }
 }
+{ const sp = path.join(M, "style.json"), st = JSON.parse(fs.readFileSync(sp, "utf8"));
+  st.metadata = Object.assign(st.metadata || {}, { "havyn:glyphs": Object.fromEntries([...new Set(stacks)].map((f) => [f, RANGES])) });
+  fs.writeFileSync(sp, JSON.stringify(st)); }
 for (const s of ["dark.json", "dark.png", "dark@2x.json", "dark@2x.png"]) { fs.mkdirSync(path.join(M, "sprites"), { recursive: true }); fs.writeFileSync(path.join(M, "sprites", s), await get(A + "sprites/v4/" + s)); }
-for (const l of ["LICENSE", "LICENSE.md", "LICENSE.txt", "fonts/LICENSE.txt", "fonts/OFL.txt", "README.md"]) { try { fs.writeFileSync(path.join(M, "ASSETS-" + l + (l.endsWith(".md") ? "" : ".txt")), await get("https://raw.githubusercontent.com/protomaps/basemaps-assets/main/" + l)); } catch (e) { console.log("no", l); } }
+// Licences: the fonts are under the SIL Open Font License (shipped beside them); the symbols derive from MIT-licensed tangrams/icons.
+for (const [from, to] of [["fonts/OFL.txt", "fonts/OFL.txt"], ["README.md", "ASSETS-README.md"]]) { try { fs.writeFileSync(path.join(M, to), await get("https://raw.githubusercontent.com/protomaps/basemaps-assets/main/" + from)); } catch (e) { console.log("no", from); } }
+try { fs.writeFileSync(path.join(M, "sprites", "LICENSE.md"), await get("https://raw.githubusercontent.com/tangrams/icons/master/LICENSE.md")); } catch (e) { console.log("no tangrams licence"); }
 console.log("glyph files:", n, "· style", Math.round(fs.statSync(path.join(M, "style.json")).size / 1024), "KB");

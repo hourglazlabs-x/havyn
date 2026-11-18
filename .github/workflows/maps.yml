@@ -12,6 +12,7 @@ on:
     - cron: "41 9 3 * *"   # monthly: fresh map data and places
 permissions:
   contents: write
+  actions: write
 concurrency:
   group: maps
   cancel-in-progress: false
@@ -52,6 +53,7 @@ jobs:
           gh release upload maps out/*.pmtiles out/maps-index.json --clobber
           keep=$(cd out && ls)
           for a in $old; do echo "$keep" | grep -qx "$a" || gh release delete-asset maps "$a" -y; done
+          gh workflow run pages.yml   # publish the new packs on HAVYN's address
       - name: Commit
         if: env.MODE != 'probe' && env.MODE != 'packs'
         run: |
