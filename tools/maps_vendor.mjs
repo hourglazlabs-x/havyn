@@ -79,5 +79,5 @@ for (const f of [...new Set(stacks)]) {
   }
 }
 for (const s of ["dark.json", "dark.png", "dark@2x.json", "dark@2x.png"]) { fs.mkdirSync(path.join(M, "sprites"), { recursive: true }); fs.writeFileSync(path.join(M, "sprites", s), await get(A + "sprites/v4/" + s)); }
-for (const l of ["LICENSE", "LICENSE.md", "README.md"]) { try { fs.writeFileSync(path.join(M, "ASSETS-" + l + (l.endsWith(".md") ? "" : ".txt")), await get("https://raw.githubusercontent.com/protomaps/basemaps-assets/main/" + l)); } catch (e) { console.log("no", l); } }
+for (const l of ["LICENSE", "LICENSE.md", "LICENSE.txt", "fonts/LICENSE.txt", "fonts/OFL.txt", "README.md"]) { try { fs.writeFileSync(path.join(M, "ASSETS-" + l + (l.endsWith(".md") ? "" : ".txt")), await get("https://raw.githubusercontent.com/protomaps/basemaps-assets/main/" + l)); } catch (e) { console.log("no", l); } }
 console.log("glyph files:", n, "· style", Math.round(fs.statSync(path.join(M, "style.json")).size / 1024), "KB");

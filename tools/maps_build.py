@@ -93,7 +93,7 @@ def places():
   nwr["amenity"="hospital"](%s);
   nwr["amenity"="fire_station"](%s);
 );
-out center tags;""" % (bb(m), bb(m), bb(m), bb(m), bb(a), bb(a))
+out center;""" % (bb(m), bb(m), bb(m), bb(m), bb(a), bb(a))
     d = overpass(q); pts, seen = [], set()
     for e in d.get("elements", []):
         t = e.get("tags", {}); k = kind(t)
@@ -113,10 +113,11 @@ out center tags;""" % (bb(m), bb(m), bb(m), bb(m), bb(a), bb(a))
   node["place"~"^(city|town|village|suburb|neighbourhood|hamlet|locality)$"]["name"](%s);
   node["place"~"^(city|town|village)$"]["name"](%s);
 );
-out tags;""" % (bb(m), bb(a))
+out;""" % (bb(m), bb(a))
     d2 = overpass(q2); names, seen2 = [], set()
     for e in d2.get("elements", []):
         t = e.get("tags", {}); n = t.get("name", "")
+        if "lat" not in e: continue
         k = (n.lower(), round(e["lat"], 2), round(e["lon"], 2))
         if not n or k in seen2: continue
         seen2.add(k); names.append([t.get("place"), n, round(e["lat"], 5), round(e["lon"], 5)])
