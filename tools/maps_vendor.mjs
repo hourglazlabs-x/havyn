@@ -14,14 +14,21 @@ execSync("npm init -y >/dev/null && npm install --no-audit --no-fund maplibre-gl
 const nm = (...p) => path.join(T, "node_modules", ...p);
 const ver = (p) => JSON.parse(fs.readFileSync(nm(p, "package.json"), "utf8")).version;
 const put = (dir, files) => { fs.mkdirSync(dir, { recursive: true }); for (const [from, to] of files) { if (!fs.existsSync(from)) throw new Error("missing " + from); fs.copyFileSync(from, path.join(dir, to)); } };
-const lic = (p) => fs.readdirSync(nm(p)).find((f) => /^licen[cs]e/i.test(f));
+// The licence file, or (when a package ships none) a note naming the licence its package.json declares.
+const lic = (p) => {
+  const f = fs.readdirSync(nm(p)).find((x) => /^licen[cs]e/i.test(x));
+  if (f) return nm(p, f);
+  const pj = JSON.parse(fs.readFileSync(nm(p, "package.json"), "utf8")), out = path.join(T, p.replace(/\W+/g, "-") + "-LICENSE.txt");
+  fs.writeFileSync(out, p + " " + pj.version + " is licensed " + (pj.license || "see its repository") + ". " + (pj.repository && (pj.repository.url || pj.repository) || "") + "\n");
+  return out;
+};
 
 const V = path.join(ROOT, "src", "vendor");
 put(path.join(V, "maplibre"), [[nm("maplibre-gl", "dist", "maplibre-gl-csp.js"), "maplibre-gl-csp.js"], [nm("maplibre-gl", "dist", "maplibre-gl-csp-worker.js"), "maplibre-gl-csp-worker.js"],
-  [nm("maplibre-gl", "dist", "maplibre-gl.css"), "maplibre-gl.css"], [nm("maplibre-gl", lic("maplibre-gl")), "LICENSE.txt"]]);
+  [nm("maplibre-gl", "dist", "maplibre-gl.css"), "maplibre-gl.css"], [lic("maplibre-gl"), "LICENSE.txt"]]);
 const pmDist = ["pmtiles.js", "index.js"].map((f) => nm("pmtiles", "dist", f)).find((f) => fs.existsSync(f));
 console.log("pmtiles dist files:", fs.readdirSync(nm("pmtiles", "dist")).join(" "));
-put(path.join(V, "pmtiles"), [[pmDist, "pmtiles.js"], [nm("pmtiles", lic("pmtiles")), "LICENSE.txt"]]);
+put(path.join(V, "pmtiles"), [[pmDist, "pmtiles.js"], [lic("pmtiles"), "LICENSE.txt"]]);
 fs.writeFileSync(path.join(V, "versions.json"), JSON.stringify({ "maplibre-gl": ver("maplibre-gl"), pmtiles: ver("pmtiles"), "@protomaps/basemaps": ver("@protomaps/basemaps") }, null, 1));
 
 // The style: Protomaps' dark flavour in HAVYN's colours (only keys the flavour has are changed; the rest log here).
