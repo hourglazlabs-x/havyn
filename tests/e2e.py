@@ -277,8 +277,8 @@ with sync_playwright() as p:
     ext_all = sorted({u for u in reqs if not (u.startswith(BASE) or u.startswith("data:") or u.startswith("blob:"))})
     ok("no external requests during the whole session", not ext_all, ext_all)
     ok("no CSP violations in normal use (incl. pdf.js)", not vio_all, vio_all[:5])
-    deploy_only = all("/shelf/" in u for u in missing)
-    ok("no script errors", not [e for e in errors if "Content Security Policy" not in e and "net::ERR" not in e and "Failed to fetch" not in e and not (deploy_only and "status of 404" in e)], errors[:5] + [u for u in missing if "/shelf/" not in u][:3])
+    deploy_only = all("/shelf/" in u or "/maps/packs/" in u for u in missing)  # v1.9: the map packs are added at deploy too
+    ok("no script errors", not [e for e in errors if "Content Security Policy" not in e and "net::ERR" not in e and "Failed to fetch" not in e and not (deploy_only and "status of 404" in e)], errors[:5] + [u for u in missing if "/shelf/" not in u and "/maps/packs/" not in u][:3])
     br.close()
 srv.shutdown()
 fails = [r for r in results if not r[1]]

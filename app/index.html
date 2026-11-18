@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-PW9J1/mW6eCGLbPX80mUVRGlUIh9REkymU7/TEnT7wo='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://mirror.download.kiwix.org https://download.kiwix.org https://lb.download.kiwix.org; font-src 'none'; media-src 'self' blob:; object-src 'none'; frame-src 'self'; worker-src 'self'; manifest-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-cYDWNItOgRRW7P5pBxyNF9y4BFK6yJHh0s6Hth1kP94='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://mirror.download.kiwix.org https://download.kiwix.org https://lb.download.kiwix.org; font-src 'none'; media-src 'self' blob:; object-src 'none'; frame-src 'self'; worker-src 'self'; manifest-src 'self'; base-uri 'none'; form-action 'none'">
 <title>HAVYN FIELD</title>
 <meta name="theme-color" content="#04050d">
 <meta name="color-scheme" content="dark">
@@ -902,6 +902,103 @@ body:not([data-ready]) .tabbar { opacity: 0; }
 .updbar svg { width: 22px; height: 22px; flex: none; color: var(--aqua); }
 .updbar b { display: block; font-size: 1rem; }
 .updbar small { font-size: .8rem; color: var(--ink2); }
+
+/* ---------------- v1.9 MAPS ---------------- */
+#mapstage { position: fixed; inset: 0; z-index: 1; display: none; background: #03071a; }
+#mapstage.on { display: block; }
+#mapgl { position: absolute; inset: 0; }
+body.mapon { overflow: hidden; }
+body.mapon .top, body.mapon header.app, body.mapon .strip { display: none; }
+.maphud { position: fixed; inset: 0; z-index: 5; pointer-events: none; padding: calc(var(--st, env(safe-area-inset-top)) + 8px) 12px calc(var(--sb, env(safe-area-inset-bottom)) + 92px); display: flex; flex-direction: column; gap: 8px; }
+.maphud > * { pointer-events: auto; }
+.mtop { display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; gap: 8px; align-items: center; }
+.mtop .ibtn, .mside .ibtn { background: rgba(4, 8, 26, .82); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); border: 1px solid rgba(111, 243, 255, .3); }
+.msearch { display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 12px; border-radius: 14px; background: rgba(4, 8, 26, .82); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); border: 1px solid rgba(111, 243, 255, .3); color: var(--mute); }
+.msearch svg { width: 18px; height: 18px; flex: none; }
+.msearch input { flex: 1; min-width: 0; border: 0; background: transparent; color: var(--ink); font: 500 1rem var(--sans); outline: none; }
+.mres { display: grid; gap: 4px; max-height: 40vh; overflow: auto; border-radius: 14px; background: rgba(4, 8, 26, .92); }
+.mres:empty { display: none; }
+.mres button { display: grid; text-align: left; padding: 10px 12px; border: 0; border-bottom: 1px solid var(--line); background: transparent; color: var(--ink); }
+.mres button b { font-size: .98rem; }
+.mres button small { color: var(--mute); font-size: .78rem; }
+.mchips { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; padding-bottom: 2px; }
+.mchips::-webkit-scrollbar { display: none; }
+.mchip { --k: #6ff3ff; flex: none; display: inline-flex; align-items: center; gap: 6px; min-height: 34px; padding: 0 12px; border-radius: 999px; border: 1px solid rgba(255, 255, 255, .18); background: rgba(4, 8, 26, .82); color: var(--ink2); font: 650 .82rem var(--sans); }
+.mchip i { width: 9px; height: 9px; border-radius: 50%; background: var(--k); opacity: .35; }
+.mchip.on { border-color: var(--k); color: #fff; }
+.mchip.on i { opacity: 1; box-shadow: 0 0 8px var(--k); }
+.mside { position: fixed; right: 12px; top: calc(var(--st, env(safe-area-inset-top)) + 112px); display: grid; gap: 8px; }
+.mside svg { width: 22px; height: 22px; transition: transform .2s; }
+.mnear, .msheet, .mpacks { margin-top: auto; border-radius: 20px; padding: 12px 14px 14px; background: rgba(4, 8, 26, .9); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); border: 1px solid rgba(111, 243, 255, .28); max-height: 52vh; overflow: auto; }
+.mpacks { margin-top: 0; }
+.nearhead { display: flex; align-items: baseline; justify-content: space-between; width: 100%; margin-bottom: 2px; padding: 2px 0 6px; border: 0; background: transparent; color: inherit; text-align: left; }
+.nearhead i { font-style: normal; color: var(--aqua); }
+.nearhead b { font: 800 .78rem var(--mono); letter-spacing: .18em; text-transform: uppercase; color: var(--aqua); }
+.nearhead small { font-size: .74rem; color: var(--mute); }
+.nearrow { display: grid; grid-template-columns: 34px 1fr auto; gap: 10px; align-items: center; width: 100%; padding: 8px 2px; text-align: left; border: 0; border-bottom: 1px solid var(--line); background: transparent; color: var(--ink); }
+.nearrow:last-of-type { border-bottom: 0; }
+.nk { --k: #6ff3ff; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: var(--k); color: #fff; box-shadow: 0 0 12px color-mix(in srgb, var(--k) 50%, transparent); }
+.nk svg { width: 18px; height: 18px; }
+.nn { min-width: 0; }
+.nn b { display: block; font-size: .95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nn small { display: block; font-size: .75rem; color: var(--mute); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nd { text-align: right; }
+.nd b { display: block; font: 800 1rem var(--mono); }
+.nd small { font: 600 .72rem var(--mono); color: var(--aqua); }
+.nd i, .msdist i { display: inline-block; font-style: normal; }
+.nearkinds { display: flex; gap: 6px; overflow-x: auto; margin-top: 8px; scrollbar-width: none; }
+.nearkinds button { flex: none; min-height: 32px; padding: 0 12px; border-radius: 999px; border: 1px solid rgba(255, 255, 255, .16); background: transparent; color: var(--ink2); font: 650 .78rem var(--sans); }
+.nearkinds button.on { border-color: var(--aqua); color: #fff; background: rgba(111, 243, 255, .12); }
+.mselfloc { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; min-height: 44px; margin-top: 8px; border-radius: 12px; border: 1px solid rgba(111, 243, 255, .45); background: rgba(111, 243, 255, .1); color: var(--ink); font: 700 .92rem var(--sans); }
+.mselfloc svg { width: 18px; height: 18px; color: var(--aqua); }
+.nearnone { margin: 6px 0; font-size: .85rem; color: var(--mute); }
+.msheet { position: relative; }
+.msx { position: absolute; right: 8px; top: 6px; width: 36px; height: 36px; border: 0; border-radius: 50%; background: rgba(255, 255, 255, .08); color: var(--ink); font-size: 1.3rem; line-height: 1; }
+.mph .msx { position: static; float: right; }
+.mshead { display: flex; gap: 12px; align-items: center; padding-right: 40px; }
+.mshead small { display: block; font: 600 .66rem var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--aqua); }
+.mshead b { display: block; font-size: 1.15rem; line-height: 1.2; }
+.msdist { display: flex; align-items: baseline; gap: 10px; margin: 10px 0 6px; }
+.msdist b { font: 900 1.6rem var(--mono); }
+.msdist span { font-size: .85rem; color: var(--ink2); }
+.msline { display: flex; gap: 8px; align-items: center; margin: 4px 0; font-size: .9rem; color: var(--ink2); }
+.msline svg { width: 16px; height: 16px; flex: none; color: var(--mute); }
+.mscoord { display: inline-flex; align-items: center; gap: 8px; margin: 6px 0 2px; padding: 6px 10px; border-radius: 10px; border: 1px solid var(--line); background: transparent; color: var(--ink); font: 600 .85rem var(--mono); }
+.mscoord small { color: var(--aqua); font: 700 .66rem var(--mono); letter-spacing: .12em; text-transform: uppercase; }
+.msbtns { display: flex; gap: 8px; margin-top: 10px; }
+.msbtn { flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 46px; padding: 0 14px; border-radius: 12px; border: 0; background: linear-gradient(180deg, #a9f5ff, #36d6f5); color: #021018; font: 800 .95rem var(--sans); text-decoration: none; }
+.msbtn svg { width: 18px; height: 18px; }
+.msbtn.call { background: linear-gradient(180deg, #ff8a95, #ff4d5e); color: #fff; }
+.msbtn.ghost { background: transparent; color: var(--ink); border: 1px solid rgba(255, 255, 255, .22); }
+.msbtn[disabled] { opacity: .45; }
+.mssave { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+.mssave button { min-height: 44px; border-radius: 12px; border: 1px solid rgba(111, 243, 255, .4); background: rgba(111, 243, 255, .08); color: var(--ink); font: 700 .88rem var(--sans); }
+.mph { display: flex; align-items: center; justify-content: space-between; }
+.mph b { font-size: 1.05rem; }
+.mpacks p { font-size: .88rem; color: var(--ink2); margin: 6px 0; }
+.mprow { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.mprow > span { flex: 1; min-width: 0; }
+.mprow b { display: block; }
+.mprow small { display: block; font-size: .76rem; color: var(--mute); }
+.mprow .msbtn { flex: none; min-height: 40px; }
+.mpacks .simbtn { margin-top: 10px; width: 100%; }
+.mapmsg { font-size: .82rem; color: var(--ink2); margin: 6px 0 0; }
+.mapmsg.warn { color: var(--warn); }
+.mapmsg:empty { display: none; }
+.mapcredit { font-size: .7rem !important; color: var(--mute) !important; }
+.maplibregl-ctrl-attrib { font-size: 10px; background: rgba(4, 8, 26, .7) !important; color: #9fb3d9; }
+.maplibregl-ctrl-attrib a { color: #bdf2ff; }
+.maplibregl-ctrl-bottom-right { bottom: calc(var(--sb, env(safe-area-inset-bottom)) + 80px); }
+.menugrid > .mt:last-child:nth-child(odd) { grid-column: 1 / -1; }
+/* the emergency list: nearest ER */
+.emnear { display: flex; align-items: center; gap: 12px; margin: 0 0 12px; padding: 12px 14px; border-radius: 16px; border: 2px solid #fff; background: #000; color: #fff; text-decoration: none; }
+.emnear > svg { width: 26px; height: 26px; flex: none; }
+.emnear span { flex: 1; }
+.emnear b { display: block; font-size: 1.2rem; font-weight: 850; }
+.emnear small { font-size: .95rem; color: #cfcfcf; }
+.nearnote { margin: 0 0 4px; font-size: .74rem; color: var(--mute); }
+.mattr { margin: 6px 0 0; font-size: .64rem; color: var(--mute); text-align: right; }
+.maplibregl-ctrl-bottom-right { display: none; }
 
 </style>
 </head>
@@ -2613,7 +2710,7 @@ const HAVYN_ENGINE = (() => {
     if (!a || num(b.updated) > num(a.updated)) return { rec: b, took: true };
     return { rec: a, took: false };
   }
-  const COLLS = ["people", "pets", "items", "log", "tasks", "buys"];
+  const COLLS = ["people", "pets", "items", "log", "tasks", "buys", "spots"];
   const SINGLES = ["settings", "plan", "outage", "checks"];
   function merge(local, incoming) {
     const out = Object.assign({}, local);
@@ -2641,6 +2738,9 @@ const HAVYN_ENGINE = (() => {
     for (const i of out.items) { i.name = str(i.name, 160); i.qty = num(i.qty); if (i.per_unit && typeof i.per_unit !== "object") i.per_unit = {}; }
     for (const t of out.tasks) { if (t.custom) t.t = str(t.t, 200); }
     for (const b of out.buys) { if (!STATUSES.includes(b.status)) b.status = "buy"; }
+    // map spots: a place on the map needs real coordinates; a removed one travels as its tombstone
+    out.spots = out.spots.filter((p) => p.deleted || (Number.isFinite(+p.lon) && Number.isFinite(+p.lat) && Math.abs(+p.lat) <= 90 && Math.abs(+p.lon) <= 180));
+    for (const p of out.spots) if (!p.deleted) { p.name = str(p.name, 120); p.kind = /^(home|meet[123]|work|school|spot)$/.test(p.kind) ? p.kind : "spot"; p.lon = +p.lon; p.lat = +p.lat; }
     return out;
   }
 
@@ -2652,7 +2752,7 @@ if (typeof module !== "undefined") module.exports = HAVYN_ENGINE;
 (() => {
   "use strict";
   const C = HAVYN_CONTENT, E = HAVYN_ENGINE;
-  const VERSION = "1.8.1+28ea8ba44a";
+  const VERSION = "1.9.0+59757fce57";
   const PREVIEW = !!window.HAVYN_PREVIEW;
   const DAY = 86400000;
   const t0 = performance.now();
@@ -2707,6 +2807,7 @@ if (typeof module !== "undefined") module.exports = HAVYN_ENGINE;
     chev: '<path d="M9 5l7 7-7 7"/>',
     paw: '<circle cx="7" cy="9" r="1.8"/><circle cx="11" cy="6" r="1.8"/><circle cx="15" cy="6.5" r="1.8"/><circle cx="18" cy="10" r="1.8"/><path d="M12 12c-3 0-6 3.5-5 6 1 2 3.5 1 5 1s4 1 5-1c1-2.5-2-6-5-6z"/>',
     pin: '<path d="M12 21s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="9" r="2.5"/>',
+    map: '<path d="M3 6.5 9 4l6 2.5L21 4v13.5L15 20l-6-2.5L3 20z"/><path d="M9 4v13.5M15 6.5V20"/>',
     check: '<path d="M5 12.5l4.5 4.5L19 7"/>',
     wave: '<circle cx="12" cy="5.5" r="2"/><path d="M3 12c2 0 2-2 4.5-2s2.5 2 4.5 2 2-2 4.5-2 2.5 2 4.5 2"/><path d="M3 17c2 0 2-2 4.5-2s2.5 2 4.5 2 2-2 4.5-2 2.5 2 4.5 2"/>',
     bug: '<ellipse cx="12" cy="15" rx="3.5" ry="4.5"/><path d="M12 10.5V7a3 3 0 0 1 3-3h2l1.5 1.5"/><path d="M8.7 13 5 11.5M8.5 16.5 5 17.5M15.3 13l3.7-1.5M15.5 16.5l3.5 1"/>',
@@ -2779,7 +2880,7 @@ if (typeof module !== "undefined") module.exports = HAVYN_ENGINE;
     plan: { contactName: "", contactPhone: "", rally1: "Home", rally2: "", rally3: "", leaveTo: "", leaveNotes: "", gas: "", water: "", power: "", gmrsCh: "", meshCh: "", updated: 0 },
     outage: { active: false, startedAt: 0, endedAt: 0, updated: 0 },
     checks: { updated: 0 },
-    people: [], pets: [], items: [], log: [], tasks: [], buys: []
+    people: [], pets: [], items: [], log: [], tasks: [], buys: [], spots: []
   });
   const prefDefaults = () => ({ theme: "void", sound: true, deviceName: "", lastBackup: 0, installHidden: false });
   let S = defaults(), PR = prefDefaults(), INC = null;
@@ -2887,9 +2988,9 @@ if (typeof module !== "undefined") module.exports = HAVYN_ENGINE;
   const SCREENS = {
     status: renderStatus, emergency: renderEmergency, playbooks: renderPlaybooks, guides: renderGuides, family: renderFamily, supplies: renderSupplies, buy: renderBuy,
     missions: renderMissions, plan: renderPlan, comms: renderComms, library: renderLibrary, binder: renderBinder, system: renderSystem, field: renderField, now: renderNow, quick: renderQuick, quests: renderQuests,
-    search: renderSearch, archive: renderArchive, sim: renderSim
+    search: renderSearch, archive: renderArchive, sim: renderSim, map: renderMap
   };
-  const TAB_OF = { status: "status", sim: "status", missions: "status", now: "status", quick: "status", quests: "status", guides: "guides", playbooks: "guides", plan: "guides", comms: "guides", library: "guides", binder: "guides", search: "guides", field: "guides", archive: "guides", emergency: "emergency", family: "family", supplies: "supplies", buy: "supplies" };
+  const TAB_OF = { status: "status", sim: "status", map: "status", missions: "status", now: "status", quick: "status", quests: "status", guides: "guides", playbooks: "guides", plan: "guides", comms: "guides", library: "guides", binder: "guides", search: "guides", field: "guides", archive: "guides", emergency: "emergency", family: "family", supplies: "supplies", buy: "supplies" };
   let lastPath = "";
   function render() {
     route = parseHash();
@@ -2926,6 +3027,7 @@ if (typeof module !== "undefined") module.exports = HAVYN_ENGINE;
     if (route.path === "search") SearchUI.mount();
     if (route.path === "archive") Get.mount();
     if (route.path === "status" || route.path === "" || route.path === "quests") Ready.mount();
+    if (route.path === "map") MapView.mount(); else if (document.body.classList.contains("mapon")) MapView.show(false);
     const simLive = route.path === "sim" && !!route.parts[1];
     if (!simLive && SimVoice.live) {
       SimVoice.live = false; Clips.stop(); AlarmSnd.stop(); Beat.stop(); Drill.stopT();
@@ -3030,7 +3132,7 @@ if (typeof module !== "undefined") module.exports = HAVYN_ENGINE;
     h += '<div class="sec"><span class="lab"><b>03</b> Train</span></div><a class="simbanner" href="#/sim"><span class="sbgrid" aria-hidden="true"></span><span class="sbx"><small>HAVYN</small><b>SIM LAB</b><span>' +
       (sd ? sd + " of " + SIMS.list.length + " run · " + sst + " ★" : "Practice in about a minute. Tap, listen, decide.") + '</span><span class="sbbar"><i style="width:' + Math.round(sst / Math.max(1, smax) * 100) + '%"></i></span></span><span class="sbic" aria-hidden="true">' + ["heart", "speaker", "bug", "flame"].map((i) => "<i>" + ic(i) + "</i>").join("") + "</span></a>";
     h += '<div class="sec"><span class="lab"><b>04</b> Know-how</span></div><div class="menugrid">' +
-      [["#/field", "book", "How do I…", FIELD().length + " answers"], ["#/library", "globe", "Library", libSummary() || "Books and manuals"], ["#/plan", "pin", "Plan", "Where to meet"], ["#/comms", "radio", "Comms", "Radios, check-ins"]]
+      [["#/map", "map", "Map", MAPS.length ? "Offline · nearest ER" : "Streets, ERs, GPS"], ["#/field", "book", "How do I…", FIELD().length + " answers"], ["#/library", "globe", "Library", libSummary() || "Books and manuals"], ["#/plan", "pin", "Plan", "Where to meet"], ["#/comms", "radio", "Comms", "Radios, check-ins"]]
         .map(([href, icn, b, sm]) => '<a class="mt" href="' + href + '">' + ic(icn) + "<span><b>" + esc(b) + "</b><small>" + esc(sm) + "</small></span></a>").join("") + "</div>";
     return h;
   }
@@ -3517,6 +3619,7 @@ if (typeof module !== "undefined") module.exports = HAVYN_ENGINE;
     cardView.id = null; cardView.beatStep = 0;
     let h = emTop();
     const I = Inc.on();
+    h += '<a class="emnear" href="#/map?k=er">' + ic("cross") + "<span><b>Nearest ER</b><small>Distance and direction, on the offline map</small></span>" + ic("chev") + "</a>";
     if (I) h += '<a class="emlogbar" href="#/emergency/log">' + ic("clock") + "<span><b>Log for responders</b><small>" + I.ev.length + (I.ev.length === 1 ? " entry" : " entries") + " since " + hm(I.ev[0].t) + "</small></span></a>";
     h += '<div class="emgrid">';
     for (const c of C.cards) h += '<a class="emtile" href="#/emergency/' + c.id + '">' + ic(c.icon) + "<span><b>" + esc(c.title) + "</b><br><small>" + esc(c.sub) + "</small></span></a>";
@@ -5106,37 +5209,443 @@ if (typeof module !== "undefined") module.exports = HAVYN_ENGINE;
   // Stored downloads that never finished (app closed mid-way): how far each got, for "carry on" buttons.
   async function arcPartial(it) { const st = await Store.get("zdl:" + it.id); return st && st.size ? st.have / st.size : 0; }
 
+  /* ---------------- MAPS: offline street maps, the places that matter in an emergency, and your family's spots ----------------
+     Map packs (PMTiles cut from OpenStreetMap by the Maps workflow) download from HAVYN's own address into this phone's
+     storage in 32 MB parts (resumable, SHA-256 checked) and are read where they lie, a few kilobytes at a time. MapLibre GL
+     draws them in the HAVYN Night style, one copy of the style per pack, least detailed at the bottom: each more detailed
+     pack covers its own area with solid land, so the statewide map shows only where the street-level one has nothing. Emergency places and place names ship with the app
+     (maps/places.json, OpenStreetMap, ODbL). GPS needs no signal; nothing here needs the internet once the packs are saved. */
+  let MAPS = [];   // installed packs: {id, uid, name, sub, file, size, sha256, data, bbox, maxzoom, center, zoom, parts, added}
+  const KM_MI = 0.621371;
+  const MAPK = {   // kinds of place: label, colour, icon
+    er: ["Emergency room", "#ff4d5e", "cross"], hospital: ["Hospital", "#ff7f91", "cross"], urgent: ["Urgent care", "#ff9f5a", "plus"],
+    fire: ["Fire station", "#ff6a3d", "flame"], police: ["Police", "#6f95ff", "people"], pharmacy: ["Pharmacy", "#3de58e", "pill"],
+    aed: ["AED", "#ffd23d", "heart"], water: ["Drinking water", "#4fc3ff", "drop"], fuel: ["Fuel", "#b48cff", "gas"],
+    home: ["Home", "#6ff3ff", "home"], meet1: ["Meeting place 1", "#6ff3ff", "pin"], meet2: ["Meeting place 2", "#6ff3ff", "pin"], meet3: ["Meeting place 3", "#6ff3ff", "pin"],
+    work: ["Work", "#6ff3ff", "pin"], school: ["School", "#6ff3ff", "pin"], spot: ["Saved spot", "#6ff3ff", "pin"]
+  };
+  const MAPCHIPS = [["er", "ER"], ["urgent", "Urgent care"], ["fire", "Fire"], ["police", "Police"], ["pharmacy", "Pharmacy"], ["aed", "AED"], ["water", "Water"], ["fuel", "Fuel"]];
+  const havKm = (a, b) => { const R = 6371, r = Math.PI / 180, dLa = (b[1] - a[1]) * r, dLo = (b[0] - a[0]) * r, s = Math.sin(dLa / 2) ** 2 + Math.cos(a[1] * r) * Math.cos(b[1] * r) * Math.sin(dLo / 2) ** 2; return 2 * R * Math.asin(Math.sqrt(s)); };
+  const bearing = (a, b) => { const r = Math.PI / 180, y = Math.sin((b[0] - a[0]) * r) * Math.cos(b[1] * r), x = Math.cos(a[1] * r) * Math.sin(b[1] * r) - Math.sin(a[1] * r) * Math.cos(b[1] * r) * Math.cos((b[0] - a[0]) * r); return (Math.atan2(y, x) / r + 360) % 360; };
+  const compass = (deg) => ["N", "NE", "E", "SE", "S", "SW", "W", "NW"][Math.round(deg / 45) % 8];
+  const miles = (km) => { const m = km * KM_MI; return m < 0.1 ? Math.round(m * 5280 / 10) * 10 + " ft" : m < 10 ? m.toFixed(1) + " mi" : Math.round(m) + " mi"; };
+  const tileBox = (z, x, y) => { const n = 2 ** z, lon = (v) => v / n * 360 - 180, lat = (v) => Math.atan(Math.sinh(Math.PI * (1 - 2 * v / n))) * 180 / Math.PI; return [lon(x), lat(y + 1), lon(x + 1), lat(y)]; };
+  const boxHit = (a, b) => a[0] <= b[2] && a[2] >= b[0] && a[1] <= b[3] && a[3] >= b[1];
+  const inBox = (p, b) => p[0] >= b[0] && p[0] <= b[2] && p[1] >= b[1] && p[1] <= b[3];
+
+  // Map packs: what HAVYN's address offers (maps/packs/index.json, from the deploy) and what this phone holds.
+  const MapPk = {
+    idx: null, why: "", state: "idle", loading: null, busy: false, stop: false, cur: "", got: 0, need: 0, base: 0, failed: [], t0: 0, PART: 32 * 1024 * 1024,
+    load() {
+      if (this.state !== "idle") return this.loading || Promise.resolve();
+      this.state = "checking";
+      return (this.loading = (async () => {
+        try { const r = await fetch("./maps/packs/index.json", { cache: "no-store" }); if (!r.ok) throw new Error("HTTP " + r.status); this.idx = ((await r.json()).packs || []).filter((p) => p && p.id && p.file && p.size && p.sha256); this.why = ""; }
+        catch (e) { this.idx = null; this.why = navigator.onLine === false || e instanceof TypeError ? "offline" : "missing"; }
+        this.state = "ready"; if (route.path === "map" || $("#ready")) render();
+      })());
+    },
+    have(id) { return MAPS.find((m) => m.id === id) || null; },
+    list() { return this.idx || []; },
+    todo() { return this.list().filter((p) => !this.have(p.id)); },
+    newer(p) { const m = this.have(p.id); return !!(m && m.sha256 !== p.sha256 && p.data > (m.data || "")); },
+    size(list) { return (list || this.todo()).reduce((a, p) => a + p.size, 0); },
+    async getOne(p) {
+      const key = "mdl:" + p.id, url = "./maps/packs/" + encodeURIComponent(p.file);
+      let st = await Store.get(key);
+      const fresh = async () => { if (st && st.parts) for (const k of st.parts) await Store.del(k); st = { file: p.file, size: p.size, sha256: p.sha256, uid: uid(), parts: [], have: 0, h: null }; await Store.set(key, st); };
+      if (!st || st.file !== p.file || st.size !== p.size) await fresh();
+      if (!(await roomFor(st.size - st.have))) throw new Error("not enough space on this phone (needs " + sz(st.size - st.have) + ")");
+      let hash = Sha256.load(st.h), tries = 0, buf = [], bl = 0;
+      const commit = async () => {
+        if (!bl) return;
+        const k = "mpart:" + st.uid + ":" + st.parts.length;
+        if (!(await Store.set(k, new Blob(buf)))) throw new Error("couldn't save on this phone (out of space?)");
+        st.parts.push(k); st.have += bl; st.h = hash.save(); buf = []; bl = 0; await Store.set(key, st);
+      };
+      this.got = st.have; this.paint();
+      while (st.have < st.size) {
+        if (this.stop) throw stopErr();
+        buf = []; bl = 0;
+        try {
+          const res = await fetch(url, { headers: st.have ? { Range: "bytes=" + st.have + "-" } : {}, cache: "no-store" });
+          if (!res.ok) throw new Error("HTTP " + res.status);
+          const from = res.status === 206 ? +((/bytes (\d+)-/.exec(res.headers.get("Content-Range") || "") || [])[1]) : 0;
+          if (st.have && (res.status !== 206 || from !== st.have)) { try { await res.body.cancel(); } catch (e) {} await fresh(); hash = Sha256.load(null); continue; }
+          const rd = res.body.getReader();
+          for (;;) {
+            const { done, value } = await rd.read();
+            if (value && value.length) { hash.update(value); buf.push(value); bl += value.length; this.got = st.have + bl; this.paint(); }
+            if (bl >= this.PART || done) await commit();
+            if (done) break;
+            if (this.stop) { try { await rd.cancel(); } catch (e) {} await commit(); throw stopErr(); }
+          }
+          if (st.have !== st.size) throw new Error(st.have > st.size ? "the download was bigger than expected" : "the connection closed early");
+          tries = 0;
+        } catch (e) {
+          if (e && e.name === "Stop") throw e;
+          try { await commit(); } catch (e2) { buf = []; bl = 0; hash = Sha256.load(st.h); }
+          this.got = st.have; this.paint();
+          if (++tries > 5 || navigator.onLine === false) throw e;
+          await pause(2500 * tries);
+        }
+      }
+      if (hash.hex() !== st.sha256) { for (const k of st.parts) await Store.del(k); await Store.del(key); throw new Error("it arrived damaged (its checksum didn't match), so it was deleted (try again)"); }
+      const old = this.have(p.id);
+      MAPS = MAPS.filter((m) => m.id !== p.id).concat([{ id: p.id, uid: st.uid, name: p.name, sub: p.sub || "", file: p.file, size: p.size, sha256: p.sha256, data: p.data || "", bbox: p.bbox, maxzoom: p.maxzoom, center: p.center, zoom: p.zoom, parts: st.parts, added: now() }]);
+      await Store.set("maps", MAPS); await Store.del(key);
+      if (old) for (const k of old.parts) await Store.del(k);
+      MapView.reopen();
+      return true;
+    },
+    async get(list, opt) {
+      opt = opt || {};
+      if (this.busy || PREVIEW) return;
+      list = (list || this.todo()).filter(Boolean);
+      if (!list.length) { if (!opt.quiet) toast("The maps are already on this phone"); return; }
+      const need = this.size(list);
+      if (!(await roomFor(need))) { toast("Not enough space on this phone for " + sz(need)); return; }
+      Object.assign(this, { busy: true, stop: false, need, base: 0, got: 0, failed: [], t0: Date.now() });
+      Wake.on(); requestPersist(); this.paint();
+      let ok = 0;
+      for (const p of list) {
+        if (this.stop) break;
+        this.cur = p.name; this.got = 0; this.paint();
+        try { if (await this.getOne(p)) ok++; } catch (e) { if (e && e.name === "Stop") break; this.failed.push(p.name + " (" + (e && e.message ? e.message : "failed") + ")"); }
+        this.base += p.size; this.got = 0;
+      }
+      this.busy = false; this.cur = "";
+      if (!document.body.classList.contains("em") && !Everything.busy) Wake.off();
+      if (ok) Snd.chime("save");
+      if (!opt.quiet) toast(ok ? (ok === 1 ? "Map saved on this phone" : ok + " maps saved on this phone") + (this.failed.length ? "; " + this.failed.length + " didn't finish" : "") : this.stop ? "Stopped. Tap Get again to carry on" : "The map didn't finish: tap Get again on Wi-Fi");
+      render();
+    },
+    async remove(id) {
+      const m = this.have(id); if (!m) return;
+      MAPS = MAPS.filter((x) => x.id !== id); await Store.set("maps", MAPS);
+      for (const k of m.parts) await Store.del(k);
+      MapView.reopen(); toast(m.name + " map removed"); render();
+    },
+    pct() { return this.need ? Math.min(100, Math.round(((this.base + this.got) / this.need) * 100)) : 0; },
+    msg() { return this.busy ? "Downloading " + this.cur + " · " + sz(this.base + this.got) + " of " + sz(this.need) + ". Keep HAVYN open." : this.failed.length ? "Didn't finish: " + this.failed.join("; ") : ""; },
+    paint() {
+      const bar = $("#mapbar"), msg = $("#mapmsg");
+      if (bar) { bar.classList.toggle("hide", !this.busy); bar.firstElementChild.style.width = this.pct() + "%"; }
+      if (msg) msg.textContent = this.msg();
+      Ready.paint();
+    }
+  };
+  class PartSource { constructor(blob, key) { this.blob = blob; this.key = key; } getKey() { return this.key; } async getBytes(o, n) { return { data: await this.blob.slice(o, o + n).arrayBuffer() }; } }
+  const loadJs = (src) => new Promise((ok, no) => { const s = document.createElement("script"); s.src = src; s.onload = ok; s.onerror = () => no(new Error("couldn't load " + src)); document.head.appendChild(s); });
+
+  // The map itself. It lives outside the screen's HTML (re-drawing a screen must not tear down the map), on #mapstage.
+  // An old-style filter (["in", "kind", "a", "b"]) as an expression, so it can be combined with one.
+  function exprFilter(f) {
+    if (!Array.isArray(f)) return f;
+    const [op, a, ...v] = f;
+    if (op === "all" || op === "any") return [op].concat(f.slice(1).map(exprFilter));
+    if (op === "none") return ["!", ["any"].concat(f.slice(1).map(exprFilter))];
+    if (typeof a !== "string") return f;   // already an expression
+    const get = a === "$type" ? ["geometry-type"] : a === "$id" ? ["id"] : ["get", a];
+    if (["==", "!=", "<", "<=", ">", ">="].includes(op)) return [op, get, v[0]];
+    if (op === "in") return ["in", get, ["literal", v]];
+    if (op === "!in") return ["!", ["in", get, ["literal", v]]];
+    if (op === "has") return ["has", a];
+    if (op === "!has") return ["!", ["has", a]];
+    return f;
+  }
+  const MapView = {
+    map: null, gl: null, readers: null, places: null, ready: false, err: "", me: null, meAt: 0, watch: null, sel: null, kinds: null, q: "", lp: 0, origin: null,
+    async libs() {
+      if (this.gl) return this.gl;
+      if (!$("#maplibrecss")) { const l = document.createElement("link"); l.id = "maplibrecss"; l.rel = "stylesheet"; l.href = "./vendor/maplibre/maplibre-gl.css"; document.head.appendChild(l); }
+      if (!window.maplibregl) await loadJs("./vendor/maplibre/maplibre-gl-csp.js");
+      if (!window.pmtiles) await loadJs("./vendor/pmtiles/pmtiles.js");
+      maplibregl.setWorkerUrl("./vendor/maplibre/maplibre-gl-csp-worker.js");
+      maplibregl.addProtocol("havyn", (params, ac) => this.tile(params, ac));
+      return (this.gl = maplibregl);
+    },
+    async data() {
+      if (this.places) return this.places;
+      try { const j = await (await fetch("./maps/places.json")).json(); this.places = { pois: j.pois || [], names: j.places || [], built: j.built || "" }; }
+      catch (e) { this.places = { pois: [], names: [], built: "" }; }
+      this.places.box = this.places.pois.reduce((a, p) => [Math.min(a[0], p[3]), Math.min(a[1], p[2]), Math.max(a[2], p[3]), Math.max(a[3], p[2])], [180, 90, -180, -90]);
+      return this.places;
+    },
+    reopen() { this.readers = null; if (this.map) { try { this.map.remove(); } catch (e) {} this.map = null; this.ready = false; } },
+    async open() {
+      if (this.readers) return this.readers;
+      const rs = [];
+      for (const m of MAPS.slice().sort((a, b) => b.maxzoom - a.maxzoom)) {
+        try {
+          const pm = new pmtiles.PMTiles(new PartSource(await archiveBlob.fromParts(m.parts), "havyn-" + m.uid)), h = await pm.getHeader();
+          rs.push({ m, pm, minZ: h.minZoom, maxZ: h.maxZoom, b: [h.minLon, h.minLat, h.maxLon, h.maxLat] });
+        } catch (e) { this.err = m.name + ": " + (e.message || e); }
+      }
+      return (this.readers = rs);
+    },
+    async tile(params, ac) {
+      const g = /^havyn:\/\/glyphs\/(.+)\/(\d+-\d+)$/.exec(params.url); if (g) return this.glyph(decodeURIComponent(g[1]), g[2], ac);
+      const t = /^havyn:\/\/([\w-]+)\/(\d+)\/(\d+)\/(\d+)/.exec(params.url); if (!t) throw new Error("havyn: bad tile");
+      const z = +t[2], x = +t[3], y = +t[4], r = (await this.open()).find((q) => q.m.id === t[1]);
+      if (r && z >= r.minZ && z <= r.maxZ && boxHit(tileBox(z, x, y), r.b)) { const res = await r.pm.getZxy(z, x, y, ac && ac.signal); if (res && res.data) return { data: res.data }; }
+      return { data: new ArrayBuffer(0) };   // nothing here in this pack: the pack below shows through
+    },
+    // Label glyphs come from HAVYN's own copy. A range it doesn't ship (an emoji, a script nobody here uses) is answered
+    // with nothing, without a request: those few characters are left out and everything else draws.
+    async glyph(stack, range, ac) {
+      const have = this.glyphs, f = stack.split(",").map((x) => x.trim()).find((x) => !have || (have[x] && have[x].includes(range)));
+      if (f) {
+        try { const r = await fetch("./maps/fonts/" + encodeURIComponent(f) + "/" + range + ".pbf", { signal: ac && ac.signal }); if (r.ok) return { data: await r.arrayBuffer() }; }
+        catch (e) { if (e && e.name === "AbortError") throw e; }
+      }
+      return { data: new ArrayBuffer(0) };
+    },
+    // The stored area plus a margin, stretched to the screen's shape: the map doesn't pan off into places it has nothing
+    // for, and zoomed all the way out the whole area fits the screen, portrait or landscape.
+    bounds() {
+      const b = MAPS.reduce((a, m) => [Math.min(a[0], m.bbox[0]), Math.min(a[1], m.bbox[1]), Math.max(a[2], m.bbox[2]), Math.max(a[3], m.bbox[3])], [180, 90, -180, -90]);
+      const my = (lat) => Math.log(Math.tan(Math.PI / 4 + lat * Math.PI / 360)) * 180 / Math.PI, iy = (y) => Math.atan(Math.exp(y * Math.PI / 180)) * 360 / Math.PI - 90;
+      const el = $("#mapgl"), want = ((el && el.clientWidth) || 390) / ((el && el.clientHeight) || 844);
+      let x0 = b[0], x1 = b[2], y0 = my(b[1]), y1 = my(b[3]);
+      const px = (x1 - x0) * 0.15, py = (y1 - y0) * 0.15, cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
+      x0 -= px; x1 += px; y0 -= py; y1 += py;
+      if ((x1 - x0) / (y1 - y0) < want) { const h = (y1 - y0) * want / 2; x0 = cx - h; x1 = cx + h; } else { const h = (x1 - x0) / want / 2; y0 = cy - h; y1 = cy + h; }
+      return [[Math.max(-180, x0), Math.max(-85, iy(y0))], [Math.min(180, x1), Math.min(85, iy(y1))]];
+    },
+    outside() { const P = this.places; return !!(this.me && P && P.pois.length && !inBox(this.me.at, P.box)); },
+    async style() {
+      const s = await (await fetch("./maps/style.json")).json(), base = new URL("./", location.href).href, layers = [];
+      this.glyphs = (s.metadata && s.metadata["havyn:glyphs"]) || null;
+      s.glyphs = "havyn://glyphs/{fontstack}/{range}"; s.sprite = base + "maps/sprites/dark"; s.sources = {};
+      // One copy of the style per pack, least detailed first: a more detailed pack only asks for tiles in its own area,
+      // and its land covers what's below. Every pack's land, water and roads come first, then HAVYN's markers, then all
+      // the labels, so town and street names stay readable over the markers. A coarser pack's labels stay out of a finer
+      // pack's area, where the finer pack has its own.
+      const packs = MAPS.slice().sort((a, b) => a.maxzoom - b.maxzoom), labels = [];
+      packs.forEach((m, i) => {
+        const src = "pk-" + m.id, finer = packs.slice(i + 1).map((q) => { const b = q.bbox; return [[[b[0], b[1]], [b[2], b[1]], [b[2], b[3]], [b[0], b[3]], [b[0], b[1]]]]; });
+        s.sources[src] = Object.assign({ type: "vector", tiles: ["havyn://" + m.id + "/{z}/{x}/{y}"], minzoom: 0, maxzoom: m.maxzoom }, i ? { bounds: m.bbox } : { attribution: "© OpenStreetMap contributors · Protomaps" });
+        for (const l of this.base || (this.base = s.layers)) {
+          if (l.type === "background") { if (!i) layers.push(l); continue; }
+          const c = Object.assign({}, l, { id: src + "-" + l.id, source: src });
+          if (l.type !== "symbol") { layers.push(c); continue; }
+          if (finer.length) c.filter = ["all", exprFilter(l.filter === undefined ? true : l.filter), ["!", ["within", { type: "MultiPolygon", coordinates: finer }]]];
+          labels.push(c);
+        }
+      });
+      this.slot = labels.length ? labels[0].id : undefined;   // HAVYN's markers go in just below the labels
+      s.layers = layers.concat(labels);
+      return s;
+    },
+    stage() { let st = $("#mapstage"); if (!st) { st = document.createElement("div"); st.id = "mapstage"; st.innerHTML = '<div id="mapgl"></div>'; document.body.appendChild(st); } return st; },
+    show(on) { const st = $("#mapstage"); if (st) st.classList.toggle("on", !!on); document.body.classList.toggle("mapon", !!on); if (on && this.map) this.map.resize(); if (!on) this.stopGps(); },
+    async mount() {
+      this.stage(); this.show(true);
+      if (this.map || this.busy || !MAPS.length) return;
+      this.busy = true; this.err = "";
+      try {
+        await this.libs(); await this.data(); await this.open();
+        const home = this.spot("home"), m0 = MAPS.find((m) => m.id === "phoenix") || MAPS[0];
+        const map = (this.map = new maplibregl.Map({ container: "mapgl", style: await this.style(), center: home ? [home.lon, home.lat] : m0.center || [-112.07, 33.45], zoom: home ? 13 : m0.zoom || 10,
+          maxBounds: this.bounds(), attributionControl: { compact: true }, maxPitch: 60, fadeDuration: 150, localIdeographFontFamily: false }));
+        map.on("error", (e) => console.warn("map", String((e && e.error && e.error.message) || e)));
+        map.on("styleimagemissing", (e) => { if (!map.hasImage(e.id)) map.addImage(e.id, { width: 1, height: 1, data: new Uint8Array(4) }); });
+        map.on("load", () => { this.layers(); this.ready = true; const s = $("#mapstate"); if (s) s.textContent = ""; });
+        map.on("click", (e) => this.pick(e));
+        map.on("contextmenu", (e) => this.drop(e.lngLat));
+        map.on("touchstart", (e) => { clearTimeout(this.lp); if (e.points && e.points.length === 1) this.lp = setTimeout(() => this.drop(e.lngLat), 600); });
+        ["touchend", "touchmove", "dragstart", "zoomstart", "rotatestart"].forEach((ev) => map.on(ev, () => clearTimeout(this.lp)));
+        map.on("rotate", () => { const c = $("#mapnorth svg"); if (c) c.style.transform = "rotate(" + -map.getBearing() + "deg)"; });
+        map.on("moveend", () => { if (!this.me) this.paintNear(); });
+        map.on("resize", () => { try { map.setMaxBounds(this.bounds()); } catch (e) {} });
+        if (PR.mapGps) this.gps(false);
+      } catch (e) { this.err = (e && e.message) || "the map couldn't start"; }
+      finally { this.busy = false; render(); }
+    },
+    spot(kind) { return L("spots").find((s) => s.kind === kind) || null; },
+    shown() { return this.kinds || (this.kinds = new Set(PR.mapKinds || ["er", "urgent", "fire", "police", "pharmacy"])); },
+    geo() {
+      const P = this.places || { pois: [] }, on = this.shown(), f = [];
+      P.pois.forEach((p, i) => { if (on.has(p[0]) || (p[0] === "hospital" && on.has("er"))) f.push({ type: "Feature", id: i, properties: { k: p[0], n: p[1], i }, geometry: { type: "Point", coordinates: [p[3], p[2]] } }); });
+      return { type: "FeatureCollection", features: f };
+    },
+    pinGeo() { return { type: "FeatureCollection", features: (S.spots || []).map((s, i) => (s.deleted ? null : { type: "Feature", id: i, properties: { k: s.kind, n: s.name || (MAPK[s.kind] || MAPK.spot)[0], i }, geometry: { type: "Point", coordinates: [s.lon, s.lat] } })).filter(Boolean) }; },
+    meGeo() {
+      if (!this.me) return { type: "FeatureCollection", features: [] };
+      const [lon, lat] = this.me.at, acc = Math.max(5, this.me.acc || 30), ring = [];
+      for (let i = 0; i <= 48; i++) { const a = i / 48 * 2 * Math.PI; ring.push([lon + (acc / 111320 / Math.cos(lat * Math.PI / 180)) * Math.cos(a), lat + (acc / 110540) * Math.sin(a)]); }
+      return { type: "FeatureCollection", features: [{ type: "Feature", properties: { t: "acc" }, geometry: { type: "Polygon", coordinates: [ring] } }, { type: "Feature", properties: { t: "me" }, geometry: { type: "Point", coordinates: [lon, lat] } }] };
+    },
+    async images() {
+      const map = this.map, mk = (kind) => new Promise((ok) => {
+        const [, col, icon] = MAPK[kind], pin = /^(home|meet|work|school|spot)/.test(kind);
+        const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">' + (pin ? '<path d="M32 60C32 60 10 38 10 24a22 22 0 0 1 44 0c0 14-22 36-22 36z" fill="' + col + '" stroke="#03071a" stroke-width="4"/>' : '<circle cx="32" cy="32" r="26" fill="' + col + '" stroke="#03071a" stroke-width="5"/>') +
+          '<g transform="translate(' + (pin ? "20 12" : "20 20") + ')" fill="none" stroke="' + (pin ? "#03071a" : "#fff") + '" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">' + P[icon] + "</g></svg>";
+        const im = new Image(64, 64); im.onload = () => { const c = document.createElement("canvas"); c.width = c.height = 64; c.getContext("2d").drawImage(im, 0, 0); ok([kind, c.getContext("2d").getImageData(0, 0, 64, 64)]); }; im.onerror = () => ok(null);
+        im.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+      });
+      for (const r of await Promise.all(Object.keys(MAPK).map(mk))) if (r && !map.hasImage("hv-" + r[0])) map.addImage("hv-" + r[0], r[1], { pixelRatio: 2 });
+    },
+    async layers() {
+      const map = this.map; await this.images();
+      map.addSource("hv-pois", { type: "geojson", data: this.geo() });
+      map.addSource("hv-pins", { type: "geojson", data: this.pinGeo() });
+      map.addSource("hv-me", { type: "geojson", data: this.meGeo() });
+      map.addLayer({ id: "hv-me-acc", type: "fill", source: "hv-me", filter: ["==", ["get", "t"], "acc"], paint: { "fill-color": "#36d6f5", "fill-opacity": 0.12, "fill-outline-color": "#36d6f5" } }, this.slot);
+      // Places: ERs and hospitals at every zoom, the rest from city level. Zoomed out, a marker that would cover a
+      // town's name or another marker gives way (ERs win); zoomed in, every one shows.
+      const ers = ["literal", ["er", "hospital"]], poi = (id, filter, over, names, extra) => map.addLayer(Object.assign({ id, type: "symbol", source: "hv-pois", filter,
+        layout: { "icon-image": ["concat", "hv-", ["get", "k"]], "icon-size": ["interpolate", ["linear"], ["zoom"], 6, 0.5, 14, 0.95], "icon-allow-overlap": ["step", ["zoom"], false, over, true], "icon-padding": 1,
+          "symbol-sort-key": ["match", ["get", "k"], "er", 0, "hospital", 1, "urgent", 2, "fire", 3, "police", 4, "pharmacy", 5, "aed", 6, "water", 7, 8],
+          "text-field": ["step", ["zoom"], "", names, ["get", "n"]], "text-font": ["Noto Sans Medium"], "text-size": 12, "text-offset": [0, 1.25], "text-anchor": "top", "text-optional": true, "text-max-width": 9 },
+        paint: { "text-color": "#eaf6ff", "text-halo-color": "#03071a", "text-halo-width": 1.6 } }, extra), this.slot);
+      poi("hv-pois", ["!", ["in", ["get", "k"], ers]], 14, 13, { minzoom: 10 });
+      poi("hv-pois-er", ["in", ["get", "k"], ers], 11, 12);
+      map.addLayer({ id: "hv-pins", type: "symbol", source: "hv-pins", layout: { "icon-image": ["concat", "hv-", ["get", "k"]], "icon-size": 0.9, "icon-anchor": "bottom", "icon-allow-overlap": true, "text-field": ["get", "n"], "text-font": ["Noto Sans Medium"], "text-size": 13, "text-offset": [0, 0.3], "text-anchor": "top", "text-optional": true },
+        paint: { "text-color": "#bdf2ff", "text-halo-color": "#03071a", "text-halo-width": 1.8 } });
+      map.addLayer({ id: "hv-me", type: "circle", source: "hv-me", filter: ["==", ["get", "t"], "me"], paint: { "circle-radius": 8, "circle-color": "#36d6f5", "circle-stroke-color": "#fff", "circle-stroke-width": 3 } });
+      this.paintNear();
+    },
+    refresh() { if (!this.map || !this.ready) return; const s = this.map.getSource("hv-pois"), p = this.map.getSource("hv-pins"), m = this.map.getSource("hv-me"); if (s) s.setData(this.geo()); if (p) p.setData(this.pinGeo()); if (m) m.setData(this.meGeo()); },
+    gps(fly) {
+      if (!navigator.geolocation) { toast("This phone can't share its location"); return; }
+      PR.mapGps = true; flush();
+      if (this.watch !== null) { if (fly && this.me && this.map) this.map.flyTo({ center: this.me.at, zoom: Math.max(this.map.getZoom(), 14) }); return; }
+      this.flyMe = fly; this.warned = false;
+      this.watch = navigator.geolocation.watchPosition((p) => {
+        this.me = { at: [p.coords.longitude, p.coords.latitude], acc: p.coords.accuracy, at0: now() };
+        this.refresh(); this.paintNear();
+        if (this.flyMe && this.map) { this.flyMe = false; this.map.flyTo({ center: this.me.at, zoom: Math.max(this.map.getZoom(), 14) }); }
+      }, (e) => {
+        // Only a refusal ends it. No fix for a while (indoors, a garage) is normal: the watch carries on and picks the signal back up.
+        if (e.code === 1) { this.stopGps(); PR.mapGps = false; flush(); toast("Location is off for HAVYN: Settings › Privacy › Location Services"); return; }
+        if (!this.me && !this.warned) { this.warned = true; toast("No GPS fix yet: try near a window or outside"); }
+        if (this.me) this.paintNear();
+      },
+      { enableHighAccuracy: true, maximumAge: 15000, timeout: 30000 });
+    },
+    stopGps() { if (this.watch !== null) { try { navigator.geolocation.clearWatch(this.watch); } catch (e) {} this.watch = null; } },
+    from() { return this.me ? this.me.at : this.map ? this.map.getCenter().toArray() : (this.spot("home") ? [this.spot("home").lon, this.spot("home").lat] : [-112.07, 33.45]); },
+    near(kinds, n) {
+      const P = this.places || { pois: [] }, o = this.from(), out = [];
+      P.pois.forEach((p, i) => { if (kinds.includes(p[0])) out.push({ i, p, km: havKm(o, [p[3], p[2]]), deg: bearing(o, [p[3], p[2]]) }); });
+      return out.sort((a, b) => a.km - b.km).slice(0, n || 5);
+    },
+    nearKind() { return [PR.mapNear || "er"]; },
+    paintNear() { const el = $("#mapnearl"); if (el) el.innerHTML = nearHtml(); },
+    pick(e) {
+      const f = this.map.queryRenderedFeatures(e.point, { layers: ["hv-pins", "hv-pois-er", "hv-pois"] })[0];
+      if (!f) { if (this.sel) { this.sel = null; render(); } return; }
+      this.sel = f.layer.id === "hv-pins" ? { pin: f.properties.i } : { poi: f.properties.i }; render();
+    },
+    drop(ll) {
+      if (!ll) return;
+      this.sel = { drop: [ll.lng, ll.lat] }; if (navigator.vibrate) try { navigator.vibrate(15); } catch (e) {}
+      render();
+    },
+    focus(at, z) { if (this.map) this.map.flyTo({ center: at, zoom: Math.max(this.map.getZoom(), z || 15) }); }
+  };
+  function nearHtml() {
+    if (!MapView.places) return "";
+    if (!MapView.places.pois.length) return '<p class="nearnone">' + (PREVIEW ? "The preview doesn't carry the map's places: open HAVYN from its address." : "The map's places aren't on this phone yet: open HAVYN once while online.") + "</p>";
+    const k = PR.mapNear || "er", open = !!PR.mapNearOpen, L = MapView.near(MapView.nearKind(), open ? 4 : 1), old = MapView.me ? Math.floor((now() - MapView.me.at0) / 60000) : 0,
+      from = MapView.me ? "from you" + (old >= 2 ? " · fix " + old + " min old" : "") + (MapView.outside() ? " · outside the map's area" : "") : MapView.spot("home") && !MapView.map ? "from home" : "from the map's center";
+    return '<button class="nearhead" data-act="map-nearopen" aria-expanded="' + open + '"><b>Nearest ' + esc(k === "er" ? "ER" : MAPK[k][0].toLowerCase()) + '</b><small>' + from + ' <i>' + (open ? "▾" : "▴") + "</i></small></button>" + (k === "er" && open ? '<p class="nearnote">Hospitals OpenStreetMap lists with an emergency room. Not sure? Call 911.</p>' : "") + (L.length ? L.map((x) =>
+      '<button class="nearrow" data-act="map-poi" data-i="' + x.i + '"><span class="nk" style="--k:' + MAPK[x.p[0]][1] + '">' + ic(MAPK[x.p[0]][2]) + '</span><span class="nn"><b>' + esc(x.p[1]) + "</b><small>" + esc(x.p[0] === "hospital" ? "Hospital (no ER listed)" : MAPK[x.p[0]][0]) + (x.p[4] ? " · " + esc(x.p[4]) : "") + '</small></span><span class="nd"><b>' + miles(x.km) + '</b><small><i style="transform:rotate(' + Math.round(x.deg) + 'deg)">↑</i> ' + compass(x.deg) + "</small></span></button>").join("") : '<p class="nearnone">None in the map data nearby.</p>');
+  }
+  function mapSheet() {
+    const V = MapView, s = V.sel; if (!s) return "";
+    const o = V.from(), row = (at) => { const km = havKm(o, at), d = bearing(o, at); return '<div class="msdist"><b>' + miles(km) + '</b><span><i style="transform:rotate(' + Math.round(d) + 'deg)">↑</i> ' + compass(d) + " " + (V.me ? "of you" : "of the map's center") + "</span></div>"; };
+    const coords = (at) => '<button class="mscoord" data-act="map-copy" data-v="' + at[1].toFixed(5) + ", " + at[0].toFixed(5) + '">' + at[1].toFixed(5) + ", " + at[0].toFixed(5) + "<small>Copy</small></button>";
+    let h = '<div class="msheet"><button class="msx" data-act="map-close" aria-label="Close">×</button>';
+    if (s.poi !== undefined) {
+      const p = V.places.pois[s.poi], at = [p[3], p[2]], K = MAPK[p[0]];
+      h += '<div class="mshead"><span class="nk" style="--k:' + K[1] + '">' + ic(K[2]) + '</span><span><small>' + esc(p[0] === "hospital" ? "Hospital · ER not listed in the map data" : K[0]) + "</small><b>" + esc(p[1]) + "</b></span></div>" + row(at) +
+        (p[4] ? '<div class="msline">' + ic("pin") + esc(p[4]) + "</div>" : "") + (p[6] ? '<div class="msline">' + ic("clock") + esc(p[6]) + "</div>" : "") + coords(at) +
+        '<div class="msbtns">' + (p[5] ? '<a class="msbtn call" href="tel:' + esc(p[5].replace(/[^\d+]/g, "")) + '">' + ic("phone") + "Call</a>" : "") + '<button class="msbtn" data-act="map-fly" data-lon="' + at[0] + '" data-lat="' + at[1] + '">' + ic("search") + "Show</button></div>";
+    } else if (s.pin !== undefined) {
+      const p = (S.spots || [])[s.pin]; if (!p || p.deleted) return "";
+      h += '<div class="mshead"><span class="nk" style="--k:#6ff3ff">' + ic("pin") + '</span><span><small>' + esc((MAPK[p.kind] || MAPK.spot)[0]) + "</small><b>" + esc(p.name || (MAPK[p.kind] || MAPK.spot)[0]) + "</b></span></div>" + row([p.lon, p.lat]) + coords([p.lon, p.lat]) +
+        '<div class="msbtns"><button class="msbtn" data-act="map-fly" data-lon="' + p.lon + '" data-lat="' + p.lat + '">' + ic("search") + 'Show</button><button class="msbtn ghost" data-act="map-unpin" data-i="' + s.pin + '">Remove</button></div>';
+    } else if (s.drop) {
+      const at = s.drop;
+      h += '<div class="mshead"><span class="nk" style="--k:#6ff3ff">' + ic("pin") + '</span><span><small>Dropped pin</small><b>Save this spot as…</b></span></div>' + row(at) + coords(at) +
+        '<div class="mssave">' + [["home", "Home"], ["meet1", "Meeting place 1"], ["meet2", "Meeting place 2"], ["meet3", "Meeting place 3"], ["work", "Work"], ["school", "School"], ["spot", "Other"]].map(([k, t]) => '<button data-act="map-save" data-k="' + k + '">' + t + "</button>").join("") + "</div>";
+    }
+    return h + '<p class="mattr">© OpenStreetMap contributors</p></div>';
+  }
+  function mapRes() {
+    const V = MapView; if (!V.q || !V.places) return "";
+    const q = V.q.toLowerCase(), o = V.from(), res = [];
+    V.places.pois.forEach((p, i) => { if (p[1].toLowerCase().includes(q)) res.push({ t: "poi", i, n: p[1], s: MAPK[p[0]][0], at: [p[3], p[2]] }); });
+    V.places.names.forEach((p) => { if (p[1].toLowerCase().includes(q)) res.push({ t: "place", n: p[1], s: p[0], at: [p[3], p[2]] }); });
+    (S.spots || []).forEach((p, i) => { if (!p.deleted && (p.name || "").toLowerCase().includes(q)) res.push({ t: "pin", i, n: p.name, s: (MAPK[p.kind] || MAPK.spot)[0], at: [p.lon, p.lat] }); });
+    res.forEach((r) => (r.km = havKm(o, r.at)));
+    res.sort((a, b) => (a.n.toLowerCase().startsWith(q) ? 0 : 1) - (b.n.toLowerCase().startsWith(q) ? 0 : 1) || a.km - b.km);
+    return res.length ? res.slice(0, 8).map((r) => '<button data-act="map-go" data-t="' + r.t + '" data-i="' + (r.i === undefined ? "" : r.i) + '" data-lon="' + r.at[0] + '" data-lat="' + r.at[1] + '"><b>' + esc(r.n) + "</b><small>" + esc(r.s) + " · " + miles(r.km) + "</small></button>").join("") : '<p class="nearnone">Nothing called that in the map data.</p>';
+  }
+  function renderMap() {
+    MapPk.load();
+    const V = MapView, have = MAPS.length > 0, idx = MapPk.list(), todo = MapPk.todo(), k = route.q.k;
+    if (k && MAPK[k]) { PR.mapNear = k; if (!V.shown().has(k)) { V.shown().add(k); PR.mapKinds = [...V.shown()]; } }
+    if (!V.places) V.data().then(() => { if (route.path === "map") render(); });
+    let h = '<div class="maphud">';
+    h += '<div class="mtop"><a class="ibtn" href="#/status" aria-label="Home">' + ic("back") + '</a><label class="msearch">' + ic("search") + '<input id="mapq" type="search" placeholder="Search places, hospitals…" autocomplete="off" value="' + esc(V.q) + '"></label>' +
+      '<button class="ibtn" data-act="map-packs" aria-label="Map packs">' + ic("map") + "</button></div>";
+    h += '<div class="mres" id="mapres">' + mapRes() + "</div>";
+    h += '<div class="mchips">' + MAPCHIPS.map(([kk, t]) => '<button class="mchip' + (V.shown().has(kk) ? " on" : "") + '" data-act="map-kind" data-k="' + kk + '" style="--k:' + MAPK[kk][1] + '"><i></i>' + t + "</button>").join("") + "</div>";
+    if (have) h += '<div class="mside"><button class="ibtn" data-act="map-gps" aria-label="Show where I am">' + ic("pin") + '</button><button class="ibtn" id="mapnorth" data-act="map-north" aria-label="North up">' + '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l4 9h-8z" fill="#ff5f6d"/><path d="M12 21l-4-9h8z" fill="#cfe9ff"/></svg></button></div>';
+    if (!have || V.packs) {
+      h += '<div class="mpacks glass"><div class="mph"><b>' + (have ? "Map packs on this phone" : "Offline maps") + "</b>" + (have ? '<button class="msx" data-act="map-packs" aria-label="Close">×</button>' : "") + "</div>" +
+        (!have ? "<p>Street maps that work with no signal. GPS works without the internet too.</p>" : "") +
+        (idx.length ? idx.map((p) => { const m = MapPk.have(p.id); return '<div class="mprow"><span><b>' + esc(p.name) + "</b><small>" + esc(p.sub || "") + " · " + sz(p.size) + (m ? " · saved " + esc(m.data || "") : "") + "</small></span>" +
+          (m ? (MapPk.newer(p) ? '<button class="msbtn" data-act="map-get" data-id="' + p.id + '"' + (MapPk.busy ? " disabled" : "") + ">Update</button>" : '<button class="msbtn ghost" data-act="map-del" data-id="' + p.id + '">Remove</button>') :
+          '<button class="msbtn" data-act="map-get" data-id="' + p.id + '"' + (MapPk.busy || PREVIEW ? " disabled" : "") + ">Get</button>") + "</div>"; }).join("") :
+          '<p class="nearnone">' + (MapPk.state === "ready" ? (PREVIEW ? "The preview can't download maps: open HAVYN from its address." : MapPk.why === "offline" ? "No internet right now: map downloads need Wi-Fi. Maps already on this phone work." : "The map packs aren't on HAVYN's address yet. Try again later on Wi-Fi.") : "Checking…") + "</p>") +
+        (todo.length > 1 && !MapPk.busy ? '<button class="simbtn" data-act="map-get" data-id="">' + ic("download") + "Get all maps · " + sz(MapPk.size()) + "</button>" : "") +
+        '<div class="bar' + (MapPk.busy ? "" : " hide") + '" id="mapbar"><i style="width:' + MapPk.pct() + '%"></i></div><p class="mapmsg" id="mapmsg">' + esc(MapPk.msg()) + "</p>" +
+        '<p class="mapcredit">Map data © OpenStreetMap contributors (ODbL), cut by Protomaps' + (idx[0] && idx[0].data ? " on " + esc(idx[0].data) : "") + ". Places: OpenStreetMap" + (V.places && V.places.built ? ", " + esc(V.places.built.slice(0, 10)) : "") + ". Check anything critical: the map can be out of date.</p></div>";
+    }
+    if (V.err) h += '<p class="mapmsg warn">' + esc(V.err) + "</p>";
+    if (have && !V.ready && !V.err) h += '<p class="mapmsg" id="mapstate">Opening the map…</p>';
+    h += V.sel ? mapSheet() : '<div class="mnear glass" id="mapnear"><div id="mapnearl">' + nearHtml() + "</div>" + (PR.mapNearOpen ? '<div class="nearkinds">' + [["er", "ER"], ["urgent", "Urgent care"], ["fire", "Fire"], ["police", "Police"], ["pharmacy", "Pharmacy"], ["aed", "AED"], ["water", "Water"]].map(([kk, t]) => '<button class="' + ((PR.mapNear || "er") === kk ? "on" : "") + '" data-act="map-near" data-k="' + kk + '">' + t + "</button>").join("") + "</div>" : "") +
+      (!V.me ? '<button class="mselfloc" data-act="map-gps">' + ic("pin") + "Use my location</button>" : "") + '<p class="mattr">© OpenStreetMap contributors</p></div>';
+    return h + "</div>";
+  }
+
   /* ---------------- READY: everything this phone should hold before an emergency, and one button to get it ---------------- */
   const Everything = {
     busy: false, stop: false,
     async run(auto) {
-      if (this.busy || Shelf.busy || Arc.busy || PREVIEW) return;
+      if (this.busy || Shelf.busy || Arc.busy || MapPk.busy || PREVIEW) return;
       this.busy = true; this.stop = false;
       if (!auto) { PR.autoGet = true; flush(); }
       try {
-        Shelf.mount(); await Promise.all([Shelf.loading || Promise.resolve(), Arc.load()]);
-        const sh = Shelf.state === "ready" ? Shelf.todo(C.shelf.items.filter((i) => i.ph)) : [], ar = Arc.todo(coreArchives());
-        if (!sh.length && !ar.length) {
+        Shelf.mount(); await Promise.all([Shelf.loading || Promise.resolve(), Arc.load(), MapPk.load()]);
+        const sh = Shelf.state === "ready" ? Shelf.todo(C.shelf.items.filter((i) => i.ph)) : [], ar = Arc.todo(coreArchives()), mp = MapPk.todo();
+        if (!sh.length && !ar.length && !mp.length) {
           if (Shelf.state === "ready" && Arc.idx && Arc.idx.size && PR.autoGet) { PR.autoGet = false; flush(); }   // all done: nothing more to carry on with
           if (!auto) toast(Shelf.state === "ready" ? "Everything is already on this phone" : "Nothing to download right now"); return;
         }
-        const left = sz(sh.reduce((a, i) => a + shelfSize(i), 0) + ar.reduce((a, i) => a + Arc.size(i), 0));
+        const left = sz(sh.reduce((a, i) => a + shelfSize(i), 0) + ar.reduce((a, i) => a + Arc.size(i), 0) + MapPk.size(mp));
         if (auto) toast(PR.firstGet ? "Getting this phone ready: downloading " + left + " (best on Wi-Fi; Stop is on Status)" : "Carrying on with this phone's downloads (" + left + " left)");
         PR.firstGet = false;
         Wake.on();
         if (sh.length) await Shelf.get(sh, { quiet: true });
-        if (ar.length && !this.stop && !Shelf.stop) await Arc.get(ar, { quiet: true });
-        const failed = Shelf.failed.length + Arc.failed.length;
-        if (!this.stop && !Shelf.stop && !Arc.stop) {
+        if (mp.length && !this.stop && !Shelf.stop) await MapPk.get(mp, { quiet: true });
+        if (ar.length && !this.stop && !Shelf.stop && !MapPk.stop) await Arc.get(ar, { quiet: true });
+        const failed = Shelf.failed.length + Arc.failed.length + MapPk.failed.length;
+        if (!this.stop && !Shelf.stop && !Arc.stop && !MapPk.stop) {
           if (!failed && PR.autoGet) { PR.autoGet = false; flush(); }
           toast(failed ? failed + " item" + (failed > 1 ? "s" : "") + " didn't finish: it carries on when HAVYN is open on Wi-Fi, or tap Download everything" : "This phone has everything it needs offline");
         }
       } finally { this.busy = false; if (!document.body.classList.contains("em")) Wake.off(); render(); }
     },
-    halt() { this.stop = true; Shelf.stop = true; Arc.stop = true; if (PR.autoGet) { PR.autoGet = false; flush(); } },
+    halt() { this.stop = true; Shelf.stop = true; Arc.stop = true; MapPk.stop = true; if (PR.autoGet) { PR.autoGet = false; flush(); } },
     // iOS pauses a web app that isn't on screen, which breaks its downloads: carry on when it's back on screen or back online.
     carryOn() {
-      const idle = () => !(this.busy || Shelf.busy || Arc.busy);
+      const idle = () => !(this.busy || Shelf.busy || Arc.busy || MapPk.busy);
       if (!PR.autoGet || PREVIEW || document.hidden || navigator.onLine === false || document.body.classList.contains("em") || !idle()) return;
       clearTimeout(this.t); this.t = setTimeout(() => { if (PR.autoGet && !document.hidden && idle() && !document.body.classList.contains("em")) this.run(true); }, 2000);
     }
@@ -5159,11 +5668,12 @@ if (typeof module !== "undefined") module.exports = HAVYN_ENGINE;
       return [
         { k: "app", w: 10, f: isStandalone() ? 1 : 0, t: "On the Home Screen", d: isStandalone() ? "Opens like an app, with its own storage." : "In Safari: Share › Add to Home Screen, then open HAVYN from its icon. Downloads made in a Safari tab stay in that tab.", go: "#/system" },
         { k: "offline", w: 10, f: sw || PREVIEW ? 1 : 0, t: "Works with no internet", d: sw ? "The app itself is saved on this phone." : "Open HAVYN once while online; it saves itself for offline use.", go: "#/system" },
-        { k: "shelf", w: 15, f: share.length ? shHave / share.length : 1, t: "Manuals and guides: " + shHave + " of " + share.length, d: (shHave === share.length ? "Every phone-set document on HAVYN's shelf is here and searchable." : "First aid, water, food, power, radio, repair and survival manuals (" + sz(share.filter((i) => !shelfHave(i)).reduce((a, i) => a + shelfSize(i), 0)) + " to go)."), n: later ? later + (later === 1 ? " more isn't" : " more aren't") + " on HAVYN's shelf yet (the publisher was unreachable); HAVYN's shelf retries every day." : "", go: "#/archive?t=shelf" },
-        { k: "arc", w: 15, f: core.length ? arHave / core.length : 1, t: "Encyclopedias: " + arHave + " of " + core.length, d: arHave === core.length ? "WikiMed and the survival libraries are here." : "WikiMed, post-disaster, water, food, medicine, knots and a kids' encyclopedia (" + sz(core.filter((i) => !haveOnPhone(i)).reduce((a, i) => a + Arc.size(i), 0)) + " to go).", go: "#/archive?t=phone" },
+        { k: "shelf", w: 10, f: share.length ? shHave / share.length : 1, t: "Manuals and guides: " + shHave + " of " + share.length, d: (shHave === share.length ? "Every phone-set document on HAVYN's shelf is here and searchable." : "First aid, water, food, power, radio, repair and survival manuals (" + sz(share.filter((i) => !shelfHave(i)).reduce((a, i) => a + shelfSize(i), 0)) + " to go)."), n: later ? later + (later === 1 ? " more isn't" : " more aren't") + " on HAVYN's shelf yet (the publisher was unreachable); HAVYN's shelf retries every day." : "", go: "#/archive?t=shelf" },
+        { k: "arc", w: 10, f: core.length ? arHave / core.length : 1, t: "Encyclopedias: " + arHave + " of " + core.length, d: arHave === core.length ? "WikiMed and the survival libraries are here." : "WikiMed, post-disaster, water, food, medicine, knots and a kids' encyclopedia (" + sz(core.filter((i) => !haveOnPhone(i)).reduce((a, i) => a + Arc.size(i), 0)) + " to go).", go: "#/archive?t=phone" },
         { k: "books", w: 5, f: link.length ? lkHave / link.length : 1, t: "Health books from their publishers: " + lkHave + " of " + link.length, d: "Where There Is No Doctor and the others aren't re-hosted; get them from Get more › Shelf (Hesperian chapters are joined into one book).", go: "#/archive?t=shelf" },
         { k: "family", w: 15, f: plan / 4, t: "Family plan: " + plan + " of 4", d: people ? "An out-of-area contact, meeting places and where to go if you must leave." : "Start with who lives with you: a few taps.", go: people ? "#/family" : "#/quick/household" },
         { k: "supplies", w: 10, f: (hasW ? 0.5 : 0) + (hasF ? 0.5 : 0), t: hasW && hasF ? "Supplies counted" : "Count your supplies", d: "A few taps for water, food, power and gear; Home turns them into days you can last.", go: "#/quick/supplies" },
+        { k: "map", w: 10, f: MapPk.list().length ? MAPS.filter((m) => MapPk.list().some((p) => p.id === m.id)).length / MapPk.list().length : Math.min(1, MAPS.length / 2), t: "Offline maps on this phone", d: "Every street in the Phoenix area and Arizona's highways, the nearest ER and GPS, with no signal.", go: "#/map" },
         { k: "sim", w: 10, f: Math.min(1, simDone() / 3), t: "Sim Lab: " + Math.min(3, simDone()) + " of 3 run", d: "About a minute each: CPR to the beat, alarm sounds, scorpions, snakes, quick missions.", go: "#/sim" },
         { k: "card", w: 10, f: now() - (PR.lastBackup || 0) < 30 * DAY ? 1 : 0, t: "Memory Card saved this month", d: "Copies your plan to every family phone and keeps a backup.", go: "#/system" }
       ];
@@ -5172,10 +5682,11 @@ if (typeof module !== "undefined") module.exports = HAVYN_ENGINE;
     left() {
       const sh = Shelf.state === "ready" ? Shelf.todo(C.shelf.items.filter((i) => i.ph)) : C.shelf.items.filter((i) => i.ph && i.lic !== "link" && !shelfHave(i));
       const ar = coreArchives().filter((i) => Arc.can(i) && !haveOnPhone(i));
-      return { n: sh.length + ar.length, bytes: sh.reduce((a, i) => a + shelfSize(i), 0) + ar.reduce((a, i) => a + Arc.size(i), 0) };
+      const mp = MapPk.state === "ready" ? MapPk.todo() : [];
+      return { n: sh.length + ar.length + mp.length, bytes: sh.reduce((a, i) => a + shelfSize(i), 0) + ar.reduce((a, i) => a + Arc.size(i), 0) + MapPk.size(mp) };
     },
     panel(full) {
-      const rows = this.rows(), sc = this.score(), lf = this.left(), busy = Shelf.busy || Arc.busy || Everything.busy, done = lf.n === 0;
+      const rows = this.rows(), sc = this.score(), lf = this.left(), busy = Shelf.busy || Arc.busy || MapPk.busy || Everything.busy, done = lf.n === 0;
       const st = sc >= 90 ? "ok" : sc >= 50 ? "warn" : "crit", lv = level(sc), circ = 2 * Math.PI * 34;
       let h = '<section class="glass panel ready hud" id="ready"><div class="rdyhead">' +
         '<div class="ring" aria-hidden="true"><svg viewBox="0 0 80 80"><circle cx="40" cy="40" r="34" class="rt"/><circle cx="40" cy="40" r="34" class="rp" style="stroke-dasharray:' + circ.toFixed(1) + ";stroke-dashoffset:" + (circ * (1 - sc / 100)).toFixed(1) + '"/></svg><div class="lv"><small>LV</small><b>' + lv.n + "</b></div></div>" +
@@ -5207,12 +5718,12 @@ if (typeof module !== "undefined") module.exports = HAVYN_ENGINE;
     },
     paint() {
       const bar = $("#rdybar"), msg = $("#rdymsg"), stop = $("#rdystop"); if (!bar && !msg) return;
-      const m = Shelf.busy ? Shelf : Arc.busy ? Arc : null;
-      if (bar) { bar.classList.toggle("hide", !m); if (m) bar.firstElementChild.style.width = (m === Shelf ? Shelf.pct() : Arc.pct()) + "%"; }
-      if (msg) msg.textContent = m === Shelf ? Shelf.msg() : m === Arc ? Arc.msg() : "";
-      if (stop) stop.classList.toggle("hide", !(Shelf.busy || Arc.busy || Everything.busy));
+      const m = Shelf.busy ? Shelf : MapPk.busy ? MapPk : Arc.busy ? Arc : null;
+      if (bar) { bar.classList.toggle("hide", !m); if (m) bar.firstElementChild.style.width = m.pct() + "%"; }
+      if (msg) msg.textContent = m ? m.msg() : "";
+      if (stop) stop.classList.toggle("hide", !(Shelf.busy || Arc.busy || MapPk.busy || Everything.busy));
     },
-    mount() { Shelf.mount(); Arc.mount(); this.paint(); }
+    mount() { Shelf.mount(); Arc.mount(); MapPk.load(); this.paint(); }
   };
   function shelfRow(it) {
     const have = shelfHave(it), info = Shelf.info(it), sy = C.shelf.systems.find((x) => x.id === it.sys);
@@ -5729,7 +6240,7 @@ if (typeof module !== "undefined") module.exports = HAVYN_ENGINE;
       setTimeout(() => this.check(false), 6000);
     },
     idle() {
-      return (route.path === "status" || route.path === "") && !document.body.classList.contains("em") && !Welcome.on && !Shelf.busy && !Arc.busy && !Everything.busy &&
+      return (route.path === "status" || route.path === "") && !document.body.classList.contains("em") && !Welcome.on && !Shelf.busy && !Arc.busy && !MapPk.busy && !Everything.busy &&
         !(SR && ((SR.drill && SR.drill.phase === "run") || (SR.beat && SR.beat.phase !== "ready" && SR.beat.phase !== "done")));
     },
     check(manual) {
@@ -5801,6 +6312,29 @@ if (typeof module !== "undefined") module.exports = HAVYN_ENGINE;
       Snd.chime("nav");
     }
     else if (act === "q-save") quickSave();
+    else if (act === "map-packs") { MapView.packs = !MapView.packs; render(); }
+    else if (act === "map-get") { const p = b.dataset.id ? MapPk.list().filter((x) => x.id === b.dataset.id) : null; MapPk.get(p); }
+    else if (act === "map-del") { if (confirmTap(b, "mapdel" + b.dataset.id, "Tap again to remove")) MapPk.remove(b.dataset.id); }
+    else if (act === "map-kind") { const k = b.dataset.k, on = MapView.shown(); on.has(k) ? on.delete(k) : on.add(k); PR.mapKinds = [...on]; flush(); MapView.refresh(); render(); }
+    else if (act === "map-near") { PR.mapNear = b.dataset.k; if (!MapView.shown().has(b.dataset.k)) { MapView.shown().add(b.dataset.k); PR.mapKinds = [...MapView.shown()]; MapView.refresh(); } flush(); render(); }
+    else if (act === "map-gps") MapView.gps(true);
+    else if (act === "map-nearopen") { PR.mapNearOpen = !PR.mapNearOpen; flush(); render(); }
+    else if (act === "map-north") { if (MapView.map) MapView.map.easeTo({ bearing: 0, pitch: 0 }); }
+    else if (act === "map-poi") { const i = +b.dataset.i, p = MapView.places && MapView.places.pois[i]; if (p) { MapView.sel = { poi: i }; MapView.focus([p[3], p[2]], 14); render(); } }
+    else if (act === "map-go") { const t = b.dataset.t, i = b.dataset.i === "" ? -1 : +b.dataset.i; MapView.q = ""; MapView.sel = t === "poi" ? { poi: i } : t === "pin" ? { pin: i } : null; MapView.focus([+b.dataset.lon, +b.dataset.lat], t === "place" ? 13 : 15); render(); }
+    else if (act === "map-close") { MapView.sel = null; render(); }
+    else if (act === "map-fly") MapView.focus([+b.dataset.lon, +b.dataset.lat], 15);
+    else if (act === "map-copy") { const v = b.dataset.v; (navigator.clipboard ? navigator.clipboard.writeText(v) : Promise.reject()).then(() => toast("Copied " + v)).catch(() => toast(v)); }
+    else if (act === "map-save") {
+      const s0 = MapView.sel && MapView.sel.drop; if (!s0) return;
+      const k = b.dataset.k, n = /^meet(\d)$/.exec(k), plan = S.plan || {}, nm = n && plan["rally" + n[1]] && plan["rally" + n[1]] !== "Home" ? plan["rally" + n[1]] : MAPK[k][0];
+      // Home, work, school and each meeting place are one spot each (saving again moves it); a record per spot, so
+      // a Memory Card carries it to the family's other phones and the newest move wins.
+      S.spots = S.spots || [];
+      const old = k === "spot" ? null : L("spots").find((x) => x.kind === k), rec = { id: old ? old.id : uid(), kind: k, name: nm, lon: +s0[0].toFixed(6), lat: +s0[1].toFixed(6), at: now() };
+      upsert("spots", rec); flush(); MapView.sel = { pin: S.spots.findIndex((x) => x.id === rec.id) }; MapView.refresh(); Snd.chime("save"); toast("Saved: " + nm); render();
+    }
+    else if (act === "map-unpin") { if (confirmTap(b, "unpin" + b.dataset.i, "Tap again to remove")) { const r = (S.spots || [])[+b.dataset.i]; if (r) remove("spots", r.id); flush(); MapView.sel = null; MapView.refresh(); render(); } }
     else if (act === "upd-check") Upd.check(true);
     else if (act === "upd-restart") location.reload();
     else if (act === "sim-pick") simPick(Number(b.dataset.i));
@@ -5949,13 +6483,14 @@ if (typeof module !== "undefined") module.exports = HAVYN_ENGINE;
     const n = decodeURIComponent(a.getAttribute("href").slice(4)), w = n === "911" ? "Called 911" : "Called " + (a.textContent.trim().replace(/^call\s+/i, "") || n);
     Inc.add(w, cardView.id || ""); if (route.path === "emergency") setTimeout(render, 50);
   }, true);
+  document.addEventListener("input", (e) => { if (e.target && e.target.id === "mapq") { MapView.q = e.target.value; const r = $("#mapres"); if (r) r.innerHTML = mapRes(); } });
   document.addEventListener("pointerdown", (e) => { if (e.target.closest(".beatart") && SR && SR.beat && SR.beat.phase === "run") { e.preventDefault(); Beat.tap(); } }, true);
   // An iPhone lets a page make sound only after a touch: unlock it on the first touch of every session (silently),
   // so the voice guide can speak the moment a card opens.
   ["pointerdown", "touchend", "keydown"].forEach((ev) => document.addEventListener(ev, function once() { Snd.ctx(); document.removeEventListener(ev, once, true); }, true));
   window.addEventListener("hashchange", render);
   document.addEventListener("visibilitychange", () => { if (document.hidden) flush(); else { if (document.body.classList.contains("em")) Wake.on(); Everything.carryOn(); } });
-  window.addEventListener("online", () => Everything.carryOn());
+  window.addEventListener("online", () => { if (MapPk.state === "ready" && MapPk.why === "offline") { MapPk.state = "idle"; MapPk.load(); } Everything.carryOn(); });
 
   async function eraseAll() {
     await PdfV.close(); Media.close(); for (const x of LIB) if (typeOf(x) === "zim") ZR.drop(x.id); LIB = [];
@@ -6241,6 +6776,7 @@ if (typeof module !== "undefined") module.exports = HAVYN_ENGINE;
     if (pr && typeof pr === "object") PR = Object.assign(prefDefaults(), pr);
     const lib = await Store.get("lib"); LIB = Array.isArray(lib) ? lib.filter((x) => x && typeof x.id === "string") : [];
     const inc = await Store.get("incident"); INC = inc && Array.isArray(inc.ev) && inc.ev.length ? inc : null;
+    const mp = await Store.get("maps"); MAPS = Array.isArray(mp) ? mp.filter((m) => m && m.id && Array.isArray(m.parts)) : [];
     const v = $(".void"); if (v && !v.children.length) for (let i = 0; i < 14; i++) { const m = document.createElement("i"); m.style.left = (5 + Math.random() * 90) + "%"; m.style.top = (40 + Math.random() * 55) + "%"; m.style.animationDelay = (-Math.random() * 22).toFixed(1) + "s"; v.appendChild(m); }
     // First open from the Home Screen: get everything onto this phone without being asked (the welcome says so, and Stop stops it).
     if (isStandalone() && !PREVIEW && !PR.setupAt) { PR.setupAt = Date.now(); PR.autoGet = true; PR.firstGet = true; flush(); }
@@ -6255,7 +6791,7 @@ if (typeof module !== "undefined") module.exports = HAVYN_ENGINE;
       navigator.serviceWorker.register("./sw.js").then((reg) => { Upd.init(reg); return navigator.serviceWorker.ready; }).then(() => { const s = $("#swst"); if (s) s.textContent = "Saved for offline"; }).catch(() => { const s = $("#swst"); if (s) s.textContent = "Not available"; });
     }
   }
-  window.__HAVYN = { upd: Upd, get sim() { return SR; }, sims: SIMS, beat: Beat, drill: Drill, alarm: AlarmSnd, get incident() { return INC; }, get state() { return S; }, get prefs() { return PR; }, get lib() { return LIB; }, E, C, version: VERSION, arc: Arc, shelf: Shelf, ready: Ready, store: Store, welcome: Welcome, voice: Voice, clips: Clips };
+  window.__HAVYN = { upd: Upd, maps: { pk: MapPk, view: MapView, get have() { return MAPS; } }, get sim() { return SR; }, sims: SIMS, beat: Beat, drill: Drill, alarm: AlarmSnd, get incident() { return INC; }, get state() { return S; }, get prefs() { return PR; }, get lib() { return LIB; }, E, C, version: VERSION, arc: Arc, shelf: Shelf, ready: Ready, store: Store, welcome: Welcome, voice: Voice, clips: Clips };
   boot();
 })();
 </script>

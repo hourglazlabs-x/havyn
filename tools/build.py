@@ -6,7 +6,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 SRC, APP, PREV = ROOT / "src", ROOT / "app", ROOT / "preview"
-APP_VERSION = "1.8.1"
+APP_VERSION = "1.9.0"
 
 def read(p): return (SRC / p).read_text(encoding="utf-8")
 
@@ -31,7 +31,12 @@ def build():
     vend = b"".join((vendor / f).read_bytes() for f in ("pdf.min.js", "pdf.worker.min.js")) + (ROOT / "vendor" / "pdflib" / "pdf-lib.esm.min.js").read_bytes()
     # Archive reader: fzstd (vendored, MIT) + HAVYN's ZIM engine, one file for the page and the service worker.
     zimkit = (ROOT / "vendor" / "fzstd" / "fzstd.js").read_text(encoding="utf-8") + "\n" + read("zimkit.js")
-    digest = hashlib.sha256((css + js + tpl + read("sw.js") + zimkit + (ROOT / "tools" / "vault.py").read_text(encoding="utf-8") + (ROOT / "tools" / "shelf.py").read_text(encoding="utf-8")).encode() + vend).hexdigest()[:10]
+    # The map kit (renderer, style, fonts, symbols, places) is cached with the app; the map packs themselves are not
+    # (the app stores those itself, from maps/packs/, which the deploy adds). A change to any kit file is a new version,
+    # so phones pick up fresh places and fonts.
+    mapkit = sorted(str(f.relative_to(SRC)).replace("\\", "/") for d in ("vendor", "maps") if (SRC / d).exists() for f in (SRC / d).rglob("*") if f.is_file())
+    kit = b"".join(f.encode() + hashlib.sha256((SRC / f).read_bytes()).digest() for f in mapkit)
+    digest = hashlib.sha256((css + js + tpl + read("sw.js") + zimkit + (ROOT / "tools" / "vault.py").read_text(encoding="utf-8") + (ROOT / "tools" / "shelf.py").read_text(encoding="utf-8")).encode() + vend + kit).hexdigest()[:10]
     version = f"{APP_VERSION}+{digest}"
     js = js.replace("__VERSION__", version)
 
@@ -54,7 +59,8 @@ def build():
     if APP.exists(): shutil.rmtree(APP)
     APP.mkdir(parents=True)
     (APP / "index.html").write_text(page(js, csp), encoding="utf-8")
-    (APP / "sw.js").write_text(read("sw.js").replace("__VERSION__", version).replace("/*VOICE*/", ", ".join('"./voice/%s"' % f for f in vfiles)), encoding="utf-8")
+    (APP / "sw.js").write_text(read("sw.js").replace("__VERSION__", version).replace("/*VOICE*/", ", ".join('"./voice/%s"' % f for f in vfiles))
+                               .replace("/*MAPKIT*/", ", ".join(json.dumps("./" + f) for f in mapkit)), encoding="utf-8")
     (APP / "zimkit.js").write_text(zimkit, encoding="utf-8")
     manifest = {
         "id": "./", "name": "HAVYN FIELD", "short_name": "HAVYN", "start_url": "./", "scope": "./",
@@ -76,6 +82,8 @@ def build():
         shutil.copy(ROOT / "vendor" / "fzstd" / "LICENSE", d / "zimkit-fzstd-LICENSE.txt")
         for f in vfiles:
             (d / "voice" / f).parent.mkdir(parents=True, exist_ok=True); shutil.copy(SRC / "voice" / f, d / "voice" / f)
+        for f in mapkit:
+            (d / f).parent.mkdir(parents=True, exist_ok=True); shutil.copy(SRC / f, d / f)
 
     # Preview build: same app, flagged so it skips the service worker; no CSP so a host page can frame it.
     if PREV.exists(): shutil.rmtree(PREV)
@@ -87,6 +95,8 @@ def build():
     shutil.copytree(APP / "pdflib", PREV / "pdflib")
     shutil.copy(APP / "zimkit.js", PREV / "zimkit.js")
     if vfiles: shutil.copytree(APP / "voice", PREV / "voice")
+    for d in ("vendor", "maps"):
+        if (APP / d).exists(): shutil.copytree(APP / d, PREV / d, ignore=shutil.ignore_patterns("packs"))
 
     # Protocol cards as markdown, one file each (generated from src/content.js, the single source).
     out = subprocess.run(["node", "-e", "process.stdout.write(JSON.stringify(require(process.argv[1])))", str(SRC / "content.js")],

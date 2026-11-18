@@ -429,3 +429,101 @@ test("v1.8 Sim Lab drawings are well-formed SVG", () => {
   const out = execFileSync("python3", ["-c", "import sys, json, xml.etree.ElementTree as E\nfor k, v in json.load(sys.stdin).items(): E.fromstring('<svg xmlns=\"http://www.w3.org/2000/svg\">' + v + '</svg>')\nprint('ok')"], { input: JSON.stringify(S.art) }).toString();
   assert.equal(out.trim(), "ok");
 });
+
+test("v1.9 map style: every label font HAVYN uses is shipped and listed, the symbol sheet is whole, licences sit beside them", () => {
+  const fs = require("node:fs"), path = require("node:path"), M = path.join(__dirname, "..", "src", "maps");
+  const st = JSON.parse(fs.readFileSync(path.join(M, "style.json"), "utf8"));
+  assert.equal(st.version, 8); assert.ok(st.layers.length > 50 && st.sources.protomaps, "a full basemap style");
+  assert.ok(st.layers.some((l) => l.type === "background") && st.layers.some((l) => l.id === "earth"), "land and background");
+  // labels come last (HAVYN puts its markers just below them)
+  const firstSym = st.layers.findIndex((l) => l.type === "symbol");
+  assert.ok(firstSym > 0 && st.layers.slice(firstSym).every((l) => l.type === "symbol"), "every label layer after every land/road layer");
+  const G = st.metadata && st.metadata["havyn:glyphs"]; assert.ok(G, "the style lists the glyphs shipped with it");
+  const shipped = fs.readdirSync(path.join(M, "fonts")).filter((f) => fs.statSync(path.join(M, "fonts", f)).isDirectory());
+  assert.deepEqual(Object.keys(G).sort(), shipped.sort(), "listed fonts = shipped fonts");
+  for (const f of shipped) {
+    const files = fs.readdirSync(path.join(M, "fonts", f)).filter((x) => x.endsWith(".pbf")).map((x) => x.slice(0, -4));
+    assert.deepEqual(G[f].slice().sort(), files.sort(), f + ": listed ranges = shipped files");
+    for (const r of ["0-255", "256-511", "768-1023", "8192-8447"]) assert.ok(files.includes(r), f + " " + r + " (Latin, accents incl. Navajo, punctuation)");
+    for (const r of files) assert.ok(fs.statSync(path.join(M, "fonts", f, r + ".pbf")).size > 1000, f + " " + r + " has glyphs");
+  }
+  const used = new Set(), walk = (v) => { if (Array.isArray(v)) v.forEach(walk); else if (typeof v === "string" && / /.test(v)) used.add(v); };
+  for (const l of st.layers) if (l.layout && l.layout["text-font"]) walk(l.layout["text-font"]);
+  for (const f of used) assert.ok(G[f], "label font " + f + " is shipped");
+  for (const s of ["dark", "dark@2x"]) {
+    const j = JSON.parse(fs.readFileSync(path.join(M, "sprites", s + ".json"), "utf8")), png = fs.readFileSync(path.join(M, "sprites", s + ".png"));
+    assert.equal(png.toString("latin1", 1, 4), "PNG");
+    const w = png.readUInt32BE(16), h = png.readUInt32BE(20);
+    assert.ok(Object.keys(j).length > 50, s + " has the symbols");
+    for (const [k, v] of Object.entries(j)) assert.ok(v.x + v.width <= w && v.y + v.height <= h, s + " " + k + " inside the sheet");
+  }
+  assert.ok(/SIL Open Font License/i.test(fs.readFileSync(path.join(M, "fonts", "OFL.txt"), "utf8")), "Noto's licence beside the fonts");
+  assert.ok(/MIT|Permission is hereby granted/i.test(fs.readFileSync(path.join(M, "sprites", "LICENSE.md"), "utf8")), "the symbols' licence beside them");
+  const V = path.join(__dirname, "..", "src", "vendor");
+  assert.ok(/BSD|Redistribution/i.test(fs.readFileSync(path.join(V, "maplibre", "LICENSE.txt"), "utf8")), "MapLibre's licence");
+  assert.ok(/BSD/i.test(fs.readFileSync(path.join(V, "pmtiles", "LICENSE.txt"), "utf8")), "PMTiles' licence");
+});
+
+test("v1.9 places: every emergency place is a known kind with a name, inside Arizona, with OpenStreetMap credited", () => {
+  const P = require("../src/maps/places.json");
+  assert.deepEqual(P.fields, ["kind", "name", "lat", "lon", "address", "phone", "hours"]);
+  assert.ok(/OpenStreetMap/.test(P.license) && /ODbL/.test(P.license), "credit and licence");
+  assert.ok(!isNaN(Date.parse(P.built)), "built date");
+  const kinds = { er: 0, hospital: 0, urgent: 0, aed: 0, fire: 0, police: 0, pharmacy: 0, water: 0, fuel: 0 };
+  for (const p of P.pois) {
+    assert.ok(p[0] in kinds, "kind " + p[0]); kinds[p[0]]++;
+    assert.ok(typeof p[1] === "string" && p[1].trim(), "a name");
+    assert.ok(p[2] >= 31.3 && p[2] <= 37.01 && p[3] >= -114.82 && p[3] <= -109.04, p[1] + " is in Arizona");
+    assert.ok(p.length === 7 && p.slice(4).every((x) => typeof x === "string"), p[1] + " address/phone/hours are text");
+    if (p[5]) assert.ok(/\d{3}.*\d{4}/.test(p[5]), p[1] + " phone looks like a number: " + p[5]);
+  }
+  assert.ok(kinds.er >= 50 && kinds.fire >= 100 && kinds.pharmacy >= 100, JSON.stringify(kinds));
+  const pk = new Set(["city", "town", "village", "hamlet", "suburb", "neighbourhood", "locality"]);
+  assert.ok(P.places.length > 300 && P.places.every((x) => pk.has(x[0]) && x[1] && x[2] >= 31.3 && x[2] <= 37.01), "place names");
+});
+
+test("v1.9 map packs: the Phoenix pack sits inside the Arizona pack, zooms and centres make sense", () => {
+  const { packs } = require("../maps/packs.json"), ids = new Set();
+  assert.ok(packs.length >= 2);
+  for (const p of packs) {
+    assert.ok(!ids.has(p.id) && /^[a-z0-9-]+$/.test(p.id), "id " + p.id); ids.add(p.id);
+    const [w, s, e, n] = p.bbox;
+    assert.ok(w < e && s < n && w >= -180 && e <= 180 && s >= -85 && n <= 85, p.id + " bbox");
+    assert.ok(p.maxzoom >= 10 && p.maxzoom <= 15, p.id + " maxzoom");
+    assert.ok(p.center[0] > w && p.center[0] < e && p.center[1] > s && p.center[1] < n, p.id + " centre inside");
+    assert.ok(p.name && p.sub, p.id + " is named for the family");
+  }
+  const phx = packs.find((p) => p.id === "phoenix"), az = packs.find((p) => p.id === "arizona");
+  assert.ok(phx.bbox[0] >= az.bbox[0] && phx.bbox[1] >= az.bbox[1] && phx.bbox[2] <= az.bbox[2] && phx.bbox[3] <= az.bbox[3] && phx.maxzoom > az.maxzoom, "detail inside the statewide pack");
+});
+
+test("v1.9 every icon the app draws exists (map markers, Map tile and buttons)", () => {
+  const fs = require("node:fs"), src = fs.readFileSync(require("node:path").join(__dirname, "..", "src", "app.js"), "utf8");
+  const i = src.indexOf("const P = {"), keys = new Set([...src.slice(i, src.indexOf("\n  };", i)).matchAll(/\n\s+([a-zA-Z0-9_]+):/g)].map((m) => m[1]));
+  const used = new Set([...src.matchAll(/\bic\("([a-zA-Z0-9_]+)"/g)].map((m) => m[1]));
+  const mk = src.slice(src.indexOf("const MAPK = {"), src.indexOf("};", src.indexOf("const MAPK = {")));
+  for (const m of mk.matchAll(/\["[^"]+", "#[0-9a-fA-F]{6}", "([a-z0-9]+)"\]/g)) used.add(m[1]);
+  const tiles = [...src.matchAll(/\["#\/[a-z]+(?:\?[^"]*)?", "([a-z0-9]+)", "/g)].map((m) => m[1]); tiles.forEach((t) => used.add(t));
+  assert.ok(used.has("map") && tiles.length >= 4 && used.size > 25, used.size + " icons");
+  for (const u of used) assert.ok(keys.has(u), "icon " + u);
+});
+
+test("v1.9 map spots travel by Memory Card: the newest move wins, a removal travels, junk coordinates don't", () => {
+  const E = require("../src/engine.js");
+  const mine = { spots: [{ id: "s1", kind: "meet1", name: "Park", lon: -112, lat: 33.5, updated: 100 }, { id: "s3", kind: "work", name: "Work", lon: -111.9, lat: 33.4, updated: 100 }] };
+  const card = E.sanitize({ spots: [
+    { id: "s1", kind: "meet1", name: "Park", lon: -112.1, lat: 33.6, updated: 200 },            // moved later on the other phone
+    { id: "s2", kind: "home", name: "Home", lon: "-112.07", lat: "33.45", updated: 150 },       // new, numbers as text
+    { id: "s3", deleted: true, updated: 300 },                                                  // removed on the other phone
+    { id: "s4", kind: "<script>", name: "x".repeat(500), lon: -112, lat: 33, updated: 1 },     // odd kind, long name
+    { id: "s5", kind: "spot", name: "Nowhere", lon: "abc", lat: 95, updated: 1 }                 // no real place: dropped
+  ] });
+  assert.equal(card.spots.length, 4);
+  const s4 = card.spots.find((p) => p.id === "s4"); assert.equal(s4.kind, "spot"); assert.equal(s4.name.length, 120);
+  const { state, report } = E.merge(mine, card), by = Object.fromEntries(state.spots.map((p) => [p.id, p]));
+  assert.deepEqual([by.s1.lon, by.s1.lat], [-112.1, 33.6], "the newer move wins");
+  assert.deepEqual([by.s2.lon, by.s2.lat], [-112.07, 33.45], "coordinates as numbers");
+  assert.ok(by.s3.deleted, "the removal travels");
+  assert.equal(E.live(state.spots).length, 3);
+  assert.ok(report.sections.includes("spots"));
+});

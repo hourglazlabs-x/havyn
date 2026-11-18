@@ -2,7 +2,7 @@ name: Deploy HAVYN FIELD
 on:
   push:
     branches: [main]
-    paths: ["app/**", ".github/workflows/pages.yml", "tools/shelf_pages.py", "shelf/kiwix.json"]
+    paths: ["app/**", ".github/workflows/pages.yml", "tools/shelf_pages.py", "tools/maps_pages.py", "shelf/kiwix.json"]
   workflow_dispatch:
   schedule:
     - cron: "17 11 * * 1"   # weekly: refresh the archive links (Kiwix publishes new editions)
@@ -21,6 +21,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+      - name: Add the offline map packs (served from HAVYN's own address)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 tools/maps_pages.py app/maps/packs
       - name: Add the phone shelf (served from HAVYN's own address)
         env:
           GH_TOKEN: ${{ github.token }}

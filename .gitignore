@@ -4,3 +4,4 @@ node_modules/
 .DS_Store
 tools/__pycache__/
 tests/__pycache__/
+app/maps/packs/

@@ -127,7 +127,7 @@
  {
   "name": "While pushing: the pace shows live and says Good at 110",
   "pass": true,
-  "detail": "['110', 'Good', 'rotate(0.3deg)']"
+  "detail": "['110', 'Good', 'rotate(0.2deg)']"
  },
  {
   "name": "Steady 110 a minute: most pushes in the zone, 3 stars",

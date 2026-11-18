@@ -249,7 +249,7 @@ const HAVYN_ENGINE = (() => {
     if (!a || num(b.updated) > num(a.updated)) return { rec: b, took: true };
     return { rec: a, took: false };
   }
-  const COLLS = ["people", "pets", "items", "log", "tasks", "buys"];
+  const COLLS = ["people", "pets", "items", "log", "tasks", "buys", "spots"];
   const SINGLES = ["settings", "plan", "outage", "checks"];
   function merge(local, incoming) {
     const out = Object.assign({}, local);
@@ -277,6 +277,9 @@ const HAVYN_ENGINE = (() => {
     for (const i of out.items) { i.name = str(i.name, 160); i.qty = num(i.qty); if (i.per_unit && typeof i.per_unit !== "object") i.per_unit = {}; }
     for (const t of out.tasks) { if (t.custom) t.t = str(t.t, 200); }
     for (const b of out.buys) { if (!STATUSES.includes(b.status)) b.status = "buy"; }
+    // map spots: a place on the map needs real coordinates; a removed one travels as its tombstone
+    out.spots = out.spots.filter((p) => p.deleted || (Number.isFinite(+p.lon) && Number.isFinite(+p.lat) && Math.abs(+p.lat) <= 90 && Math.abs(+p.lon) <= 180));
+    for (const p of out.spots) if (!p.deleted) { p.name = str(p.name, 120); p.kind = /^(home|meet[123]|work|school|spot)$/.test(p.kind) ? p.kind : "spot"; p.lon = +p.lon; p.lat = +p.lat; }
     return out;
   }
 

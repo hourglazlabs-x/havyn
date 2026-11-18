@@ -1,7 +1,21 @@
 # HAVYN: mission state
 
-**Current milestone:** M8, HAVYN FIELD v1.8: the Sim Lab, train by doing in about a minute (CPR Beat, Alarm ID, the 2-Minute Drill, five illustrated scans and three missions, narrated, with stars). Built on v1.7 (cards read aloud, the log for responders, the status line), v1.6 (the command deck and the British voice) and v1.5 (Download everything). Live at https://hourglazlabs-x.github.io/havyn/ (GitHub Pages, deployed on every push to `app/`).
-**Build:** 1.8.1 · 2026-11-16 · `app/index.html` 634 KB + `zimkit.js` 54 KB + PDF.js and pdf-lib + 206 voice recordings (10.3 MB), all cached for offline. Installed phones update themselves (v1.8.1).
+**Current milestone:** M9, HAVYN FIELD v1.9: offline maps. Street maps of the Phoenix metro and all of Arizona on the phone, the nearest ER with distance and direction, GPS with no signal, and the family's meeting places saved on the map and shared by Memory Card. Built on v1.8 (the Sim Lab), v1.7 (cards read aloud, the log for responders), v1.6 (the command deck and the British voice) and v1.5 (Download everything). Live at https://hourglazlabs-x.github.io/havyn/ (GitHub Pages, deployed on every push to `app/`).
+**Build:** 1.9.0 · 2026-11-17 · `app/index.html` 684 KB + `zimkit.js` 54 KB + PDF.js and pdf-lib + the map kit (MapLibre GL JS, PMTiles, style, fonts, symbols and 2,659 places: 3.6 MB) + 206 voice recordings (10.3 MB), all cached for offline. The two map packs (184 MB) download into the app like the manuals. Installed phones update themselves.
+
+## v1.9 "done when": evidence
+
+| Criterion | Status | Evidence |
+| --- | --- | --- |
+| Maps work with no signal | PASS (Chrome) | e2e_maps: both packs download from HAVYN's own address with byte ranges, each checked against its SHA-256; the map draws only from the packs on the phone (tiles and label fonts through `havyn://`; no request leaves HAVYN's address and the content security policy is never tripped); after a restart nothing downloads again. |
+| Downloads are safe | PASS (Chrome) | A pack whose SHA-256 doesn't match is refused and deleted; Stop keeps the 32 MB parts already saved and Get carries on from there; Remove needs a second tap and frees the space; the map carries on with the pack that's left. |
+| The nearest ER, fast | PASS (Chrome) | From downtown Phoenix by GPS: Banner University Medical Center Phoenix, 1.4 mi NE (a hospital OpenStreetMap lists with an emergency room). It works before any pack is downloaded, and the emergency list's Nearest ER opens the map on it. |
+| A professional map | PASS (Chrome, screenshots) | Street level downtown (267 named-road features); Flagstaff from the statewide pack, with the Phoenix pack asking for nothing there; town names (Phoenix, Mesa, Scottsdale…) stay readable over the markers; no doubled labels where the packs overlap; zoomed right out, all of Arizona fits the phone and the map stops at the stored area. `tests/map_glyphs.js`: every character in 4.1 million labelled features over 22,676 tiles checked against the shipped fonts; every town, road and water name is drawable, the accents in Navajo place names included (Tsé Dildǫ́ʼí); one character in 12.2 million uses has no glyph (a Cyrillic letter in a spam shop name). Screenshots `tests/shots/maps-*.png`. |
+| GPS you can trust | PASS (Chrome) | Use my location puts you on the map; a dropout doesn't end tracking; away from the stored area the list says so; a fix 2 minutes old or more shows its age. |
+| The family shares its places | PASS (Chrome, engine) | A long-press saves Meeting place 1 (named from the family plan); saving it again moves it (one record). Engine: spots merge by Memory Card, the newest move wins, a removal travels, junk coordinates are dropped. |
+| On an iPhone | OPEN | Not yet run on a phone: map speed and memory on the family's oldest iPhone, the 184 MB download into Safari's storage, the location prompt in the Home Screen app, long-press and pinch. |
+
+Test totals for 1.9.0: engine 37/37, archive reader 208/208, end-to-end 91/91 + 76/76 + 31/31 + 72/72 + 35/35 + 38/38 + 9/9, maps 41/41 (with the glyph scan of both packs), shelf fetcher 27/27.
 
 ## v1.8 "done when": evidence
 
@@ -138,15 +152,17 @@ An independent pass compared every card step with its sources (AHA 2025 adult an
 2. **Two shelf documents still to fetch** (ATP 3-34.45, DOT ERG 2024): the daily `shelf` run retries them; check the release's `shelf-index.json`.
 3. **Medical review gate (20 cards, the v1.7 timer hints and the v1.8 Sim Lab answers).** A trained EMT or nurse must review and sign each file in `content/cards/`; until then every card shows "Awaiting EMT or nurse review".
 4. **On-device checks that headless Chrome can't do:**
+   - v1.9: the map on an iPhone: drawing speed and memory on the oldest phone (WebGL), the 184 MB of packs stored in Safari's IndexedDB, the location prompt and accuracy in the Home Screen app, long-press to drop a pin, pinch and rotate.
    - v1.8: CPR Beat tap timing on an iPhone (touch latency); the alarm tones through the phone speaker with the ring switch on silent.
    - v1.7: the card voice on an iPhone (first touch unlocks sound; the ring switch shouldn't silence it while a card talks); the 8 MB of recordings caching on first install over cellular.
    - v1.3: import a 1–2 GB archive on an iPhone (Safari's IndexedDB with a multi-GB file); archive video inside the reader on iOS (service-worker byte ranges in WebKit); the reader frame's link handling and dark pages in WebKit; how much HAVYN may store (`navigator.storage.estimate()` on the family phones).
    - Earlier: the binder share sheet; the PDF reader on long books; the metronome with the silent switch on; wake lock; AirDrop of a Memory Card; Dynamic Type at the largest size; first-screen time on the oldest iPhone.
-5. **Windows vault script:** run once on a Windows PC (only the bash version ran here).
-6. **Codex audit** against these tables, then **founder acceptance**.
+5. **Map data check:** the ER list is what OpenStreetMap tags (a hospital with `emergency=yes`), not Arizona's licensing list; freestanding ERs mapped another way aren't listed. Compare the family's nearest ERs with what you know, and fix OpenStreetMap if one is wrong (the monthly `maps` run picks it up).
+6. **Windows vault script:** run once on a Windows PC (only the bash version ran here).
+7. **Codex audit** against these tables, then **founder acceptance**.
 
 ## Next
 
 - **Home library (CORE):** set up Kiwix Hotspot on a laptop or iPad on the home Wi-Fi; save its address in HAVYN (Get more › Home).
 - **VAULT:** buy the drives (Black Friday), run the vault script, keep a second drive in sync.
-- **Later:** full-text search inside archives on the phone (needs a Xapian reader); Zimit archives inside HAVYN (needs a sandboxed replay engine); maps inside HAVYN (Apple Maps offline covers it for now).
+- **Later:** full-text search inside archives on the phone (needs a Xapian reader); Zimit archives inside HAVYN (needs a sandboxed replay engine).

@@ -1,0 +1,207 @@
+[
+ {
+  "name": "Every town, road and water name in the packs has its letters in HAVYN's fonts (zoom 5 and up)",
+  "pass": true,
+  "detail": "152 characters, 22676 tiles, 6.9 s; missing: [('U+0435', 1, 'Scarlet D\\u200b\\u200b\\u200b\\u200b\\u200b\\u200b\\u200b\\u200b\\u200b\\u200b\\u200b\\u200bum\\u200b\\u200b\\u200b\\u200b\\u200b\\u200b\\u200b\\u200b\\u200b\\u200b\\u200b\\u200b\\u200b\\u200b\\u200bps')]"
+ },
+ {
+  "name": "A pack whose checksum doesn't match is refused and deleted",
+  "pass": true,
+  "detail": "[\"Arizona (it arrived damaged (its checksum didn't match), so it was deleted (try again))\"]"
+ },
+ {
+  "name": "Home: Map leads the know-how tiles",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "Readiness has an offline-maps quest",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "Map screen offers both packs with sizes",
+  "pass": true,
+  "detail": "(['Phoenix metro', 'Arizona'], ['142', '42', '184'])"
+ },
+ {
+  "name": "Before any map: the nearest ER list already works (places ship with the app)",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "Stop keeps what arrived (resumable)",
+  "pass": true,
+  "detail": "56623104"
+ },
+ {
+  "name": "Get all maps finishes both, checksums verified",
+  "pass": true,
+  "detail": "['phoenix:5', 'arizona:2']"
+ },
+ {
+  "name": "\u2026carrying on from where it stopped",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "The map opens offline-style from the stored packs",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "Downtown Phoenix at street level, street names and all",
+  "pass": true,
+  "detail": "265"
+ },
+ {
+  "name": "Flagstaff, outside the Phoenix pack, comes from the statewide pack",
+  "pass": true,
+  "detail": "129"
+ },
+ {
+  "name": "\u2026and the Phoenix pack asks for nothing there",
+  "pass": true,
+  "detail": "0"
+ },
+ {
+  "name": "Zoomed out over the metro, town names stay readable over the ER markers",
+  "pass": true,
+  "detail": "['Ajo', 'Wickenburg', 'Buckeye', 'Gila Bend', 'Black Canyon City', 'Payson', 'Eloy', 'Florence']"
+ },
+ {
+  "name": "Markers sit above every pack's land and roads and below all the labels; you and your pins on top",
+  "pass": true,
+  "detail": "['hv-me-acc', 'hv-pois', 'hv-pois-er', 'hv-pins', 'hv-me']"
+ },
+ {
+  "name": "Inside the Phoenix pack the statewide pack's labels stay out (no doubled street names)",
+  "pass": true,
+  "detail": "0"
+ },
+ {
+  "name": "Street names draw with the fonts HAVYN ships, from its own address",
+  "pass": true,
+  "detail": "(10, ['http://127.0.0.1:8783/maps/fonts/Noto%20Sans%20Italic/0-255.pbf', 'http://127.0.0.1:8783/maps/fonts/Noto%20Sans%20Medium/0-255.pbf', 'http://127.0.0.1:8783/maps/fonts/Noto%20Sans%20Regular/0-255.pbf'])"
+ },
+ {
+  "name": "A label with characters HAVYN doesn't ship (Georgian, an emoji) still draws, and asks for nothing",
+  "pass": true,
+  "detail": "(13, [])"
+ },
+ {
+  "name": "It won't pan off to places it has nothing for, and zoomed right out all of Arizona fits the phone",
+  "pass": true,
+  "detail": "[-111.93, 34.22, 5.19, -115.69, 27.24, -108.17, 40.67]"
+ },
+ {
+  "name": "Use my location: GPS (no internet needed) puts you on the map",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "Nearest ER from downtown Phoenix is a confirmed ER within 3 miles",
+  "pass": true,
+  "detail": "Banner University Medical Center Phoenix Emergency room \u00b7 1111 East McDowell Road, Phoenix 1.4 mi \u2191 NE"
+ },
+ {
+  "name": "GPS keeps tracking through a dropout; away from the stored area the list says so",
+  "pass": true,
+  "detail": "NEAREST ER\nfrom you \u00b7 outside the map's area \u25b4\nPalo Verde Hospital\nEmergency roo"
+ },
+ {
+  "name": "\u2026and back home it doesn't",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "The list opens to four, with place kinds",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "Nearest pharmacy, and pharmacies are on the map",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "A place opens its card: distance, direction, address, coordinates",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "Search finds places offline",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "A result flies there and opens it",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "Long-press (right-click here) drops a pin to save",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "Saved as Meeting place 1, with its coordinates",
+  "pass": true,
+  "detail": "[{'id': 'mwlhuehg7fnpec', 'kind': 'meet1', 'name': 'Meeting place 1', 'lon': -112, 'lat': 33.501217, 'at': 1794968406484, 'updated': 1794968406484}]"
+ },
+ {
+  "name": "\u2026and it's on the map",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "Saving Meeting place 1 again moves it: one record, so the family's phones agree after a Memory Card",
+  "pass": true,
+  "detail": "[{'id': 'mwlhuehg7fnpec', 'kind': 'meet1', 'name': 'Meeting place 1', 'lon': -112.02, 'lat': 33.52, 'at': 1794968408595, 'updated': 1794968408595}]"
+ },
+ {
+  "name": "After a restart the maps are still here, nothing downloaded again",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "Readiness: the maps quest is complete",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "Emergency list: Nearest ER, one tap to the map",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "\u2026opens the map on the nearest ER",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "Remove needs a second tap, then frees the space",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "The map carries on with what's left",
+  "pass": true,
+  "detail": ""
+ },
+ {
+  "name": "No errors on the page",
+  "pass": true,
+  "detail": "[]"
+ },
+ {
+  "name": "The map runs inside HAVYN's content security policy (no violations, no outside requests)",
+  "pass": true,
+  "detail": "([], [])"
+ },
+ {
+  "name": "Nothing the map asked for was missing",
+  "pass": true,
+  "detail": "['http://127.0.0.1:8783/shelf/archives.json', 'http://127.0.0.1:8783/shelf/index.json', 'http://127.0.0.1:8783/shelf/index.json']"
+ }
+]

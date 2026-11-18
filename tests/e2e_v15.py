@@ -217,7 +217,7 @@ with sync_playwright() as p:
     # ---------------- v1.6 the command deck ----------------
     SIT = json.loads(__import__("subprocess").run(["node", "-e", "const C=require(process.argv[1]); process.stdout.write(JSON.stringify(C.situations))", str(ROOT / "src" / "content.js")], check=True, capture_output=True, text=True).stdout)
     page.goto(BASE + "#/status"); page.wait_for_selector("#ready")
-    ok("deck: Home leads with the level, the red tile, What's happening and know-how", page.locator("#ready .ring .lv b").count() == 1 and page.locator(".sostile").count() == 1 and page.locator(".nowgrid .gt").count() == len(SIT) and page.locator(".menugrid .mt").count() == 4,
+    ok("deck: Home leads with the level, the red tile, What's happening and know-how", page.locator("#ready .ring .lv b").count() == 1 and page.locator(".sostile").count() == 1 and page.locator(".nowgrid .gt").count() == len(SIT) and page.locator(".menugrid .mt").count() == 5,  # v1.9: Map joined the know-how tiles
        [page.locator(x).count() for x in ("#ready .ring", ".sostile", ".nowgrid .gt", ".menugrid .mt")])
     ok("deck: the rank is one of the levels", page.inner_text("#ready .rank").strip() in ("Recruit", "Scout", "Ranger", "Guardian", "Sentinel", "Fortress"), page.inner_text("#ready .rank"))
     bad = []

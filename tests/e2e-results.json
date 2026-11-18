@@ -2,7 +2,7 @@
  {
   "check": "first screen under 1 s (6x CPU throttle)",
   "pass": true,
-  "detail": "107 ms normal, 609 ms throttled"
+  "detail": "141 ms normal, 884 ms throttled"
  },
  {
   "check": "service worker controls the page",
@@ -402,12 +402,12 @@
  {
   "check": "binder PDF made on the phone",
   "pass": true,
-  "detail": "43442 bytes"
+  "detail": "43448 bytes"
  },
  {
   "check": "binder copy saved to the library",
   "pass": true,
-  "detail": "[['mwjlxurjgcnnw7', 27]]"
+  "detail": "[['mwlhv5kxq5qyec', 27]]"
  },
  {
   "check": "binder PDF is searchable in the reader",

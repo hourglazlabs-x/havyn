@@ -43,8 +43,11 @@ def archives(dest):
             print("archive %s: %s (the app will look it up itself)" % (a["id"], e))
     (dest / "archives.json").write_text(json.dumps({"built": datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds"), "items": out}, separators=(",", ":")), encoding="utf-8")
 
-LIMIT = 800_000_000   # GitHub Pages sites must stay under 1 GB
 dest = Path(sys.argv[1]); dest.mkdir(parents=True, exist_ok=True)
+# GitHub Pages sites must stay under 1 GB: the shelf gets what the app, its recordings and the map packs leave (to 800 MB).
+used = sum(f.stat().st_size for f in dest.parent.rglob("*") if f.is_file())
+LIMIT = max(0, min(800_000_000, 990_000_000 - used))
+print("site so far %.1f MB; room for the shelf %.1f MB" % (used / 1e6, LIMIT / 1e6))
 archives(dest)
 if subprocess.run(["gh", "release", "download", "shelf", "-p", "shelf-index.json", "-D", str(dest), "--clobber"]).returncode:
     print("No shelf release yet: the app will offer publisher links instead."); sys.exit(0)

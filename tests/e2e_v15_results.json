@@ -7,27 +7,27 @@
  {
   "name": "Status shows how ready this phone is",
   "pass": true,
-  "detail": "LV\n1\nTHIS PHONE \u00b7 RANK\nRecruit\n10\n% READY\n10 XP TO SCOUT\nDownload everything \u00b7 21 MB\n11 items \u00b7 on Wi-Fi, keep HAVYN open; it picks up where it stopped.\nNEXT QUESTS\n1 OF 9 COMPLETE \u203a\nOn the Home Scree"
+  "detail": "LV\n1\nTHIS PHONE \u00b7 RANK\nRecruit\n10\n% READY\n10 XP TO SCOUT\nDownload everything \u00b7 21 MB\n11 items \u00b7 on Wi-Fi, keep HAVYN open; it picks up where it stopped.\nNEXT QUESTS\n1 OF 10 COMPLETE \u203a\nOn the Home Scre"
  },
  {
   "name": "one button offers to download everything",
   "pass": true,
-  "detail": "LV\n1\nTHIS PHONE \u00b7 RANK\nRecruit\n10\n% READY\n10 XP TO SCOUT\nDownload everything \u00b7 21 MB\n11 items \u00b7 on Wi-Fi, keep HAVYN open; it picks up where it stopped.\nNEXT QUESTS\n1 OF 9 COMPLETE \u203a\nOn the Home Screen\n+10 XP\nManuals and guides: 0 of 4\n+15 XP\nEncyclopedias: 0 of 7\n+15 XP"
+  "detail": "LV\n1\nTHIS PHONE \u00b7 RANK\nRecruit\n10\n% READY\n10 XP TO SCOUT\nDownload everything \u00b7 21 MB\n11 items \u00b7 on Wi-Fi, keep HAVYN open; it picks up where it stopped.\nNEXT QUESTS\n1 OF 10 COMPLETE \u203a\nOn the Home Screen\n+10 XP\nManuals and guides: 0 of 4\n+10 XP\nEncyclopedias: 0 of 7\n+10 XP"
  },
  {
   "name": "Home shows the next quests with their XP",
   "pass": true,
-  "detail": "LV\n1\nTHIS PHONE \u00b7 RANK\nRecruit\n10\n% READY\n10 XP TO SCOUT\nDownload everything \u00b7 21 MB\n11 items \u00b7 on Wi-Fi, keep HAVYN open; it picks up where it stopped.\nNEXT QUESTS\n1 OF 9 COMPLETE \u203a\nOn the Home Screen\n+10 XP\nManuals and guides: 0 of 4\n+15 XP\nEncyclopedias: 0 of 7\n+15 XP"
+  "detail": "LV\n1\nTHIS PHONE \u00b7 RANK\nRecruit\n10\n% READY\n10 XP TO SCOUT\nDownload everything \u00b7 21 MB\n11 items \u00b7 on Wi-Fi, keep HAVYN open; it picks up where it stopped.\nNEXT QUESTS\n1 OF 10 COMPLETE \u203a\nOn the Home Screen\n+10 XP\nManuals and guides: 0 of 4\n+10 XP\nEncyclopedias: 0 of 7\n+10 XP"
  },
  {
   "name": "the Quests screen covers manuals, encyclopedias, plan, supplies and backup",
   "pass": true,
-  "detail": "LV\n1\nTHIS PHONE \u00b7 RANK\nRecruit\n10\n% READY\n10 XP TO SCOUT\nDownload everything \u00b7 21 MB\n11 items \u00b7 on Wi-Fi, keep HAVYN open; it picks up where it stopped.\nQUESTS\n1 OF 9 COMPLETE\nOn the Home Screen\nIn Safari: Share \u203a Add to Home Screen, then open HAVYN from its icon. Downloads made in a Safari tab stay in that tab.\n+10 XP\nManuals and guides: 0 of 4\nFirst aid, water, food, power, radio, repair and sur"
+  "detail": "LV\n1\nTHIS PHONE \u00b7 RANK\nRecruit\n10\n% READY\n10 XP TO SCOUT\nDownload everything \u00b7 21 MB\n11 items \u00b7 on Wi-Fi, keep HAVYN open; it picks up where it stopped.\nQUESTS\n1 OF 10 COMPLETE\nOn the Home Screen\nIn Safari: Share \u203a Add to Home Screen, then open HAVYN from its icon. Downloads made in a Safari tab stay in that tab.\n+10 XP\nManuals and guides: 0 of 4\nFirst aid, water, food, power, radio, repair and su"
  },
  {
   "name": "progress shows while downloading",
   "pass": true,
-  "detail": "LV\n1\nTHIS PHONE \u00b7 RANK\nRecruit\n10\n% READY\n10 XP TO SCOUT\nDownload everything \u00b7 21 MB\nStop\n11 items \u00b7 on Wi-Fi, keep HAVYN open; it picks up where it stopped.\nDownloading 1 of 4: Emergency Disinfection of Drinking Water \u00b7 1%. Keep HAVYN open; the screen stays on.\nNEXT QUESTS\n1 OF 9 COMPLETE \u203a\nOn the "
+  "detail": "LV\n1\nTHIS PHONE \u00b7 RANK\nRecruit\n10\n% READY\n10 XP TO SCOUT\nDownload everything \u00b7 21 MB\nStop\n11 items \u00b7 on Wi-Fi, keep HAVYN open; it picks up where it stopped.\nDownloading 1 of 4: Emergency Disinfection of Drinking Water \u00b7 0%. Keep HAVYN open; the screen stays on.\nNEXT QUESTS\n1 OF 10 COMPLETE \u203a\nOn the"
  },
  {
   "name": "the shelf documents arrive first",
@@ -57,7 +57,7 @@
  {
   "name": "every downloaded archive was checked",
   "pass": true,
-  "detail": "[{'id': 'mwjlvfsi39bz6n', 'type': 'zim', 'name': 'Test WikiMed: medical encyclopedia', 'shelf': '', 'catalog': 'p-wikimed', 'verified': True, 'check': 'sha256', 'size': 44276, 'file': 'wikipedia_en_medicine_maxi_2026-10.zim'}, {'id': 'mwjlvieyouhda0', 'type': 'zim', 'name': 'Test Water treatment', 'shelf': '', 'catalog': 'p-water', 'verified': True, 'check': 'md5', 'size': 44248, 'file': 'zimgit-water_en_2026-10.zim'}, {'id': 'mwjlvimpjt4k4l', 'type': 'zim', 'name': 'Test Food for preppers', 'shelf': '', 'catalog': 'p-food', 'verified': True, 'check': 'sha256', 'size': 44261, 'file': 'zimgit-food-preparation_en_2026-10.zim'}, {'id': 'mwjlvitzrra49w', 'type': 'zim', 'name': 'Test Medical library', 'shelf': '', 'catalog': 'p-medlib', 'verified': True, 'check': 'sha256', 'size': 44251, 'file': 'zimgit-medicine_en_2026-10.zim'}, {'id': 'mwjlvj14ztao3q', 'type': 'zim', 'name': 'Test A library of knots', 'shelf': '', 'catalog': 'p-knots', 'verified': True, 'check': 'sha256', 'size': 44251, 'file': 'zimgit-knots_en_2026-10.zim'}, {'id': 'mwjlvj8u87euw5', 'type': 'zim', 'name': 'Test Vikidia: encyclopedia for kids', 'shelf': '', 'catalog': 'p-vikidia', 'verified': True, 'check': 'sha256', 'size': 44270, 'file': 'vikidia_en_all_maxi_2026-10.zim'}]"
+  "detail": "[{'id': 'mwlhow0e4umnp2', 'type': 'zim', 'name': 'Test WikiMed: medical encyclopedia', 'shelf': '', 'catalog': 'p-wikimed', 'verified': True, 'check': 'sha256', 'size': 44276, 'file': 'wikipedia_en_medicine_maxi_2026-10.zim'}, {'id': 'mwlhoymtlzgy5r', 'type': 'zim', 'name': 'Test Water treatment', 'shelf': '', 'catalog': 'p-water', 'verified': True, 'check': 'md5', 'size': 44248, 'file': 'zimgit-water_en_2026-10.zim'}, {'id': 'mwlhoytskbqp3i', 'type': 'zim', 'name': 'Test Food for preppers', 'shelf': '', 'catalog': 'p-food', 'verified': True, 'check': 'sha256', 'size': 44261, 'file': 'zimgit-food-preparation_en_2026-10.zim'}, {'id': 'mwlhoz1joe8ht9', 'type': 'zim', 'name': 'Test Medical library', 'shelf': '', 'catalog': 'p-medlib', 'verified': True, 'check': 'sha256', 'size': 44251, 'file': 'zimgit-medicine_en_2026-10.zim'}, {'id': 'mwlhoz8nitpwp6', 'type': 'zim', 'name': 'Test A library of knots', 'shelf': '', 'catalog': 'p-knots', 'verified': True, 'check': 'sha256', 'size': 44251, 'file': 'zimgit-knots_en_2026-10.zim'}, {'id': 'mwlhozghh7rv99', 'type': 'zim', 'name': 'Test Vikidia: encyclopedia for kids', 'shelf': '', 'catalog': 'p-vikidia', 'verified': True, 'check': 'sha256', 'size': 44270, 'file': 'vikidia_en_all_maxi_2026-10.zim'}]"
  },
  {
   "name": "against Kiwix's SHA-256, or the ZIM's own MD5 when Kiwix has none",
@@ -117,12 +117,12 @@
  {
   "name": "Quests say the downloads are done",
   "pass": true,
-  "detail": "QUESTS\nLV\n3\nTHIS PHONE \u00b7 RANK\nRanger\n40\n% READY\n20 XP TO GUARDIAN\nQUESTS\n3 OF 9 COMPLETE\nOn the Home Screen\nIn Safari: Share \u203a Add to Home Screen, then open HAVYN from its icon. Downloads made in a Safari tab stay in that tab.\n+10 XP\nHealth books from their publishers: 0 of 7\nWhere There Is No Doctor and the others aren't re-hosted; get them from Get more \u203a Shelf (Hesperian chapters are joined int"
+  "detail": "QUESTS\nLV\n2\nTHIS PHONE \u00b7 RANK\nScout\n30\n% READY\n10 XP TO RANGER\nQUESTS\n3 OF 10 COMPLETE\nOn the Home Screen\nIn Safari: Share \u203a Add to Home Screen, then open HAVYN from its icon. Downloads made in a Safari tab stay in that tab.\n+10 XP\nHealth books from their publishers: 0 of 7\nWhere There Is No Doctor and the others aren't re-hosted; get them from Get more \u203a Shelf (Hesperian chapters are joined into "
  },
  {
   "name": "readiness counts only manuals HAVYN's shelf holds, and says what's missing",
   "pass": true,
-  "detail": "LV\n3\nTHIS PHONE \u00b7 RANK\nRanger\n40\n% READY\n20 XP TO GUARDIAN\nQUESTS\n3 OF 9 COMPLETE\nOn the Home Screen\nIn Safari: Share \u203a Add to Home Screen, then open HAVYN from its icon. Downloads made in a Safari tab stay in that tab.\n+10 XP\nHealth books from their publishers: 0 of 7\nWhere There Is No Doctor and the others aren't re-hosted; get them from Get more \u203a Shelf (Hesperian chapters are joined into one book).\n+5 XP\nFamily plan: 0 of 4\nStart with who lives with you: a few taps.\n+15 XP\nCount your supplies\nA few taps for water, food, power and gear; Home turns them into days you can last.\n+10 XP\nSim Lab"
+  "detail": "LV\n2\nTHIS PHONE \u00b7 RANK\nScout\n30\n% READY\n10 XP TO RANGER\nQUESTS\n3 OF 10 COMPLETE\nOn the Home Screen\nIn Safari: Share \u203a Add to Home Screen, then open HAVYN from its icon. Downloads made in a Safari tab stay in that tab.\n+10 XP\nHealth books from their publishers: 0 of 7\nWhere There Is No Doctor and the others aren't re-hosted; get them from Get more \u203a Shelf (Hesperian chapters are joined into one book).\n+5 XP\nFamily plan: 0 of 4\nStart with who lives with you: a few taps.\n+15 XP\nCount your supplies\nA few taps for water, food, power and gear; Home turns them into days you can last.\n+10 XP\nOffline m"
  },
  {
   "name": "the field index lists answers and how many manuals are here",
@@ -137,7 +137,7 @@
  {
   "name": "a page link opens the manual at that page",
   "pass": true,
-  "detail": "#/library/mwjlvfrhvw2280?page=102&from=%23%2Ffield 102 / 268"
+  "detail": "#/library/mwlhovztz5nvj9?page=102&from=%23%2Ffield 102 / 268"
  },
  {
   "name": "Back returns to the field index",
@@ -172,7 +172,7 @@
  {
   "name": "a playbook lists the pages that go with it",
   "pass": true,
-  "detail": "Run a generator safely\nCARD\nCPSC generator alert \u00b7 p. 1\nCarbon monoxide and backfeeding\nOSHA generator sheet \u00b7 p. 1\nGenerator safety fact sheet \u00b7 not on this phone yet | [{\"id\": \"mwjlvfq0orscin\", \"type\": \"pdf\", \"name\": \"Emergency Disinfection of Drinking Water\", \"shelf\": \"sh-epawater\", \"catalog\": \"\", \"verified\": false, \"check\": \"\", \"size\": 976, \"file\": \"EPA-Emergency-Disinfection-of-Drinking-Water.pdf\"}, {\"id\": \"mwjlvfqdq9mq25\", \"type\": \"pdf\", \"name\": \"Portable Generator Hazards\", \"shelf\": \"sh-cpscgen\", \"catalog\": \"\", \"verified\": false, \"check\": \"\", \"size\": 637, \"file\": \"CPSC-Portable-Generator-Hazards.pdf\"}, {\"id\": \"mwjlvfqqmlqjn3\", \"type\": \"pdf\", \"name\": \"National Interoperability Field Operations Guide (NIFOG 2.02)\", \"shelf\": \"sh-nifog\", \"catalog\": \"\", \"verified\": false, \"check\": \"\", \"size\": 67800, \"file\": \"CISA-NIFOG-2.02.pdf\"}, {\"id\": \"mwjlvfrhvw2280\", \"type\": \"pdf\", \"name\": \"CERT Basic Training manual\", \"shelf\": \"sh-cert\", \"catalog\": \"\", \"verified\": false, \"check\": \"\", \"size\": 85516, \"file\": \"FEMA-CERT-Basic-Training-Participant-Manual-2019.pdf\"}]"
+  "detail": "Run a generator safely\nCARD\nCPSC generator alert \u00b7 p. 1\nCarbon monoxide and backfeeding\nOSHA generator sheet \u00b7 p. 1\nGenerator safety fact sheet \u00b7 not on this phone yet | [{\"id\": \"mwlhovxt5npm8x\", \"type\": \"pdf\", \"name\": \"Emergency Disinfection of Drinking Water\", \"shelf\": \"sh-epawater\", \"catalog\": \"\", \"verified\": false, \"check\": \"\", \"size\": 976, \"file\": \"EPA-Emergency-Disinfection-of-Drinking-Water.pdf\"}, {\"id\": \"mwlhovybhqfr2m\", \"type\": \"pdf\", \"name\": \"Portable Generator Hazards\", \"shelf\": \"sh-cpscgen\", \"catalog\": \"\", \"verified\": false, \"check\": \"\", \"size\": 637, \"file\": \"CPSC-Portable-Generator-Hazards.pdf\"}, {\"id\": \"mwlhovz2prqgpz\", \"type\": \"pdf\", \"name\": \"National Interoperability Field Operations Guide (NIFOG 2.02)\", \"shelf\": \"sh-nifog\", \"catalog\": \"\", \"verified\": false, \"check\": \"\", \"size\": 67800, \"file\": \"CISA-NIFOG-2.02.pdf\"}, {\"id\": \"mwlhovztz5nvj9\", \"type\": \"pdf\", \"name\": \"CERT Basic Training manual\", \"shelf\": \"sh-cert\", \"catalog\": \"\", \"verified\": false, \"check\": \"\", \"size\": 85516, \"file\": \"FEMA-CERT-Basic-Training-Participant-Manual-2019.pdf\"}]"
  },
  {
   "name": "Search everything finds field answers",
@@ -192,17 +192,17 @@
  {
   "name": "parts are separate storage entries that delete cleanly",
   "pass": true,
-  "detail": "(54, 48)"
+  "detail": "(47, 41)"
  },
  {
   "name": "deck: Home leads with the level, the red tile, What's happening and know-how",
   "pass": true,
-  "detail": "[1, 1, 8, 4]"
+  "detail": "[1, 1, 8, 5]"
  },
  {
   "name": "deck: the rank is one of the levels",
   "pass": true,
-  "detail": "Ranger"
+  "detail": "Scout"
  },
  {
   "name": "deck: each situation brings its plan, cards, manual pages and numbers together",
@@ -247,7 +247,7 @@
  {
   "name": "quick: the household and supplies quests move",
   "pass": true,
-  "detail": "LV\n3\nTHIS PHONE \u00b7 RANK\nRanger\n49\n% READY\n11 XP TO GUARDIAN\nQUESTS\n3 OF 9 COMPLETE\nOn the Home Screen\nIn Safari: Share \u203a Add to Home Screen, then open HAVYN from its icon. Downloads made in a Safari tab stay in that tab.\n+10 XP\nHealth books from their publishers: 0 of 7\nWhere There Is No Doctor and the others aren't re-hosted; get them from Get more \u203a Shelf (Hesperian chapters are joined into one book).\n+5 XP\nFamily plan: 1 of 4\nAn out-of-area contact, meeting places and where to go if you must l"
+  "detail": "LV\n2\nTHIS PHONE \u00b7 RANK\nScout\n39\n% READY\n1 XP TO RANGER\nQUESTS\n3 OF 10 COMPLETE\nOn the Home Screen\nIn Safari: Share \u203a Add to Home Screen, then open HAVYN from its icon. Downloads made in a Safari tab stay in that tab.\n+10 XP\nHealth books from their publishers: 0 of 7\nWhere There Is No Doctor and the others aren't re-hosted; get them from Get more \u203a Shelf (Hesperian chapters are joined into one book).\n+5 XP\nFamily plan: 1 of 4\nAn out-of-area contact, meeting places and where to go if you must leav"
  },
  {
   "name": "voice: an elegant British woman first (Serena, Enhanced), then the nearest woman's voice, never a man's while a woman's is there",
@@ -257,7 +257,7 @@
  {
   "name": "voice: System says which voice speaks (HAVYN's own British voice when it ships), with Hear it",
   "pass": true,
-  "detail": "ACE SOUNDS\nOn\nOff\nSave settings\nTHIS PHONE\nInstalled to Home Screen\nNo\nOffline copy\nSaved for offline\nStorage\nOn this phone\nLibrary\n7 archives \u00b7 4 PDFs \u00b7 465 KB\nNetwork use\nDownloads you start, from HAVYN and Kiwix only\nVersion\n1.8.0+28ea8ba44a\nUpdates\nCheck now\n\nDeleting the app icon deletes its data. Keep Memory Cards on another phone and the vault drive.\n\nReplay the welcome tour\nVOICE\nIn use\nHAVYN's own British voice (built in, works offline)\nHear it\nDANGER ZONE\nErase everything on this phone"
+  "detail": "ACE SOUNDS\nOn\nOff\nSave settings\nTHIS PHONE\nInstalled to Home Screen\nNo\nOffline copy\nSaved for offline\nStorage\nOn this phone\nLibrary\n7 archives \u00b7 4 PDFs \u00b7 465 KB\nNetwork use\nDownloads you start, from HAVYN and Kiwix only\nVersion\n1.9.0+054307f821\nUpdates\nCheck now\n\nDeleting the app icon deletes its data. Keep Memory Cards on another phone and the vault drive.\n\nReplay the welcome tour\nVOICE\nIn use\nHAVYN's own British voice (built in, works offline)\nHear it\nDANGER ZONE\nErase everything on this phone"
  },
  {
   "name": "no page errors",

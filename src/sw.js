@@ -12,13 +12,16 @@ const ASSETS = ["./", "./index.html", "./manifest.webmanifest", "./apple-touch-i
 // file that fails on a weak connection never stops the app itself from installing; a missing one is saved the first
 // time it plays with a connection.
 const VOICE = [/*VOICE*/];
+// The offline map kit: MapLibre and pmtiles, the HAVYN Night style, fonts, symbols and the emergency places. Same
+// one-by-one caching; the map packs (maps/packs/) are stored by the app itself, never here.
+const MAPKIT = [/*MAPKIT*/];
 
 // Archive pages never run scripts and never reach the network.
 const ZCSP = "default-src 'self' data: blob:; script-src 'none'; object-src 'none'; frame-src 'none'; worker-src 'none'; connect-src 'none'; " +
   "form-action 'none'; base-uri 'self'; style-src 'self' 'unsafe-inline' data:; img-src 'self' data: blob:; media-src 'self' data: blob:; font-src 'self' data:";
 
 self.addEventListener("install", (event) => {
-  event.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS).then(() => Promise.allSettled(VOICE.map((u) => c.add(u))))).then(() => self.skipWaiting()));
+  event.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS).then(() => Promise.allSettled(VOICE.concat(MAPKIT).map((u) => c.add(u))))).then(() => self.skipWaiting()));
 });
 
 self.addEventListener("activate", (event) => {
@@ -128,7 +131,8 @@ self.addEventListener("fetch", (event) => {
   const rel = url.pathname.startsWith(scopePath) ? url.pathname.slice(scopePath.length) : "";
   if (rel.startsWith("z/")) { event.respondWith(zimResponse(rel.slice(2), req, base)); return; }
   if (rel.startsWith("shelf/")) return; // shelf downloads go straight to HAVYN's address; the app stores them itself, never twice
-  if (rel.startsWith("voice/")) {
+  if (rel.startsWith("maps/packs/")) return; // map packs go straight to the network; the app keeps them in its own storage
+  if (rel.startsWith("voice/") || rel.startsWith("vendor/") || rel.startsWith("maps/")) {
     event.respondWith(caches.match(req, { ignoreSearch: true }).then((r) => r || fetch(req).then((res) => {
       if (res.ok && res.status === 200) { const copy = res.clone(); caches.open(CACHE).then((c) => c.put(url.origin + url.pathname, copy)).catch(() => {}); }
       return res;
